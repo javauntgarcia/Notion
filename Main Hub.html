@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Javaun — Main Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Calming palette drawn from the photo's serene tones */
+    --denim:       #4A6A8A;
+    --denim-light: #7DA0BC;
+    --slate:       #6B7F8E;
+    --slate-light: #9BB0BE;
+    --sage:        #6B8C6E;
+    --sage-light:  #9AB89C;
+    --ivory:       #F0EBE1;
+    --ivory-dark:  #DDD5C8;
+    --mist:        #C8D8E2;
+    --fog:         #2A3A45;
+    --fog-mid:     #3A4F5C;
+    --ink:         #1A2530;
+    --glass:       rgba(200,216,226,0.13);
+    --glass-border: rgba(200,216,226,0.22);
+    /* semantic aliases */
+    --rust:        #4A6A8A;
+    --rust-light:  #7DA0BC;
+    --navy:        #2A3A45;
+    --navy-mid:    #3A4F5C;
+    --gold:        #6B7F8E;
+    --gold-light:  #C8D8E2;
+    --green:       #6B8C6E;
+    --green-light: #9AB89C;
+    --cream:       #F0EBE1;
+    --cream-dark:  #DDD5C8;
+    --chestnut:    #6B7F8E;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: 'DM Mono', monospace;
+    color: var(--ivory);
+    background: var(--fog);
+    overflow-x: hidden;
+  }
+
+  /* ── HERO / BG ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Main%20Hub.jpg');
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: transparent;
+    z-index: 1;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: 2.5rem 3rem 3rem;
+  }
+
+  /* ── HEADER ── */
+  .top-bar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .wordmark {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #fff;
+    opacity: 0.95;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.7);
+  }
+  .date-stamp {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: #fff;
+    opacity: 0.9;
+    text-align: right;
+    line-height: 1.7;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.7);
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 8vw, 6.5rem);
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4);
+  }
+  .hero-title em {
+    font-style: italic;
+    color: #C4622D;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* ── GLASS CARD ── */
+  .glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+  }
+
+  /* ── GRID LAYOUT ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 1rem;
+  }
+
+  /* ── QUOTE / WORD ── */
+  .quote-card {
+    grid-column: 1 / 3;
+    padding: 1.6rem 2rem;
+  }
+  .section-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+    margin-bottom: 0.7rem;
+    opacity: 1;
+  }
+  .quote-text {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.15rem;
+    font-style: italic;
+    line-height: 1.55;
+    color: #1A2530;
+    margin-bottom: 0.5rem;
+  }
+  .quote-attr {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+    opacity: 0.85;
+  }
+  .word-pill {
+    display: inline-block;
+    margin-top: 1rem;
+    background: rgba(74,106,138,0.12);
+    border: 1px solid rgba(74,106,138,0.3);
+    border-radius: 100px;
+    padding: 0.3rem 1rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+  }
+  .word-of-week {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1A2530;
+    margin-top: 0.25rem;
+    letter-spacing: 0.05em;
+  }
+  .word-def {
+    font-size: 0.65rem;
+    color: #3A4F5C;
+    opacity: 0.8;
+    margin-top: 0.2rem;
+    line-height: 1.5;
+    max-width: 320px;
+  }
+
+  /* ── INVISALIGN TIMER ── */
+  .timer-card {
+    grid-column: 3 / 4;
+    padding: 1.4rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .timer-ring-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.6rem 0;
+  }
+  .timer-svg { position: relative; }
+  .timer-track { fill: none; stroke: rgba(245,239,228,0.12); stroke-width: 6; }
+  .timer-fill {
+    fill: none;
+    stroke: #7DA0BC;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 55;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 1s ease;
+  }
+  .timer-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .timer-hh {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1A2530;
+    line-height: 1;
+  }
+  .timer-label { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: #4A6A8A; opacity: 0.8; }
+  .timer-btns { display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap; }
+  .timer-btn {
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    border: 1px solid rgba(74,106,138,0.3);
+    background: rgba(74,106,138,0.08);
+    color: #1A2530;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .timer-btn:hover { background: rgba(74,106,138,0.2); border-color: #4A6A8A; }
+  .timer-btn.active { background: #4A6A8A; border-color: #4A6A8A; color: #fff; }
+  .timer-liner {
+    font-size: 0.6rem;
+    color: #4A6A8A;
+    text-align: center;
+    margin-top: 0.3rem;
+    opacity: 0.9;
+  }
+
+  /* ── TO-DO ── */
+  .todo-card {
+    grid-column: 1 / 2;
+    padding: 1.4rem 1.6rem;
+  }
+  .todo-input-wrap {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+  .todo-input {
+    flex: 1;
+    background: rgba(74,106,138,0.07);
+    border: 1px solid rgba(74,106,138,0.2);
+    border-radius: 6px;
+    padding: 0.4rem 0.7rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: #1A2530;
+    outline: none;
+    letter-spacing: 0.05em;
+  }
+  .todo-input::placeholder { color: rgba(26,37,48,0.35); }
+  .todo-input:focus { border-color: #4A6A8A; }
+  .add-btn {
+    background: #4A6A8A;
+    border: none;
+    border-radius: 6px;
+    color: var(--ivory);
+    font-size: 1rem;
+    width: 28px; height: 28px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .add-btn:hover { background: #7DA0BC; }
+  .todo-list { list-style: none; max-height: 180px; overflow-y: auto; }
+  .todo-list::-webkit-scrollbar { width: 3px; }
+  .todo-list::-webkit-scrollbar-thumb { background: rgba(196,98,45,0.4); border-radius: 2px; }
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid rgba(74,106,138,0.12);
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    color: #1A2530;
+    opacity: 0.9;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 0.9; transform: none; } }
+  .todo-item.done span { text-decoration: line-through; opacity: 0.35; }
+  .todo-check {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid #4A6A8A;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .todo-check.checked { background: #4A6A8A; border-color: #4A6A8A; }
+  .todo-check.checked::after { content: '✓'; font-size: 8px; color: white; }
+  .todo-del { margin-left: auto; color: rgba(74,106,138,0.3); cursor: pointer; font-size: 0.7rem; transition: color 0.2s; }
+  .todo-del:hover { color: #4A6A8A; }
+
+  /* ── GOAL TRACKER ── */
+  .goals-card {
+    grid-column: 2 / 4;
+    padding: 1.4rem 1.8rem;
+  }
+  .goals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+    margin-top: 0.6rem;
+  }
+  .goal-item {}
+  .goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.35rem;
+  }
+  .goal-name {
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #1A2530;
+    opacity: 0.75;
+  }
+  .goal-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #4A6A8A;
+  }
+  .goal-bar-track {
+    height: 5px;
+    background: rgba(74,106,138,0.12);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .goal-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .bar-rust  { background: linear-gradient(90deg, #4A6A8A, #7DA0BC); }
+  .bar-navy  { background: linear-gradient(90deg, #3A4F5C, #6B7F8E); }
+  .bar-gold  { background: linear-gradient(90deg, #5A7A8A, #9BB0BE); }
+  .bar-green { background: linear-gradient(90deg, #6B8C6E, #9AB89C); }
+  .bar-cream { background: linear-gradient(90deg, #8A9EA8, #C8D8E2); }
+  .goal-milestone {
+    font-size: 0.52rem;
+    color: #3A4F5C;
+    opacity: 0.55;
+    margin-top: 0.2rem;
+    letter-spacing: 0.05em;
+  }
+  .goal-pct-edit {
+    width: 36px;
+    background: transparent;
+    border: none;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #4A6A8A;
+    cursor: pointer;
+    text-align: right;
+    outline: none;
+  }
+
+  /* ── NAV TILES ── */
+  .nav-strip {
+    grid-column: 1 / 4;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+  }
+  .nav-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 1.1rem 0.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: transform 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+  .nav-tile:hover { transform: translateY(-3px); }
+  .nav-tile .nav-icon { font-size: 1.4rem; }
+  .nav-tile .nav-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .nt-wellness  { background: rgba(107,140,110,0.28); border: 1px solid rgba(154,184,156,0.38); }
+  .nt-wellness:hover  { background: rgba(107,140,110,0.48); }
+  .nt-growth    { background: rgba(125,160,188,0.22); border: 1px solid rgba(155,176,190,0.38); }
+  .nt-growth:hover    { background: rgba(125,160,188,0.42); }
+  .nt-finances  { background: rgba(74,106,138,0.28); border: 1px solid rgba(107,127,142,0.4); }
+  .nt-finances:hover  { background: rgba(74,106,138,0.48); }
+  .nt-productivity { background: rgba(58,79,92,0.42); border: 1px solid rgba(107,127,142,0.38); }
+  .nt-productivity:hover { background: rgba(58,79,92,0.65); }
+  .nt-planning  { background: rgba(26,37,48,0.38); border: 1px solid rgba(200,216,226,0.2); }
+  .nt-planning:hover  { background: rgba(26,37,48,0.62); }
+
+  /* ── CALENDAR EMBED ── */
+  .calendar-card {
+    grid-column: 1 / 4;
+    padding: 0;
+    overflow: hidden;
+  }
+  .cal-header {
+    padding: 1rem 1.6rem 0.6rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+    opacity: 0.9;
+  }
+  .cal-embed-wrap {
+    width: 100%;
+    height: 420px;
+    background: rgba(74,106,138,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1rem;
+  }
+  .cal-embed-wrap iframe {
+    width: 100%; height: 100%;
+    border: none; border-radius: 8px;
+    display: none;
+  }
+  .cal-placeholder {
+    text-align: center;
+  }
+  .cal-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .cal-msg {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: #1A2530;
+    opacity: 0.45;
+    line-height: 1.7;
+  }
+  .cal-input-row {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 480px;
+  }
+  .cal-url-input {
+    flex: 1;
+    background: rgba(74,106,138,0.07);
+    border: 1px solid rgba(74,106,138,0.2);
+    border-radius: 6px;
+    padding: 0.45rem 0.8rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    color: #1A2530;
+    outline: none;
+    letter-spacing: 0.04em;
+  }
+  .cal-url-input::placeholder { color: rgba(26,37,48,0.35); }
+  .cal-url-input:focus { border-color: #4A6A8A; }
+  .cal-set-btn {
+    background: #4A6A8A;
+    border: 1px solid #4A6A8A;
+    border-radius: 6px;
+    padding: 0.45rem 1rem;
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .cal-set-btn:hover { background: #3A5878; }
+
+  /* ── FOOTER ── */
+  .footer-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 3rem;
+    background: rgba(26,37,48,0.75);
+    backdrop-filter: blur(10px);
+    position: relative; z-index: 2;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ivory);
+    opacity: 0.45;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .hero-content { padding: 1.5rem 1.2rem 2rem; }
+    .main-grid { grid-template-columns: 1fr; }
+    .quote-card, .timer-card, .todo-card, .goals-card, .nav-strip, .calendar-card {
+      grid-column: 1 / 2 !important;
+    }
+    .nav-strip { grid-template-columns: repeat(3, 1fr); }
+    .goals-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-content">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="date-stamp" id="dateStamp">Loading...</div>
+    </div>
+
+    <!-- TITLE -->
+    <h1 class="hero-title">Main <em>Hub</em></h1>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+
+      <!-- QUOTE + WORD OF WEEK -->
+      <div class="glass quote-card">
+        <div class="section-label">✦ Quote of the Week</div>
+        <p class="quote-text" id="quoteText" style="opacity:0.3;font-style:italic;">No quote set yet — add one below.</p>
+        <p class="quote-attr" id="quoteAttr"></p>
+
+        <div style="margin-top:1.2rem;">
+          <div class="section-label">✦ Word of the Week</div>
+          <div class="word-pill" id="wotwPill" style="opacity:0.3;">Word · Week —</div>
+          <div class="word-of-week" id="wotw" style="opacity:0.3;">—</div>
+          <div class="word-def" id="wotwDef" style="opacity:0.3;">No word set yet — add one below.</div>
+        </div>
+
+        <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <input id="quoteIn" style="flex:1;min-width:140px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Edit quote…" />
+          <input id="attrIn" style="flex:1;min-width:100px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="— Attribution" />
+          <button onclick="saveQuote()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
+        </div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input id="wotwIn" style="flex:1;min-width:100px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Word of week…" />
+          <input id="wotwDefIn" style="flex:2;min-width:160px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Definition…" />
+          <button onclick="saveWord()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
+        </div>
+      </div>
+
+      <!-- INVISALIGN TIMER -->
+      <div class="glass timer-card">
+        <div class="section-label">✦ Invisalign Liner Timer</div>
+        <div class="timer-ring-wrap" style="position:relative; width:110px; height:110px; margin:0 auto;">
+          <svg class="timer-svg" width="110" height="110">
+            <circle class="timer-track" cx="55" cy="55" r="46"/>
+            <circle class="timer-fill" id="timerRing" cx="55" cy="55" r="35"/>
+          </svg>
+          <div class="timer-center">
+            <div class="timer-hh" id="timerDisplay">22:00</div>
+            <div class="timer-label">hrs today</div>
+          </div>
+        </div>
+        <div class="timer-liner" id="linerInfo">Liner #— · Day — of 10</div>
+        <!-- 10-day pip track -->
+        <div id="dayPips" style="display:flex;gap:4px;justify-content:center;margin:0.5rem 0;"></div>
+        <div class="timer-btns" style="margin-top:0.4rem;">
+          <button class="timer-btn" id="startBtn" onclick="startTimer()">▶ Start</button>
+          <button class="timer-btn" onclick="resetTimer()">↺ Reset Day</button>
+          <button class="timer-btn" onclick="nextLiner()">New Liner →</button>
+        </div>
+        <div style="margin-top:0.8rem; display:flex; gap:0.4rem; align-items:center; justify-content:center; flex-wrap:wrap;">
+          <span style="font-size:0.52rem; opacity:0.5; letter-spacing:0.1em;">LINER #</span>
+          <input id="linerNum" type="number" min="1" value="1" style="width:40px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:4px;padding:0.2rem 0.4rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:#1A2530;outline:none;text-align:center;" onchange="updateLinerLabel()"/>
+        </div>
+      </div>
+
+      <!-- TO-DO LIST -->
+      <div class="glass todo-card">
+        <div class="section-label">✦ Daily To-Do</div>
+        <div class="todo-input-wrap">
+          <input class="todo-input" id="todoInput" placeholder="Add a task…" onkeydown="if(event.key==='Enter')addTodo()" />
+          <button class="add-btn" onclick="addTodo()">+</button>
+        </div>
+        <ul class="todo-list" id="todoList"></ul>
+      </div>
+
+      <!-- GOAL TRACKER -->
+      <div class="glass goals-card">
+        <div class="section-label">✦ Goal Tracker</div>
+        <div class="goals-grid" id="goalsGrid">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- NAV STRIP -->
+      <div class="nav-strip">
+        <a class="nav-tile nt-wellness" href="Wellness.html">
+          <span class="nav-icon">🌿</span>
+          <span class="nav-label">Wellness</span>
+        </a>
+        <a class="nav-tile nt-growth" href="Growth.html">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">Growth</span>
+        </a>
+        <a class="nav-tile nt-finances" href="Finances.html">
+          <span class="nav-icon">💰</span>
+          <span class="nav-label">Finances</span>
+        </a>
+        <a class="nav-tile nt-productivity" href="Productivity.html">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-label">Productivity</span>
+        </a>
+        <a class="nav-tile nt-planning" href="Planning.html">
+          <span class="nav-icon">🗺️</span>
+          <span class="nav-label">Planning</span>
+        </a>
+      </div>
+
+      <!-- CALENDAR EMBED -->
+      <div class="glass calendar-card">
+        <div class="cal-header">✦ Weekly Outlook — Notion Calendar</div>
+        <div class="cal-embed-wrap" id="calWrap">
+          <iframe id="calFrame" src="" title="Notion Calendar"></iframe>
+          <div class="cal-placeholder" id="calPlaceholder">
+            <div class="cal-icon">📅</div>
+            <div class="cal-msg">Paste your Notion calendar embed URL below<br/>to display your weekly outlook here.</div>
+          </div>
+          <div class="cal-input-row">
+            <input class="cal-url-input" id="calUrl" placeholder="https://notion.so/embed/…" />
+            <button class="cal-set-btn" onclick="setCalendar()">Embed →</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-grid -->
+  </div><!-- /hero-content -->
+</div><!-- /hero -->
+
+<div class="footer-bar">
+  <span id="footerDate"></span>
+</div>
+
+<script>
+// ── DATE ──
+function updateDate() {
+  const now = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  const ds = now.toLocaleDateString('en-US', opts);
+  document.getElementById('dateStamp').innerHTML = ds + '<br/>Week ' + getWeekNum(now);
+}
+function getWeekNum(d) {
+  const s = new Date(d.getFullYear(), 0, 1);
+  return Math.ceil(((d - s) / 86400000 + s.getDay() + 1) / 7);
+}
+updateDate(); setInterval(updateDate, 60000);
+
+// ── QUOTE / WORD PERSISTENCE ──
+function loadContent() {
+  const q = localStorage.getItem('hub_quote');
+  const a = localStorage.getItem('hub_attr');
+  const w = localStorage.getItem('hub_wotw');
+  const d = localStorage.getItem('hub_wotwdef');
+  if (q) { const el = document.getElementById('quoteText'); el.textContent = q; el.style.opacity = ''; el.style.fontStyle = ''; }
+  if (a) document.getElementById('quoteAttr').textContent = a;
+  if (w) {
+    const wEl = document.getElementById('wotw'); wEl.textContent = w; wEl.style.opacity = '';
+    const pEl = document.getElementById('wotwPill'); pEl.style.opacity = ''; pEl.textContent = 'Word · Week ' + getWeekNum(new Date());
+  }
+  if (d) { const dEl = document.getElementById('wotwDef'); dEl.textContent = d; dEl.style.opacity = ''; }
+}
+function saveQuote() {
+  const q = document.getElementById('quoteIn').value.trim();
+  const a = document.getElementById('attrIn').value.trim();
+  if (q) {
+    const el = document.getElementById('quoteText');
+    el.textContent = q; el.style.opacity = ''; el.style.fontStyle = '';
+    localStorage.setItem('hub_quote', q);
+  }
+  if (a) { document.getElementById('quoteAttr').textContent = a; localStorage.setItem('hub_attr', a); }
+  document.getElementById('quoteIn').value = '';
+  document.getElementById('attrIn').value = '';
+}
+function saveWord() {
+  const w = document.getElementById('wotwIn').value.trim();
+  const d = document.getElementById('wotwDefIn').value.trim();
+  if (w) {
+    const wEl = document.getElementById('wotw');
+    const pEl = document.getElementById('wotwPill');
+    const dEl = document.getElementById('wotwDef');
+    wEl.textContent = w; wEl.style.opacity = '';
+    pEl.style.opacity = ''; pEl.textContent = 'Word · Week ' + getWeekNum(new Date());
+    localStorage.setItem('hub_wotw', w);
+    if (d) { dEl.textContent = d; dEl.style.opacity = ''; localStorage.setItem('hub_wotwdef', d); }
+  }
+  document.getElementById('wotwIn').value = '';
+  document.getElementById('wotwDefIn').value = '';
+}
+loadContent();
+
+// ── TO-DO ──
+let todos = JSON.parse(localStorage.getItem('hub_todos') || '[]');
+function saveTodos() { localStorage.setItem('hub_todos', JSON.stringify(todos)); }
+function renderTodos() {
+  const ul = document.getElementById('todoList');
+  ul.innerHTML = '';
+  todos.forEach((t, i) => {
+    const li = document.createElement('li');
+    li.className = 'todo-item' + (t.done ? ' done' : '');
+    li.innerHTML = `
+      <div class="todo-check ${t.done?'checked':''}" onclick="toggleTodo(${i})"></div>
+      <span>${t.text}</span>
+      <span class="todo-del" onclick="deleteTodo(${i})">✕</span>
+    `;
+    ul.appendChild(li);
+  });
+}
+function addTodo() {
+  const inp = document.getElementById('todoInput');
+  const v = inp.value.trim();
+  if (!v) return;
+  todos.unshift({ text: v, done: false });
+  saveTodos(); renderTodos();
+  inp.value = '';
+}
+function toggleTodo(i) { todos[i].done = !todos[i].done; saveTodos(); renderTodos(); }
+function deleteTodo(i) { todos.splice(i, 1); saveTodos(); renderTodos(); }
+renderTodos();
+
+// ── GOALS ──
+const goalDefs = [
+  { name: 'Wellness', key: 'g_wellness', color: 'bar-green', milestone: '— set after subpage —', pct: 0 },
+  { name: 'Growth', key: 'g_growth', color: 'bar-gold', milestone: '— set after subpage —', pct: 0 },
+  { name: 'Finances', key: 'g_finances', color: 'bar-rust', milestone: '— set after subpage —', pct: 0 },
+  { name: 'Productivity', key: 'g_productivity', color: 'bar-navy', milestone: '— set after subpage —', pct: 0 },
+  { name: 'Planning', key: 'g_planning', color: 'bar-cream', milestone: '— set after subpage —', pct: 0 },
+];
+function saveGoals() { goalDefs.forEach(g => localStorage.setItem(g.key, g.pct)); }
+function loadGoals() { goalDefs.forEach(g => { const s = localStorage.getItem(g.key); if (s !== null) g.pct = +s; }); }
+function renderGoals() {
+  const grid = document.getElementById('goalsGrid');
+  grid.innerHTML = '';
+  goalDefs.forEach((g, i) => {
+    const div = document.createElement('div');
+    div.className = 'goal-item';
+    div.innerHTML = `
+      <div class="goal-header">
+        <span class="goal-name">${g.name}</span>
+        <input class="goal-pct-edit" type="number" min="0" max="100" value="${g.pct}"
+          onchange="updateGoal(${i}, this.value)" title="Click to edit %"/>
+      </div>
+      <div class="goal-bar-track">
+        <div class="goal-bar-fill ${g.color}" id="bar_${i}" style="width:${g.pct}%"></div>
+      </div>
+      <div class="goal-milestone">${g.milestone}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+function updateGoal(i, val) {
+  goalDefs[i].pct = Math.max(0, Math.min(100, +val));
+  document.getElementById('bar_' + i).style.width = goalDefs[i].pct + '%';
+  saveGoals();
+}
+loadGoals(); renderGoals();
+
+// ── INVISALIGN TIMER ──
+// 10-day liner cycle. Seeded so today = Day 2.
+// Cycle start is stored as a date string; day = floor((today - start) / 1 day) + 1
+const DAILY_GOAL = 22 * 3600; // 22 hours in seconds
+const CYCLE_DAYS = 10;
+
+function getCycleStart() {
+  let s = localStorage.getItem('inv_cycle_start');
+  if (!s) {
+    // Seed: today is Day 2, so cycle started yesterday
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    s = yesterday.toDateString();
+    localStorage.setItem('inv_cycle_start', s);
+  }
+  return new Date(s);
+}
+
+function getCurrentDay() {
+  const start = getCycleStart();
+  const today = new Date();
+  const diff = Math.floor((today - start) / 86400000);
+  return Math.min(diff + 1, CYCLE_DAYS); // 1-indexed, cap at 10
+}
+
+function renderDayPips(currentDay) {
+  const wrap = document.getElementById('dayPips');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= CYCLE_DAYS; i++) {
+    const pip = document.createElement('div');
+    pip.style.cssText = `
+      width:14px; height:14px; border-radius:50%;
+      border: 1.5px solid rgba(245,239,228,0.3);
+      background: ${i < currentDay ? '#4A6A8A' : i === currentDay ? '#C8D8E2' : 'transparent'};
+      box-shadow: ${i === currentDay ? '0 0 6px rgba(200,216,226,0.5)' : 'none'};
+      transition: background 0.3s;
+      cursor: default;
+    `;
+    pip.title = `Day ${i}`;
+    wrap.appendChild(pip);
+  }
+}
+
+function updateLinerLabel() {
+  const num = document.getElementById('linerNum').value;
+  const day = getCurrentDay();
+  document.getElementById('linerInfo').textContent = `Liner #${num} · Day ${day} of ${CYCLE_DAYS}`;
+  localStorage.setItem('inv_liner', num);
+  renderDayPips(day);
+}
+
+let timerSeconds = parseInt(localStorage.getItem('inv_seconds') || '0');
+let timerRunning = false;
+let timerInterval = null;
+
+function renderTimer() {
+  const remaining = Math.max(0, DAILY_GOAL - timerSeconds);
+  const h = Math.floor(remaining / 3600);
+  const m = Math.floor((remaining % 3600) / 60);
+  document.getElementById('timerDisplay').textContent =
+    String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  const circumference = 2 * Math.PI * 35;
+  const pct = Math.min(1, timerSeconds / DAILY_GOAL);
+  const ring = document.getElementById('timerRing');
+  ring.style.strokeDasharray = circumference;
+  ring.style.strokeDashoffset = circumference * (1 - pct);
+  // Turn ring gold when goal met
+  ring.style.stroke = pct >= 1 ? '#C8D8E2' : '#7DA0BC';
+}
+
+function startTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('startBtn').textContent = '▶ Start';
+  } else {
+    timerRunning = true;
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      localStorage.setItem('inv_seconds', timerSeconds);
+      renderTimer();
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 0;
+  localStorage.setItem('inv_seconds', 0);
+  document.getElementById('startBtn').textContent = '▶ Start';
+  renderTimer();
+}
+
+function nextLiner() {
+  // Start a fresh 10-day cycle from today
+  localStorage.setItem('inv_cycle_start', new Date().toDateString());
+  resetTimer();
+  const n = document.getElementById('linerNum');
+  n.value = +n.value + 1;
+  localStorage.setItem('inv_liner', n.value);
+  updateLinerLabel();
+}
+
+// Auto-reset daily timer at midnight, advance cycle day
+function checkMidnightReset() {
+  const lastDate = localStorage.getItem('inv_date');
+  const today = new Date().toDateString();
+  if (lastDate && lastDate !== today) {
+    resetTimer();
+    // Check if 10-day cycle is complete
+    const day = getCurrentDay();
+    if (day >= CYCLE_DAYS) {
+      // Cycle done — show subtle prompt (pip track will show full)
+    }
+  }
+  localStorage.setItem('inv_date', today);
+}
+
+// Init
+const savedLiner = localStorage.getItem('inv_liner');
+if (savedLiner) document.getElementById('linerNum').value = savedLiner;
+updateLinerLabel();
+renderTimer();
+checkMidnightReset();
+setInterval(checkMidnightReset, 60000);
+
+// ── CALENDAR ──
+function setCalendar() {
+  const url = document.getElementById('calUrl').value.trim();
+  if (!url) return;
+  const frame = document.getElementById('calFrame');
+  const placeholder = document.getElementById('calPlaceholder');
+  frame.src = url;
+  frame.style.display = 'block';
+  placeholder.style.display = 'none';
+  localStorage.setItem('hub_calurl', url);
+}
+const savedCal = localStorage.getItem('hub_calurl');
+if (savedCal) {
+  document.getElementById('calUrl').value = savedCal;
+  setCalendar();
+}
+</script>
+</body>
+</html>
