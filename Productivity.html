@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Productivity · Hub</title>
+
+  <!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  PRODUCTIVITY DASHBOARD — EDIT GUIDE                        ║
+  ║                                                              ║
+  ║  NOTION EMBED: Paste the raw GitHub Pages URL into a         ║
+  ║  Notion /embed block, e.g.:                                  ║
+  ║  https://javauntgarcia.github.io/Notion/Productivity.html    ║
+  ║  localStorage works when the page is served from GitHub      ║
+  ║  Pages. It does NOT work if you paste the raw file directly  ║
+  ║  into Notion without hosting it first.                       ║
+  ║                                                              ║
+  ║  QUICK EDIT LANDMARKS — search for these to jump to each     ║
+  ║  section you want to change:                                 ║
+  ║                                                              ║
+  ║  PALETTE      → ":root {" near the top of <style>           ║
+  ║  BACKGROUND   → "EDIT: background image URL"                ║
+  ║  AFFIRMATIONS → "EDIT: default affirmation statements"       ║
+  ║  GOALS        → "EDIT: 2026 goals"                          ║
+  ║  VISIBILITY   → "EDIT: visibility prompt text"              ║
+  ║  FLASHCARDS   → "EDIT: vocab localStorage key"              ║
+  ║  SUBPAGES     → "EDIT: subpage cards"                       ║
+  ╚══════════════════════════════════════════════════════════════╝
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ══════════════════════════════════════════
+       PALETTE — EDIT: swap hex values here to
+       recolor the entire dashboard at once
+    ══════════════════════════════════════════ */
+    :root {
+      --black:       #080808;
+      --charcoal:    #161212;
+      --crimson:     #7a1a1a;
+      --crimson-mid: #b02a2a;
+      --amber:       #c8852a;
+      --gold:        #e8b84b;
+      --warm-white:  #f5ede0;
+      --ivory:       #ede0cc;
+      --glass:       rgba(200,133,42,0.12);
+      --glass-hover: rgba(200,133,42,0.20);
+      --glass-b:     rgba(232,184,75,0.28);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      color: var(--warm-white);
+      background: var(--black);
+      overflow-x: hidden;
+    }
+
+    /* outer wrapper sizes to content; bg-layer fills it absolutely */
+    .page-wrap {
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* ── BACKGROUND — stretches to full page height, scrolls with content ── */
+    .bg-layer {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+    .bg-layer img {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, rgba(8,4,4,0.52) 0%, rgba(20,8,4,0.32) 45%, rgba(8,4,4,0.62) 100%);
+    }
+    .bg-tail { display: none; }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative;
+      z-index: 10;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem 8rem;
+    }
+
+    /* ── GLASS CARD ── */
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-b);
+      border-radius: 14px;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 2rem;
+      background: rgba(8,4,4,0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(232,184,75,0.10);
+    }
+    .back-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ivory);
+      text-decoration: none;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 1; }
+    .back-link svg { width: 14px; height: 14px; }
+    .topbar-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--amber);
+      opacity: 0.7;
+    }
+
+    /* ── MASTHEAD ── */
+    .masthead {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 1rem 4rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--amber);
+      opacity: 0.85;
+      margin-bottom: 0.75rem;
+    }
+    .masthead h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: clamp(3.5rem, 10vw, 6.5rem);
+      line-height: 0.95;
+      color: var(--warm-white);
+      letter-spacing: -0.01em;
+    }
+    .masthead h1 em { font-style: italic; color: var(--gold); font-weight: 400; }
+    .tagline { display: none; }
+    .scroll-cue {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      animation: bob 2s ease-in-out infinite;
+    }
+    .scroll-cue span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--ivory);
+      opacity: 0.45;
+    }
+    .scroll-cue svg { width: 18px; height: 18px; color: var(--ivory); opacity: 0.35; }
+
+    /* ── SHARED TYPOGRAPHY ── */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--amber);
+      opacity: 0.75;
+      margin-bottom: 1rem;
+    }
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(232,184,75,0.18), transparent);
+    }
+
+    /* ── SHARED BUTTONS ── */
+    .btn-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(232,184,75,0.10);
+      border: 1px solid rgba(232,184,75,0.3);
+      border-radius: 99px;
+      padding: 0.45rem 1.1rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-pill:hover { background: rgba(232,184,75,0.20); color: var(--warm-white); }
+    .save-confirm {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      opacity: 0;
+      margin-right: 1rem;
+      align-self: center;
+      transition: opacity 0.4s;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes bob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(6px); } }
+
+    /* ════════════════════════════════════════
+       SECTION 1 — IDENTITY AFFIRMATIONS
+    ════════════════════════════════════════ */
+    .affirmations-section { padding: 6rem 0 5rem; animation: fadeUp 0.8s 0.1s ease both; }
+    .affirmations-list { display: flex; flex-direction: column; }
+    .affirmation-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.1rem 1.6rem;
+      border-bottom: 1px solid rgba(232,184,75,0.08);
+      transition: background 0.2s;
+    }
+    .affirmations-list .affirmation-row:first-child { border-radius: 14px 14px 0 0; }
+    .affirmations-list .affirmation-row:last-child { border-bottom: none; border-radius: 0 0 14px 14px; }
+    .affirmation-row:hover { background: rgba(232,184,75,0.06); }
+    .affirmation-index {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      color: var(--amber);
+      opacity: 0.45;
+      letter-spacing: 0.15em;
+      min-width: 1.8rem;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .affirmation-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+    .affirmation-input {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--warm-white);
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed rgba(232,184,75,0.3);
+      outline: none;
+      width: 100%;
+      line-height: 1.3;
+      padding: 0.1rem 0;
+      transition: border-color 0.2s;
+    }
+    .affirmation-input::placeholder { color: rgba(245,237,224,0.25); }
+    .affirmation-input:focus { border-color: rgba(232,184,75,0.7); }
+    .affirmations-save { margin-top: 1rem; display: flex; justify-content: flex-end; align-items: center; }
+
+    /* ════════════════════════════════════════
+       SECTION 2 — 2026 GOAL TRACKERS
+    ════════════════════════════════════════ */
+    .goals-section { padding: 5rem 0 5rem; animation: fadeUp 0.8s 0.15s ease both; }
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+    @media (max-width: 680px) { .goals-grid { grid-template-columns: 1fr; } }
+
+    .goal-card {
+      padding: 1.5rem 1.5rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    /* icon — SVG line art, no emoji */
+    .goal-icon {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .goal-icon svg { width: 18px; height: 18px; color: var(--amber); opacity: 0.7; }
+    .goal-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--amber);
+      opacity: 0.85;
+    }
+    .goal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--warm-white);
+      line-height: 1.3;
+      margin-top: 0.15rem;
+    }
+    .goal-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--ivory);
+      opacity: 0.7;
+    }
+    .progress-track {
+      height: 3px;
+      background: rgba(232,184,75,0.12);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--crimson-mid), var(--gold));
+      width: 0%;
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    /* stepper — +/− counter */
+    .goal-stepper { display: flex; align-items: center; gap: 0.65rem; margin-top: 0.2rem; }
+    .stepper-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--gold);
+      background: rgba(232,184,75,0.10);
+      border: 1px solid rgba(232,184,75,0.22);
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .stepper-btn:hover { background: rgba(232,184,75,0.22); }
+    .stepper-count {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      color: var(--warm-white);
+      min-width: 1.4rem;
+      text-align: center;
+    }
+    /* toggle — binary done/not done */
+    .goal-toggle { display: flex; align-items: center; gap: 0.7rem; cursor: pointer; margin-top: 0.2rem; }
+    .toggle-track {
+      width: 36px; height: 20px;
+      border-radius: 99px;
+      background: rgba(232,184,75,0.12);
+      border: 1px solid rgba(232,184,75,0.22);
+      position: relative;
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+    .toggle-track.on { background: rgba(176,42,42,0.55); border-color: var(--crimson-mid); }
+    .toggle-thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--ivory);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      opacity: 0.5;
+    }
+    .toggle-track.on .toggle-thumb { transform: translateX(16px); opacity: 1; }
+    .toggle-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--ivory);
+      opacity: 0.55;
+      letter-spacing: 0.08em;
+    }
+    .toggle-track.on + .toggle-label { color: var(--gold); opacity: 0.85; }
+
+    /* ════════════════════════════════════════
+       SECTION 3 — VISIBILITY STATEMENT
+    ════════════════════════════════════════ */
+    .visibility-section { padding: 5rem 0 5rem; animation: fadeUp 0.8s 0.25s ease both; }
+    .visibility-card { padding: 2rem 2.2rem; }
+    .vis-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .vis-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--warm-white);
+    }
+    .vis-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      color: var(--amber);
+      opacity: 0.7;
+    }
+    .vis-textarea {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--warm-white);
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed rgba(232,184,75,0.3);
+      outline: none;
+      width: 100%;
+      resize: none;
+      min-height: 3.5rem;
+      line-height: 1.6;
+      padding: 0.2rem 0 0.5rem;
+      transition: border-color 0.2s;
+    }
+    .vis-textarea::placeholder { color: rgba(245,237,224,0.18); font-style: italic; }
+    .vis-textarea:focus { border-color: rgba(232,184,75,0.65); }
+    .vis-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 1rem;
+      gap: 1rem;
+    }
+    .vis-saved-at {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      color: var(--amber);
+      opacity: 0.4;
+    }
+
+    /* ════════════════════════════════════════
+       SECTION 4 — VOCABULARY FLASHCARDS
+    ════════════════════════════════════════ */
+    .vocab-section { padding: 5rem 0 5rem; animation: fadeUp 0.8s 0.35s ease both; }
+    .vocab-wrapper { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+    .flashcard-scene {
+      width: 100%;
+      max-width: 520px;
+      height: 240px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .flashcard-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .flashcard-scene.flipped .flashcard-inner { transform: rotateY(180deg); }
+    .flashcard-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+    .flashcard-front {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-b);
+    }
+    .flashcard-back {
+      background: rgba(176,42,42,0.18);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(176,42,42,0.35);
+      transform: rotateY(180deg);
+    }
+    .fc-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--amber);
+      opacity: 0.6;
+      margin-bottom: 0.8rem;
+    }
+    .fc-word {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 600;
+      color: var(--warm-white);
+      line-height: 1.1;
+    }
+    .fc-pos {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      opacity: 0.6;
+      margin-top: 0.4rem;
+      text-transform: uppercase;
+    }
+    .fc-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      color: var(--ivory);
+      opacity: 0.28;
+      margin-top: 1.2rem;
+    }
+    .fc-definition {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--warm-white);
+      line-height: 1.55;
+      max-width: 380px;
+    }
+    .fc-example {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--ivory);
+      opacity: 0.5;
+      line-height: 1.5;
+      max-width: 360px;
+      margin-top: 0.8rem;
+      font-style: italic;
+    }
+    .fc-nav { display: flex; align-items: center; gap: 1.2rem; }
+    .fc-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(232,184,75,0.10);
+      border: 1px solid rgba(232,184,75,0.25);
+      border-radius: 99px;
+      padding: 0.45rem 1.1rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .fc-btn:hover { background: rgba(232,184,75,0.20); }
+    .fc-btn:disabled { opacity: 0.22; cursor: default; }
+    .fc-counter {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: var(--ivory);
+      opacity: 0.45;
+      min-width: 5rem;
+      text-align: center;
+    }
+    .fc-empty {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--ivory);
+      opacity: 0.38;
+      text-align: center;
+      padding: 2.5rem 0;
+    }
+    .fc-empty a { color: var(--amber); text-decoration: none; }
+    .fc-empty a:hover { text-decoration: underline; }
+
+    /* ════════════════════════════════════════
+       SUBPAGE CARDS
+    ════════════════════════════════════════ */
+    .subpages-section { padding: 5rem 0 0; animation: fadeUp 0.8s 0.45s ease both; }
+    .subpages-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 600px) { .subpages-grid { grid-template-columns: 1fr; } }
+
+    .sub-card {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.25s, transform 0.25s;
+      cursor: pointer;
+      overflow: hidden;
+      padding: 0;
+    }
+    .sub-card:hover { background: var(--glass-hover); transform: translateY(-4px); }
+    .sub-card-accent { height: 3px; width: 100%; flex-shrink: 0; }
+    .sub-card-cover {
+      width: 100%; height: 130px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .sub-card-cover::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(8,4,4,0.08) 0%, rgba(8,4,4,0.55) 100%);
+    }
+    .sub-card-body {
+      padding: 1rem 1.4rem 1.3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      flex: 1;
+    }
+    .sub-card-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--amber);
+      opacity: 0.75;
+    }
+    .sub-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--warm-white);
+      line-height: 1.15;
+    }
+    .sub-card-arrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      margin-top: auto;
+      padding-top: 0.5rem;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .sub-card:hover .sub-card-arrow { opacity: 1; transform: translateX(0); }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 2rem 0 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--amber);
+      opacity: 0.35;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <div class="bg-layer">
+    <!-- EDIT: background image URL -->
+    <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Productivity.jpg" alt="" />
+  </div>
+
+  <div class="topbar">
+    <a href="Main Hub.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Main Hub
+    </a>
+    <div class="topbar-date" id="today-date"></div>
+  </div>
+
+  <div class="page">
+
+    <!-- MASTHEAD -->
+    <div class="masthead">
+      <p class="eyebrow">Personal Dashboard</p>
+      <h1>Produc<em>tivity</em></h1>
+      <p class="tagline">build · ship · grow</p>
+      <div class="scroll-cue">
+        <span>scroll</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         SECTION 1 — IDENTITY AFFIRMATIONS
+         EDIT: default affirmation statements are
+         in the JS below (search "DEFAULT_AFFIRMATIONS")
+    ══════════════════════════════════════════ -->
+    <section class="affirmations-section">
+      <p class="section-label">Who I Am</p>
+      <div class="glass affirmations-list" id="affirmations-list"></div>
+      <div class="affirmations-save">
+        <span class="save-confirm" id="aff-confirm">Saved</span>
+        <button class="btn-pill" onclick="saveAffirmations()">Save</button>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         SECTION 2 — 2026 GOALS
+         EDIT: goal targets are in the JS below
+         (search "EDIT: 2026 goals")
+    ══════════════════════════════════════════ -->
+    <section class="goals-section">
+      <p class="section-label">2026 Goals</p>
+      <div class="goals-grid">
+
+        <!-- Curriculum -->
+        <div class="glass goal-card">
+          <div class="goal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="goal-name">Curriculum</div>
+            <div class="goal-title">Complete 2 Self-Designed Curriculums</div>
+          </div>
+          <div>
+            <div class="goal-meta" id="curr-meta">—</div>
+            <div class="progress-track"><div class="progress-fill" id="curr-bar"></div></div>
+          </div>
+          <div class="goal-stepper">
+            <button class="stepper-btn" onclick="stepGoal('prod_curr_done',-1,2,'curr')">−</button>
+            <span class="stepper-count" id="curr-count">0</span>
+            <button class="stepper-btn" onclick="stepGoal('prod_curr_done',1,2,'curr')">+</button>
+          </div>
+        </div>
+
+        <!-- Journalism -->
+        <div class="glass goal-card">
+          <div class="goal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="goal-name">Journalism</div>
+            <div class="goal-title">Publish a Freelance Article</div>
+          </div>
+          <div>
+            <div class="goal-meta" id="jour-meta">—</div>
+            <div class="progress-track"><div class="progress-fill" id="jour-bar"></div></div>
+          </div>
+          <div class="goal-toggle" onclick="toggleGoal('prod_jour_done','jour')">
+            <div class="toggle-track" id="jour-track"><div class="toggle-thumb"></div></div>
+            <span class="toggle-label" id="jour-label">Not yet</span>
+          </div>
+        </div>
+
+        <!-- Depop -->
+        <div class="glass goal-card">
+          <div class="goal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+          </div>
+          <div>
+            <div class="goal-name">Depop</div>
+            <div class="goal-title">Sell 25 Items</div>
+          </div>
+          <div>
+            <div class="goal-meta" id="dep-meta">—</div>
+            <div class="progress-track"><div class="progress-fill" id="dep-bar"></div></div>
+          </div>
+          <div class="goal-stepper">
+            <button class="stepper-btn" onclick="stepGoal('prod_dep_sold',-1,25,'dep')">−</button>
+            <span class="stepper-count" id="dep-count">0</span>
+            <button class="stepper-btn" onclick="stepGoal('prod_dep_sold',1,25,'dep')">+</button>
+          </div>
+        </div>
+
+        <!-- Social Media — spans 2 columns -->
+        <div class="glass goal-card" style="grid-column: span 2;">
+          <div class="goal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </div>
+          <div>
+            <div class="goal-name">Social Media</div>
+            <div class="goal-title">Publish Every Week in 2026</div>
+          </div>
+          <div>
+            <div class="goal-meta" id="social-meta">—</div>
+            <div class="progress-track"><div class="progress-fill" id="social-bar"></div></div>
+          </div>
+          <div class="goal-stepper">
+            <button class="stepper-btn" onclick="stepGoal('prod_social_weeks',-1,52,'social')">−</button>
+            <span class="stepper-count" id="social-count">0</span>
+            <button class="stepper-btn" onclick="stepGoal('prod_social_weeks',1,52,'social')">+</button>
+          </div>
+        </div>
+
+        <!-- Vocabulary -->
+        <div class="glass goal-card">
+          <div class="goal-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/>
+            </svg>
+          </div>
+          <div>
+            <div class="goal-name">Vocabulary</div>
+            <div class="goal-title">Build the Word Bank</div>
+          </div>
+          <div>
+            <div class="goal-meta" id="vocab-meta">—</div>
+            <div class="progress-track"><div class="progress-fill" id="vocab-bar"></div></div>
+          </div>
+          <div class="stepper-count" id="vocab-count" style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--warm-white);">—</div>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         SECTION 3 — VISIBILITY STATEMENT
+         EDIT: visibility prompt text — change the
+         placeholder attribute on the textarea below
+    ══════════════════════════════════════════ -->
+    <section class="visibility-section">
+      <p class="section-label">Visibility</p>
+      <div class="glass visibility-card">
+        <div class="vis-header">
+          <div class="vis-title">How I'm making myself visible today</div>
+          <div class="vis-date" id="vis-date"></div>
+        </div>
+        <!-- EDIT: visibility prompt text -->
+        <textarea
+          class="vis-textarea"
+          id="vis-text"
+          rows="3"
+          placeholder="What's one thing you'll do today to be seen — professionally, creatively, or publicly?"
+        ></textarea>
+        <div class="vis-footer">
+          <span class="vis-saved-at" id="vis-saved-at"></span>
+          <button class="btn-pill" onclick="saveVisibility()">Save</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         SECTION 4 — VOCABULARY FLASHCARDS
+         EDIT: vocab localStorage key — see JS below
+         (search "EDIT: vocab localStorage key")
+    ══════════════════════════════════════════ -->
+    <section class="vocab-section">
+      <p class="section-label">Vocabulary Flashcards</p>
+      <div class="vocab-wrapper" id="fc-wrapper"></div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         EDIT: subpage cards
+         To add a card: copy one <a> block and update
+         href, accent gradient, background-image,
+         sub-card-label, and sub-card-title
+    ══════════════════════════════════════════ -->
+    <section class="subpages-section">
+      <p class="section-label">Subpages</p>
+      <div class="subpages-grid">
+
+        <a href="Personal Curriculum.html" class="glass sub-card">
+          <div class="sub-card-accent" style="background:linear-gradient(90deg,#7a1a1a,#c8852a);"></div>
+          <div class="sub-card-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Personal_Curriculum.jpg');background-color:#1a0c08;"></div>
+          <div class="sub-card-body">
+            <div class="sub-card-label">Study</div>
+            <div class="sub-card-title">Personal Curriculum</div>
+            <div class="sub-card-arrow">Open →</div>
+          </div>
+        </a>
+
+        <a href="Content calendar.html" class="glass sub-card">
+          <div class="sub-card-accent" style="background:linear-gradient(90deg,#c8852a,#e8b84b);"></div>
+          <div class="sub-card-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Content_Calendar.jpg');background-color:#1a1008;"></div>
+          <div class="sub-card-body">
+            <div class="sub-card-label">Brand</div>
+            <div class="sub-card-title">Content Calendar</div>
+            <div class="sub-card-arrow">Open →</div>
+          </div>
+        </a>
+
+        <a href="Work.html" class="glass sub-card">
+          <div class="sub-card-accent" style="background:linear-gradient(90deg,#3a1a08,#c8852a);"></div>
+          <div class="sub-card-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Work.jpg');background-color:#120e08;"></div>
+          <div class="sub-card-body">
+            <div class="sub-card-label">SFMTA</div>
+            <div class="sub-card-title">Work</div>
+            <div class="sub-card-arrow">Open →</div>
+          </div>
+        </a>
+
+        <a href="Depop.html" class="glass sub-card">
+          <div class="sub-card-accent" style="background:linear-gradient(90deg,#b02a2a,#e8b84b);"></div>
+          <div class="sub-card-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Depop.jpg');background-color:#160a0a;"></div>
+          <div class="sub-card-body">
+            <div class="sub-card-label">Side Hustle</div>
+            <div class="sub-card-title">Depop</div>
+            <div class="sub-card-arrow">Open →</div>
+          </div>
+        </a>
+
+        <a href="Notion Guide.html" class="glass sub-card">
+          <div class="sub-card-accent" style="background:linear-gradient(90deg,#c8852a,#7a1a1a);"></div>
+          <div class="sub-card-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Notion_Guide.jpg');background-color:#10100a;"></div>
+          <div class="sub-card-body">
+            <div class="sub-card-label">System</div>
+            <div class="sub-card-title">Notion Guide</div>
+            <div class="sub-card-arrow">Open →</div>
+          </div>
+        </a>
+
+        <a href="Vocabulary List.html" class="glass sub-card">
+          <div class="sub-card-accent" style="background:linear-gradient(90deg,#e8b84b,#b02a2a);"></div>
+          <div class="sub-card-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Vocabulary_List.jpg');background-color:#12100a;"></div>
+          <div class="sub-card-body">
+            <div class="sub-card-label">Language</div>
+            <div class="sub-card-title">Vocabulary List</div>
+            <div class="sub-card-arrow">Open →</div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <div class="footer">build in public · rest in private</div>
+
+  </div><!-- /page -->
+
+</div><!-- /page-wrap -->
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── HELPERS ── */
+  var now = new Date();
+  function ls(k)       { try { return localStorage.getItem(k); }    catch(e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); }        catch(e) {} }
+  function pct(n, d)   { return d ? Math.min(100, Math.max(0, Math.round(n / d * 100))) : 0; }
+  function bar(id, p)  { setTimeout(function(){ var el=document.getElementById(id); if(el) el.style.width=p+'%'; }, 200); }
+  function todayKey()  { return now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate(); }
+
+  /* ── DATES ── */
+  document.getElementById('today-date').textContent =
+    now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  document.getElementById('vis-date').textContent =
+    now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+
+  /* ════════════════════════════════════════
+     SECTION 1 — AFFIRMATIONS
+     EDIT: default affirmation statements
+     Change or add lines in the array below.
+     The page saves edits to localStorage so
+     they persist. Defaults show only when
+     nothing has been saved yet.
+  ════════════════════════════════════════ */
+  var DEFAULT_AFFIRMATIONS = [
+    'I am an active person.',
+    'I am a writer.',
+    'I am building something that matters.',
+    'I am consistent, even when it\'s hard.',
+    'I am someone who shows up for his community.',
+    'I am always becoming.'
+  ];
+  /* EDIT: add more slots by adding more strings above */
+
+  function loadAffirmations() {
+    try {
+      var stored = JSON.parse(ls('prod_affirmations') || 'null');
+      return Array.isArray(stored) ? stored : DEFAULT_AFFIRMATIONS.slice();
+    } catch(e) { return DEFAULT_AFFIRMATIONS.slice(); }
+  }
+
+  function renderAffirmations() {
+    var list = document.getElementById('affirmations-list');
+    var data = loadAffirmations();
+    list.innerHTML = '';
+    data.forEach(function(text, i) {
+      var row = document.createElement('div');
+      row.className = 'affirmation-row';
+      row.innerHTML =
+        '<span class="affirmation-index">0'+(i+1)+'</span>'+
+        '<div class="affirmation-dot"></div>'+
+        '<input class="affirmation-input" data-idx="'+i+'" value="'+text.replace(/"/g,'&quot;')+'" placeholder="I am…" />';
+      list.appendChild(row);
+    });
+  }
+
+  window.saveAffirmations = function() {
+    var inputs = document.querySelectorAll('.affirmation-input');
+    var vals = [];
+    inputs.forEach(function(inp) { vals.push(inp.value || ''); });
+    lsSet('prod_affirmations', JSON.stringify(vals));
+    var c = document.getElementById('aff-confirm');
+    c.style.opacity = 1;
+    setTimeout(function(){ c.style.opacity = 0; }, 1800);
+  };
+
+  renderAffirmations();
+
+  /* ════════════════════════════════════════
+     SECTION 2 — 2026 GOALS
+     EDIT: 2026 goals
+     To change a goal target, update the
+     number in stepGoal(..., TARGET, ...) in
+     the HTML, and update the cap inside
+     renderGoals() below.
+  ════════════════════════════════════════ */
+
+  window.stepGoal = function(key, delta, max, id) {
+    var cur  = parseInt(ls(key)) || 0;
+    var next = Math.min(max, Math.max(0, cur + delta));
+    lsSet(key, next);
+    renderGoals();
+  };
+
+  window.toggleGoal = function(key, id) {
+    var cur = ls(key) === '1' ? '0' : '1';
+    lsSet(key, cur);
+    renderGoals();
+  };
+
+  function renderGoals() {
+
+    /* Curriculum — target: 2 */
+    (function() {
+      var n = Math.min(2, Math.max(0, parseInt(ls('prod_curr_done')) || 0));
+      document.getElementById('curr-count').textContent = n;
+      document.getElementById('curr-meta').textContent  = n + ' of 2 completed';
+      bar('curr-bar', pct(n, 2));
+    })();
+
+    /* Journalism — binary */
+    (function() {
+      var done  = ls('prod_jour_done') === '1';
+      var track = document.getElementById('jour-track');
+      var label = document.getElementById('jour-label');
+      track.className = 'toggle-track' + (done ? ' on' : '');
+      label.textContent = done ? 'Published' : 'Not yet';
+      document.getElementById('jour-meta').textContent = done ? 'Goal complete' : 'In progress';
+      bar('jour-bar', done ? 100 : 0);
+    })();
+
+    /* Depop — target: 25 */
+    (function() {
+      var n = Math.min(25, Math.max(0, parseInt(ls('prod_dep_sold')) || 0));
+      document.getElementById('dep-count').textContent = n;
+      document.getElementById('dep-meta').textContent  = n + ' of 25 sold';
+      bar('dep-bar', pct(n, 25));
+    })();
+
+    /* Social — target: 52 weeks */
+    (function() {
+      var n = Math.min(52, Math.max(0, parseInt(ls('prod_social_weeks')) || 0));
+      document.getElementById('social-count').textContent = n;
+      document.getElementById('social-meta').textContent  = n + ' of 52 weeks';
+      bar('social-bar', pct(n, 52));
+    })();
+
+    /* Vocabulary — reads from Vocabulary List subpage */
+    /* EDIT: vocab localStorage key
+       Change the keys in the candidates array to match
+       whatever key your Vocabulary List page writes to */
+    (function() {
+      var words = [];
+      var candidates = ['vl_words','vl_word_list','vocab_words','vocab_list','wotd_list'];
+      for (var i = 0; i < candidates.length; i++) {
+        try {
+          var p = JSON.parse(ls(candidates[i]) || 'null');
+          if (Array.isArray(p) && p.length) { words = p; break; }
+        } catch(e) {}
+      }
+      var n      = words.length;
+      var target = 52;
+      document.getElementById('vocab-count').textContent = n || '—';
+      document.getElementById('vocab-meta').textContent  = n + ' of ' + target + ' words';
+      bar('vocab-bar', pct(n, target));
+    })();
+  }
+
+  renderGoals();
+
+  /* ════════════════════════════════════════
+     SECTION 3 — VISIBILITY STATEMENT
+     Saves per-day; resets automatically each
+     new calendar day.
+  ════════════════════════════════════════ */
+  (function() {
+    var key    = 'prod_vis_' + todayKey();
+    var ta     = document.getElementById('vis-text');
+    ta.value   = ls(key) || '';
+    var savedAt = ls(key + '_ts');
+    if (savedAt) document.getElementById('vis-saved-at').textContent = 'Saved ' + savedAt;
+  })();
+
+  window.saveVisibility = function() {
+    var key = 'prod_vis_' + todayKey();
+    var val = document.getElementById('vis-text').value;
+    lsSet(key, val);
+    var t = now.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+    lsSet(key + '_ts', t);
+    document.getElementById('vis-saved-at').textContent = 'Saved ' + t;
+    var btn = document.querySelector('.vis-footer .btn-pill');
+    var orig = btn.textContent;
+    btn.textContent = 'Saved';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  };
+
+  /* ════════════════════════════════════════
+     SECTION 4 — VOCABULARY FLASHCARDS
+     Reads same keys as the vocab goal tracker.
+     Shuffles the deck each session.
+  ════════════════════════════════════════ */
+  (function() {
+    var wrapper = document.getElementById('fc-wrapper');
+    var words   = [];
+    var candidates = ['vl_words','vl_word_list','vocab_words','vocab_list','wotd_list'];
+    for (var i = 0; i < candidates.length; i++) {
+      try {
+        var p = JSON.parse(ls(candidates[i]) || 'null');
+        if (Array.isArray(p) && p.length) { words = p; break; }
+      } catch(e) {}
+    }
+
+    var deck    = words.slice().sort(function(){ return Math.random() - 0.5; });
+    var cur     = 0;
+    var flipped = false;
+
+    function renderEmpty() {
+      wrapper.innerHTML = '<p class="fc-empty">No words found. <a href="Vocabulary List.html">Add words in your Vocabulary List →</a></p>';
+    }
+
+    function renderCard() {
+      if (!deck.length) { renderEmpty(); return; }
+      var w   = deck[cur];
+      var word = w.word || w.term || '—';
+      var pos  = w.pos  || w.partOfSpeech || '';
+      var def  = w.definition || w.def || w.meaning || 'No definition saved.';
+      var ex   = w.example    || w.sentence || '';
+
+      wrapper.innerHTML =
+        '<div class="flashcard-scene" id="fc-scene" onclick="flipCard()">'+
+          '<div class="flashcard-inner">'+
+            '<div class="flashcard-face flashcard-front">'+
+              '<div class="fc-label">Word '+(cur+1)+' of '+deck.length+'</div>'+
+              '<div class="fc-word">'+word+'</div>'+
+              (pos ? '<div class="fc-pos">'+pos+'</div>' : '')+
+              '<div class="fc-hint">tap to flip</div>'+
+            '</div>'+
+            '<div class="flashcard-face flashcard-back">'+
+              '<div class="fc-label">'+word+'</div>'+
+              '<div class="fc-definition">'+def+'</div>'+
+              (ex ? '<div class="fc-example">"'+ex+'"</div>' : '')+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="fc-nav">'+
+          '<button class="fc-btn" onclick="prevCard()" '+(cur===0?'disabled':'')+'>Prev</button>'+
+          '<span class="fc-counter">'+(cur+1)+' / '+deck.length+'</span>'+
+          '<button class="fc-btn" onclick="nextCard()" '+(cur===deck.length-1?'disabled':'')+'>Next</button>'+
+        '</div>';
+      flipped = false;
+    }
+
+    window.flipCard = function() {
+      var s = document.getElementById('fc-scene');
+      if (!s) return;
+      flipped = !flipped;
+      s.className = 'flashcard-scene' + (flipped ? ' flipped' : '');
+    };
+    window.nextCard = function() { if (cur < deck.length-1) { cur++; renderCard(); } };
+    window.prevCard = function() { if (cur > 0)             { cur--; renderCard(); } };
+
+    deck.length ? renderCard() : renderEmpty();
+  })();
+
+  /* Sync across tabs */
+  window.addEventListener('storage', function(){ location.reload(); });
+
+})();
+</script>
+
+</body>
+</html>
