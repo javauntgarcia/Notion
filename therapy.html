@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Therapy — Growth</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root {
+  --blue-deep: #0a0f1e;
+  --blue-mid: #0d1f3c;
+  --blue-silk: #1a3a5c;
+  --blue-bright: #1e4d7b;
+  --blue-sheen: #2a6499;
+  --blue-glow: #3d7fb5;
+  --blue-mist: rgba(61,127,181,0.35);
+  --blue-veil: rgba(26,58,92,0.6);
+  --silver: rgba(180,210,240,0.85);
+  --silver-dim: rgba(160,195,230,0.55);
+  --silver-ghost: rgba(140,180,220,0.3);
+  --white-silk: rgba(230,240,255,0.9);
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+html, body {
+  min-height: 100vh;
+  background: transparent;
+  font-family: var(--font-body);
+  color: var(--silver);
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND ── */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+.bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  filter: brightness(0.85) saturate(1.1);
+}
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(5,10,20,0.45) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(5,10,20,0.25) 0%, transparent 60%),
+    linear-gradient(to right, rgba(5,10,20,0.2) 0%, transparent 30%, transparent 70%, rgba(5,10,20,0.2) 100%);
+}
+
+/* ── LAYOUT ── */
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding-bottom: 5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 1.5rem 1.5rem;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.back-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0.5px solid var(--silver-ghost);
+  background: rgba(13,31,60,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  backdrop-filter: blur(8px);
+  color: var(--blue-glow);
+  font-size: 14px;
+  text-decoration: none;
+}
+.back-btn:hover { background: rgba(42,100,153,0.25); border-color: rgba(61,127,181,0.5); }
+
+.page-title-wrap .eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--silver-dim);
+  margin-bottom: 3px;
+}
+.page-title-wrap h1 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--white-silk);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+.page-title-wrap h1 em {
+  font-style: italic;
+  color: var(--blue-glow);
+}
+
+.page-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ── CALENDAR WRAPPER ── */
+.cal-wrap {
+  opacity: 0.5;
+  background: rgba(10,18,40,0.7);
+  border: 0.5px solid rgba(61,127,181,0.25);
+  border-radius: 20px;
+  backdrop-filter: blur(18px);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  transition: opacity 0.25s;
+}
+.cal-wrap:hover { opacity: 0.85; }
+
+/* ── CALENDAR HEADER ── */
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.4rem 0.9rem;
+  border-bottom: 0.5px solid rgba(61,127,181,0.15);
+}
+.cal-month-label {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 300;
+  color: var(--white-silk);
+  letter-spacing: 0.04em;
+}
+.cal-nav {
+  display: flex;
+  gap: 6px;
+}
+.cal-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(61,127,181,0.3);
+  background: rgba(13,31,60,0.5);
+  color: var(--blue-glow);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.cal-nav-btn:hover { background: rgba(42,100,153,0.3); border-color: rgba(61,127,181,0.6); }
+
+/* ── DAY-OF-WEEK LABELS ── */
+.cal-dow-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 0.55rem 0.8rem 0;
+}
+.cal-dow {
+  text-align: center;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--silver-ghost);
+  padding-bottom: 4px;
+}
+
+/* ── DAYS GRID ── */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  padding: 0.4rem 0.8rem 1rem;
+}
+
+/* ── DAY CELL ── */
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+  gap: 3px;
+}
+.cal-day:hover { background: rgba(61,127,181,0.12); }
+.cal-day.empty { cursor: default; pointer-events: none; }
+
+/* Number */
+.cal-day-num {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+  color: rgba(230,240,255,0.85); /* default: white-ish */
+}
+
+/* Therapy Friday */
+.cal-day.therapy .cal-day-num {
+  color: #0a0f1e; /* near-black */
+  background: rgba(230,240,255,0.88);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+/* Today */
+.cal-day.today .cal-day-num {
+  color: var(--blue-glow);
+  border: 1px solid rgba(61,127,181,0.6);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cal-day.therapy.today .cal-day-num {
+  color: #0a0f1e;
+  background: rgba(230,240,255,0.88);
+  border: 2px solid var(--blue-glow);
+}
+
+/* Has entry dot */
+.cal-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--blue-glow);
+  opacity: 0.8;
+}
+.cal-day.therapy .cal-dot { background: rgba(10,20,40,0.7); }
+
+/* Faded (other month) */
+.cal-day.other-month .cal-day-num { opacity: 0.25; }
+.cal-day.other-month { pointer-events: none; }
+
+/* ── SESSION PANEL (below calendar) ── */
+.session-panel {
+  display: none;
+  animation: fadeUp 0.25s ease;
+}
+.session-panel.open { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.panel-date-label {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 300;
+  color: var(--white-silk);
+}
+.panel-therapy-badge {
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: rgba(230,240,255,0.1);
+  border: 0.5px solid rgba(230,240,255,0.3);
+  color: var(--white-silk);
+  margin-left: 10px;
+}
+.panel-close {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 0.5px solid var(--silver-ghost);
+  background: transparent;
+  color: var(--silver-dim);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.panel-close:hover { border-color: rgba(61,127,181,0.5); color: var(--blue-glow); }
+
+/* Entry card */
+.entry-card {
+  background: rgba(10,20,40,0.45);
+  border: 0.5px solid rgba(61,127,181,0.2);
+  border-radius: 18px;
+  padding: 1.25rem;
+  backdrop-filter: blur(16px);
+}
+
+/* Full-width note box */
+.box-full {
+  background: rgba(13,31,60,0.5);
+  border: 0.5px solid rgba(61,127,181,0.18);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 10px;
+}
+
+.box-label {
+  font-size: 8px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--blue-glow);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.box-label::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: rgba(61,127,181,0.2);
+}
+.box-icon { font-size: 12px; }
+
+.box-full textarea, .box textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--silver);
+  resize: none;
+  line-height: 1.7;
+}
+.box-full textarea::placeholder, .box textarea::placeholder { color: rgba(100,150,200,0.3); }
+
+/* Two-column grid */
+.session-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.box {
+  background: rgba(13,31,60,0.5);
+  border: 0.5px solid rgba(61,127,181,0.18);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+/* Takeaway list */
+.takeaway-list { display: flex; flex-direction: column; gap: 6px; }
+.takeaway-item { display: flex; gap: 8px; align-items: flex-start; }
+.takeaway-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--blue-glow);
+  margin-top: 8px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.takeaway-item input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 0.5px solid rgba(61,127,181,0.15);
+  outline: none;
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--silver);
+  padding: 2px 0 4px;
+  line-height: 1.5;
+}
+.takeaway-item input::placeholder { color: rgba(100,150,200,0.28); }
+
+.add-takeaway, .add-step {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(61,127,181,0.5);
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.2s;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-top: 6px;
+}
+.add-takeaway:hover, .add-step:hover { color: var(--blue-glow); }
+
+/* Next steps */
+.next-steps-list { display: flex; flex-direction: column; gap: 7px; }
+.step-item { display: flex; align-items: flex-start; gap: 8px; }
+.step-check {
+  width: 15px; height: 15px;
+  border-radius: 3px;
+  border: 0.5px solid rgba(61,127,181,0.4);
+  flex-shrink: 0;
+  margin-top: 4px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  font-size: 9px;
+  color: transparent;
+}
+.step-check.done { background: rgba(42,100,153,0.35); border-color: rgba(61,127,181,0.7); color: var(--blue-glow); }
+.step-item input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 0.5px solid rgba(61,127,181,0.15);
+  outline: none;
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--silver);
+  padding: 2px 0 4px;
+}
+.step-item input::placeholder { color: rgba(100,150,200,0.28); }
+.step-item input.crossed { text-decoration: line-through; color: var(--silver-ghost); }
+
+/* Feeling chips */
+.session-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 0.5px solid rgba(61,127,181,0.1);
+}
+.feeling-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 100px;
+  border: 0.5px solid rgba(61,127,181,0.2);
+  color: var(--silver-ghost);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.chip.on { border-color: rgba(61,127,181,0.5); color: var(--blue-glow); background: rgba(42,100,153,0.15); }
+.chip:hover { border-color: rgba(61,127,181,0.4); color: var(--silver-dim); }
+.delete-entry {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(180,100,100,0.4);
+  cursor: pointer;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+.delete-entry:hover { color: rgba(220,80,80,0.7); }
+
+/* Empty state */
+.no-entry-state {
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-style: italic;
+  color: rgba(61,127,181,0.35);
+}
+.add-entry-btn {
+  display: block;
+  margin: 0 auto;
+  font-family: var(--font-body);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 8px 22px;
+  background: rgba(42,100,153,0.2);
+  border: 0.5px solid rgba(61,127,181,0.4);
+  border-radius: 100px;
+  color: var(--blue-glow);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.add-entry-btn:hover { background: rgba(42,100,153,0.35); }
+
+/* ── LEGEND ── */
+.cal-legend {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0 0.2rem;
+  margin-bottom: 0.7rem;
+  opacity: 0.6;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--silver-dim); }
+.legend-dot-white {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(230,240,255,0.15); border: 0.5px solid rgba(230,240,255,0.3);
+}
+.legend-dot-black {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(230,240,255,0.88); border: 0.5px solid rgba(230,240,255,0.6);
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: 0.6rem 1rem 1rem;
+  background: linear-gradient(to top, rgba(5,10,20,0.96) 60%, transparent);
+}
+.bottom-nav-inner {
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  background: rgba(10,20,40,0.6);
+  border: 0.5px solid rgba(61,127,181,0.18);
+  border-radius: 100px;
+  padding: 5px;
+  backdrop-filter: blur(20px);
+}
+.nav-pill {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 100px;
+  color: var(--silver-dim);
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+}
+.nav-pill:hover { color: rgba(61,127,181,0.8); }
+.nav-pill.active {
+  background: rgba(42,100,153,0.22);
+  color: var(--blue-glow);
+  border: 0.5px solid rgba(61,127,181,0.4);
+}
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <img class="bg-img" src="https://javauntgarcia.github.io/Notion/therapy.jpg" alt="Therapy background">
+  <div class="bg-vignette"></div>
+</div>
+
+<div class="page">
+
+  <div class="page-header">
+    <a class="back-btn" href="Growth.html">←</a>
+    <div class="page-title-wrap">
+      <p class="eyebrow">Page 04</p>
+      <h1><em>Therapy</em></h1>
+    </div>
+  </div>
+
+  <div class="page-inner">
+
+    <!-- Legend -->
+    <div class="cal-legend">
+      <div class="legend-item"><div class="legend-dot-white"></div> Regular day</div>
+      <div class="legend-item"><div class="legend-dot-black"></div> Therapy Friday</div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="cal-wrap">
+      <div class="cal-header">
+        <div class="cal-month-label" id="cal-month-label">May 2026</div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="shiftMonth(-1)">‹</button>
+          <button class="cal-nav-btn" onclick="shiftMonth(1)">›</button>
+        </div>
+      </div>
+      <div class="cal-dow-row">
+        <div class="cal-dow">Su</div>
+        <div class="cal-dow">Mo</div>
+        <div class="cal-dow">Tu</div>
+        <div class="cal-dow">We</div>
+        <div class="cal-dow">Th</div>
+        <div class="cal-dow">Fr</div>
+        <div class="cal-dow">Sa</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+
+    <!-- Day entry panel -->
+    <div class="session-panel" id="session-panel">
+      <div class="panel-header">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
+          <span class="panel-date-label" id="panel-date-label"></span>
+          <span class="panel-therapy-badge" id="panel-therapy-badge" style="display:none;">Therapy Day</span>
+        </div>
+        <button class="panel-close" onclick="closePanel()">✕</button>
+      </div>
+      <div id="panel-content"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a class="nav-pill" href="Growth.html">Home</a>
+    <a class="nav-pill" href="Journal.html">Journal</a>
+    <a class="nav-pill" href="wants.html">Wants</a>
+    <a class="nav-pill" href="inspo.html">Inspo</a>
+    <a class="nav-pill active" href="therapy.html">Therapy</a>
+  </div>
+</div>
+
+<script>
+/* ─── CONSTANTS ─── */
+const FEELINGS = ['Grounded','Anxious','Expansive','Tired','Clear','Restless','Grateful','Overwhelmed','Hopeful','Proud','Unsettled','Seen'];
+
+/* ─── THERAPY FRIDAY LOGIC ─────────────────────────────────────────────
+   Anchor: Friday 2026-01-09 is session #1 (every other Friday after that).
+   Any Friday whose week-index from anchor is even = therapy Friday.
+──────────────────────────────────────────────────────────────────────── */
+const THERAPY_ANCHOR = new Date('2026-01-09T12:00:00'); // known therapy Friday
+
+function isTherapyFriday(date) {
+  // Must be a Friday
+  if (date.getDay() !== 5) return false;
+  // Days since anchor (both treated at noon to avoid DST issues)
+  const noon = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+  const diffDays = Math.round((noon - THERAPY_ANCHOR) / 86400000);
+  // Every 14 days from anchor is a therapy day
+  return diffDays % 14 === 0;
+}
+
+/* ─── STATE ─── */
+let entries = {}; // key: 'YYYY-MM-DD', value: { id, notes, takeaways[], steps[], feelings[] }
+try {
+  const stored = localStorage.getItem('therapy_entries_v2');
+  if (stored) entries = JSON.parse(stored);
+} catch(e) {}
+
+function persist() {
+  try { localStorage.setItem('therapy_entries_v2', JSON.stringify(entries)); } catch(e) {}
+}
+
+/* ─── CALENDAR STATE ─── */
+const today = new Date();
+let calYear  = today.getFullYear();
+let calMonth = today.getMonth(); // 0-indexed
+let selectedDate = null; // 'YYYY-MM-DD'
+
+/* ─── CALENDAR RENDER ─── */
+function renderCalendar() {
+  const monthNames = ['January','February','March','April','May','June',
+                      'July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent = monthNames[calMonth] + ' ' + calYear;
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+
+  // Fill leading blanks with prev-month days (greyed)
+  for (let i = 0; i < firstDay; i++) {
+    const d = daysInPrev - firstDay + 1 + i;
+    const cell = makeDayCell(calYear, calMonth - 1, d, true);
+    grid.appendChild(cell);
+  }
+
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cell = makeDayCell(calYear, calMonth, d, false);
+    grid.appendChild(cell);
+  }
+
+  // Trailing blanks
+  const total = firstDay + daysInMonth;
+  const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let d = 1; d <= trailing; d++) {
+    const cell = makeDayCell(calYear, calMonth + 1, d, true);
+    grid.appendChild(cell);
+  }
+}
+
+function makeDayCell(year, month, day, otherMonth) {
+  // Normalise month
+  const dt = new Date(year, month, day, 12);
+  const yy = dt.getFullYear();
+  const mm = dt.getMonth();
+  const dd = dt.getDate();
+  const key = dateKey(yy, mm, dd);
+
+  const cell = document.createElement('div');
+  cell.className = 'cal-day';
+  if (otherMonth) { cell.classList.add('other-month'); cell.classList.add('empty'); }
+
+  const therapy = isTherapyFriday(dt);
+  if (therapy) cell.classList.add('therapy');
+
+  const isToday = (yy === today.getFullYear() && mm === today.getMonth() && dd === today.getDate());
+  if (isToday) cell.classList.add('today');
+
+  if (key === selectedDate) cell.classList.add('selected');
+
+  // Number span
+  const numSpan = document.createElement('div');
+  numSpan.className = 'cal-day-num';
+  numSpan.textContent = dd;
+  cell.appendChild(numSpan);
+
+  // Dot if has entry
+  if (!otherMonth && entries[key]) {
+    const dot = document.createElement('div');
+    dot.className = 'cal-dot';
+    cell.appendChild(dot);
+  }
+
+  if (!otherMonth) {
+    cell.addEventListener('click', () => selectDay(key, dt));
+  }
+
+  return cell;
+}
+
+function dateKey(y, m, d) {
+  return y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+}
+
+function shiftMonth(delta) {
+  calMonth += delta;
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0;  calYear++; }
+  renderCalendar();
+}
+
+/* ─── DAY SELECTION ─── */
+function selectDay(key, dt) {
+  selectedDate = key;
+  renderCalendar(); // re-render to highlight selected
+
+  const panel = document.getElementById('session-panel');
+  panel.classList.add('open');
+
+  // Label
+  const options = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  document.getElementById('panel-date-label').textContent =
+    dt.toLocaleDateString('en-US', options);
+
+  // Therapy badge
+  const badge = document.getElementById('panel-therapy-badge');
+  badge.style.display = isTherapyFriday(dt) ? '' : 'none';
+
+  renderPanelContent(key);
+
+  // Scroll to panel
+  setTimeout(() => {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 80);
+}
+
+function closePanel() {
+  selectedDate = null;
+  document.getElementById('session-panel').classList.remove('open');
+  renderCalendar();
+}
+
+/* ─── PANEL CONTENT ─── */
+function renderPanelContent(key) {
+  const container = document.getElementById('panel-content');
+  const entry = entries[key];
+
+  if (!entry) {
+    container.innerHTML = `
+      <div class="no-entry-state">No entry yet for this day.</div>
+      <button class="add-entry-btn" onclick="createEntry('${key}')">+ Add Entry</button>`;
+    return;
+  }
+
+  const takeawayInputs = (entry.takeaways || ['','']).map((t, ti) => `
+    <div class="takeaway-item" id="ti-${key}-${ti}">
+      <div class="takeaway-dot"></div>
+      <input type="text" placeholder="Insight…" value="${escHtml(t)}"
+        oninput="updateTakeaway('${key}', ${ti}, this.value)" />
+    </div>`).join('');
+
+  const stepInputs = (entry.steps || []).map((s, si) => `
+    <div class="step-item" id="si-${key}-${si}">
+      <div class="step-check ${s.done ? 'done' : ''}" onclick="toggleStep('${key}', ${si}, this)">
+        ${s.done ? '✓' : ''}
+      </div>
+      <input type="text" placeholder="Something to carry forward…" value="${escHtml(s.text)}"
+        class="${s.done ? 'crossed' : ''}"
+        oninput="updateStep('${key}', ${si}, this.value)" />
+    </div>`).join('');
+
+  const feelingChips = FEELINGS.map(f => `
+    <span class="chip ${(entry.feelings || []).includes(f) ? 'on' : ''}"
+      onclick="toggleFeeling('${key}', '${f}', this)">${f}</span>`).join('');
+
+  container.innerHTML = `
+    <div class="entry-card">
+      <div class="box-full">
+        <div class="box-label"><span class="box-icon">✍</span> Notes</div>
+        <textarea rows="5" placeholder="What came up today? Stream of consciousness, key moments…"
+          oninput="updateNotes('${key}', this.value)">${escHtml(entry.notes || '')}</textarea>
+      </div>
+
+      <div class="session-grid">
+        <div class="box">
+          <div class="box-label"><span class="box-icon">◈</span> Takeaways</div>
+          <div class="takeaway-list" id="tlist-${key}">${takeawayInputs}</div>
+          <span class="add-takeaway" onclick="addTakeaway('${key}')">+ add insight</span>
+        </div>
+        <div class="box">
+          <div class="box-label"><span class="box-icon">→</span> Next Steps</div>
+          <div class="next-steps-list" id="slist-${key}">${stepInputs}</div>
+          <span class="add-step" onclick="addStep('${key}')">+ add step</span>
+        </div>
+      </div>
+
+      <div class="session-footer">
+        <div class="feeling-chips">${feelingChips}</div>
+        <span class="delete-entry" onclick="deleteEntry('${key}')">Delete</span>
+      </div>
+    </div>`;
+}
+
+/* ─── ENTRY CRUD ─── */
+function createEntry(key) {
+  entries[key] = {
+    id: Date.now(),
+    notes: '',
+    takeaways: ['', ''],
+    steps: [{text:'',done:false},{text:'',done:false}],
+    feelings: []
+  };
+  persist();
+  renderPanelContent(key);
+  renderCalendar(); // add dot
+}
+
+function deleteEntry(key) {
+  if (!confirm('Remove this entry?')) return;
+  delete entries[key];
+  persist();
+  renderPanelContent(key);
+  renderCalendar();
+}
+
+function updateNotes(key, val) {
+  if (!entries[key]) return;
+  entries[key].notes = val; persist();
+}
+
+function updateTakeaway(key, idx, val) {
+  if (!entries[key]) return;
+  entries[key].takeaways[idx] = val; persist();
+}
+
+function addTakeaway(key) {
+  if (!entries[key]) return;
+  entries[key].takeaways.push('');
+  const idx = entries[key].takeaways.length - 1;
+  const list = document.getElementById('tlist-' + key);
+  const item = document.createElement('div');
+  item.className = 'takeaway-item';
+  item.id = 'ti-' + key + '-' + idx;
+  item.innerHTML = `<div class="takeaway-dot"></div>
+    <input type="text" placeholder="Insight…"
+      oninput="updateTakeaway('${key}', ${idx}, this.value)" />`;
+  list.appendChild(item);
+  item.querySelector('input').focus();
+  persist();
+}
+
+function updateStep(key, idx, val) {
+  if (!entries[key]) return;
+  entries[key].steps[idx].text = val; persist();
+}
+
+function toggleStep(key, idx, el) {
+  if (!entries[key]) return;
+  entries[key].steps[idx].done = !entries[key].steps[idx].done;
+  el.classList.toggle('done');
+  el.textContent = entries[key].steps[idx].done ? '✓' : '';
+  const input = el.nextElementSibling;
+  if (input) input.classList.toggle('crossed', entries[key].steps[idx].done);
+  persist();
+}
+
+function addStep(key) {
+  if (!entries[key]) return;
+  entries[key].steps.push({text:'', done:false});
+  const idx = entries[key].steps.length - 1;
+  const list = document.getElementById('slist-' + key);
+  const item = document.createElement('div');
+  item.className = 'step-item';
+  item.innerHTML = `<div class="step-check" onclick="toggleStep('${key}', ${idx}, this)"></div>
+    <input type="text" placeholder="Something to carry forward…"
+      oninput="updateStep('${key}', ${idx}, this.value)" />`;
+  list.appendChild(item);
+  item.querySelector('input').focus();
+  persist();
+}
+
+function toggleFeeling(key, feeling, el) {
+  if (!entries[key]) return;
+  if (!entries[key].feelings) entries[key].feelings = [];
+  const i = entries[key].feelings.indexOf(feeling);
+  if (i === -1) entries[key].feelings.push(feeling);
+  else entries[key].feelings.splice(i, 1);
+  el.classList.toggle('on');
+  persist();
+}
+
+/* ─── UTILS ─── */
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ─── INIT ─── */
+renderCalendar();
+</script>
+</body>
+</html>

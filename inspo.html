@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inspo — Growth</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root {
+  --bg: #0a0508;
+  --magenta: #c0135a;
+  --magenta-bright: #e8186e;
+  --magenta-dim: rgba(192,19,90,0.45);
+  --magenta-ghost: rgba(192,19,90,0.2);
+  --magenta-veil: rgba(192,19,90,0.08);
+  --pink: #ff2d78;
+  --cream: rgba(245,238,242,0.88);
+  --cream-dim: rgba(230,218,228,0.55);
+  --cream-ghost: rgba(210,195,210,0.28);
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: var(--font-body);
+  color: var(--cream);
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND ── */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  filter: brightness(0.52) saturate(1.15);
+}
+
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 100%, rgba(5,2,4,0.97) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 40% at 100% 0%, rgba(5,2,4,0.8) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 0% 50%, rgba(5,2,4,0.6) 0%, transparent 55%),
+    linear-gradient(to bottom, rgba(5,2,4,0.55) 0%, transparent 25%, transparent 60%, rgba(5,2,4,0.85) 100%);
+}
+
+/* ── LAYOUT ── */
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding-bottom: 6rem;
+}
+
+/* ── HEADER ── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 1.5rem 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header-left { display: flex; align-items: center; gap: 1rem; }
+
+.back-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 0.5px solid var(--cream-ghost);
+  background: rgba(10,5,8,0.4);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+  backdrop-filter: blur(8px); color: var(--cream-dim);
+  font-size: 14px; text-decoration: none;
+}
+.back-btn:hover { background: var(--magenta-veil); border-color: var(--magenta-dim); }
+
+.page-title-wrap .eyebrow {
+  font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--cream-ghost); margin-bottom: 2px;
+}
+.page-title-wrap h1 {
+  font-family: var(--font-display);
+  font-size: 1.9rem; font-weight: 300; color: var(--cream);
+  letter-spacing: 0.02em; line-height: 1.1;
+}
+.page-title-wrap h1 em { font-style: italic; color: var(--magenta-bright); }
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+.count-label {
+  font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--cream-ghost);
+}
+
+.add-btn {
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 9px 20px;
+  background: var(--magenta-ghost);
+  border: 0.5px solid var(--magenta-dim);
+  border-radius: 100px; color: rgba(232,24,110,0.85);
+  cursor: pointer; transition: all 0.25s; backdrop-filter: blur(8px);
+}
+.add-btn:hover { background: rgba(192,19,90,0.3); border-color: var(--magenta-bright); color: var(--pink); }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  max-width: 1000px; margin: 0 auto;
+  padding: 0 1.5rem 1.25rem;
+  display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+
+.filter-pill {
+  font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 100px;
+  border: 0.5px solid var(--cream-ghost);
+  background: rgba(10,5,8,0.35);
+  color: var(--cream-ghost); cursor: pointer; transition: all 0.2s;
+  white-space: nowrap; backdrop-filter: blur(6px); user-select: none;
+}
+.filter-pill:hover { color: var(--cream-dim); border-color: rgba(210,195,210,0.4); }
+.filter-pill.active {
+  background: var(--magenta-ghost);
+  border-color: var(--magenta-dim);
+  color: rgba(232,24,110,0.9);
+}
+
+/* ── GRID ── */
+.board {
+  max-width: 1000px; margin: 0 auto;
+  padding: 0 1.5rem;
+  columns: 3;
+  column-gap: 10px;
+}
+
+@media (max-width: 600px) { .board { columns: 2; } }
+
+/* ── TILE ── */
+.tile {
+  break-inside: avoid;
+  margin-bottom: 10px;
+  position: relative;
+  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 0.5px solid rgba(192,19,90,0.15);
+  transition: border-color 0.3s, transform 0.3s;
+  background: rgba(20,10,15,0.6);
+  display: block;
+}
+.tile:hover {
+  border-color: rgba(192,19,90,0.45);
+  transform: translateY(-2px);
+}
+
+.tile img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  transition: filter 0.3s;
+}
+.tile:hover img { filter: brightness(0.75); }
+
+.tile-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(5,2,4,0.92) 0%, transparent 100%);
+  padding: 1rem 0.85rem 0.75rem;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.tile:hover .tile-overlay { transform: translateY(0); }
+
+.tile-date {
+  font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--magenta-bright); margin-bottom: 3px;
+}
+
+.tile-tag {
+  font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--cream-ghost);
+}
+
+/* Placeholder tile (upload CTA) */
+.tile-placeholder {
+  break-inside: avoid;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  border: 0.5px dashed rgba(192,19,90,0.25);
+  background: rgba(192,19,90,0.04);
+  aspect-ratio: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.25s; gap: 8px;
+}
+.tile-placeholder:hover { border-color: var(--magenta-dim); background: var(--magenta-veil); }
+.tile-placeholder-icon { font-size: 22px; color: var(--magenta-dim); }
+.tile-placeholder-text {
+  font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--magenta-dim);
+}
+
+/* ── MODAL — ADD ── */
+.modal-backdrop {
+  display: none; position: fixed; inset: 0; z-index: 50;
+  background: rgba(5,2,4,0.82); backdrop-filter: blur(10px);
+  align-items: center; justify-content: center;
+  padding: 1.5rem; overflow-y: auto;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal {
+  background: rgba(12,6,10,0.96);
+  border: 0.5px solid rgba(192,19,90,0.3);
+  border-radius: 22px; padding: 1.75rem;
+  width: 100%; max-width: 480px;
+  backdrop-filter: blur(24px); margin: auto;
+  animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal h3 {
+  font-family: var(--font-display);
+  font-size: 1.45rem; font-weight: 300; font-style: italic;
+  color: var(--cream); margin-bottom: 1.4rem;
+}
+
+/* Image drop zone */
+.drop-zone {
+  width: 100%; aspect-ratio: 4/3;
+  border: 0.5px dashed rgba(192,19,90,0.3);
+  border-radius: 14px;
+  background: rgba(192,19,90,0.04);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px; cursor: pointer;
+  transition: all 0.25s; position: relative; overflow: hidden;
+  margin-bottom: 1.1rem;
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--magenta-dim);
+  background: var(--magenta-veil);
+}
+
+.drop-zone-icon { font-size: 28px; color: var(--magenta-dim); }
+.drop-zone-text {
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--cream-ghost);
+}
+.drop-zone-sub {
+  font-size: 9px; color: rgba(210,195,210,0.2);
+  letter-spacing: 0.05em;
+}
+
+.drop-preview {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: none;
+}
+
+.modal-field { margin-bottom: 1rem; }
+
+.modal-label {
+  font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--cream-ghost); margin-bottom: 6px; display: block;
+}
+
+.modal-input, .modal-select {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(192,19,90,0.2);
+  border-radius: 10px; padding: 10px 13px;
+  font-family: var(--font-body); font-size: 12px;
+  color: var(--cream); outline: none; transition: border-color 0.2s;
+}
+.modal-input:focus, .modal-select:focus { border-color: rgba(192,19,90,0.5); }
+.modal-input::placeholder { color: rgba(210,195,210,0.2); }
+.modal-select { background-color: rgba(12,6,10,0.95); }
+option { background: #120810; }
+
+.modal-footer {
+  display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.4rem;
+}
+
+.modal-cancel {
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 9px 20px; background: transparent;
+  border: 0.5px solid rgba(192,19,90,0.18);
+  border-radius: 100px; color: var(--cream-ghost);
+  cursor: pointer; transition: all 0.2s;
+}
+.modal-cancel:hover { border-color: rgba(192,19,90,0.35); color: var(--cream-dim); }
+
+.modal-confirm {
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 9px 22px;
+  background: rgba(192,19,90,0.2);
+  border: 0.5px solid rgba(192,19,90,0.5);
+  border-radius: 100px; color: var(--magenta-bright);
+  cursor: pointer; transition: all 0.2s;
+}
+.modal-confirm:hover { background: rgba(192,19,90,0.32); border-color: var(--magenta-bright); }
+
+/* ── LIGHTBOX ── */
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 60;
+  background: rgba(5,2,4,0.95); backdrop-filter: blur(12px);
+  align-items: center; justify-content: center;
+  flex-direction: column; padding: 2rem;
+}
+.lightbox.open { display: flex; }
+
+.lb-img-wrap {
+  max-width: 680px; width: 100%; margin-bottom: 1.25rem;
+  border-radius: 16px; overflow: hidden;
+  border: 0.5px solid rgba(192,19,90,0.25);
+}
+.lb-img { width: 100%; display: block; object-fit: cover; max-height: 70vh; }
+
+.lb-meta {
+  max-width: 680px; width: 100%;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+}
+
+.lb-info {}
+.lb-tag-row {
+  display: flex; gap: 8px; align-items: center; margin-bottom: 6px;
+}
+
+.lb-tag {
+  font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 100px;
+  border: 0.5px solid var(--magenta-dim);
+  color: var(--magenta-bright);
+}
+
+.lb-date {
+  font-size: 9px; letter-spacing: 0.12em;
+  color: var(--cream-ghost);
+}
+
+.lb-link {
+  font-family: var(--font-display);
+  font-size: 1rem; font-style: italic; font-weight: 300;
+  color: var(--cream-dim); text-decoration: none;
+  border-bottom: 0.5px solid rgba(192,19,90,0.3);
+  padding-bottom: 1px; transition: all 0.2s;
+  word-break: break-all;
+}
+.lb-link:hover { color: var(--magenta-bright); border-color: var(--magenta-bright); }
+
+.lb-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+.lb-btn {
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 7px 16px; border-radius: 100px;
+  border: 0.5px solid rgba(192,19,90,0.25);
+  background: transparent; color: var(--cream-ghost);
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+  display: inline-block;
+}
+.lb-btn:hover { border-color: rgba(192,19,90,0.5); color: var(--cream-dim); }
+.lb-btn.danger:hover { border-color: rgba(200,80,80,0.4); color: rgba(220,100,100,0.7); }
+
+.lb-close {
+  position: absolute; top: 1.5rem; right: 1.5rem;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 0.5px solid rgba(192,19,90,0.25);
+  background: rgba(12,6,10,0.6);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--cream-ghost); font-size: 14px;
+  transition: all 0.2s; backdrop-filter: blur(8px);
+}
+.lb-close:hover { border-color: rgba(192,19,90,0.5); color: var(--cream-dim); }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  max-width: 1000px; margin: 3rem auto; text-align: center;
+  padding: 0 1.5rem;
+}
+.empty-state p {
+  font-family: var(--font-display);
+  font-size: 1.2rem; font-style: italic;
+  color: rgba(192,19,90,0.25); line-height: 1.7;
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+  display: flex; justify-content: center;
+  padding: 0.75rem 1rem 1rem;
+  background: linear-gradient(to top, rgba(5,2,4,0.95) 0%, transparent 100%);
+}
+
+.bottom-nav-inner {
+  display: flex; gap: 4px;
+  background: rgba(8,4,6,0.82);
+  border: 0.5px solid rgba(192,19,90,0.18);
+  border-radius: 100px; padding: 5px;
+  backdrop-filter: blur(16px);
+}
+
+.nav-pill {
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 100px;
+  cursor: pointer; transition: all 0.25s;
+  color: rgba(192,19,90,0.35);
+  border: none; background: transparent;
+  text-decoration: none; display: inline-block;
+}
+.nav-pill:hover { color: rgba(192,19,90,0.75); }
+.nav-pill.active {
+  background: rgba(192,19,90,0.15);
+  color: var(--magenta-bright);
+  border: 0.5px solid rgba(192,19,90,0.4);
+}
+
+/* hidden file input */
+.file-input { display: none; }
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <img class="bg-img" src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/inspo.jpg" alt="Inspo" />
+  <div class="bg-vignette"></div>
+</div>
+
+<div class="page">
+
+  <div class="page-header">
+    <div class="header-left">
+      <a class="back-btn" href="Growth.html">←</a>
+      <div class="page-title-wrap">
+        <p class="eyebrow">Page 03</p>
+        <h1><em>Inspo</em></h1>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="count-label" id="count-label">0 images</span>
+      <button class="add-btn" onclick="openAddModal()">+ Add Image</button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <span class="filter-pill active" onclick="setFilter('All', this)">All</span>
+    <span class="filter-pill" onclick="setFilter('Fashion', this)">Fashion</span>
+    <span class="filter-pill" onclick="setFilter('Editorial', this)">Editorial</span>
+    <span class="filter-pill" onclick="setFilter('Art', this)">Art</span>
+    <span class="filter-pill" onclick="setFilter('Architecture', this)">Architecture</span>
+    <span class="filter-pill" onclick="setFilter('Nature', this)">Nature</span>
+    <span class="filter-pill" onclick="setFilter('People', this)">People</span>
+    <span class="filter-pill" onclick="setFilter('Mood', this)">Mood</span>
+    <span class="filter-pill" onclick="setFilter('Other', this)">Other</span>
+  </div>
+
+  <!-- Board -->
+  <div class="board" id="board"></div>
+
+  <div class="empty-state" id="empty-state" style="display:none;">
+    <p>Your vision board begins here.<br>Add images that move you.</p>
+  </div>
+
+</div>
+
+<!-- Add Modal -->
+<div class="modal-backdrop" id="add-modal">
+  <div class="modal">
+    <h3>Add to board</h3>
+
+    <div class="drop-zone" id="drop-zone"
+      onclick="document.getElementById('file-input').click()"
+      ondragover="handleDragOver(event)"
+      ondragleave="handleDragLeave(event)"
+      ondrop="handleDrop(event)">
+      <img class="drop-preview" id="drop-preview" />
+      <div id="drop-zone-content">
+        <div class="drop-zone-icon">✦</div>
+        <span class="drop-zone-text">Upload or drag image</span>
+        <span class="drop-zone-sub">jpg, png, webp, gif</span>
+      </div>
+    </div>
+
+    <input type="file" accept="image/*" class="file-input" id="file-input" onchange="handleFileInput(this)" />
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="modal-field">
+        <label class="modal-label">Category</label>
+        <select class="modal-select" id="m-cat">
+          <option>Fashion</option>
+          <option>Editorial</option>
+          <option>Art</option>
+          <option>Architecture</option>
+          <option>Nature</option>
+          <option>People</option>
+          <option>Mood</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Date Added</label>
+        <input type="date" class="modal-input" id="m-date" />
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">Source URL (optional)</label>
+      <input type="text" class="modal-input" id="m-url" placeholder="https://…" />
+    </div>
+
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="modal-confirm" onclick="saveImage()">Add to Board</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="handleLbBackdropClick(event)">
+  <div class="lb-close" onclick="closeLightbox()">✕</div>
+  <div class="lb-img-wrap">
+    <img class="lb-img" id="lb-img" src="" alt="" />
+  </div>
+  <div class="lb-meta">
+    <div class="lb-info">
+      <div class="lb-tag-row">
+        <span class="lb-tag" id="lb-tag"></span>
+        <span class="lb-date" id="lb-date"></span>
+      </div>
+      <a class="lb-link" id="lb-link" href="#" target="_blank" style="display:none;"></a>
+    </div>
+    <div class="lb-actions">
+      <a class="lb-btn" id="lb-open-btn" href="#" target="_blank" style="display:none;">↗ Source</a>
+      <button class="lb-btn danger" onclick="deleteImage()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a class="nav-pill" href="Growth.html">Home</a>
+    <a class="nav-pill" href="Journal.html">Journal</a>
+    <a class="nav-pill" href="wants.html">Wants</a>
+    <a class="nav-pill active" href="inspo.html">Inspo</a>
+    <a class="nav-pill" href="therapy.html">Therapy</a>
+  </div>
+</div>
+
+<script>
+let images = [];
+let currentFilter = 'All';
+let activeLbId = null;
+let pendingImg = null;
+
+try {
+  const s = localStorage.getItem('inspo_images');
+  if (s) images = JSON.parse(s);
+} catch(e) {}
+
+function persist() {
+  try { localStorage.setItem('inspo_images', JSON.stringify(images)); } catch(e) {}
+}
+
+// ── FILTER ──
+function setFilter(cat, el) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderBoard();
+}
+
+// ── RENDER BOARD ──
+function renderBoard() {
+  const board = document.getElementById('board');
+  const empty = document.getElementById('empty-state');
+  board.innerHTML = '';
+
+  const filtered = currentFilter === 'All'
+    ? images
+    : images.filter(img => img.cat === currentFilter);
+
+  document.getElementById('count-label').textContent =
+    images.length + (images.length === 1 ? ' image' : ' images');
+
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  filtered.forEach(img => {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.onclick = () => openLightbox(img.id);
+
+    const dateFormatted = img.date
+      ? new Date(img.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      : '';
+
+    tile.innerHTML = `
+      <img src="${img.src}" alt="${escHtml(img.cat)}" loading="lazy" />
+      <div class="tile-overlay">
+        <div class="tile-date">${dateFormatted}</div>
+        <div class="tile-tag">${escHtml(img.cat)}</div>
+      </div>`;
+    board.appendChild(tile);
+  });
+}
+
+// ── ADD MODAL ──
+let isEditing = false;
+
+function openAddModal() {
+  pendingImg = null;
+  isEditing = false;
+  resetDropZone();
+  document.getElementById('m-cat').value = 'Fashion';
+  document.getElementById('m-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('m-url').value = '';
+  document.querySelector('.modal h3').textContent = 'Add to board';
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function closeAddModal() {
+  document.getElementById('add-modal').classList.remove('open');
+  pendingImg = null;
+}
+
+document.getElementById('add-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('add-modal')) closeAddModal();
+});
+
+// ── FILE HANDLING ──
+function handleFileInput(input) {
+  const file = input.files[0];
+  if (file) loadImageFile(file);
+  input.value = '';
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+  document.getElementById('drop-zone').classList.remove('dragover');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadImageFile(file);
+}
+
+function loadImageFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    pendingImg = e.target.result;
+    const preview = document.getElementById('drop-preview');
+    preview.src = pendingImg;
+    preview.style.display = 'block';
+    document.getElementById('drop-zone-content').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetDropZone() {
+  const preview = document.getElementById('drop-preview');
+  preview.src = '';
+  preview.style.display = 'none';
+  document.getElementById('drop-zone-content').style.display = '';
+  document.getElementById('drop-zone').classList.remove('dragover');
+}
+
+function saveImage() {
+  if (!pendingImg) {
+    document.getElementById('drop-zone').style.borderColor = 'rgba(192,19,90,0.6)';
+    setTimeout(() => document.getElementById('drop-zone').style.borderColor = '', 1000);
+    return;
+  }
+  let url = document.getElementById('m-url').value.trim();
+  if (url && !url.startsWith('http')) url = 'https://' + url;
+
+  const img = {
+    id: Date.now().toString(),
+    src: pendingImg,
+    cat: document.getElementById('m-cat').value,
+    date: document.getElementById('m-date').value,
+    url
+  };
+  images.unshift(img);
+  persist();
+  closeAddModal();
+  renderBoard();
+}
+
+// ── LIGHTBOX ──
+function openLightbox(id) {
+  const img = images.find(i => i.id === id);
+  if (!img) return;
+  activeLbId = id;
+
+  document.getElementById('lb-img').src = img.src;
+  document.getElementById('lb-tag').textContent = img.cat;
+
+  const dateFormatted = img.date
+    ? new Date(img.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    : '';
+  document.getElementById('lb-date').textContent = dateFormatted;
+
+  const linkEl = document.getElementById('lb-link');
+  const openBtn = document.getElementById('lb-open-btn');
+  if (img.url) {
+    linkEl.href = img.url;
+    try { linkEl.textContent = new URL(img.url).hostname.replace('www.',''); } catch(e) { linkEl.textContent = img.url; }
+    linkEl.style.display = '';
+    openBtn.href = img.url;
+    openBtn.style.display = '';
+  } else {
+    linkEl.style.display = 'none';
+    openBtn.style.display = 'none';
+  }
+
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  activeLbId = null;
+}
+
+function handleLbBackdropClick(e) {
+  if (e.target === document.getElementById('lightbox')) closeLightbox();
+}
+
+function deleteImage() {
+  if (!activeLbId || !confirm('Remove this image from your board?')) return;
+  images = images.filter(i => i.id !== activeLbId);
+  persist();
+  closeLightbox();
+  renderBoard();
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeLightbox();
+    closeAddModal();
+  }
+  if (e.key === 'ArrowRight' && activeLbId) {
+    const idx = images.findIndex(i => i.id === activeLbId);
+    if (idx < images.length - 1) openLightbox(images[idx + 1].id);
+  }
+  if (e.key === 'ArrowLeft' && activeLbId) {
+    const idx = images.findIndex(i => i.id === activeLbId);
+    if (idx > 0) openLightbox(images[idx - 1].id);
+  }
+});
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+renderBoard();
+</script>
+</body>
+</html>
