@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yearly Outlook — Javaun Garcia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --deep:      #1e2610;
+      --olive:     #2a3018;
+      --moss:      #3a4a22;
+      --moss-lt:   #4a5830;
+      --sage:      #6a7c42;
+      --sage-lt:   #8a9c58;
+      --khaki:     #b0aa70;
+      --khaki-lt:  #ccc888;
+      --cream:     #e8e4c8;
+      --pale:      #f0edd8;
+
+      /* Quarter palette — 50% opacity, harmonized with olive/khaki image */
+      --q1-bg:     rgba(28,24,18,0.50);   /* warm dark — Q1 winter */
+      --q1-accent: #e8dfc0;
+      --q1-text:   #d8cfa8;
+      --q2-bg:     rgba(224,218,188,0.50); /* warm cream — Q2 spring */
+      --q2-accent: #2a2818;
+      --q2-text:   #1e1c10;
+      --q3-bg:     rgba(48,68,24,0.50);   /* olive green — Q3 summer */
+      --q3-accent: #c8d890;
+      --q3-text:   #d8e8a8;
+      --q4-bg:     rgba(88,84,64,0.50);   /* warm taupe — Q4 fall */
+      --q4-accent: #d8d0a8;
+      --q4-text:   #e0d8b8;
+
+      --glass:        rgba(20,28,8,0.55);
+      --glass-border: rgba(160,170,100,0.20);
+      --topbar:       rgba(18,24,8,0.82);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Mono', monospace;
+      color: var(--pale);
+      overflow-x: hidden;
+      background: var(--deep);
+    }
+
+    .bg-image {
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center center;
+      z-index: 0;
+    }
+    .bg-scrim {
+      position: fixed; inset: 0;
+      background: linear-gradient(180deg,
+        rgba(18,24,8,0.52) 0%,
+        rgba(18,24,8,0.25) 20%,
+        rgba(18,24,8,0.48) 65%,
+        rgba(18,24,8,0.92) 100%);
+      z-index: 1;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: fixed; top:0; left:0; right:0;
+      z-index:200; height:52px;
+      background: var(--topbar);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(160,170,100,0.18);
+      display:flex; align-items:center;
+      justify-content:space-between; padding:0 24px;
+    }
+    .topbar-nav { display:flex; gap:24px; }
+    .topbar-nav a {
+      font-family:'DM Mono',monospace;
+      font-size:0.67rem; letter-spacing:0.13em;
+      text-transform:uppercase; color:var(--khaki-lt);
+      text-decoration:none; opacity:0.8;
+      transition:opacity 0.2s,color 0.2s;
+    }
+    .topbar-nav a:hover { opacity:1; color:var(--pale); }
+    .topbar-date { font-size:0.63rem; letter-spacing:0.1em; color:var(--khaki); opacity:0.65; }
+
+    /* ── PAGE ── */
+    .page { position:relative; z-index:10; padding-top:52px; }
+
+    /* ── HERO ── */
+    .hero-block {
+      position:absolute;
+      top:calc(52px + 24px); right:32px;
+      text-align:right; pointer-events:none; z-index:20;
+    }
+    .hero-title {
+      font-family:'Cormorant Garamond',serif;
+      font-size:clamp(2.8rem,7vw,5rem);
+      font-weight:300; line-height:0.9;
+      color:var(--pale);
+      text-shadow:0 2px 28px rgba(18,24,8,0.8);
+    }
+    .hero-title em { font-style:italic; color:var(--khaki-lt); }
+
+    /* ── CONTENT ── */
+    .content {
+      padding: calc(52px + 24px) 24px 80px;
+      max-width: 960px; margin: 0 auto;
+    }
+
+    /* ── YEAR TABS ── */
+    .year-tabs {
+      display:flex; gap:6px; margin-bottom:24px;
+    }
+    .year-tab {
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.35rem; font-weight:300;
+      color:var(--khaki); opacity:0.42;
+      background:none; border:none;
+      border-bottom:2px solid transparent;
+      padding:5px 4px 7px;
+      cursor:pointer;
+      transition:opacity 0.2s,color 0.2s,border-color 0.2s;
+    }
+    .year-tab em { font-style:italic; }
+    .year-tab:hover { opacity:0.72; }
+    .year-tab.active { opacity:1; color:var(--pale); border-bottom-color:var(--sage-lt); }
+    .year-sep { color:var(--khaki); opacity:0.22; font-size:1.1rem; padding:5px 2px; align-self:center; }
+
+    /* ── YEAR PANEL ── */
+    .year-panel { display:none; }
+    .year-panel.active { display:block; animation:fadeUp 0.28s ease both; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(10px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── YEAR THEME ── */
+    .theme-block {
+      background: var(--glass);
+      backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+      border:1px solid var(--glass-border);
+      border-radius:16px; padding:18px 24px;
+      margin-bottom:22px;
+    }
+    .theme-eyebrow {
+      font-size:0.56rem; letter-spacing:0.22em;
+      text-transform:uppercase; color:var(--khaki);
+      opacity:0.58; margin-bottom:6px;
+    }
+    .theme-input {
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.85rem; font-weight:300; font-style:italic;
+      background:none; border:none; outline:none;
+      color:var(--pale); width:100%;
+      border-bottom:1px solid rgba(160,170,100,0.18);
+      padding-bottom:3px; transition:border-color 0.2s;
+    }
+    .theme-input::placeholder { color:rgba(232,228,200,0.18); font-style:italic; }
+    .theme-input:focus { border-bottom-color:rgba(160,170,100,0.42); }
+
+    /* ── YEARLY CALENDAR ── */
+    .year-cal {
+      display:grid;
+      grid-template-columns: repeat(4,1fr);
+      gap:10px;
+      margin-bottom:28px;
+    }
+    @media(max-width:700px) { .year-cal { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:420px) { .year-cal { grid-template-columns:1fr; } }
+
+    /* Month card — colored by quarter */
+    .month-card {
+      border-radius:14px;
+      overflow:hidden;
+      cursor:pointer;
+      transition:transform 0.2s, box-shadow 0.2s;
+      position:relative;
+    }
+    .month-card:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,0,0,0.35); }
+
+    /* Q1 — warm dark / charcoal */
+    .month-card.q1 { background:rgba(28,24,18,0.50); border:1px solid rgba(80,72,48,0.5); }
+    .month-card.q1 .mc-header { background:rgba(18,16,10,0.55); border-bottom:1px solid rgba(80,72,48,0.3); }
+    .month-card.q1 .mc-month  { color:#e8dfc0; }
+    .month-card.q1 .mc-dow    { color:rgba(180,168,120,0.5); }
+    .month-card.q1 .mc-day    { color:rgba(216,207,168,0.75); }
+    .month-card.q1 .mc-day.today-day { background:#e8dfc0; color:#1a1810; }
+    .month-card.q1 .mc-day.has-event::after { background:rgba(200,188,140,0.8); }
+
+    /* Q2 — warm cream / sand */
+    .month-card.q2 { background:rgba(224,218,188,0.50); border:1px solid rgba(180,168,120,0.5); }
+    .month-card.q2 .mc-header { background:rgba(200,194,160,0.55); border-bottom:1px solid rgba(160,150,100,0.35); }
+    .month-card.q2 .mc-month  { color:#2a2818; }
+    .month-card.q2 .mc-dow    { color:rgba(80,72,40,0.6); }
+    .month-card.q2 .mc-day    { color:rgba(50,44,22,0.85); }
+    .month-card.q2 .mc-day.today-day { background:#2a2818; color:#e8dfc0; }
+    .month-card.q2 .mc-day.has-event::after { background:rgba(60,54,28,0.7); }
+
+    /* Q3 — olive green */
+    .month-card.q3 { background:rgba(48,68,24,0.50); border:1px solid rgba(80,110,40,0.5); }
+    .month-card.q3 .mc-header { background:rgba(32,48,14,0.55); border-bottom:1px solid rgba(70,96,32,0.35); }
+    .month-card.q3 .mc-month  { color:#c8d890; }
+    .month-card.q3 .mc-dow    { color:rgba(140,168,80,0.6); }
+    .month-card.q3 .mc-day    { color:rgba(200,224,140,0.8); }
+    .month-card.q3 .mc-day.today-day { background:#b8d070; color:#1a2e10; }
+    .month-card.q3 .mc-day.has-event::after { background:rgba(180,208,100,0.8); }
+
+    /* Q4 — warm taupe / khaki */
+    .month-card.q4 { background:rgba(88,84,64,0.50); border:1px solid rgba(130,124,88,0.5); }
+    .month-card.q4 .mc-header { background:rgba(64,60,44,0.55); border-bottom:1px solid rgba(110,104,72,0.35); }
+    .month-card.q4 .mc-month  { color:#d8d0a8; }
+    .month-card.q4 .mc-dow    { color:rgba(180,172,128,0.55); }
+    .month-card.q4 .mc-day    { color:rgba(216,208,168,0.8); }
+    .month-card.q4 .mc-day.today-day { background:#d8d0a8; color:#1e1c10; }
+    .month-card.q4 .mc-day.has-event::after { background:rgba(200,192,148,0.8); }
+
+    .month-card.q1 .mc-day.phase-bar { color:rgba(200,188,140,0.9); }
+    .month-card.q2 .mc-day.phase-bar { color:rgba(60,54,28,0.8); }
+    .month-card.q3 .mc-day.phase-bar { color:rgba(180,208,100,0.9); }
+    .month-card.q4 .mc-day.phase-bar { color:rgba(200,192,148,0.9); }
+
+    .mc-header { padding:10px 10px 6px; }
+    .mc-month {
+      font-family:'Cormorant Garamond',serif;
+      font-size:0.95rem; font-weight:400; line-height:1;
+    }
+    .mc-grid {
+      padding:4px 6px 8px;
+      display:grid; grid-template-columns:repeat(7,1fr);
+      gap:1px;
+    }
+    .mc-dow {
+      font-size:0.42rem; letter-spacing:0.06em;
+      text-transform:uppercase; text-align:center;
+      padding:2px 0 3px;
+    }
+    .mc-day {
+      font-size:0.5rem; text-align:center;
+      padding:2px 1px; border-radius:3px;
+      cursor:pointer; transition:opacity 0.15s;
+      position:relative; line-height:1.6;
+    }
+    .mc-day:hover { opacity:0.7; }
+    .mc-day.today-day {
+      border-radius:50%;
+      width:14px; height:14px;
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto; font-weight:600;
+    }
+    /* single-day dot */
+    .mc-day.has-event::after {
+      content:'';
+      position:absolute; bottom:1px; left:50%;
+      transform:translateX(-50%);
+      width:3px; height:3px; border-radius:50%;
+    }
+    /* phase bar — runs across multiple days */
+    .mc-day.phase-bar {
+      position:relative;
+    }
+    .mc-day.phase-bar::before {
+      content:'';
+      position:absolute;
+      bottom:2px; left:0; right:0;
+      height:3px;
+      background: currentColor;
+      opacity:0.7;
+    }
+    .mc-day.phase-start::before { border-radius:3px 0 0 3px; left:20%; }
+    .mc-day.phase-mid::before   { border-radius:0; }
+    .mc-day.phase-end::before   { border-radius:0 3px 3px 0; right:20%; }
+    .mc-day.phase-solo::before  { border-radius:3px; left:20%; right:20%; }
+    .mc-day.empty { cursor:default; }
+
+    /* ── QUARTER LEGEND ── */
+    .q-legend {
+      display:flex; gap:12px; flex-wrap:wrap;
+      margin-bottom:28px; align-items:center;
+    }
+    .q-legend-item {
+      display:flex; align-items:center; gap:6px;
+      font-size:0.58rem; letter-spacing:0.1em;
+      text-transform:uppercase; color:var(--khaki);
+      opacity:0.7;
+    }
+    .q-swatch {
+      width:12px; height:12px; border-radius:3px;
+      flex-shrink:0;
+    }
+
+    /* ── QUARTER SUMMARY ── */
+    .section-eyebrow {
+      font-size:0.57rem; letter-spacing:0.22em;
+      text-transform:uppercase; color:var(--khaki);
+      opacity:0.65; margin-bottom:14px;
+    }
+
+    .quarters-grid {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:12px;
+    }
+    @media(max-width:700px) { .quarters-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:420px) { .quarters-grid { grid-template-columns:1fr; } }
+
+    .q-summary-card {
+      border-radius:14px; overflow:hidden;
+      border:1px solid rgba(160,170,100,0.12);
+    }
+    .q-summary-header {
+      padding:12px 14px 8px;
+      display:flex; align-items:baseline; gap:8px;
+    }
+    .q-summary-label {
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.1rem; font-weight:300;
+    }
+    .q-summary-months {
+      font-size:0.52rem; letter-spacing:0.08em;
+      opacity:0.6;
+    }
+    .q-summary-body { padding:0 14px 12px; }
+    .q-textarea {
+      width:100%; font-family:'DM Mono',monospace;
+      font-size:0.68rem; background:none; border:none;
+      outline:none; resize:none; min-height:80px;
+      line-height:1.65;
+    }
+
+    /* Q summary card theming */
+    .qs-q1 { background:rgba(28,24,18,0.50); border-color:rgba(80,72,48,0.4); }
+    .qs-q1 .q-summary-header { background:rgba(18,16,10,0.55); border-bottom:1px solid rgba(80,72,48,0.25); }
+    .qs-q1 .q-summary-label  { color:#e8dfc0; }
+    .qs-q1 .q-summary-months { color:rgba(180,168,120,0.6); }
+    .qs-q1 .q-textarea       { color:#d8cfa8; }
+    .qs-q1 .q-textarea::placeholder { color:rgba(160,148,100,0.28); }
+
+    .qs-q2 { background:rgba(224,218,188,0.50); border-color:rgba(160,152,108,0.45); }
+    .qs-q2 .q-summary-header { background:rgba(200,194,160,0.55); border-bottom:1px solid rgba(148,140,96,0.3); }
+    .qs-q2 .q-summary-label  { color:#2a2818; }
+    .qs-q2 .q-summary-months { color:rgba(70,64,36,0.65); }
+    .qs-q2 .q-textarea       { color:#2a2818; }
+    .qs-q2 .q-textarea::placeholder { color:rgba(80,72,40,0.35); }
+
+    .qs-q3 { background:rgba(48,68,24,0.50); border-color:rgba(80,110,40,0.4); }
+    .qs-q3 .q-summary-header { background:rgba(32,48,14,0.55); border-bottom:1px solid rgba(70,96,32,0.28); }
+    .qs-q3 .q-summary-label  { color:#c8d890; }
+    .qs-q3 .q-summary-months { color:rgba(140,168,80,0.65); }
+    .qs-q3 .q-textarea       { color:#c8d890; }
+    .qs-q3 .q-textarea::placeholder { color:rgba(120,148,60,0.35); }
+
+    .qs-q4 { background:rgba(88,84,64,0.50); border-color:rgba(130,124,88,0.4); }
+    .qs-q4 .q-summary-header { background:rgba(64,60,44,0.55); border-bottom:1px solid rgba(110,104,72,0.28); }
+    .qs-q4 .q-summary-label  { color:#d8d0a8; }
+    .qs-q4 .q-summary-months { color:rgba(180,172,128,0.6); }
+    .qs-q4 .q-textarea       { color:#d0c8a0; }
+    .qs-q4 .q-textarea::placeholder { color:rgba(160,152,108,0.32); }
+
+    .q-status-badge {
+      font-size:0.5rem; letter-spacing:0.08em;
+      text-transform:uppercase; padding:2px 7px;
+      border-radius:10px; margin-left:auto;
+      align-self:center;
+    }
+    .badge-past     { background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.3); }
+    .badge-now      { background:rgba(160,170,100,0.35); color:var(--khaki-lt); }
+    .badge-upcoming { background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.2); }
+    /* white card badges need dark treatment */
+    .qs-q2 .badge-past     { background:rgba(0,0,0,0.06); color:rgba(0,0,0,0.28); }
+    .qs-q2 .badge-now      { background:rgba(42,74,42,0.18); color:#3a5a2a; }
+    .qs-q2 .badge-upcoming { background:rgba(0,0,0,0.04); color:rgba(0,0,0,0.2); }
+
+    /* ── EVENT MODAL ── */
+    .modal-overlay {
+      display:none; position:fixed; inset:0;
+      background:rgba(10,18,4,0.72);
+      backdrop-filter:blur(10px); z-index:400;
+      align-items:center; justify-content:center;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal {
+      background:rgba(18,26,8,0.97);
+      border:1px solid rgba(160,170,100,0.28);
+      border-radius:20px; padding:28px 26px;
+      width:90%; max-width:400px; position:relative;
+    }
+    .modal-close {
+      position:absolute; top:14px; right:16px;
+      background:none; border:none;
+      color:var(--khaki); font-size:1.1rem;
+      cursor:pointer; opacity:0.5; transition:opacity 0.2s;
+    }
+    .modal-close:hover { opacity:1; }
+    .modal-title {
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.4rem; font-weight:300;
+      color:var(--pale); margin-bottom:16px;
+    }
+    .modal-title em { font-style:italic; color:var(--khaki-lt); }
+    .field-label {
+      font-size:0.56rem; letter-spacing:0.16em;
+      text-transform:uppercase; color:var(--khaki);
+      opacity:0.6; margin-bottom:5px;
+    }
+    .field-group { margin-bottom:13px; }
+    .modal input[type=text],
+    .modal input[type=date],
+    .modal input[type=time],
+    .modal textarea,
+    .modal select {
+      width:100%; font-family:'DM Mono',monospace;
+      font-size:0.7rem;
+      background:rgba(160,170,100,0.07);
+      border:1px solid rgba(160,170,100,0.2);
+      border-radius:9px; padding:8px 12px;
+      color:var(--pale); outline:none;
+      transition:border-color 0.2s;
+    }
+    .modal input:focus,.modal textarea:focus,.modal select:focus { border-color:rgba(160,170,100,0.45); }
+    .modal input::placeholder,.modal textarea::placeholder { color:rgba(176,170,112,0.28); }
+    .modal select option { background:#1a2610; }
+    .modal textarea { resize:none; min-height:60px; line-height:1.6; }
+    .time-row { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+    .modal-actions { display:flex; gap:8px; margin-top:16px; }
+    .btn-primary {
+      font-family:'DM Mono',monospace;
+      font-size:0.6rem; letter-spacing:0.1em;
+      text-transform:uppercase;
+      background:var(--moss-lt); color:var(--pale);
+      border:none; border-radius:9px;
+      padding:9px 16px; cursor:pointer;
+      transition:background 0.2s; flex:1;
+    }
+    .btn-primary:hover { background:var(--sage); }
+    .btn-danger {
+      font-family:'DM Mono',monospace;
+      font-size:0.6rem; letter-spacing:0.1em;
+      text-transform:uppercase;
+      background:rgba(160,50,50,0.3); color:#e09090;
+      border:1px solid rgba(160,50,50,0.35);
+      border-radius:9px; padding:9px 14px;
+      cursor:pointer; transition:all 0.2s;
+    }
+    .btn-danger:hover { background:rgba(160,50,50,0.5); }
+
+    /* save dot */
+    .save-dot {
+      position:fixed; bottom:20px; right:20px;
+      width:7px; height:7px; border-radius:50%;
+      background:var(--sage-lt); z-index:300;
+      opacity:0; transition:opacity 0.3s;
+    }
+    .save-dot.show { opacity:1; }
+
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-thumb { background:rgba(160,170,100,0.2); border-radius:4px; }
+  </style>
+</head>
+<body>
+
+<img class="bg-image" src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Yearly%20Outlook.jpg" alt="" />
+<div class="bg-scrim"></div>
+
+<nav class="topbar">
+  <div class="topbar-nav">
+    <a href="Planning.html">← Planning</a>
+    <a href="Main Hub.html">Main Hub</a>
+  </div>
+  <div class="topbar-date" id="topbarDate"></div>
+  <div class="topbar-nav">
+    <a href="Monthly Outline.html">Monthly</a>
+    <a href="Wellness.html">Wellness</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="hero-block">
+    <div class="hero-title">Yearly <em>Outlook</em></div>
+  </div>
+
+  <div class="content">
+
+    <!-- YEAR TABS -->
+    <div class="year-tabs">
+      <button class="year-tab active" data-year="2026" onclick="switchYear('2026')">20<em>26</em></button>
+      <span class="year-sep">·</span>
+      <button class="year-tab" data-year="2027" onclick="switchYear('2027')">20<em>27</em></button>
+      <span class="year-sep">·</span>
+      <button class="year-tab" data-year="2028" onclick="switchYear('2028')">20<em>28</em></button>
+    </div>
+
+    <!-- PANELS — one per year, built by JS -->
+    <div id="panel-2026" class="year-panel active"></div>
+    <div id="panel-2027" class="year-panel"></div>
+    <div id="panel-2028" class="year-panel"></div>
+
+  </div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modalTitle">Add <em>Event</em></div>
+    <div class="field-group">
+      <div class="field-label">Title</div>
+      <input type="text" id="evTitle" placeholder="Event name…" />
+    </div>
+    <div class="field-group">
+      <div class="field-label">Date</div>
+      <input type="date" id="evDate" />
+    </div>
+    <div class="field-group">
+      <div class="field-label">End Date <span style="opacity:0.4;font-size:0.55rem">(leave blank for single day)</span></div>
+      <input type="date" id="evEndDate" />
+    </div>
+    <div class="field-group">
+      <div class="field-label">Time (optional)</div>
+      <div class="time-row">
+        <input type="time" id="evStart" />
+        <input type="time" id="evEnd" />
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Notes</div>
+      <textarea id="evNotes" placeholder="Any details…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="saveEvent()">Save</button>
+      <button class="btn-danger" id="deleteBtn" onclick="deleteEvent()" style="display:none">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="save-dot" id="saveDot"></div>
+
+<script>
+const MONTH_NAMES = ['January','February','March','April','May','June',
+                     'July','August','September','October','November','December'];
+const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW_SHORT   = ['S','M','T','W','T','F','S'];
+const YEARS       = ['2026','2027','2028'];
+
+const today    = new Date();
+const todayY   = today.getFullYear();
+const todayM   = today.getMonth();   // 0-indexed
+const todayD   = today.getDate();
+const curQ     = Math.floor(todayM / 3) + 1;
+
+// which month/day was clicked for modal
+let editingId   = null;
+let clickedDate = null;
+
+/* ══════════════════════════════════
+   QUARTER HELPERS
+══════════════════════════════════ */
+function qForMonth(mo) { return Math.floor(mo / 3) + 1; } // mo 0-indexed → Q 1-4
+
+const Q_INFO = {
+  1: { label:'Q1', months:'Jan · Feb · Mar', cls:'q1', sumCls:'qs-q1' },
+  2: { label:'Q2', months:'Apr · May · Jun', cls:'q2', sumCls:'qs-q2' },
+  3: { label:'Q3', months:'Jul · Aug · Sep', cls:'q3', sumCls:'qs-q3' },
+  4: { label:'Q4', months:'Oct · Nov · Dec', cls:'q4', sumCls:'qs-q4' },
+};
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('topbarDate').textContent =
+    today.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+
+  seedMilestones();
+  YEARS.forEach(yr => buildPanel(yr));
+
+  const def = YEARS.includes(String(todayY)) ? String(todayY) : '2026';
+  switchYear(def);
+});
+
+/* ══════════════════════════════════
+   BUILD PANEL
+══════════════════════════════════ */
+function buildPanel(yr) {
+  const panel = document.getElementById(`panel-${yr}`);
+  const y     = parseInt(yr);
+
+  panel.innerHTML = `
+    <!-- THEME -->
+    <div class="theme-block">
+      <div class="theme-eyebrow">${yr} · Year Theme</div>
+      <input class="theme-input" id="theme-${yr}" type="text"
+        placeholder="e.g. Expansion, Depth, Becoming…"
+        oninput="save('${yr}')" />
+    </div>
+
+    <!-- Q LEGEND -->
+    <div class="q-legend">
+      <div class="q-legend-item"><div class="q-swatch" style="background:rgba(28,24,18,0.7);border:1px solid rgba(80,72,48,0.6)"></div>Q1 — Winter</div>
+      <div class="q-legend-item"><div class="q-swatch" style="background:rgba(224,218,188,0.7);border:1px solid rgba(160,152,108,0.6)"></div>Q2 — Spring</div>
+      <div class="q-legend-item"><div class="q-swatch" style="background:rgba(48,68,24,0.7);border:1px solid rgba(80,110,40,0.6)"></div>Q3 — Summer</div>
+      <div class="q-legend-item"><div class="q-swatch" style="background:rgba(88,84,64,0.7);border:1px solid rgba(130,124,88,0.6)"></div>Q4 — Fall</div>
+    </div>
+
+    <!-- 12-MONTH CALENDAR GRID -->
+    <div class="year-cal" id="cal-${yr}"></div>
+
+    <div class="divider" style="border:none;border-top:1px solid rgba(160,170,100,0.1);margin:8px 0 24px"></div>
+
+    <!-- QUARTER SUMMARIES -->
+    <div class="section-eyebrow">Quarterly Summary</div>
+    <div class="quarters-grid" id="qsum-${yr}"></div>
+  `;
+
+  renderYearCal(yr);
+  renderQuarterSummaries(yr);
+  loadData(yr);
+}
+
+/* ══════════════════════════════════
+   RENDER 12-MONTH CALENDAR
+══════════════════════════════════ */
+function renderYearCal(yr) {
+  const y       = parseInt(yr);
+  const calWrap = document.getElementById(`cal-${yr}`);
+  const events  = getEvents();
+  calWrap.innerHTML = '';
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+  function ds(mo, d) { return `${yr}-${pad(mo+1)}-${pad(d)}`; }
+  function isPhase(ev) { return ev.end_date && ev.end_date > ev.date; }
+  function activeOnDay(dateStr) {
+    return events.filter(ev =>
+      isPhase(ev) ? dateStr >= ev.date && dateStr <= ev.end_date : ev.date === dateStr
+    );
+  }
+
+  for (let mo = 0; mo < 12; mo++) {
+    const q        = qForMonth(mo);
+    const qCls     = Q_INFO[q].cls;
+    const firstDay = new Date(y, mo, 1).getDay();
+    const daysInMo = new Date(y, mo + 1, 0).getDate();
+
+    const card = document.createElement('div');
+    card.className = `month-card ${qCls}`;
+
+    const hdr = document.createElement('div');
+    hdr.className = 'mc-header';
+    hdr.innerHTML = `<div class="mc-month">${MONTH_NAMES[mo]}</div>`;
+    card.appendChild(hdr);
+
+    const grid = document.createElement('div');
+    grid.className = 'mc-grid';
+
+    DOW_SHORT.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'mc-dow'; el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    for (let i = 0; i < firstDay; i++) {
+      const e = document.createElement('div');
+      e.className = 'mc-day empty';
+      grid.appendChild(e);
+    }
+
+    for (let d = 1; d <= daysInMo; d++) {
+      const dateStr  = ds(mo, d);
+      const prevStr  = d > 1        ? ds(mo, d-1) : null;
+      const nextStr  = d < daysInMo ? ds(mo, d+1) : null;
+      const isToday  = (y === todayY && mo === todayM && d === todayD);
+      const dayEvs   = activeOnDay(dateStr);
+      const phaseEvs = dayEvs.filter(isPhase);
+      const dotEvs   = dayEvs.filter(ev => !isPhase(ev));
+
+      const el = document.createElement('div');
+      let cls = 'mc-day' + (isToday ? ' today-day' : '');
+
+      if (phaseEvs.length > 0) {
+        const ph = phaseEvs[0];
+        const prevActive = prevStr && activeOnDay(prevStr).some(e => e.id === ph.id);
+        const nextActive = nextStr && activeOnDay(nextStr).some(e => e.id === ph.id);
+        cls += ' phase-bar';
+        if (!prevActive && !nextActive) cls += ' phase-solo';
+        else if (!prevActive)           cls += ' phase-start';
+        else if (!nextActive)           cls += ' phase-end';
+        else                            cls += ' phase-mid';
+        el.title = ph.title + (ph.notes ? ' · ' + ph.notes : '');
+      } else if (dotEvs.length > 0) {
+        cls += ' has-event';
+        el.title = dotEvs.map(e => e.title).join(' · ');
+      }
+
+      el.className = cls;
+      el.textContent = d;
+      el.onclick = () => openNewModal(dateStr);
+      grid.appendChild(el);
+    }
+
+    card.appendChild(grid);
+    calWrap.appendChild(card);
+  }
+}
+
+/* ══════════════════════════════════
+   RENDER QUARTER SUMMARIES
+══════════════════════════════════ */
+function renderQuarterSummaries(yr) {
+  const y    = parseInt(yr);
+  const wrap = document.getElementById(`qsum-${yr}`);
+  wrap.innerHTML = '';
+
+  for (let q = 1; q <= 4; q++) {
+    const info = Q_INFO[q];
+    let badgeCls, badgeTxt;
+    if (y < todayY || (y === todayY && q < curQ))      { badgeCls='badge-past';     badgeTxt='Past'; }
+    else if (y === todayY && q === curQ)               { badgeCls='badge-now';      badgeTxt='Now'; }
+    else                                               { badgeCls='badge-upcoming'; badgeTxt='Ahead'; }
+
+    const card = document.createElement('div');
+    card.className = `q-summary-card ${info.sumCls}`;
+    card.innerHTML = `
+      <div class="q-summary-header">
+        <span class="q-summary-label">${info.label}</span>
+        <span class="q-summary-months">${info.months}</span>
+        <span class="q-status-badge ${badgeCls}">${badgeTxt}</span>
+      </div>
+      <div class="q-summary-body">
+        <textarea class="q-textarea" id="q-${yr}-${q}"
+          placeholder="Focus areas, milestones, intentions…"
+          oninput="save('${yr}')"></textarea>
+      </div>
+    `;
+    wrap.appendChild(card);
+  }
+}
+
+/* ══════════════════════════════════
+   YEAR TABS
+══════════════════════════════════ */
+function switchYear(yr) {
+  document.querySelectorAll('.year-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.year === yr));
+  document.querySelectorAll('.year-panel').forEach(p =>
+    p.classList.toggle('active', p.id === 'panel-' + yr));
+}
+
+/* ══════════════════════════════════
+   EVENTS STORAGE
+══════════════════════════════════ */
+function getEvents()        { return JSON.parse(localStorage.getItem('plan_cal_events') || '[]'); }
+function setEvents(arr)     { localStorage.setItem('plan_cal_events', JSON.stringify(arr)); }
+
+/* ══════════════════════════════════
+   SEED MILESTONES (runs once)
+══════════════════════════════════ */
+function seedMilestones() {
+  if (localStorage.getItem('plan_milestones_seeded') === 'v2') return;
+
+  const milestones = [
+    // ── SAVINGS & FINANCE ──
+    { date:'2026-06-01', title:'Discover card payoff target',          notes:'Finance' },
+    { date:'2026-10-01', title:'Emergency fund fully funded (3 mo)',   notes:'Finance' },
+    { date:'2026-12-01', title:'Roth IRA 2026 maxed ($7,000)',         notes:'Finance' },
+    { date:'2027-01-01', title:'Roth IRA 2027 contributions begin',    notes:'Finance' },
+    { date:'2027-01-01', title:'Wedding fund savings begin',           notes:'Finance' },
+    { date:'2027-06-01', title:'Buenos Aires living fund target hit',  notes:'Finance' },
+    { date:'2026-07-01', end_date:'2028-04-01', title:'Citi card payoff phase', notes:'Finance · $280/mo for 20 months' },
+    { date:'2028-04-01', title:'Citi card fully paid off 🎉',          notes:'Finance · cash flow freed' },
+
+    // ── CONTENT CREATION ──
+    { date:'2026-06-01', title:'10K TikTok milestone 🎯',              notes:'Content · 1 full year serious' },
+    { date:'2026-09-01', title:'Brand partnership conversations begin', notes:'Content' },
+    { date:'2026-12-01', title:'First paid brand partnership',         notes:'Content' },
+    { date:'2027-03-01', title:'Pitch Streetsblog SF / Next City',     notes:'Content · longform policy writing' },
+    { date:'2027-06-01', title:'2–3 published longform pieces',        notes:'Content' },
+    { date:'2027-07-01', end_date:'2028-12-31', title:'Buenos Aires content era', notes:'Content · travel series' },
+
+    // ── ENGAGEMENT & WEDDING ──
+    { date:'2027-03-15', title:'Engagement 💍',                        notes:'Spring 2027 · March–April window' },
+    { date:'2027-05-01', title:'Wedding venue booked — Sayulita',      notes:'Wedding' },
+    { date:'2027-07-01', title:'Vendors locked (photo, planner, catering)', notes:'Wedding' },
+    { date:'2027-09-01', title:'Invitations designed & sent',          notes:'Wedding' },
+    { date:'2027-10-01', title:'Guest travel logistics finalized',     notes:'Wedding' },
+    { date:'2028-03-01', end_date:'2028-05-31', title:'Wedding window 🎉', notes:'March–May 2028' },
+    { date:'2028-05-15', end_date:'2028-06-30', title:'Honeymoon — Brazil & Argentina 🌎', notes:'South America' },
+
+    // ── GAP YEAR / MOVE ABROAD ──
+    { date:'2026-09-01', end_date:'2026-12-31', title:'Buenos Aires research & visa prep', notes:'Gap Year Prep' },
+    { date:'2026-12-01', title:'Passport renewed',                     notes:'Gap Year Prep' },
+    { date:'2027-01-01', title:'Final SFMTA date set, notice given',   notes:'Gap Year' },
+    { date:'2027-03-01', title:'Last day at SFMTA',                    notes:'Gap Year begins' },
+    { date:'2027-04-01', title:'Arrive Buenos Aires 🌎',               notes:'Gap Year · base city' },
+    { date:'2027-04-01', end_date:'2028-06-30', title:'Gap year abroad', notes:'Buenos Aires base' },
+    { date:'2027-06-01', end_date:'2028-05-31', title:'Regional South America travel', notes:'Colombia, Peru, Chile, Brazil' },
+
+    // ── LAW SCHOOL ──
+    { date:'2027-01-01', end_date:'2027-06-01', title:'LSAT prep phase', notes:'Law School · target 170+' },
+    { date:'2027-06-15', title:'LSAT sitting',                         notes:'Law School · June/Aug 2027' },
+    { date:'2027-09-01', title:'LSAT retake if needed',                notes:'Law School' },
+    { date:'2028-09-01', end_date:'2028-12-31', title:'Law school applications', notes:'Columbia, NYU, Stanford, Berkeley, Penn' },
+    { date:'2029-03-01', title:'Law school decisions arrive',          notes:'Law School · negotiate LRAP' },
+    { date:'2029-05-01', title:'Commit to law school',                 notes:'Law School' },
+    { date:'2029-08-01', title:'Law school begins 🎓',                 notes:'Law School' },
+  ];
+
+  const existing = getEvents();
+  const seeded = milestones.map(m => ({
+    id:       'seed_' + m.date + '_' + Math.random().toString(36).slice(2,7),
+    title:    m.title,
+    date:     m.date,
+    end_date: m.end_date || '',
+    start:    '',
+    end:      '',
+    notes:    m.notes,
+  }));
+
+  setEvents([...existing, ...seeded]);
+  localStorage.setItem('plan_milestones_seeded', 'v2');
+}
+
+function openNewModal(ds) {
+  editingId = null; clickedDate = ds;
+  document.getElementById('modalTitle').innerHTML = 'Add <em>Event</em>';
+  document.getElementById('evTitle').value   = '';
+  document.getElementById('evDate').value    = ds;
+  document.getElementById('evEndDate').value = '';
+  document.getElementById('evStart').value   = '';
+  document.getElementById('evEnd').value     = '';
+  document.getElementById('evNotes').value   = '';
+  document.getElementById('deleteBtn').style.display = 'none';
+  document.getElementById('eventModal').classList.add('open');
+  setTimeout(() => document.getElementById('evTitle').focus(), 60);
+}
+
+function saveEvent() {
+  const title = document.getElementById('evTitle').value.trim();
+  if (!title) { document.getElementById('evTitle').focus(); return; }
+  const ev = {
+    id:       editingId || String(Date.now()),
+    title,
+    date:     document.getElementById('evDate').value,
+    end_date: document.getElementById('evEndDate').value,
+    start:    document.getElementById('evStart').value,
+    end:      document.getElementById('evEnd').value,
+    notes:    document.getElementById('evNotes').value,
+  };
+  let evs = getEvents();
+  if (editingId) { const i = evs.findIndex(e=>e.id===editingId); if(i>-1) evs[i]=ev; else evs.push(ev); }
+  else evs.push(ev);
+  setEvents(evs);
+  flashSave(); closeModal();
+  YEARS.forEach(yr => renderYearCal(yr));
+}
+
+function deleteEvent() {
+  if (!editingId) return;
+  setEvents(getEvents().filter(e=>e.id!==editingId));
+  flashSave(); closeModal();
+  YEARS.forEach(yr => renderYearCal(yr));
+}
+
+function closeModal() {
+  document.getElementById('eventModal').classList.remove('open');
+  editingId = null;
+}
+
+document.getElementById('eventModal').addEventListener('click', function(e) {
+  if (e.target===this) closeModal();
+});
+
+/* ══════════════════════════════════
+   YEAR DATA (theme + quarterly)
+══════════════════════════════════ */
+function save(yr) {
+  const data = {
+    theme: (document.getElementById(`theme-${yr}`) || {}).value || '',
+    q1:    (document.getElementById(`q-${yr}-1`)   || {}).value || '',
+    q2:    (document.getElementById(`q-${yr}-2`)   || {}).value || '',
+    q3:    (document.getElementById(`q-${yr}-3`)   || {}).value || '',
+    q4:    (document.getElementById(`q-${yr}-4`)   || {}).value || '',
+  };
+  localStorage.setItem(`plan_yearly_${yr}`, JSON.stringify(data));
+  flashSave();
+}
+
+function loadData(yr) {
+  const data = JSON.parse(localStorage.getItem(`plan_yearly_${yr}`) || '{}');
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.value=val||''; };
+  set(`theme-${yr}`, data.theme);
+  set(`q-${yr}-1`,   data.q1);
+  set(`q-${yr}-2`,   data.q2);
+  set(`q-${yr}-3`,   data.q3);
+  set(`q-${yr}-4`,   data.q4);
+}
+
+function flashSave() {
+  const dot = document.getElementById('saveDot');
+  dot.classList.add('show');
+  clearTimeout(dot._t);
+  dot._t = setTimeout(()=>dot.classList.remove('show'), 1400);
+}
+</script>
+</body>
+</html>
