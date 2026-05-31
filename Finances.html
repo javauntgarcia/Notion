@@ -351,65 +351,88 @@
   /* ── SUBPAGE NAV ── */
   .subpage-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
     margin-bottom: 32px;
   }
+  @media (max-width: 900px) {
+    .subpage-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .subpage-grid { grid-template-columns: 1fr 1fr; }
+  }
   .subpage-card {
     position: relative;
-    background: var(--card-bg);
     border: 1px solid var(--glass-border);
     border-radius: 14px;
     padding: 28px 26px;
     text-decoration: none;
     overflow: hidden;
-    transition: border-color 0.2s, transform 0.2s;
+    transition: border-color 0.25s, transform 0.25s;
     display: block;
+    background-size: cover;
+    background-position: center;
+    min-height: 160px;
+  }
+  /* dark scrim over the bg image */
+  .subpage-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(10,8,7,0.62);
+    transition: background 0.25s;
+    border-radius: 14px;
+    z-index: 0;
   }
   .subpage-card:hover {
-    border-color: rgba(201,162,126,0.6);
+    border-color: rgba(201,162,126,0.7);
     transform: translateY(-3px);
   }
+  .subpage-card:hover::after {
+    background: rgba(10,8,7,0.44);
+  }
+  /* top shimmer line on hover */
   .subpage-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 1px;
+    height: 2px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
     opacity: 0;
     transition: opacity 0.3s;
+    z-index: 2;
   }
   .subpage-card:hover::before { opacity: 1; }
-  .subpage-icon {
-    font-size: 1.3rem;
-    margin-bottom: 14px;
-    opacity: 0.8;
-  }
+  /* all card children sit above the scrim */
+  .subpage-card > * { position: relative; z-index: 1; }
   .subpage-card-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.25rem;
-    font-weight: 400;
+    font-size: 1.5rem;
+    font-weight: 300;
     font-style: italic;
     color: var(--parchment);
     margin-bottom: 6px;
     letter-spacing: 0.02em;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.6);
   }
   .subpage-card-desc {
-    font-size: 0.6rem;
+    font-size: 0.58rem;
     letter-spacing: 0.12em;
     line-height: 1.7;
-    color: var(--warm-mid);
+    color: var(--cream);
     text-transform: uppercase;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
   }
   .subpage-arrow {
     position: absolute;
-    top: 28px;
+    bottom: 24px;
     right: 24px;
     font-size: 0.8rem;
     color: var(--accent);
     opacity: 0;
     transition: opacity 0.2s, transform 0.2s;
     transform: translateX(-4px);
+    z-index: 1;
   }
   .subpage-card:hover .subpage-arrow {
     opacity: 1;
@@ -448,7 +471,7 @@
 <nav class="topbar">
   <a href="Main Hub.html">← Main Hub</a>
   <span class="topbar-date" id="topbar-date"></span>
-  <a href="https://javauntgarcia.github.io/Notion/Statements.html">Import Statements →</a>
+  <a href="Statements.html">Import Statements →</a>
 </nav>
 
 <div class="page-wrap">
@@ -498,7 +521,7 @@
     <div class="section-header">
       <h2 class="section-title">This Month's Budget</h2>
       <div class="section-rule"></div>
-      <a href="https://javauntgarcia.github.io/Notion/Budget.html" style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);text-decoration:none;">Manage →</a>
+      <a href="Budget.html" style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);text-decoration:none;">Manage →</a>
     </div>
     <div class="budget-grid" id="budget-grid">
       <!-- rendered by JS -->
@@ -519,32 +542,26 @@
   <!-- SUBPAGE NAV -->
   <section>
     <div class="section-header">
-      <h2 class="section-title">Tools</h2>
-      <div class="section-rule"></div>
-    </div>
+      
     <div class="subpage-grid">
-      <a href="https://javauntgarcia.github.io/Notion/Accounts.html" class="subpage-card">
-        <div class="subpage-icon">◈</div>
+      <a href="Accounts.html" class="subpage-card" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Accounts.jpg');">
         <p class="subpage-card-title">Accounts</p>
-        <p class="subpage-card-desc">Update balances · View transaction history · Manage all 9 accounts</p>
+        <p class="subpage-card-desc">Balances · Net worth · All 9 accounts</p>
         <span class="subpage-arrow">→</span>
       </a>
-      <a href="https://javauntgarcia.github.io/Notion/Budget.html" class="subpage-card">
-        <div class="subpage-icon">◉</div>
+      <a href="Budget.html" class="subpage-card" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Budget.jpg');">
         <p class="subpage-card-title">Budget</p>
-        <p class="subpage-card-desc">Category limits · Spending progress · Monthly breakdown</p>
+        <p class="subpage-card-desc">June & July · Shared bills · Debt paydown</p>
         <span class="subpage-arrow">→</span>
       </a>
-      <a href="https://javauntgarcia.github.io/Notion/Statements.html" class="subpage-card">
-        <div class="subpage-icon">◎</div>
+      <a href="Statements.html" class="subpage-card" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Statements.jpg');">
         <p class="subpage-card-title">Statements</p>
-        <p class="subpage-card-desc">Upload CSV files · Parse transactions · Auto-categorize spending</p>
+        <p class="subpage-card-desc">Transactions · Owner tagging · All accounts</p>
         <span class="subpage-arrow">→</span>
       </a>
-      <a href="https://javauntgarcia.github.io/Notion/Summaries.html" class="subpage-card">
-        <div class="subpage-icon">◐</div>
+      <a href="Summaries.html" class="subpage-card" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Summaries.jpg');">
         <p class="subpage-card-title">Summaries</p>
-        <p class="subpage-card-desc">Filter by day · Week · Month · Year · Net worth over time</p>
+        <p class="subpage-card-desc">Monthly · By day · Seasonal trends</p>
         <span class="subpage-arrow">→</span>
       </a>
     </div>
@@ -563,162 +580,109 @@ dateEl.textContent = new Date().toLocaleDateString('en-US', {
   weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
 }).toUpperCase();
 
-// ── ACCOUNT DEFINITIONS ──
-// Positive balance = asset. Negative = debt (credit cards).
-const ACCOUNT_DEFS = [
-  // CREDIT CARDS (debt)
-  { key: 'fin_bilt',        name: 'BILT Mastercard',       type: 'Credit Card', class: 'debt' },
-  { key: 'fin_discover',    name: 'Discover It',           type: 'Credit Card', class: 'debt' },
-  { key: 'fin_citi',        name: 'Citi Diamond Preferred',type: 'Credit Card', class: 'debt' },
-  { key: 'fin_chase_sap',   name: 'Chase Sapphire Reserve',type: 'Credit Card', class: 'debt' },
-  // CHECKING / SAVINGS
-  { key: 'fin_wells',       name: 'Wells Fargo',           type: 'Checking',    class: 'checking' },
-  { key: 'fin_chase_chk',   name: 'Chase Checking',        type: 'Checking',    class: 'checking' },
-  { key: 'fin_chase_sav',   name: 'Chase Savings',         type: 'Savings',     class: 'asset' },
-  // HYSA
-  { key: 'fin_wf_hysa',     name: 'Wealthfront HYSA',      type: 'HYSA',        class: 'asset' },
-  { key: 'fin_wf_shared',   name: 'Wealthfront HYSA (Shared)', type: 'HYSA',    class: 'asset' },
+// ── HELPERS ──
+function fmt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmt0(n) {
+  return '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ── REAL ACCOUNT DATA (as of May 31, 2026) ──
+const ACCOUNTS = [
+  { name: 'BILT Mastercard',        type: 'Credit Card', class: 'debt',     balance: -1219.14 },
+  { name: 'Discover It',            type: 'Credit Card', class: 'debt',     balance: -2059.57 },
+  { name: 'Citi Diamond Preferred', type: 'Credit Card', class: 'debt',     balance: -5459.99 },
+  { name: 'Chase Sapphire Reserve', type: 'Credit Card', class: 'debt',     balance: -88.02   },
+  { name: 'Chase Checking',         type: 'Checking',    class: 'checking', balance:  3801.95  },
+  { name: 'Chase Savings',          type: 'Savings',     class: 'asset',    balance:  21.03    },
+  { name: 'Wealthfront Joint',      type: 'HYSA',        class: 'asset',    balance:  1371.91  },
+  { name: 'Wealthfront Personal',   type: 'HYSA',        class: 'asset',    balance:  879.69   },
+  { name: 'Vanguard Roth IRA',      type: 'Investment',  class: 'asset',    balance:  18857.00 },
 ];
 
-// ── LOAD ACCOUNTS ──
 function loadAccounts() {
   const grid = document.getElementById('accounts-grid');
-  grid.innerHTML = '';
   let totalAssets = 0, totalDebt = 0;
-  let latestUpdate = null;
 
-  ACCOUNT_DEFS.forEach(def => {
-    const stored = JSON.parse(localStorage.getItem(def.key) || 'null');
-    const balance = stored ? stored.balance : null;
-    const updated = stored ? stored.updated : null;
-    const prev    = stored ? (stored.prev || null) : null;
+  grid.innerHTML = ACCOUNTS.map(a => {
+    if (a.class === 'debt')  totalDebt   += Math.abs(a.balance);
+    else                      totalAssets += a.balance;
 
-    // Net worth calculation
-    if (balance !== null) {
-      if (def.class === 'debt') totalDebt += Math.abs(balance);
-      else totalAssets += balance;
-      if (!latestUpdate || new Date(updated) > new Date(latestUpdate)) latestUpdate = updated;
-    }
-
-    // Delta display
-    let deltaHtml = '';
-    if (balance !== null && prev !== null) {
-      const diff = balance - prev;
-      if (diff !== 0) {
-        const sign = diff > 0 ? '+' : '';
-        // For debt cards, going up is bad
-        const cls = def.class === 'debt'
-          ? (diff > 0 ? 'up' : 'down')
-          : (diff > 0 ? 'down' : 'up'); // assets: up = good
-        const colorCls = def.class === 'debt'
-          ? (diff > 0 ? 'up' : 'down')
-          : (diff > 0 ? 'down' : 'up');
-        deltaHtml = `<p class="account-delta ${colorCls}">${sign}${fmt(diff)} from last</p>`;
-      }
-    }
-
-    const balDisplay = balance !== null ? fmt(balance) : '—';
-    const balClass = balance === null ? ''
-      : def.class === 'debt' ? 'neg'
-      : balance >= 0 ? 'pos' : 'neg';
-
-    grid.innerHTML += `
-      <div class="account-card ${def.class}">
-        <p class="account-name">${def.name}</p>
-        <span class="account-type-tag">${def.type}</span>
-        <p class="account-balance ${balClass}">${balDisplay}</p>
-        ${deltaHtml}
-        <p class="account-updated">${updated ? 'Updated ' + fmtDate(updated) : 'No data — visit Accounts'}</p>
+    const balClass = a.class === 'debt' ? 'neg' : 'pos';
+    const display  = fmt(a.balance);
+    return `
+      <div class="account-card ${a.class}">
+        <p class="account-name">${a.name}</p>
+        <span class="account-type-tag">${a.type}</span>
+        <p class="account-balance ${balClass}">${display}</p>
+        <p class="account-updated">As of May 31, 2026</p>
       </div>`;
-  });
+  }).join('');
 
-  // Net worth display
   const nw = totalAssets - totalDebt;
   const nwEl = document.getElementById('net-worth-display');
   nwEl.textContent = fmt(nw);
   nwEl.className = 'nw-value ' + (nw >= 0 ? 'positive' : 'negative');
   document.getElementById('total-assets').textContent = fmt(totalAssets);
   document.getElementById('total-debt').textContent   = '-' + fmt(totalDebt);
-  document.getElementById('last-updated').textContent = latestUpdate ? fmtDate(latestUpdate) : 'Never';
+  document.getElementById('last-updated').textContent = 'May 31, 2026';
 }
 
-// ── LOAD BUDGET SUMMARY ──
+// ── BUDGET SUMMARY (June 2026) ──
+const BUDGET_CATS = [
+  { name: 'Housing',      spent: 2700, limit: 2700 },
+  { name: 'Debt Payoff',  spent:  280, limit: 2340 },
+  { name: 'Savings',      spent: 1350, limit: 1675 },
+  { name: 'Groceries',    spent:  487, limit:  400 },
+  { name: 'Dining Out',   spent:  343, limit:  300 },
+  { name: 'Transport',    spent:  128, limit:  120 },
+];
+
 function loadBudget() {
   const grid = document.getElementById('budget-grid');
-  const cats = JSON.parse(localStorage.getItem('fin_budget_categories') || '[]');
-  const txns = JSON.parse(localStorage.getItem('fin_transactions') || '[]');
-
-  if (cats.length === 0) {
-    grid.innerHTML = `<div class="budget-card" style="grid-column:1/-1;opacity:0.5;">
-      <p class="budget-cat-name" style="margin-bottom:8px;">No budget categories set</p>
-      <a href="https://javauntgarcia.github.io/Notion/Budget.html" style="font-size:0.6rem;letter-spacing:0.12em;color:var(--accent);text-decoration:none;text-transform:uppercase;">Set up budget →</a>
-    </div>`;
-    return;
-  }
-
-  // Current month spending by category
-  const now = new Date();
-  const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const spent = {};
-  txns.forEach(t => {
-    if (!t.date || !t.category || !t.date.startsWith(monthStr)) return;
-    spent[t.category] = (spent[t.category] || 0) + Math.abs(t.amount);
-  });
-
-  grid.innerHTML = cats.slice(0, 6).map(cat => {
-    const s = spent[cat.name] || 0;
-    const pct = Math.min((s / cat.limit) * 100, 100);
-    const over = s > cat.limit;
+  grid.innerHTML = BUDGET_CATS.map(cat => {
+    const pct = Math.min((cat.spent / cat.limit) * 100, 100);
+    const over = cat.spent > cat.limit;
     const fillClass = over ? 'over' : pct < 70 ? 'good' : '';
     return `<div class="budget-card">
       <div class="budget-cat">
         <span class="budget-cat-name">${cat.name}</span>
-        <span class="budget-cat-nums">${fmt(s)} / ${fmt(cat.limit)}</span>
+        <span class="budget-cat-nums">${fmt0(cat.spent)} / ${fmt0(cat.limit)}</span>
       </div>
       <div class="budget-bar-bg">
-        <div class="budget-bar-fill ${fillClass}" style="width:${pct}%"></div>
+        <div class="budget-bar-fill ${fillClass}" style="width:${pct.toFixed(1)}%"></div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ── LOAD GOALS ──
+// ── GOALS ──
+const GOALS = [
+  { name: 'Pay Off Discover',         current: 2059.57, target: 2059.57, note: 'lump-sum June 2026' },
+  { name: 'Pay Off Citi (21 mo.)',     current:  140.00, target: 5459.99, note: '$280/mo · Dec 2027' },
+  { name: 'Roth IRA — 2026',          current: 1300.00, target: 6500.00, note: '$325 biweekly' },
+  { name: 'WF Personal Buffer',        current:  879.69, target: 2000.00, note: 'rebuilding post-move' },
+];
+
 function loadGoals() {
   const grid = document.getElementById('goals-grid');
-  const goals = JSON.parse(localStorage.getItem('fin_goals') || '[]');
-
-  const defaults = [
-    { name: 'Pay off Discover', target: 3500, current: 0, unit: '$' },
-    { name: 'Pay off Citi Balance Transfer', target: 5600, current: 0, unit: '$' },
-    { name: 'Wealthfront HYSA Target', target: 15000, current: 0, unit: '$' },
-  ];
-
-  const display = goals.length > 0 ? goals : defaults;
-
-  grid.innerHTML = display.map(g => {
+  grid.innerHTML = GOALS.map(g => {
     const pct = Math.min((g.current / g.target) * 100, 100);
-    const remaining = g.target - g.current;
+    const remaining = Math.max(g.target - g.current, 0);
     return `<div class="goal-card">
       <p class="goal-name">${g.name}</p>
-      <p class="goal-progress-text">${g.unit}${fmt2(g.current)} <span style="font-size:1rem;color:var(--warm-mid)">/ ${g.unit}${fmt2(g.target)}</span></p>
+      <p class="goal-progress-text">${fmt(g.current)} <span style="font-size:1rem;color:var(--warm-mid)">/ ${fmt(g.target)}</span></p>
       <div class="goal-bar-bg">
-        <div class="goal-bar-fill" style="width:${pct}%"></div>
+        <div class="goal-bar-fill" style="width:${pct.toFixed(1)}%"></div>
       </div>
-      <p class="goal-sub">${pct.toFixed(0)}% complete · ${g.unit}${fmt2(remaining)} remaining</p>
+      <p class="goal-sub">${pct.toFixed(0)}% complete · ${fmt(remaining)} remaining · ${g.note}</p>
     </div>`;
   }).join('');
-}
-
-// ── HELPERS ──
-function fmt(n) {
-  if (n === null || n === undefined || isNaN(n)) return '—';
-  return '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-function fmt2(n) {
-  return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-}
-function fmtDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 // ── INIT ──
