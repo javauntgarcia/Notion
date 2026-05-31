@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accounts</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:           #080604;
+    --near-black:    #0e0c0a;
+    --dark:          #1a1714;
+    --mid:           #2e2a26;
+    --rule:          rgba(255,255,255,0.08);
+    --warm-grey:     #8a8076;
+    --light-grey:    #b0a99f;
+    --off-white:     #e8e2da;
+    --white:         #f5f0ea;
+    --accent:        #c9a27e;
+    --accent-dim:    rgba(201,162,126,0.15);
+    --accent-border: rgba(201,162,126,0.28);
+    --positive:      #7eb89a;
+    --negative:      #c97e7e;
+    --caution:       #c9b97e;
+    --frost:         rgba(255,252,248,0.07);
+    --frost-hover:   rgba(255,252,248,0.11);
+    --frost-border:  rgba(255,252,248,0.13);
+    --frost-strong:  rgba(255,252,248,0.10);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--ink);
+    color: var(--off-white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  .bg-layer {
+    position: fixed; inset: 0; z-index: 0;
+    background-image: url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Accounts.jpg');
+    background-size: cover;
+    background-position: center 30%;
+    filter: brightness(0.36) contrast(1.06) saturate(1.12);
+  }
+  .bg-layer::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      155deg,
+      rgba(8,6,4,0.50) 0%,
+      rgba(10,8,5,0.28) 45%,
+      rgba(6,7,10,0.42) 100%
+    );
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; height: 52px;
+    background: rgba(10,8,6,0.55);
+    backdrop-filter: blur(24px) saturate(1.6);
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    border-bottom: 1px solid var(--frost-border);
+    box-shadow: 0 1px 0 rgba(255,252,248,0.04), 0 4px 32px rgba(0,0,0,0.4);
+  }
+  .topbar a {
+    font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); text-decoration: none; transition: color 0.2s;
+  }
+  .topbar a:hover { color: var(--white); }
+  .topbar-center {
+    font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--warm-grey);
+  }
+  .topbar-date { font-size: 0.62rem; letter-spacing: 0.1em; color: var(--warm-grey); text-transform: uppercase; }
+
+  /* ── PAGE WRAP ── */
+  .page-wrap {
+    position: relative; z-index: 1;
+    max-width: 1060px; margin: 0 auto;
+    padding: 72px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 44px 0 32px;
+    border-bottom: 1px solid rgba(255,252,248,0.08);
+    margin-bottom: 40px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-label {
+    font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--warm-grey); margin-bottom: 8px;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    font-weight: 300; line-height: 1;
+    color: var(--white); letter-spacing: -0.01em;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-stats { display: flex; gap: 28px; flex-wrap: wrap; }
+  .hero-stat {}
+  .hs-label {
+    font-size: 0.56rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--warm-grey); margin-bottom: 4px;
+  }
+  .hs-value { font-size: 1.1rem; color: var(--off-white); }
+  .hs-value.acc { color: var(--accent); }
+  .hs-value.pos { color: var(--positive); }
+  .hs-value.neg { color: var(--negative); }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 18px; padding-top: 4px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 300; font-style: italic;
+    color: var(--off-white); white-space: nowrap;
+  }
+  .section-rule { flex: 1; height: 1px; background: rgba(255,252,248,0.08); }
+  .section-note {
+    font-size: 0.56rem; letter-spacing: 0.12em;
+    color: var(--warm-grey); text-transform: uppercase; white-space: nowrap;
+  }
+
+  /* ── NET WORTH BANNER ── */
+  .networth-banner {
+    background: var(--frost);
+    backdrop-filter: blur(28px) saturate(1.6);
+    -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    border: 1px solid var(--frost-border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,252,248,0.1);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+    animation: fadeUp 0.6s 0.05s ease both;
+  }
+  .nw-left {}
+  .nw-eyebrow {
+    font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--warm-grey); margin-bottom: 6px;
+  }
+  .nw-total {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 300; line-height: 1;
+    color: var(--white);
+    letter-spacing: -0.02em;
+  }
+  .nw-total span { color: var(--accent); }
+  .nw-sub {
+    font-size: 0.56rem; letter-spacing: 0.12em; color: var(--warm-grey);
+    margin-top: 6px; text-transform: uppercase;
+  }
+  .nw-right {
+    display: flex; flex-direction: column; gap: 10px; min-width: 200px;
+  }
+  .nw-split {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 8px 12px;
+    background: rgba(255,252,248,0.04);
+    border: 1px solid rgba(255,252,248,0.07);
+    border-radius: 8px;
+  }
+  .nw-split-label {
+    font-size: 0.52rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--warm-grey);
+  }
+  .nw-split-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 300;
+  }
+  .nw-split-val.assets { color: var(--positive); }
+  .nw-split-val.liabilities { color: var(--negative); }
+  .nw-split-val.net { color: var(--accent); }
+
+  /* ── ACCOUNT GRID ── */
+  .accounts-section {
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s 0.10s ease both;
+  }
+  .accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 14px;
+  }
+
+  /* ── ACCOUNT CARD ── */
+  .acct-card {
+    background: var(--frost);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    border: 1px solid var(--frost-border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,252,248,0.09);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+  .acct-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .acct-card:hover {
+    background: var(--frost-hover);
+    box-shadow: 0 6px 32px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,252,248,0.13);
+    transform: translateY(-1px);
+  }
+  .acct-card:hover::before { opacity: 1; }
+
+  /* card type accent bars */
+  .acct-card.type-credit::before   { background: linear-gradient(90deg, var(--negative), transparent); }
+  .acct-card.type-checking::before { background: linear-gradient(90deg, #7e9ab8, transparent); }
+  .acct-card.type-savings::before  { background: linear-gradient(90deg, var(--positive), transparent); }
+  .acct-card.type-invest::before   { background: linear-gradient(90deg, var(--accent), transparent); }
+  .acct-card.type-joint::before    { background: linear-gradient(90deg, #c9b97e, transparent); }
+
+  .acct-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .acct-institution {
+    font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--warm-grey); margin-bottom: 3px;
+  }
+  .acct-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; font-weight: 400;
+    color: var(--off-white); line-height: 1.2;
+  }
+  .acct-badge {
+    font-size: 0.44rem; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 20px;
+    border: 1px solid;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .badge-credit   { color: var(--negative); border-color: rgba(201,126,126,0.3); background: rgba(201,126,126,0.08); }
+  .badge-checking { color: #7e9ab8; border-color: rgba(126,154,184,0.3); background: rgba(126,154,184,0.08); }
+  .badge-savings  { color: var(--positive); border-color: rgba(126,184,154,0.3); background: rgba(126,184,154,0.08); }
+  .badge-invest   { color: var(--accent); border-color: var(--accent-border); background: var(--accent-dim); }
+  .badge-joint    { color: var(--caution); border-color: rgba(201,185,126,0.3); background: rgba(201,185,126,0.08); }
+
+  /* Points pill — shown inside card when account has reward points */
+  .points-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-bottom: 14px;
+    padding: 5px 11px;
+    border-radius: 20px;
+    background: rgba(201,162,126,0.10);
+    border: 1px solid rgba(201,162,126,0.24);
+    width: fit-content;
+  }
+  .points-pill-icon {
+    font-size: 0.6rem; line-height: 1;
+  }
+  .points-pill-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem; font-weight: 400; line-height: 1;
+    color: var(--accent); letter-spacing: 0.01em;
+  }
+  .points-pill-label {
+    font-size: 0.44rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--warm-grey); padding-left: 4px;
+    border-left: 1px solid rgba(255,252,248,0.10);
+    margin-left: 2px;
+  }
+
+  .acct-balance-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 14px;
+  }
+  .acct-balance {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; font-weight: 300; line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .acct-balance.credit  { color: var(--negative); }
+  .acct-balance.asset   { color: var(--off-white); }
+  .acct-balance-dir {
+    font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--warm-grey);
+  }
+
+  .acct-meta {
+    display: flex; gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,252,248,0.06);
+  }
+  .acct-meta-item {}
+  .acct-meta-label {
+    font-size: 0.44rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--warm-grey); margin-bottom: 2px;
+  }
+  .acct-meta-val {
+    font-size: 0.62rem; color: var(--light-grey); letter-spacing: 0.04em;
+  }
+  .acct-meta-val.highlight { color: var(--accent); }
+  .acct-meta-val.pos { color: var(--positive); }
+  .acct-meta-val.neg { color: var(--negative); }
+
+  /* ── ALLOCATION BAR ── */
+  .allocation-section {
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s 0.15s ease both;
+  }
+  .alloc-wrap {
+    background: var(--frost);
+    backdrop-filter: blur(22px) saturate(1.4);
+    -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    border: 1px solid var(--frost-border);
+    border-radius: 14px;
+    padding: 24px 26px;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,252,248,0.08);
+  }
+  .alloc-bar-track {
+    height: 8px;
+    background: rgba(255,252,248,0.06);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    margin-bottom: 18px;
+    gap: 2px;
+  }
+  .alloc-seg {
+    height: 100%;
+    border-radius: 2px;
+    transition: opacity 0.2s;
+  }
+  .alloc-seg:hover { opacity: 0.8; }
+  .alloc-legend {
+    display: flex; flex-wrap: wrap; gap: 16px;
+  }
+  .alloc-item {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .alloc-dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+  .alloc-item-label {
+    font-size: 0.52rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--warm-grey);
+  }
+  .alloc-item-val {
+    font-size: 0.58rem; color: var(--light-grey); margin-left: 2px;
+  }
+  .alloc-item-pct {
+    font-size: 0.5rem; color: var(--warm-grey); margin-left: 1px;
+  }
+
+  /* ── QUICK STATS STRIP ── */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s 0.20s ease both;
+  }
+  .stat-card {
+    background: var(--frost);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid var(--frost-border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,252,248,0.08);
+    transition: background 0.18s;
+  }
+  .stat-card:hover { background: var(--frost-hover); }
+  .stat-label {
+    font-size: 0.5rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--warm-grey); margin-bottom: 8px;
+  }
+  .stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem; font-weight: 300; line-height: 1;
+    color: var(--off-white);
+  }
+  .stat-val.accent { color: var(--accent); }
+  .stat-val.pos    { color: var(--positive); }
+  .stat-val.neg    { color: var(--negative); }
+  .stat-val.caution{ color: var(--caution); }
+  .stat-sub {
+    font-size: 0.48rem; letter-spacing: 0.1em; color: var(--warm-grey);
+    margin-top: 4px; text-transform: uppercase;
+  }
+
+  /* ── LAST UPDATED ── */
+  .last-updated {
+    text-align: center;
+    font-size: 0.5rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--warm-grey); opacity: 0.6;
+    padding-top: 8px;
+    animation: fadeUp 0.6s 0.28s ease both;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 200;
+    background: rgba(20,16,12,0.96);
+    border: 1px solid var(--accent-border);
+    border-radius: 8px; padding: 12px 18px;
+    font-size: 0.62rem; letter-spacing: 0.08em; color: var(--off-white);
+    opacity: 0; transform: translateY(8px);
+    transition: all 0.25s;
+    pointer-events: none;
+    backdrop-filter: blur(16px);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes countUp {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .networth-banner { grid-template-columns: 1fr; }
+    .nw-right { min-width: unset; }
+    .accounts-grid { grid-template-columns: 1fr; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .topbar-center { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a href="Finances.html">← Finances</a>
+  <span class="topbar-center">Finance Portal</span>
+  <a href="Main Hub.html">← Main Hub</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div>
+      <p class="hero-label">Finance Portal · Account Overview</p>
+      <h1>Ac<em>counts</em></h1>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <p class="hs-label">Total Accounts</p>
+        <p class="hs-value acc" id="total-accounts">10</p>
+      </div>
+      <div class="hero-stat">
+        <p class="hs-label">Net Worth</p>
+        <p class="hs-value pos" id="hero-networth">—</p>
+      </div>
+      <div class="hero-stat">
+        <p class="hs-label">As Of</p>
+        <p class="hs-value" id="hero-date">—</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- NET WORTH BANNER -->
+  <div class="networth-banner">
+    <div class="nw-left">
+      <p class="nw-eyebrow">Current Net Worth</p>
+      <p class="nw-total"><span id="nw-dollars">$</span><span id="nw-cents"></span></p>
+      <p class="nw-sub" id="nw-sub-line">—</p>
+    </div>
+    <div class="nw-right">
+      <div class="nw-split">
+        <span class="nw-split-label">Total Assets</span>
+        <span class="nw-split-val assets" id="total-assets">—</span>
+      </div>
+      <div class="nw-split">
+        <span class="nw-split-label">Total Debt</span>
+        <span class="nw-split-val liabilities" id="total-debt">—</span>
+      </div>
+      <div class="nw-split">
+        <span class="nw-split-label">Net Position</span>
+        <span class="nw-split-val net" id="net-position">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALLOCATION BAR -->
+  <div class="allocation-section">
+    <div class="section-header">
+      <h2 class="section-title">Allocation</h2>
+      <div class="section-rule"></div>
+      <span class="section-note">by category</span>
+    </div>
+    <div class="alloc-wrap">
+      <div class="alloc-bar-track" id="alloc-bar"></div>
+      <div class="alloc-legend" id="alloc-legend"></div>
+    </div>
+  </div>
+
+  <!-- CREDIT CARDS -->
+  <div class="accounts-section">
+    <div class="section-header">
+      <h2 class="section-title">Credit Cards</h2>
+      <div class="section-rule"></div>
+      <span class="section-note" id="cc-total">—</span>
+    </div>
+    <div class="accounts-grid" id="credit-grid"></div>
+  </div>
+
+  <!-- CASH & BANKING -->
+  <div class="accounts-section">
+    <div class="section-header">
+      <h2 class="section-title">Cash & Banking</h2>
+      <div class="section-rule"></div>
+      <span class="section-note" id="bank-total">—</span>
+    </div>
+    <div class="accounts-grid" id="bank-grid"></div>
+  </div>
+
+  <!-- INVESTMENTS -->
+  <div class="accounts-section">
+    <div class="section-header">
+      <h2 class="section-title">Investments</h2>
+      <div class="section-rule"></div>
+      <span class="section-note" id="invest-total">—</span>
+    </div>
+    <div class="accounts-grid" id="invest-grid"></div>
+  </div>
+
+  <!-- QUICK STATS -->
+  <div class="section-header" style="animation: fadeUp 0.6s 0.18s ease both;">
+    <h2 class="section-title">Snapshot</h2>
+    <div class="section-rule"></div>
+    <span class="section-note">financial ratios</span>
+  </div>
+  <div class="stats-strip" id="stats-strip"></div>
+
+  <p class="last-updated" id="last-updated"></p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATE ──
+const now = new Date();
+const dateStr = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+document.getElementById('topbar-date') && (document.getElementById('topbar-date').textContent = dateStr);
+document.getElementById('hero-date').textContent = now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+document.getElementById('last-updated').textContent = 'Balances as of ' + dateStr;
+
+// ── ACCOUNT DATA ──
+const ACCOUNTS = [
+  // Credit Cards (liabilities — positive = owed)
+  {
+    id: 'discover',
+    institution: 'Discover',
+    name: 'it® Card',
+    type: 'credit',
+    balance: 2059.57,
+    apr: '22.99%',
+    creditLine: null,
+    notes: 'Being paid down',
+    meta: [
+      { label: 'Balance Owed', val: '$2,059.57', cls: 'neg' },
+      { label: 'Status', val: 'Active', cls: '' },
+      { label: 'APR', val: '22.99%', cls: '' },
+    ]
+  },
+  {
+    id: 'citi',
+    institution: 'Citi',
+    name: 'Diamond Preferred',
+    type: 'credit',
+    balance: 5459.99,
+    apr: '0% promo',
+    creditLine: null,
+    notes: '0% APR balance transfer',
+    meta: [
+      { label: 'Balance Owed', val: '$5,459.99', cls: 'neg' },
+      { label: 'APR', val: '0% Promo', cls: 'pos' },
+      { label: 'Type', val: 'Balance Transfer', cls: '' },
+    ]
+  },
+  {
+    id: 'bilt',
+    institution: 'Wells Fargo / BILT',
+    name: 'BILT Mastercard',
+    type: 'credit',
+    balance: 1219.14,
+    apr: '',
+    creditLine: null,
+    points: 120400,
+    pointsLabel: 'BILT Points',
+    notes: 'Rent rewards card',
+    meta: [
+      { label: 'Balance Owed', val: '$1,219.14', cls: 'neg' },
+      { label: 'BILT Points', val: '120,400 pts', cls: 'highlight' },
+      { label: 'Status', val: 'Active', cls: '' },
+    ]
+  },
+  {
+    id: 'chase-sapphire',
+    institution: 'Chase',
+    name: 'Sapphire Preferred',
+    type: 'credit',
+    balance: 88.02,
+    apr: '26.49%',
+    creditLine: 21900,
+    points: 64914,
+    pointsLabel: 'Ultimate Rewards',
+    notes: 'Travel rewards — 64,914 UR pts',
+    meta: [
+      { label: 'Balance Owed', val: '$88.02', cls: 'neg' },
+      { label: 'UR Points', val: '64,914 pts', cls: 'highlight' },
+      { label: 'Credit Line', val: '$21,900', cls: '' },
+    ]
+  },
+  {
+    id: 'wells-fargo',
+    institution: 'Wells Fargo',
+    name: 'Active Cash®',
+    type: 'credit',
+    balance: 0,
+    apr: '',
+    creditLine: null,
+    notes: 'Paid off · Inactive',
+    meta: [
+      { label: 'Balance Owed', val: '$0.00', cls: 'pos' },
+      { label: 'Status', val: 'Paid Off ✓', cls: 'pos' },
+      { label: 'Notes', val: 'Inactive', cls: '' },
+    ]
+  },
+  // Banking
+  {
+    id: 'chase-checking',
+    institution: 'Chase',
+    name: 'Total Checking',
+    type: 'checking',
+    balance: 3801.95,
+    apr: '',
+    creditLine: null,
+    notes: 'Primary spending hub',
+    meta: [
+      { label: 'Balance', val: '$3,801.95', cls: 'pos' },
+      { label: 'Role', val: 'Primary Hub', cls: 'highlight' },
+      { label: 'Account', val: '****1345', cls: '' },
+    ]
+  },
+  {
+    id: 'chase-savings',
+    institution: 'Chase',
+    name: 'Savings Account',
+    type: 'savings',
+    balance: 21.03,
+    apr: '0.00%',
+    creditLine: null,
+    notes: 'Buffer / transit account',
+    meta: [
+      { label: 'Balance', val: '$21.03', cls: '' },
+      { label: 'APY', val: '0.01%', cls: '' },
+      { label: 'Role', val: 'Transit Buffer', cls: '' },
+    ]
+  },
+  // Investments
+  {
+    id: 'wf-joint',
+    institution: 'Wealthfront',
+    name: 'Joint Rent Savings',
+    type: 'joint',
+    balance: 1371.91,
+    apr: '~4.5% APY',
+    creditLine: null,
+    notes: 'Shared with partner · Rent fund',
+    meta: [
+      { label: 'Balance', val: '$1,371.91', cls: 'pos' },
+      { label: 'APY', val: '~4.5%', cls: 'pos' },
+      { label: 'Type', val: 'Joint', cls: '' },
+    ]
+  },
+  {
+    id: 'wf-personal',
+    institution: 'Wealthfront',
+    name: 'Personal Cash Account',
+    type: 'savings',
+    balance: 879.69,
+    apr: '~4.5% APY',
+    creditLine: null,
+    notes: 'Includes Depop earnings sub-account',
+    meta: [
+      { label: 'Balance', val: '$879.69', cls: 'pos' },
+      { label: 'APY', val: '~4.5%', cls: 'pos' },
+      { label: 'Type', val: 'Individual', cls: '' },
+    ]
+  },
+  {
+    id: 'vanguard',
+    institution: 'Vanguard',
+    name: 'Roth IRA',
+    type: 'invest',
+    balance: 18857.00,
+    apr: '',
+    creditLine: null,
+    notes: 'VTI · VOO · QQQ · VMFXX',
+    meta: [
+      { label: 'Value', val: '$18,857.00', cls: 'pos' },
+      { label: 'Holdings', val: 'VTI · VOO · QQQ', cls: 'highlight' },
+      { label: 'Type', val: 'Roth IRA', cls: '' },
+    ]
+  },
+];
+
+// ── CATEGORIZE ──
+const creditCards = ACCOUNTS.filter(a => a.type === 'credit');
+const bankAccts   = ACCOUNTS.filter(a => a.type === 'checking' || a.type === 'savings');
+const investAccts = ACCOUNTS.filter(a => a.type === 'invest' || a.type === 'joint');
+
+const totalDebt    = creditCards.reduce((s, a) => s + a.balance, 0);
+const totalBanking = bankAccts.reduce((s, a) => s + a.balance, 0);
+const totalInvest  = investAccts.reduce((s, a) => s + a.balance, 0);
+const totalAssets  = totalBanking + totalInvest;
+const netWorth     = totalAssets - totalDebt;
+
+// ── FORMAT HELPERS ──
+function fmt(n, decimals=2) {
+  return '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
+}
+function fmtShort(n) {
+  if (Math.abs(n) >= 1000) return '$' + (Math.abs(n)/1000).toFixed(1) + 'k';
+  return fmt(n);
+}
+
+// ── RENDER NET WORTH ──
+document.getElementById('hero-networth').textContent = fmt(netWorth);
+const nwWhole = Math.floor(Math.abs(netWorth)).toLocaleString('en-US');
+const nwCents = (Math.abs(netWorth) % 1).toFixed(2).slice(1);
+document.getElementById('nw-dollars').textContent = (netWorth < 0 ? '-$' : '$') + nwWhole;
+document.getElementById('nw-cents').textContent = nwCents;
+document.getElementById('nw-sub-line').textContent =
+  `Assets ${fmt(totalAssets)} · Debt ${fmt(totalDebt)}`;
+document.getElementById('total-assets').textContent = fmt(totalAssets);
+document.getElementById('total-debt').textContent   = fmt(totalDebt);
+document.getElementById('net-position').textContent = fmt(netWorth);
+
+// ── SECTION TOTALS ──
+document.getElementById('cc-total').textContent     = `${creditCards.length} cards · ${fmt(totalDebt)} owed`;
+document.getElementById('bank-total').textContent   = `${bankAccts.length} accounts · ${fmt(totalBanking)}`;
+document.getElementById('invest-total').textContent = `${investAccts.length} accounts · ${fmt(totalInvest)}`;
+
+// ── BUILD CARD HTML ──
+function buildCard(a) {
+  const isCredit = a.type === 'credit';
+  const balCls   = isCredit ? 'credit' : 'asset';
+  const badgeCls = {
+    credit: 'badge-credit', checking: 'badge-checking',
+    savings: 'badge-savings', invest: 'badge-invest', joint: 'badge-joint'
+  }[a.type] || 'badge-checking';
+  const badgeLabel = {
+    credit: 'Credit', checking: 'Checking',
+    savings: 'Savings', invest: 'Investment', joint: 'Joint'
+  }[a.type] || 'Account';
+
+  const metaHtml = a.meta.map(m =>
+    `<div class="acct-meta-item">
+      <p class="acct-meta-label">${m.label}</p>
+      <p class="acct-meta-val ${m.cls}">${m.val}</p>
+    </div>`
+  ).join('');
+
+  const pointsPill = a.points ? `
+    <div class="points-pill">
+      <span class="points-pill-icon">✦</span>
+      <span class="points-pill-val">${a.points.toLocaleString('en-US')}</span>
+      <span class="points-pill-label">${a.pointsLabel}</span>
+    </div>` : '';
+
+  return `
+    <div class="acct-card type-${a.type}">
+      <div class="acct-top">
+        <div>
+          <p class="acct-institution">${a.institution}</p>
+          <p class="acct-name">${a.name}</p>
+        </div>
+        <span class="acct-badge ${badgeCls}">${badgeLabel}</span>
+      </div>
+      <div class="acct-balance-row">
+        <p class="acct-balance ${balCls}">${fmt(a.balance)}</p>
+        <span class="acct-balance-dir">${isCredit ? 'owed' : 'available'}</span>
+      </div>
+      ${pointsPill}
+      <div class="acct-meta">${metaHtml}</div>
+    </div>`;
+}
+
+document.getElementById('credit-grid').innerHTML  = creditCards.map(buildCard).join('');
+document.getElementById('bank-grid').innerHTML    = bankAccts.map(buildCard).join('');
+document.getElementById('invest-grid').innerHTML  = investAccts.map(buildCard).join('');
+
+// ── ALLOCATION BAR ──
+const allocCategories = [
+  { label: 'Vanguard IRA', val: 18857.00, color: '#c9a27e' },
+  { label: 'WF Joint',     val: 1371.91,  color: '#c9b97e' },
+  { label: 'WF Personal',  val: 879.69,   color: '#b8c97e' },
+  { label: 'Chase Checking',val: 3801.95, color: '#7e9ab8' },
+  { label: 'Chase Savings', val: 21.03,   color: '#7eb8b8' },
+];
+const allocTotal = allocCategories.reduce((s, c) => s + c.val, 0);
+const barEl   = document.getElementById('alloc-bar');
+const legEl   = document.getElementById('alloc-legend');
+allocCategories.forEach(c => {
+  const pct = (c.val / allocTotal * 100).toFixed(1);
+  const seg = document.createElement('div');
+  seg.className = 'alloc-seg';
+  seg.style.cssText = `width:${pct}%;background:${c.color};`;
+  seg.title = `${c.label}: ${fmt(c.val)} (${pct}%)`;
+  barEl.appendChild(seg);
+
+  legEl.innerHTML += `
+    <div class="alloc-item">
+      <div class="alloc-dot" style="background:${c.color}"></div>
+      <span class="alloc-item-label">${c.label}</span>
+      <span class="alloc-item-val">${fmtShort(c.val)}</span>
+      <span class="alloc-item-pct">${pct}%</span>
+    </div>`;
+});
+
+// ── QUICK STATS ──
+const debtToAsset = (totalDebt / totalAssets * 100).toFixed(1);
+const investRatio = (totalInvest / totalAssets * 100).toFixed(1);
+const liquidCash  = totalBanking;
+const biggestDebt = creditCards.reduce((m, a) => a.balance > m.balance ? a : m, creditCards[0]);
+const totalPoints = ACCOUNTS.reduce((s, a) => s + (a.points || 0), 0);
+
+const stats = [
+  { label: 'Debt-to-Asset Ratio', val: debtToAsset + '%', cls: parseFloat(debtToAsset) > 50 ? 'neg' : parseFloat(debtToAsset) > 25 ? 'caution' : 'pos', sub: 'lower is better' },
+  { label: 'Liquid Cash',         val: fmt(liquidCash),  cls: 'pos', sub: 'checking + savings' },
+  { label: 'Investment Ratio',    val: investRatio + '%', cls: 'accent', sub: 'of total assets' },
+  { label: 'Largest Debt',        val: fmt(biggestDebt.balance), cls: 'neg', sub: biggestDebt.institution + ' ' + biggestDebt.name },
+  { label: 'Invested',            val: fmt(totalInvest), cls: 'pos', sub: 'wealthfront + vanguard' },
+  { label: 'Total Rewards Pts',   val: totalPoints.toLocaleString('en-US'), cls: 'accent', sub: 'bilt + chase ur' },
+];
+
+document.getElementById('stats-strip').innerHTML = stats.map(s => `
+  <div class="stat-card">
+    <p class="stat-label">${s.label}</p>
+    <p class="stat-val ${s.cls}">${s.val}</p>
+    <p class="stat-sub">${s.sub}</p>
+  </div>`).join('');
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>
