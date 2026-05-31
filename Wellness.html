@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wellness · Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── PALETTE (sampled from Wellness.jpg: blue floral wallpaper + handstand) ── */
+    :root {
+      --cobalt:      #1a3a6e;
+      --cobalt-mid:  #2d5ba8;
+      --powder:      #8fb8e0;
+      --ice:         #c9dff5;
+      --cream:       #eef2f7;
+      --blush:       #c8a47a;
+      --white:       #ffffff;
+
+      /* frosted glass per spec */
+      --glass:       rgba(255,255,255,0.25);
+      --glass-hover: rgba(255,255,255,0.33);
+      --glass-b:     rgba(255,255,255,0.45);
+      --blur:        backdrop-filter: blur(14px);
+
+      /* overlay to keep bg visible + text legible without black */
+      --overlay:     rgba(14,28,54,0.42);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      color: var(--cream);
+      background: #0d1c36;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── BACKGROUND — full width, natural height, scrolls with page ── */
+    .bg-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 0;
+    }
+
+    .bg-layer img {
+      display: block;
+      width: 100%;
+      height: auto;       /* natural height — never crops */
+    }
+
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        160deg,
+        rgba(14,28,54,0.38) 0%,
+        rgba(20,45,90,0.22) 45%,
+        rgba(14,28,54,0.50) 100%
+      );
+    }
+
+    /* below the image, fill with white */
+    .bg-tail {
+      background: #ffffff;
+      width: 100%;
+      min-height: 4rem;
+    }
+
+    /* ── LAYOUT WRAPPER — overlays the image ── */
+    .page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem 8rem;
+    }
+
+    /* ── GLASS CARD MIXIN ── */
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-b);
+      border-radius: 14px;
+    }
+
+    /* ── TOP BAR — fixed so it stays visible while scrolling ── */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 2rem;
+      background: rgba(14,28,54,0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .back-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ice);
+      text-decoration: none;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: opacity 0.2s;
+    }
+
+    .back-link:hover { opacity: 1; }
+
+    .back-link svg { width: 14px; height: 14px; }
+
+    .topbar-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--powder);
+      opacity: 0.7;
+    }
+
+    /* ── MASTHEAD — full viewport height so image shows on load ── */
+    .masthead {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 1rem 4rem;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--powder);
+      opacity: 0.85;
+      margin-bottom: 0.75rem;
+    }
+
+    .masthead h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: clamp(3.5rem, 10vw, 6.5rem);
+      line-height: 0.95;
+      color: var(--white);
+      letter-spacing: -0.01em;
+    }
+
+    .masthead h1 em {
+      font-style: italic;
+      color: var(--powder);
+      font-weight: 400;
+    }
+
+    .tagline {
+      margin-top: 1.2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--ice);
+      opacity: 0.65;
+    }
+
+    /* scroll cue */
+    .scroll-cue {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      animation: bob 2s ease-in-out infinite;
+    }
+
+    .scroll-cue span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--ice);
+      opacity: 0.45;
+    }
+
+    .scroll-cue svg {
+      width: 18px;
+      height: 18px;
+      color: var(--ice);
+      opacity: 0.35;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(6px); }
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--powder);
+      opacity: 0.75;
+      margin-bottom: 1rem;
+    }
+
+    /* ═══════════════════════════════════════
+       GOAL TRACKERS
+    ═══════════════════════════════════════ */
+    .goals-section {
+      margin-bottom: 0;
+      padding: 6rem 0 5rem;
+      animation: fadeUp 0.8s 0.15s ease both;
+    }
+
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 680px) {
+      .goals-grid { grid-template-columns: 1fr; }
+    }
+
+    .goal-card {
+      padding: 1.4rem 1.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .goal-icon {
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    .goal-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--powder);
+      opacity: 0.85;
+    }
+
+    .goal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      line-height: 1.3;
+    }
+
+    .goal-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--ice);
+      opacity: 0.75;
+    }
+
+    .progress-track {
+      height: 4px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--cobalt-mid), var(--powder));
+      width: 0%;
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .goal-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .goal-value span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--ice);
+      opacity: 0.7;
+      font-weight: 300;
+      display: block;
+      margin-top: 0.25rem;
+    }
+
+    /* ═══════════════════════════════════════
+       LATEST SNAPSHOT
+    ═══════════════════════════════════════ */
+    .snapshot-section {
+      padding: 5rem 0 5rem;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .snapshot-card {
+      padding: 1.8rem 2rem;
+    }
+
+    .snapshot-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .snapshot-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .snapshot-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      color: var(--powder);
+      opacity: 0.7;
+    }
+
+    .snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .snap-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .snap-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--powder);
+      opacity: 0.75;
+    }
+
+    .snap-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .snap-unit {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--ice);
+      opacity: 0.6;
+    }
+
+    .snap-delta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.05em;
+    }
+
+    .snap-delta.pos { color: #7dcea0; }
+    .snap-delta.neg { color: #f1948a; }
+    .snap-delta.neu { color: var(--ice); opacity: 0.5; }
+
+    .snap-notes {
+      grid-column: 1 / -1;
+      margin-top: 0.5rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .snap-notes-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--powder);
+      opacity: 0.7;
+      margin-bottom: 0.4rem;
+    }
+
+    .snap-notes-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--ice);
+      opacity: 0.8;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .no-data-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 99px;
+      padding: 0.4rem 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--ice);
+      opacity: 0.7;
+      margin-top: 0.5rem;
+    }
+
+    /* ═══════════════════════════════════════
+       SUBPAGE NAVIGATION CARDS
+    ═══════════════════════════════════════ */
+    .subpages-section {
+      padding: 5rem 0 0;
+      animation: fadeUp 0.8s 0.45s ease both;
+    }
+
+    .subpages-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .subpages-grid { grid-template-columns: 1fr; }
+    }
+
+    .sub-card {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.25s, transform 0.25s;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .sub-card:hover {
+      background: var(--glass-hover);
+      transform: translateY(-4px);
+    }
+
+    /* cover image banner */
+    .sub-card-cover {
+      width: 100%;
+      height: 140px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .sub-card-cover::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,22,46,0.10) 0%,
+        rgba(10,22,46,0.55) 100%
+      );
+    }
+
+    /* icon floats over cover, bottom-left */
+    .sub-card-icon {
+      position: absolute;
+      bottom: 10px;
+      left: 14px;
+      font-size: 1.3rem;
+      line-height: 1;
+      z-index: 2;
+    }
+
+    /* text body below the cover */
+    .sub-card-body {
+      padding: 1.1rem 1.4rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    .sub-card-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--powder);
+      opacity: 0.8;
+    }
+
+    .sub-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--white);
+      line-height: 1.15;
+    }
+
+    .sub-card-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.63rem;
+      color: var(--ice);
+      opacity: 0.62;
+      line-height: 1.55;
+    }
+
+    .sub-card-arrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      color: var(--powder);
+      margin-top: auto;
+      padding-top: 0.6rem;
+      opacity: 0;
+      transform: translateX(-4px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .sub-card:hover .sub-card-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      margin: 0;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 2rem 0 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.8rem;
+      color: var(--powder);
+      opacity: 0.4;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- wrapper: image + overlaid content stack together -->
+  <div style="position:relative;">
+
+    <div class="bg-layer">
+      <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Wellness.jpg" alt="" />
+    </div>
+
+  <!-- Fixed top bar -->
+  <div class="topbar">
+    <a id="back-main-hub" href="https://javauntgarcia.github.io/Notion/Main_Hub.html" target="_top" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Main Hub
+    </a>
+    <div class="topbar-date" id="today-date"></div>
+  </div>
+
+  <div class="page">
+
+    <!-- MASTHEAD -->
+    <div class="masthead">
+      <p class="eyebrow">Personal Dashboard</p>
+      <h1>Well<em>ness</em></h1>
+      <p class="tagline">track · move · reflect</p>
+      <div class="scroll-cue">
+        <span>scroll</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- GOAL TRACKERS -->
+    <section class="goals-section">
+      <p class="section-label">Goal Progress</p>
+      <div class="goals-grid">
+
+        <!-- Consistency Goal -->
+        <div class="glass goal-card">
+          <div class="goal-icon">🗓</div>
+          <div>
+            <div class="goal-name">Consistency</div>
+            <div class="goal-title">Active 75% of the Year</div>
+          </div>
+          <div>
+            <div class="goal-meta" id="consist-meta">Loading…</div>
+            <div style="margin-top:0.6rem;" class="progress-track">
+              <div class="progress-fill" id="consist-bar"></div>
+            </div>
+          </div>
+          <div class="goal-value" id="consist-val">—<span id="consist-sub"></span></div>
+        </div>
+
+        <!-- Body Goal -->
+        <div class="glass goal-card">
+          <div class="goal-icon">⚖️</div>
+          <div>
+            <div class="goal-name">Body</div>
+            <div class="goal-title">Reach 165 lbs</div>
+          </div>
+          <div>
+            <div class="goal-meta" id="weight-meta">Loading…</div>
+            <div style="margin-top:0.6rem;" class="progress-track">
+              <div class="progress-fill" id="weight-bar"></div>
+            </div>
+          </div>
+          <div class="goal-value" id="weight-val">—<span id="weight-sub"></span></div>
+        </div>
+
+        <!-- Strength Goal -->
+        <div class="glass goal-card">
+          <div class="goal-icon">💪</div>
+          <div>
+            <div class="goal-name">Strength</div>
+            <div class="goal-title">Achieve 50 Push-Ups</div>
+          </div>
+          <div>
+            <div class="goal-meta" id="pushup-meta">Loading…</div>
+            <div style="margin-top:0.6rem;" class="progress-track">
+              <div class="progress-fill" id="pushup-bar"></div>
+            </div>
+          </div>
+          <div class="goal-value" id="pushup-val">—<span id="pushup-sub"></span></div>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- LATEST SNAPSHOT -->
+    <section class="snapshot-section">
+      <p class="section-label">Latest Check-In Snapshot</p>
+      <div class="glass snapshot-card">
+        <div class="snapshot-header">
+          <div class="snapshot-title">Weekly Check-In</div>
+          <div class="snapshot-date" id="snap-date">No entry yet</div>
+        </div>
+        <div id="snap-content">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- SUBPAGE NAV -->
+    <section class="subpages-section">
+      <p class="section-label">Subpages</p>
+      <div class="subpages-grid">
+
+        <a id="nav-weekly-checkin" href="https://javauntgarcia.github.io/Notion/Weekly%20Check-in.html" target="_top" class="glass sub-card">
+          <div class="sub-card-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/weekly%20check-in.jpg');"></div>
+          <div class="sub-card-body">
+            <div class="sub-card-label">Weekly</div>
+            <div class="sub-card-title">Check-In</div>
+            <div class="sub-card-desc">Log weight, body measurements, and notes each week.</div>
+            <div class="sub-card-arrow">Open →</div>
+          </div>
+        </a>
+
+        <a id="nav-workout-plan" href="https://javauntgarcia.github.io/Notion/Workout_Plan.html" target="_top" class="glass sub-card">
+          <div class="sub-card-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Workout_Plan.jpg');"></div>
+          <div class="sub-card-body">
+            <div class="sub-card-label">Training</div>
+            <div class="sub-card-title">Workout Plan</div>
+            <div class="sub-card-desc">Your full weekly split, exercises, sets, and rest times.</div>
+            <div class="sub-card-arrow">Open →</div>
+          </div>
+        </a>
+
+        <a id="nav-workout-tracker" href="https://javauntgarcia.github.io/Notion/Workout_Tracker.html" target="_top" class="glass sub-card">
+          <div class="sub-card-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Workout_Tracker.jpg');"></div>
+          <div class="sub-card-body">
+            <div class="sub-card-label">Sessions</div>
+            <div class="sub-card-title">Workout Tracker</div>
+            <div class="sub-card-desc">Record every session and watch your consistency grow.</div>
+            <div class="sub-card-arrow">Open →</div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+
+
+  </div><!-- /wrapper -->
+
+  <!-- dark continuation for any content scrolling below the image -->
+  <div class="bg-tail"></div>
+
+  <script>
+  // ============================================================
+  // EDIT: NAV URLS — once each subpage has its own Notion page
+  // with a /embed block, replace the GitHub Pages URLs below
+  // with the Notion page URL. target="_top" is already set on
+  // every link so navigation stays within Notion.
+  // ============================================================
+  var NAV_URLS = {
+    'back-main-hub':       'https://www.notion.so/2026-Hub-371e14bd8682801fbef6fd4f2104237d',
+    'nav-weekly-checkin':  'https://www.notion.so/Weekly-Check-in-371e14bd868280df99dcd83d3a8758c3',
+    'nav-workout-plan':    'https://www.notion.so/Workout-Plan-371e14bd8682805daaadcac282bed107',
+    'nav-workout-tracker': 'https://www.notion.so/Workout-Tracker-371e14bd8682804f86bcf51064377fc4'
+  };
+  Object.keys(NAV_URLS).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.href = NAV_URLS[id];
+  });
+
+  (function () {
+
+    /* ── DATE ── */
+    var now = new Date();
+    var opts = { weekday:'long', month:'long', day:'numeric', year:'numeric' };
+    document.getElementById('today-date').textContent =
+      now.toLocaleDateString('en-US', opts);
+
+    /* ── HELPERS ── */
+    function ls(key) {
+      try { return localStorage.getItem(key); } catch(e) { return null; }
+    }
+    function pct(n, d) {
+      return d ? Math.min(100, Math.max(0, Math.round(n / d * 100))) : 0;
+    }
+    function bar(id, p) {
+      setTimeout(function () {
+        var el = document.getElementById(id);
+        if (el) el.style.width = p + '%';
+      }, 180);
+    }
+
+    /* ════════════════════════════════════════
+       GOAL 1: CONSISTENCY — active days this year
+       Writer key: wl_active_days (integer, written by Workout Tracker)
+       Target: 0.75 × days elapsed in year
+    ════════════════════════════════════════ */
+    (function () {
+      var activeDays = parseInt(ls('wl_active_days')) || 0;
+      var start = new Date(now.getFullYear(), 0, 1);
+      var elapsed = Math.ceil((now - start) / 86400000);
+      var target = Math.round(elapsed * 0.75);
+      var p = pct(activeDays, target);
+
+      document.getElementById('consist-meta').textContent =
+        activeDays + ' active days / ' + target + ' target (' + elapsed + ' days elapsed)';
+      document.getElementById('consist-val').innerHTML =
+        p + '<span>% of pace</span>';
+      bar('consist-bar', p);
+
+      // also show yearly total pace
+      var yearTarget = Math.round(365 * 0.75); // 274
+      var yearPct = pct(activeDays, yearTarget);
+      if (activeDays === 0) {
+        document.getElementById('consist-meta').textContent = 'No sessions logged yet';
+        document.getElementById('consist-val').innerHTML = '—<span>log sessions to track</span>';
+        document.getElementById('consist-sub').textContent = '';
+      }
+    })();
+
+    /* ════════════════════════════════════════
+       GOAL 2: BODY — reach 165 lbs
+       Reader keys: wl_weight (latest), wl_weight_start (first entry)
+       Also reads check-in entries directly as fallback
+    ════════════════════════════════════════ */
+    (function () {
+      var current = parseFloat(ls('wl_weight')) || 0;
+      var target = 165;
+
+      // Try to read from check-in entries array
+      if (!current) {
+        try {
+          var entries = JSON.parse(ls('wl_checkin_entries') || '[]');
+          if (entries.length) {
+            // entries are [{date, weight, ...}] sorted newest first or oldest first
+            var sorted = entries.slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+            current = parseFloat(sorted[0].weight) || 0;
+          }
+        } catch(e) {}
+      }
+
+      if (!current) {
+        document.getElementById('weight-meta').textContent = 'No weight logged yet';
+        document.getElementById('weight-val').innerHTML = '—<span>log from Check-In</span>';
+        bar('weight-bar', 0);
+        return;
+      }
+
+      // Progress toward 165: if currently above, measure how close
+      // Assume starting above target; progress = how much lost toward goal
+      var start = parseFloat(ls('wl_weight_start')) || current;
+      var totalToLose = Math.abs(start - target);
+      var lost = totalToLose > 0 ? Math.abs(current - start) : 0;
+      var p = totalToLose > 0 ? pct(lost, totalToLose) : (current <= target ? 100 : 0);
+
+      // If at or below target
+      if (current <= target) p = 100;
+
+      document.getElementById('weight-meta').textContent =
+        'Current: ' + current + ' lbs → Goal: ' + target + ' lbs';
+      document.getElementById('weight-val').innerHTML =
+        current + '<span>lbs current</span>';
+      bar('weight-bar', p);
+    })();
+
+    /* ════════════════════════════════════════
+       GOAL 3: STRENGTH — 50 push-ups
+       Writer key: wl_pushups (integer, written by Workout Tracker)
+    ════════════════════════════════════════ */
+    (function () {
+      var pushups = parseInt(ls('wl_pushups')) || 0;
+      var target = 50;
+      var p = pct(pushups, target);
+
+      if (!pushups) {
+        document.getElementById('pushup-meta').textContent = 'No max logged yet';
+        document.getElementById('pushup-val').innerHTML = '—<span>log from Tracker</span>';
+        bar('pushup-bar', 0);
+        return;
+      }
+
+      document.getElementById('pushup-meta').textContent =
+        'Max reps: ' + pushups + ' / Goal: ' + target;
+      document.getElementById('pushup-val').innerHTML =
+        pushups + '<span>max reps</span>';
+      bar('pushup-bar', p);
+    })();
+
+    /* ════════════════════════════════════════
+       LATEST SNAPSHOT — reads most recent check-in entry
+       Tries multiple key patterns for compatibility
+    ════════════════════════════════════════ */
+    (function () {
+      var snap = document.getElementById('snap-content');
+      var dateEl = document.getElementById('snap-date');
+      var entry = null;
+
+      // Try wl_checkin_entries array (expected format from Weekly_Check_in.html)
+      try {
+        var arr = JSON.parse(ls('wl_checkin_entries') || '[]');
+        if (arr.length) {
+          arr.sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+          entry = arr[0];
+        }
+      } catch(e) {}
+
+      // Fallback: individual wl_ keys written by older versions
+      if (!entry) {
+        var w = ls('wl_weight');
+        if (w) {
+          entry = {
+            date: ls('wl_last_date') || 'Unknown date',
+            weight: w,
+            chest: ls('wl_chest') || null,
+            waist: ls('wl_waist') || null,
+            arms:  ls('wl_arms')  || null,
+            notes: ls('wl_notes') || null
+          };
+        }
+      }
+
+      if (!entry) {
+        snap.innerHTML =
+          '<div class="no-data-pill">📋 No check-in data yet — <a href="https://javauntgarcia.github.io/Notion/Weekly%20Check-in.html" target="_top" style="color:var(--powder);margin-left:0.3rem;">log your first entry →</a></div>';
+        return;
+      }
+
+      // Format date
+      try {
+        var d = new Date(entry.date);
+        if (!isNaN(d)) {
+          dateEl.textContent = d.toLocaleDateString('en-US', {
+            weekday:'short', month:'short', day:'numeric', year:'numeric'
+          });
+        } else {
+          dateEl.textContent = entry.date;
+        }
+      } catch(e) { dateEl.textContent = entry.date; }
+
+      // Build stat rows
+      var stats = [
+        { label: 'Weight',    value: entry.weight,   unit: 'lbs', key: 'weight'   },
+        { label: 'Chest',     value: entry.chest,    unit: 'in',  key: 'chest'    },
+        { label: 'Waist',     value: entry.waist,    unit: 'in',  key: 'waist'    },
+        { label: 'Shoulders', value: entry.shoulders,unit: 'in',  key: 'shoulders'},
+        { label: 'Arms',      value: entry.arms,     unit: 'in',  key: 'arms'     },
+        { label: 'Thighs',    value: entry.thighs,   unit: 'in',  key: 'thighs'   },
+        { label: 'Calves',    value: entry.calves,   unit: 'in',  key: 'calves'   },
+        { label: 'Glutes',    value: entry.glutes,   unit: 'in',  key: 'glutes'   },
+      ];
+
+      // Compute deltas vs previous entry if available
+      var prev = null;
+      try {
+        var arr2 = JSON.parse(ls('wl_checkin_entries') || '[]');
+        if (arr2.length > 1) {
+          arr2.sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+          prev = arr2[1];
+        }
+      } catch(e) {}
+
+      var statsHtml = '<div class="snapshot-grid">';
+      var hasAny = false;
+
+      stats.forEach(function (s) {
+        var v = parseFloat(s.value);
+        if (isNaN(v)) return;
+        hasAny = true;
+
+        var deltaHtml = '';
+        if (prev) {
+          var pv = parseFloat(prev[s.key]);
+          if (!isNaN(pv)) {
+            var diff = Math.round((v - pv) * 10) / 10;
+            var cls = diff < 0 ? 'neg' : (diff > 0 ? 'pos' : 'neu');
+            var sign = diff > 0 ? '+' : '';
+            deltaHtml = '<div class="snap-delta ' + cls + '">' + sign + diff + ' ' + s.unit + ' vs last</div>';
+          }
+        }
+
+        statsHtml +=
+          '<div class="snap-stat">' +
+            '<div class="snap-label">' + s.label + '</div>' +
+            '<div class="snap-value">' + v +
+              '<div class="snap-unit">' + s.unit + '</div>' +
+            '</div>' +
+            deltaHtml +
+          '</div>';
+      });
+
+      if (!hasAny) {
+        statsHtml += '<div class="no-data-pill">Entry found but no measurements recorded.</div>';
+      }
+
+      // Notes
+      if (entry.notes && entry.notes.trim()) {
+        statsHtml +=
+          '<div class="snap-notes">' +
+            '<div class="snap-notes-label">Notes</div>' +
+            '<div class="snap-notes-text">' + entry.notes + '</div>' +
+          '</div>';
+      }
+
+      statsHtml += '</div>';
+      snap.innerHTML = statsHtml;
+    })();
+
+    /* ── listen for storage changes from other tabs ── */
+    window.addEventListener('storage', function () {
+      location.reload();
+    });
+
+  })();
+  </script>
+
+</body>
+</html>
