@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planning — Javaun Garcia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cerulean:    #2b5278;
+      --cerulean-lt: #5a8ab8;
+      --olive:       #4a5c3a;
+      --olive-lt:    #7a9460;
+      --terra:       #8c4a2f;
+      --terra-lt:    #c47050;
+      --cream:       #f2ead8;
+      --sand:        #c9b08a;
+      --sand-lt:     #e0ceaa;
+      --gold:        #b89050;
+      --gold-lt:     #d4b070;
+      --teal:        #2a6060;
+      --teal-lt:     #4a9090;
+      --rose:        #9a7060;
+      --rose-lt:     #c09080;
+      --slate:       #506070;
+      --slate-lt:    #7898a8;
+      --plum:        #6a4060;
+      --plum-lt:     #9a6888;
+      --glass:       rgba(18,28,40,0.55);
+      --glass-border: rgba(242,234,216,0.18);
+      --topbar:      rgba(18,28,40,0.75);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* ── FULL BLEED BACKGROUND ── */
+    .bg-image {
+      position: fixed;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      z-index: 0;
+    }
+    .bg-scrim {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(18,28,40,0.25) 0%,
+        rgba(18,28,40,0.10) 30%,
+        rgba(18,28,40,0.55) 65%,
+        rgba(18,28,40,0.92) 100%
+      );
+      z-index: 1;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      height: 52px;
+      background: var(--topbar);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(242,234,216,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .topbar-nav { display: flex; gap: 24px; }
+    .topbar-nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.67rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--sand-lt);
+      text-decoration: none;
+      opacity: 0.8;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .topbar-nav a:hover { opacity: 1; color: var(--cream); }
+    .topbar-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.63rem;
+      letter-spacing: 0.1em;
+      color: var(--sand);
+      opacity: 0.7;
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .page {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      padding-top: 52px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HERO TITLE — top right ── */
+    .hero-title-block {
+      position: absolute;
+      top: calc(52px + 32px);
+      right: 36px;
+      pointer-events: none;
+      text-align: right;
+      z-index: 20;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.2rem, 9vw, 6rem);
+      font-weight: 300;
+      line-height: 0.9;
+      color: var(--cream);
+      text-shadow: 0 2px 32px rgba(18,28,40,0.5);
+    }
+    .hero-title em { font-style: italic; color: var(--sand-lt); }
+
+    /* ── MAIN LAYOUT: panel left, ~52% down ── */
+    .main-layout {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 0 24px 24px;
+      padding-top: calc(52vh - 52px);
+    }
+
+    /* ── TASK PANEL ── */
+    .task-panel {
+      width: 420px;
+      max-width: 100%;
+      background: rgba(38,22,14,0.74);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(201,160,110,0.22);
+      border-radius: 20px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .panel-header {
+      padding: 22px 24px 16px;
+      border-bottom: 1px solid rgba(201,160,110,0.12);
+    }
+    .panel-date {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--terra-lt);
+      margin-bottom: 4px;
+    }
+    .panel-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .panel-title em { font-style: italic; color: var(--sand-lt); }
+
+    .progress-wrap {
+      padding: 12px 24px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .progress-track {
+      flex: 1;
+      height: 3px;
+      background: rgba(242,234,216,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--olive), var(--olive-lt));
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+    .progress-text {
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      color: var(--sand);
+      opacity: 0.65;
+      white-space: nowrap;
+    }
+
+    .add-task-area {
+      padding: 14px 24px 0;
+      display: flex;
+      gap: 8px;
+    }
+    .task-input {
+      flex: 1;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.73rem;
+      background: rgba(242,234,216,0.07);
+      border: 1px solid rgba(242,234,216,0.15);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--cream);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .task-input::placeholder { color: rgba(201,176,138,0.38); }
+    .task-input:focus { border-color: rgba(201,176,138,0.45); background: rgba(242,234,216,0.1); }
+
+    .btn-add {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--terra);
+      color: var(--cream);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-add:hover { background: var(--terra-lt); }
+
+    .task-list {
+      padding: 10px 16px;
+      max-height: 340px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .task-list::-webkit-scrollbar { width: 3px; }
+    .task-list::-webkit-scrollbar-thumb { background: rgba(201,176,138,0.2); border-radius: 3px; }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(242,234,216,0.05);
+      border: 1px solid rgba(242,234,216,0.08);
+      transition: background 0.18s;
+      animation: slideIn 0.25s ease both;
+    }
+    .task-item:hover { background: rgba(242,234,216,0.09); }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .task-check {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(201,176,138,0.5);
+      background: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: all 0.2s;
+    }
+    .task-check:checked { background: var(--olive); border-color: var(--olive-lt); }
+    .task-check:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -52%);
+      font-size: 10px;
+      color: var(--cream);
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 0.77rem;
+      color: var(--cream);
+      line-height: 1.35;
+      transition: opacity 0.2s;
+    }
+    .task-item.done .task-text {
+      opacity: 0.35;
+      text-decoration: line-through;
+      text-decoration-color: rgba(201,176,138,0.4);
+    }
+
+    .task-del {
+      background: none; border: none;
+      color: rgba(201,176,138,0.3);
+      cursor: pointer; font-size: 0.85rem;
+      padding: 2px 3px;
+      flex-shrink: 0;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    .task-del:hover { color: rgba(201,176,138,0.7); }
+
+    .empty-tasks {
+      text-align: center;
+      padding: 28px 16px;
+      color: rgba(201,176,138,0.3);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+    }
+
+    .panel-footer {
+      padding: 12px 24px 18px;
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid rgba(201,160,110,0.1);
+    }
+    .btn-ghost {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: transparent;
+      color: var(--sand);
+      border: 1px solid rgba(201,176,138,0.25);
+      border-radius: 8px;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: all 0.18s;
+      flex: 1;
+    }
+    .btn-ghost:hover { border-color: rgba(201,176,138,0.5); color: var(--cream); }
+
+    /* ── ARCHIVE TOGGLE BAR ── */
+    .archive-toggle-bar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 24px 10px;
+      padding: 10px 16px;
+      background: var(--sand);
+      border: 1px solid rgba(140,100,50,0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .archive-toggle-bar:hover { background: var(--sand-lt); }
+    .archive-toggle-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cerulean);
+    }
+    .archive-toggle-chevron {
+      font-size: 0.8rem;
+      color: var(--cerulean);
+      opacity: 0.8;
+      transition: transform 0.3s;
+    }
+    .archive-toggle-bar.open .archive-toggle-chevron { transform: rotate(180deg); }
+
+    /* ── ARCHIVE DRAWER ── */
+    .archive-drawer {
+      position: relative;
+      z-index: 10;
+      margin: 0 24px 32px;
+      background: rgba(14,22,34,0.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(242,234,216,0.12);
+      border-radius: 16px;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.4s ease;
+    }
+    .archive-drawer.open { max-height: 600px; }
+    .archive-inner { padding: 20px 24px; }
+
+    .archive-day-block {
+      margin-bottom: 20px;
+      padding-left: 16px;
+      border-left: 2px solid rgba(201,176,138,0.15);
+    }
+    .archive-day-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .archive-day-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--sand-lt);
+    }
+    .archive-day-pct {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      color: rgba(201,176,138,0.45);
+    }
+    .archive-task-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+      font-size: 0.7rem;
+      color: rgba(242,234,216,0.45);
+    }
+    .archive-task-row.done { text-decoration: line-through; opacity: 0.5; }
+    .a-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .a-done { background: var(--olive-lt); }
+    .a-open { background: rgba(201,176,138,0.25); }
+
+    /* ── SUBPAGE CARDS ── */
+    .subpage-row {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      gap: 16px;
+      padding: 0 24px 40px;
+      margin-top: 16px;
+    }
+
+    .subpage-card {
+      flex: 1;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      min-height: 160px;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      border: 1px solid rgba(242,234,216,0.14);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .subpage-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(18,28,40,0.5); }
+
+    .subpage-card-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      transition: transform 0.4s ease;
+    }
+    .subpage-card:hover .subpage-card-bg { transform: scale(1.04); }
+
+    .subpage-card-scrim { position: absolute; inset: 0; }
+
+    .subpage-card-content {
+      position: relative;
+      z-index: 2;
+      padding: 22px 24px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .subpage-card-eyebrow {
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--sand);
+      opacity: 0.75;
+      margin-bottom: 6px;
+    }
+    .subpage-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem;
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .subpage-card-title em { font-style: italic; color: var(--sand-lt); }
+    .subpage-card-arrow {
+      position: absolute;
+      top: 20px; right: 20px;
+      font-size: 1rem;
+      color: var(--sand);
+      opacity: 0.5;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .subpage-card:hover .subpage-card-arrow { opacity: 1; transform: translate(3px,-3px); }
+
+    /* ── SAVE DOT ── */
+    .save-dot {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--olive-lt);
+      z-index: 300;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .save-dot.show { opacity: 1; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .main-layout { padding: 20px 16px 32px; padding-top: calc(52vh - 52px); }
+      .task-panel { width: 100%; }
+      .subpage-row { flex-direction: column; padding: 0 16px 32px; }
+      .archive-toggle-bar, .archive-drawer { margin-left: 16px; margin-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<img class="bg-image" src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/planning.jpg" alt="" />
+<div class="bg-scrim"></div>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <div class="topbar-nav">
+    <a id="back-main-hub" href="https://javauntgarcia.github.io/Notion/Main_Hub.html" target="_top">← Main Hub</a>
+  </div>
+  <div class="topbar-date" id="topbarDate"></div>
+  <div class="topbar-nav">
+    <a id="nav-wellness" href="https://javauntgarcia.github.io/Notion/Wellness.html" target="_top">Wellness</a>
+    <a id="nav-productivity" href="https://javauntgarcia.github.io/Notion/Productivity.html" target="_top">Productivity</a>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- PLANNING TITLE — top right -->
+  <div class="hero-title-block">
+    <div class="hero-title"><em>Planning</em></div>
+  </div>
+
+  <!-- TASK PANEL — left, ~52vh down -->
+  <div class="main-layout">
+    <div class="task-panel">
+
+      <div class="panel-header">
+        <div class="panel-date" id="panelDate"></div>
+        <div class="panel-title">Daily <em>Tasks</em></div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 / 0</div>
+      </div>
+
+      <div class="add-task-area">
+        <input class="task-input" id="taskInput" type="text"
+          placeholder="Add a task…"
+          onkeydown="if(event.key==='Enter')addTask()" />
+        <button class="btn-add" onclick="addTask()">+ Add</button>
+      </div>
+
+      <div class="task-list" id="taskList"></div>
+
+      <div class="panel-footer">
+        <button class="btn-ghost" onclick="clearDone()">Clear Done</button>
+        <button class="btn-ghost" onclick="archiveDay()">Archive Day →</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 65vh spacer pushes archive + cards below the people -->
+  <div style="height: 65vh; min-height: 320px;"></div>
+
+  <!-- ARCHIVE TOGGLE -->
+  <div class="archive-toggle-bar" id="archiveToggleBar" onclick="toggleArchive()">
+    <span class="archive-toggle-label">Archived Days</span>
+    <span class="archive-toggle-chevron" id="archiveChevron">▾</span>
+  </div>
+
+  <!-- ARCHIVE DRAWER -->
+  <div class="archive-drawer" id="archiveDrawer">
+    <div class="archive-inner" id="archiveInner"></div>
+  </div>
+
+  <!-- SUBPAGE CARDS -->
+  <div class="subpage-row">
+
+    <a id="nav-monthly-outline" class="subpage-card" href="https://javauntgarcia.github.io/Notion/Monthly%20Outline.html" target="_top">
+      <div class="subpage-card-bg" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Monthly%20Outline.jpg'); background-position: center center;"></div>
+      <div class="subpage-card-scrim" style="background:linear-gradient(160deg,rgba(10,20,38,0.10) 0%,rgba(14,36,68,0.82) 100%);"></div>
+      <div class="subpage-card-content">
+        <div class="subpage-card-eyebrow">Subpage · Calendar</div>
+        <div class="subpage-card-title">Monthly <em>Outline</em></div>
+      </div>
+      <div class="subpage-card-arrow">↗</div>
+    </a>
+
+    <a id="nav-yearly-outlook" class="subpage-card" href="https://javauntgarcia.github.io/Notion/Yearly%20Outlook.html" target="_top">
+      <div class="subpage-card-bg" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Yearly%20Outlook.jpg'); background-position: center center;"></div>
+      <div class="subpage-card-scrim" style="background:linear-gradient(160deg,rgba(18,24,8,0.10) 0%,rgba(30,42,12,0.82) 100%);"></div>
+      <div class="subpage-card-content">
+        <div class="subpage-card-eyebrow">Subpage · Goals</div>
+        <div class="subpage-card-title">Yearly <em>Outlook</em></div>
+      </div>
+      <div class="subpage-card-arrow">↗</div>
+    </a>
+
+  </div>
+
+</div><!-- /page -->
+
+<div class="save-dot" id="saveDot"></div>
+
+<script>
+// ============================================================
+// EDIT: NAV URLS — replace GitHub Pages URLs with Notion page
+// URLs once each subpage has a /embed Notion page set up.
+// target="_top" is already set on every link.
+// ============================================================
+var NAV_URLS = {
+  'back-main-hub':       'https://javauntgarcia.github.io/Notion/Main_Hub.html',      // EDIT: Notion Main Hub page URL
+  'nav-wellness':        'https://javauntgarcia.github.io/Notion/Wellness.html',       // EDIT: Notion Wellness page URL
+  'nav-productivity':    'https://javauntgarcia.github.io/Notion/Productivity.html',   // EDIT: Notion Productivity page URL
+  'nav-monthly-outline': 'https://javauntgarcia.github.io/Notion/Monthly%20Outline.html', // EDIT: Notion Monthly Outline page URL
+  'nav-yearly-outlook':  'https://javauntgarcia.github.io/Notion/Yearly%20Outlook.html'   // EDIT: Notion Yearly Outlook page URL
+};
+Object.keys(NAV_URLS).forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.href = NAV_URLS[id];
+});
+
+const today = new Date();
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('topbarDate').textContent =
+    today.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('panelDate').textContent =
+    today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+  renderTasks();
+});
+
+function todayKey() {
+  return `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+}
+function getTasks() { return JSON.parse(localStorage.getItem('plan_tasks_'+todayKey())||'[]'); }
+function setTasks(arr) { localStorage.setItem('plan_tasks_'+todayKey(), JSON.stringify(arr)); flashSave(); }
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function flashSave() {
+  const d = document.getElementById('saveDot');
+  d.classList.add('show');
+  clearTimeout(d._t);
+  d._t = setTimeout(() => d.classList.remove('show'), 1400);
+}
+
+function addTask() {
+  const input = document.getElementById('taskInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  const tasks = getTasks();
+  tasks.push({ id: Date.now(), text, done: false });
+  setTasks(tasks);
+  input.value = '';
+  renderTasks();
+}
+
+function renderTasks() {
+  const tasks = getTasks();
+  const list  = document.getElementById('taskList');
+  const done  = tasks.filter(t => t.done).length;
+  const total = tasks.length;
+  const pct   = total ? Math.round((done/total)*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} / ${total}`;
+
+  if (!tasks.length) {
+    list.innerHTML = '<div class="empty-tasks">✦ &nbsp; No tasks yet</div>';
+    return;
+  }
+  list.innerHTML = '';
+  tasks.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'task-item' + (t.done ? ' done' : '');
+    row.innerHTML = `
+      <input type="checkbox" class="task-check" ${t.done?'checked':''} onchange="toggleTask(${t.id})" />
+      <span class="task-text">${escHtml(t.text)}</span>
+      <button class="task-del" onclick="deleteTask(${t.id})">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function toggleTask(id) {
+  const tasks = getTasks();
+  const t = tasks.find(x => x.id === id);
+  if (t) { t.done = !t.done; setTasks(tasks); renderTasks(); }
+}
+function deleteTask(id) {
+  setTasks(getTasks().filter(x => x.id !== id));
+  renderTasks();
+}
+function clearDone() {
+  setTasks(getTasks().filter(x => !x.done));
+  renderTasks();
+}
+
+function archiveDay() {
+  const tasks = getTasks();
+  if (!tasks.length) return;
+  const key = 'plan_archive';
+  const archive = JSON.parse(localStorage.getItem(key)||'[]');
+  const idx = archive.findIndex(a => a.date === todayKey());
+  const entry = {
+    date: todayKey(),
+    label: today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}),
+    tasks
+  };
+  if (idx > -1) archive.splice(idx,1,entry); else archive.unshift(entry);
+  localStorage.setItem(key, JSON.stringify(archive));
+  localStorage.removeItem('plan_tasks_'+todayKey());
+  flashSave();
+  renderTasks();
+  if (document.getElementById('archiveDrawer').classList.contains('open')) renderArchive();
+}
+
+let archiveOpen = false;
+function toggleArchive() {
+  archiveOpen = !archiveOpen;
+  document.getElementById('archiveDrawer').classList.toggle('open', archiveOpen);
+  document.getElementById('archiveToggleBar').classList.toggle('open', archiveOpen);
+  if (archiveOpen) renderArchive();
+}
+
+function renderArchive() {
+  const archive = JSON.parse(localStorage.getItem('plan_archive')||'[]');
+  const inner   = document.getElementById('archiveInner');
+  if (!archive.length) {
+    inner.innerHTML = '<div style="font-size:0.68rem;color:rgba(201,176,138,0.35);text-align:center;padding:24px">No archived days yet</div>';
+    return;
+  }
+  inner.innerHTML = '';
+  archive.forEach(day => {
+    const done  = day.tasks.filter(t=>t.done).length;
+    const total = day.tasks.length;
+    const pct   = total ? Math.round((done/total)*100) : 0;
+    const block = document.createElement('div');
+    block.className = 'archive-day-block';
+    block.innerHTML = `
+      <div class="archive-day-header">
+        <span class="archive-day-name">${day.label}</span>
+        <span class="archive-day-pct">${pct}% done</span>
+      </div>
+      ${day.tasks.map(t=>`
+        <div class="archive-task-row ${t.done?'done':''}">
+          <div class="a-dot ${t.done?'a-done':'a-open'}"></div>
+          <span>${escHtml(t.text)}</span>
+        </div>
+      `).join('')}
+    `;
+    inner.appendChild(block);
+  });
+}
+</script>
+</body>
+</html>
