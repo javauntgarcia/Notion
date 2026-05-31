@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════════════
+   PALETTE — Budget.jpg
+   Jet black void · iridescent champagne pearl
+   Oxidized bronze/copper · vivid goldfish orange
+   Warm skin · deep mauve-plum · crystal shimmer
+   ══════════════════════════════════════════════ */
+:root {
+  --void:          #050404;
+  --deep:          #0c0909;
+  --near:          #151010;
+  --mid:           #231a18;
+
+  /* Champagne pearl — primary text */
+  --pearl:         #f0e8d8;
+  --pearl-dim:     #c8bfb0;
+  --pearl-ghost:   #9a9088;
+
+  /* Goldfish orange — primary accent */
+  --gold:          #a8a0c8;
+  --gold-bright:   #ccc4e8;
+  --gold-dim:      rgba(168,160,200,0.14);
+  --gold-border:   rgba(168,160,200,0.32);
+
+  /* Iridescent bronze/copper — secondary accent */
+  --bronze:        #b8906a;
+  --bronze-dim:    rgba(184,144,106,0.14);
+  --bronze-border: rgba(184,144,106,0.28);
+
+  /* Deep mauve-plum — tertiary, danger */
+  --mauve:         #8c6878;
+  --mauve-bright:  #b07a8e;
+  --mauve-dim:     rgba(140,104,120,0.16);
+  --mauve-border:  rgba(140,104,120,0.30);
+
+  /* Crystal shimmer — glass surfaces */
+  --glass:         rgba(240,232,216,0.06);
+  --glass-hover:   rgba(240,232,216,0.10);
+  --glass-border:  rgba(240,232,216,0.12);
+  --glass-inset:   rgba(255,245,225,0.10);
+
+  /* Status */
+  --ok:            #7aaa8c;
+  --warn:          #c8a040;
+  --over:          #c07070;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Mono', monospace;
+  background: var(--void);
+  color: var(--pearl);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND ── */
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0;
+  background-image: url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Budget.jpg');
+  background-size: cover;
+  background-position: center 25%;
+  filter: brightness(0.50) contrast(1.06) saturate(1.15);
+}
+.bg-layer::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 30%,
+    rgba(10,5,5,0.10) 0%,
+    rgba(5,4,4,0.28) 60%,
+    rgba(5,4,4,0.58) 100%
+  );
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 52px;
+  background: rgba(8,6,5,0.70);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 rgba(240,232,216,0.04), 0 4px 32px rgba(0,0,0,0.6);
+}
+.topbar a {
+  font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gold); text-decoration: none; transition: color 0.2s;
+}
+.topbar a:hover { color: var(--pearl); }
+.topbar-center {
+  font-size: 0.58rem; letter-spacing: 0.26em; text-transform: uppercase;
+  color: var(--pearl-ghost);
+}
+
+/* ── PAGE ── */
+.page-wrap {
+  position: relative; z-index: 1;
+  max-width: 1080px; margin: 0 auto;
+  padding: 72px 24px 88px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 48px 0 32px;
+  border-bottom: 1px solid rgba(240,232,216,0.08);
+  margin-bottom: 44px;
+  display: flex; align-items: flex-end;
+  justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  animation: fadeUp 0.7s ease both;
+}
+.hero-label {
+  font-size: 0.58rem; letter-spacing: 0.26em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-bottom: 10px;
+}
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 7vw, 5.2rem);
+  font-weight: 300; line-height: 0.95;
+  color: var(--pearl); letter-spacing: -0.01em;
+}
+.hero h1 em {
+  font-style: italic;
+  background: linear-gradient(90deg, var(--gold-bright), #ede8ff, var(--bronze), var(--gold-bright));
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+.hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+.hs-label {
+  font-size: 0.52rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-bottom: 5px;
+}
+.hs-value { font-size: 1.05rem; color: var(--pearl); }
+.hs-value.gold  { color: var(--gold-bright); }
+.hs-value.ok    { color: var(--ok); }
+.hs-value.warn  { color: var(--warn); }
+.hs-value.over  { color: var(--over); }
+
+/* ── MONTH TOGGLE ── */
+.month-toggle {
+  display: flex; gap: 0;
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 36px;
+  animation: fadeUp 0.7s 0.05s ease both;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.4), inset 0 1px 0 var(--glass-inset);
+}
+.month-tab {
+  font-family: 'DM Mono', monospace;
+  flex: 1; padding: 14px 20px;
+  background: transparent; border: none;
+  cursor: pointer; transition: all 0.2s;
+  text-align: left;
+  border-right: 1px solid var(--glass-border);
+  position: relative;
+}
+.month-tab:last-child { border-right: none; }
+.month-tab-label {
+  font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-bottom: 4px;
+}
+.month-tab-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem; font-weight: 300;
+  color: var(--pearl-dim); letter-spacing: -0.01em;
+}
+.month-tab-sub {
+  font-size: 0.48rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-top: 3px;
+}
+.month-tab.active {
+  background: rgba(168,160,200,0.10);
+}
+.month-tab.active .month-tab-name { color: var(--gold-bright); }
+.month-tab.active .month-tab-label { color: var(--bronze); }
+.month-tab.active::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold-bright), var(--bronze));
+}
+.month-tab:hover:not(.active) { background: var(--glass-hover); }
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex; align-items: baseline; gap: 14px;
+  margin-bottom: 18px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.12rem; font-weight: 300; font-style: italic;
+  color: var(--pearl); white-space: nowrap;
+}
+.section-rule {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(168,160,200,0.40), rgba(240,232,216,0.06));
+}
+.section-note {
+  font-size: 0.54rem; letter-spacing: 0.12em;
+  color: var(--pearl-ghost); text-transform: uppercase; white-space: nowrap;
+}
+
+/* ── INCOME / SUMMARY BANNER ── */
+.summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 32px;
+  animation: fadeUp 0.7s 0.10s ease both;
+}
+.sum-card {
+  background: var(--glass);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: 0 3px 28px rgba(0,0,0,0.45), inset 0 1px 0 var(--glass-inset);
+  position: relative; overflow: hidden;
+}
+.sum-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.sum-card.income::before  { background: linear-gradient(90deg, var(--ok), transparent); }
+.sum-card.budget::before  { background: linear-gradient(90deg, var(--gold), transparent); }
+.sum-card.net::before     { background: linear-gradient(90deg, var(--bronze), transparent); }
+.sum-eyebrow {
+  font-size: 0.49rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-bottom: 8px;
+}
+.sum-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 300; line-height: 1; letter-spacing: -0.02em;
+}
+.sum-value.income { color: var(--ok); }
+.sum-value.budget { color: var(--gold-bright); }
+.sum-value.net.surplus { color: var(--ok); }
+.sum-value.net.deficit { color: var(--over); }
+.sum-sub {
+  font-size: 0.49rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-top: 6px;
+}
+
+/* ── ONE-TIME EXPENSES BANNER (June only) ── */
+.onetime-banner {
+  background: rgba(168,160,200,0.08);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid var(--gold-border);
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(168,160,200,0.12);
+  display: flex; align-items: flex-start; gap: 16px;
+  animation: fadeUp 0.7s 0.12s ease both;
+}
+.onetime-icon { font-size: 1.4rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.onetime-body {}
+.onetime-title {
+  font-size: 0.54rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 6px;
+}
+.onetime-grid {
+  display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px;
+}
+.onetime-item {}
+.onetime-item-label {
+  font-size: 0.46rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-bottom: 2px;
+}
+.onetime-item-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.0rem; font-weight: 300;
+  color: var(--gold-bright);
+}
+.onetime-text {
+  font-size: 0.58rem; letter-spacing: 0.04em; line-height: 1.6;
+  color: var(--pearl-dim);
+}
+.onetime-text strong { color: var(--pearl); font-weight: 400; }
+
+/* ── BUDGET LINE ITEMS ── */
+.budget-section {
+  margin-bottom: 36px;
+  animation: fadeUp 0.7s 0.15s ease both;
+}
+.budget-grid {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.budget-row {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.35), inset 0 1px 0 var(--glass-inset);
+  display: grid;
+  grid-template-columns: 200px 1fr 90px 90px 80px;
+  align-items: center;
+  gap: 16px;
+  transition: background 0.15s;
+  position: relative; overflow: hidden;
+}
+.budget-row::before {
+  content: ''; position: absolute;
+  left: 0; top: 0; bottom: 0; width: 3px;
+}
+.budget-row.fixed::before   { background: var(--mauve); }
+.budget-row.flex::before    { background: var(--gold); }
+.budget-row.savings::before { background: var(--ok); }
+.budget-row.debt::before    { background: var(--over); }
+.budget-row:hover { background: var(--glass-hover); }
+
+.br-cat {
+  font-size: 0.5rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--pearl-ghost);
+}
+.br-desc {
+  font-size: 0.62rem; letter-spacing: 0.03em;
+  color: var(--pearl);
+}
+.br-type {
+  font-size: 0.44rem; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 20px; display: inline-block;
+}
+.type-fixed   { background: var(--mauve-dim); color: var(--mauve-bright); border: 1px solid var(--mauve-border); }
+.type-flex    { background: var(--gold-dim);  color: var(--gold-bright);  border: 1px solid var(--gold-border); }
+.type-savings { background: rgba(122,170,140,0.12); color: var(--ok); border: 1px solid rgba(122,170,140,0.28); }
+.type-debt    { background: rgba(192,112,112,0.12); color: var(--over); border: 1px solid rgba(192,112,112,0.28); }
+
+.br-amount {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem; font-weight: 300; letter-spacing: -0.01em;
+  text-align: right;
+  color: var(--pearl);
+}
+.br-pct {
+  font-size: 0.52rem; color: var(--pearl-ghost);
+  text-align: right; letter-spacing: 0.06em;
+}
+
+/* Category group header */
+.budget-group-header {
+  padding: 12px 0 6px;
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 8px;
+}
+.bg-label {
+  font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--pearl-ghost); white-space: nowrap;
+}
+.bg-rule { flex: 1; height: 1px; background: rgba(240,232,216,0.06); }
+.bg-total {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.9rem; font-weight: 300;
+  color: var(--pearl-dim);
+}
+
+/* ── CATEGORY WHEEL ── */
+.wheel-section {
+  margin-bottom: 36px;
+  animation: fadeUp 0.7s 0.20s ease both;
+}
+.wheel-wrap {
+  background: var(--glass);
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 3px 28px rgba(0,0,0,0.40), inset 0 1px 0 var(--glass-inset);
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 32px;
+  align-items: center;
+}
+.wheel-donut {
+  position: relative;
+  width: 200px; height: 200px; flex-shrink: 0;
+}
+.wheel-donut svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.wheel-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+}
+.wheel-center-label {
+  font-size: 0.44rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-bottom: 4px;
+}
+.wheel-center-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 300;
+  color: var(--pearl); line-height: 1;
+}
+.wheel-legend { display: flex; flex-direction: column; gap: 10px; }
+.wl-item {
+  display: grid; grid-template-columns: 10px 140px 1fr 70px;
+  align-items: center; gap: 10px;
+}
+.wl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.wl-name {
+  font-size: 0.54rem; letter-spacing: 0.08em;
+  color: var(--pearl-dim);
+}
+.wl-bar-track {
+  height: 4px; background: rgba(240,232,216,0.07);
+  border-radius: 2px; overflow: hidden;
+}
+.wl-bar-fill { height: 100%; border-radius: 2px; }
+.wl-amt {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem; font-weight: 300;
+  color: var(--pearl); text-align: right;
+}
+
+/* ── DEBT PAYDOWN TRACKER ── */
+.debt-section {
+  margin-bottom: 36px;
+  animation: fadeUp 0.7s 0.24s ease both;
+}
+.debt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.debt-card {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.40), inset 0 1px 0 var(--glass-inset);
+  position: relative; overflow: hidden;
+}
+.debt-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--over), transparent);
+}
+.dc-institution {
+  font-size: 0.48rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-bottom: 3px;
+}
+.dc-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-weight: 300; color: var(--pearl);
+  margin-bottom: 12px;
+}
+.dc-balance {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem; font-weight: 300;
+  color: var(--over); letter-spacing: -0.02em;
+  line-height: 1;
+}
+.dc-sub {
+  font-size: 0.48rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-top: 4px; margin-bottom: 14px;
+}
+.dc-track {
+  height: 5px; background: rgba(240,232,216,0.07);
+  border-radius: 3px; overflow: hidden; margin-bottom: 8px;
+}
+.dc-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--over), var(--mauve));
+}
+.dc-meta {
+  display: flex; justify-content: space-between;
+  font-size: 0.48rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--pearl-ghost);
+}
+
+/* ── SAVINGS GOALS ── */
+.savings-section {
+  margin-bottom: 36px;
+  animation: fadeUp 0.7s 0.28s ease both;
+}
+.savings-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.savings-card {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.35), inset 0 1px 0 var(--glass-inset);
+  position: relative; overflow: hidden;
+}
+.savings-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--ok), transparent);
+}
+.sc-label {
+  font-size: 0.48rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-bottom: 8px;
+}
+.sc-amount {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.55rem; font-weight: 300; line-height: 1;
+  color: var(--ok); letter-spacing: -0.02em;
+}
+.sc-sub {
+  font-size: 0.46rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--pearl-ghost); margin-top: 5px;
+}
+
+/* ── NOTES / TRANSITION ALERT ── */
+.note-section {
+  margin-bottom: 20px;
+  animation: fadeUp 0.7s 0.32s ease both;
+}
+.note-card {
+  background: rgba(184,144,106,0.08);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--bronze-border);
+  border-radius: 12px;
+  padding: 18px 22px;
+  box-shadow: 0 2px 18px rgba(0,0,0,0.35), inset 0 1px 0 rgba(184,144,106,0.12);
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.note-icon { font-size: 1.1rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.note-title {
+  font-size: 0.52rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--bronze); margin-bottom: 5px;
+}
+.note-text {
+  font-size: 0.59rem; letter-spacing: 0.03em; line-height: 1.65;
+  color: var(--pearl-dim);
+}
+.note-text strong { color: var(--pearl); font-weight: 400; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 200;
+  background: rgba(8,6,5,0.96);
+  border: 1px solid var(--gold-border);
+  border-radius: 8px; padding: 12px 18px;
+  font-size: 0.62rem; letter-spacing: 0.08em; color: var(--pearl);
+  opacity: 0; transform: translateY(8px);
+  transition: all 0.25s; pointer-events: none;
+  backdrop-filter: blur(16px);
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .summary-row { grid-template-columns: 1fr; }
+  .budget-row { grid-template-columns: 1fr 1fr; }
+  .br-type, .br-pct { display: none; }
+  .wheel-wrap { grid-template-columns: 1fr; }
+  .debt-grid, .savings-grid { grid-template-columns: 1fr; }
+  .month-tab-sub { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a href="Finances.html">← Finances</a>
+  <span class="topbar-center">Finance Portal</span>
+  <a href="Main Hub.html">← Main Hub</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div>
+      <p class="hero-label">Finance Portal · Monthly Budget</p>
+      <h1>Bud<em>get</em></h1>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <p class="hs-label">Viewing</p>
+        <p class="hs-value gold" id="hero-month">—</p>
+      </div>
+      <div>
+        <p class="hs-label">Total Budget</p>
+        <p class="hs-value" id="hero-budget">—</p>
+      </div>
+      <div>
+        <p class="hs-label">Net After Budget</p>
+        <p class="hs-value" id="hero-net">—</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- MONTH TOGGLE -->
+  <div class="month-toggle">
+    <button class="month-tab active" onclick="switchMonth('june', this)">
+      <p class="month-tab-label">Transition Month</p>
+      <p class="month-tab-name">June 2026</p>
+      <p class="month-tab-sub">Last month at current place · Moving out</p>
+    </button>
+    <button class="month-tab" onclick="switchMonth('july', this)">
+      <p class="month-tab-label">New Baseline</p>
+      <p class="month-tab-name">July 2026+</p>
+      <p class="month-tab-sub">Gap year begins · New budget template</p>
+    </button>
+  </div>
+
+  <!-- SUMMARY BANNER -->
+  <div class="summary-row" id="summary-row"></div>
+
+  <!-- JUNE ONLY: ONE-TIME EXPENSES -->
+  <div id="onetime-section"></div>
+
+  <!-- SHARED BILLS BREAKDOWN -->
+  <div class="shared-section" id="shared-section"></div>
+
+  <!-- BUDGET LINE ITEMS -->
+  <div class="budget-section">
+    <div class="section-header">
+      <h2 class="section-title">Budget Line Items</h2>
+      <div class="section-rule"></div>
+      <span class="section-note" id="lines-note">—</span>
+    </div>
+    <div class="budget-grid" id="budget-grid"></div>
+  </div>
+
+  <!-- ALLOCATION DONUT -->
+  <div class="wheel-section">
+    <div class="section-header">
+      <h2 class="section-title">Allocation Breakdown</h2>
+      <div class="section-rule"></div>
+      <span class="section-note">recurring only</span>
+    </div>
+    <div class="wheel-wrap">
+      <div class="wheel-donut">
+        <svg viewBox="0 0 100 100" id="donut-svg"></svg>
+        <div class="wheel-center">
+          <p class="wheel-center-label">Monthly</p>
+          <p class="wheel-center-val" id="donut-total">—</p>
+        </div>
+      </div>
+      <div class="wheel-legend" id="wheel-legend"></div>
+    </div>
+  </div>
+
+  <!-- DEBT PAYDOWN -->
+  <div class="debt-section">
+    <div class="section-header">
+      <h2 class="section-title">Debt Paydown</h2>
+      <div class="section-rule"></div>
+      <span class="section-note">current balances</span>
+    </div>
+    <div class="debt-grid">
+      <div class="debt-card">
+        <p class="dc-institution">Citi</p>
+        <p class="dc-name">Diamond Preferred</p>
+        <p class="dc-balance">$5,459.99</p>
+        <p class="dc-sub">0% promo APR · balance transfer</p>
+        <div class="dc-track">
+          <div class="dc-fill" style="width:72%"></div>
+        </div>
+        <div class="dc-meta">
+          <span>Originally ~$7,600</span>
+          <span>72% of peak</span>
+        </div>
+      </div>
+      <div class="debt-card">
+        <p class="dc-institution">Discover</p>
+        <p class="dc-name">it® Card</p>
+        <p class="dc-balance">$2,059.57</p>
+        <p class="dc-sub">22.99% APR · priority paydown</p>
+        <div class="dc-track">
+          <div class="dc-fill" style="width:55%"></div>
+        </div>
+        <div class="dc-meta">
+          <span>Originally ~$3,750</span>
+          <span>55% of peak</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVINGS GOALS -->
+  <div class="savings-section">
+    <div class="section-header">
+      <h2 class="section-title">Savings & Investment Goals</h2>
+      <div class="section-rule"></div>
+      <span class="section-note" id="savings-note">—</span>
+    </div>
+    <div class="savings-grid" id="savings-grid"></div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="note-section" id="notes-section"></div>
+
+</div><!-- end page-wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// BUDGET DATA
+// ══════════════════════════════════════════════
+
+const BUDGETS = {
+  june: {
+    income: 6700,
+    incomeNote: '3 pay periods in June · SFMTA biweekly',
+
+    oneTime: [
+      { label: 'Movers',            amount: 1500,  note: 'estimate — local move' },
+      { label: 'Security Deposit',  amount: 2700,  note: 'new place' },
+      { label: 'Overlap Utilities', amount: 200,   note: 'final PG&E true-up' },
+    ],
+
+    // Fixed shared bills — shown with full/your-share breakdown
+    sharedBills: [
+      { desc: 'Rent',              full: 4350,  yourShare: 2700, yourPct: 62, note: 'BILT — settled via payroll sweep' },
+      { desc: 'PG&E / Utilities',  full: 260,   yourShare: 130,  yourPct: 50, note: 'last month — final true-up' },
+      { desc: 'Lemonade Renters',  full: 84,    yourShare: 42,   yourPct: 50, note: 'pet + renters insurance' },
+      { desc: 'Stak Parking',      full: 250,   yourShare: 125,  yourPct: 50, note: 'shared parking space' },
+    ],
+
+    lines: [
+      // Fixed — your share only
+      { cat: 'Housing',     desc: 'Rent — your share (62%)',            amount: 2700, type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Utilities',   desc: 'PG&E — your share (50%)',            amount: 130,  type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Insurance',   desc: 'Lemonade — your share (50%)',        amount: 42,   type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Parking',     desc: 'Stak — your share (50%)',            amount: 125,  type: 'fixed',   group: 'Fixed Obligations' },
+      // Debt — corrected per plan
+      { cat: 'Debt',        desc: 'Discover — lump-sum payoff target',  amount: 2060, type: 'debt',    group: 'Debt Payments' },
+      { cat: 'Debt',        desc: 'Citi — $140 biweekly (×2 periods)',  amount: 280,  type: 'debt',    group: 'Debt Payments' },
+      // BILT excluded — joint day-to-day, settled externally
+      // Savings
+      { cat: 'Savings',     desc: 'WF Joint — payroll sweep',           amount: 1350, type: 'savings', group: 'Savings & Investing' },
+      { cat: 'Investing',   desc: 'Roth IRA — Vanguard (biweekly)',     amount: 325,  type: 'savings', group: 'Savings & Investing' },
+      // Discretionary
+      { cat: 'Groceries',   desc: 'Groceries & household',              amount: 400,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Dining Out',  desc: 'Restaurants & delivery',             amount: 300,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Transport',   desc: 'Clipper, Lyft, rideshare',           amount: 120,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Shopping',    desc: 'Clothing, Amazon, misc.',            amount: 150,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Subscriptions',desc:'Adobe, Netflix, subscriptions',      amount: 120,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Entertainment',desc:'Bars, events, nightlife',            amount: 150,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Health',      desc: 'Pharmacy, wellness, grooming',       amount: 75,   type: 'flex',    group: 'Discretionary' },
+    ],
+
+    savings: [
+      { label: 'WF Joint — Rent/Travel Fund', amount: 1350, sub: 'auto each payroll' },
+      { label: 'Vanguard Roth IRA',           amount: 325,  sub: '$6,500/yr target · on track' },
+      { label: 'WF Personal Buffer',          amount: 0,    sub: 'depleted — movers + deposit month' },
+    ],
+
+    notes: [
+      { icon: '🚚', title: 'Moving Month — Tight Cashflow',
+        text: '<strong>June is your bridge month.</strong> Three paychecks land this month — use the third as a lump-sum sweep at Discover to close that balance. After one-time costs (~$4,400) you\'ll have roughly <strong>$280 buffer</strong> remaining. Hold discretionary spend lean.' },
+      { icon: '💳', title: 'BILT Card — Not Budgeted',
+        text: 'BILT is your joint day-to-day card with Eston. Charges are settled externally between you two. When you tag transactions in Statements.html, mark anything shared as <strong>½</strong> with the percentage — those flow into your actual spend tracking but don\'t count as budget commitments.' },
+      { icon: '🏦', title: 'Citi Fixed Plan — 21 Months',
+        text: '<strong>$280/month ($140 biweekly)</strong> pays off $5,460 by Dec 2027. Payment is fixed — set autopay to $140 on each payroll date. Don\'t adjust unless you get a windfall.' },
+    ],
+  },
+
+  july: {
+    income: 6700,
+    incomeNote: '4 SFMTA pay periods · gap year begins late summer',
+
+    oneTime: [],
+
+    sharedBills: [
+      { desc: 'PG&E / Utilities',  full: 0,    yourShare: 0,   yourPct: 0,  note: 'no longer at current place' },
+      { desc: 'Lemonade Renters',  full: 84,   yourShare: 42,  yourPct: 50, note: 'new place — confirm split' },
+      { desc: 'Stak Parking',      full: 250,  yourShare: 125, yourPct: 50, note: 'confirm if continuing' },
+    ],
+
+    lines: [
+      // No rent
+      { cat: 'Insurance',    desc: 'Lemonade — your share (50%)',        amount: 42,   type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Parking',      desc: 'Stak — your share (50%)',            amount: 125,  type: 'fixed',   group: 'Fixed Obligations' },
+      // Debt — Discover paid off in June, Citi fixed at $280/mo
+      { cat: 'Debt',         desc: 'Citi — $140 biweekly (fixed plan)',  amount: 280,  type: 'debt',    group: 'Debt Payments' },
+      // Savings — freed-up rent budget redistributed
+      { cat: 'Savings',      desc: 'WF Joint — travel/gap year fund',    amount: 1350, type: 'savings', group: 'Savings & Investing' },
+      { cat: 'Savings',      desc: 'WF Personal — buffer rebuild',       amount: 500,  type: 'savings', group: 'Savings & Investing' },
+      { cat: 'Investing',    desc: 'Roth IRA — Vanguard',                amount: 325,  type: 'savings', group: 'Savings & Investing' },
+      // Discretionary — gap year spending profile
+      { cat: 'Groceries',    desc: 'Groceries & household',              amount: 450,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Dining Out',   desc: 'Restaurants & delivery',             amount: 400,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Transport',    desc: 'Clipper, Lyft, rideshare',           amount: 120,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Shopping',     desc: 'Clothing, Amazon, misc.',            amount: 250,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Subscriptions',desc: 'Adobe, Netflix, subscriptions',      amount: 120,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Entertainment',desc: 'Bars, events, shows',                amount: 200,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'LSAT Prep',    desc: 'Study materials, practice tests',    amount: 150,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Travel',       desc: 'Gap year exploration fund',          amount: 300,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Health',       desc: 'Pharmacy, wellness, self-care',      amount: 100,  type: 'flex',    group: 'Discretionary' },
+    ],
+
+    savings: [
+      { label: 'WF Joint — Travel Fund',  amount: 1350, sub: 'auto each payroll' },
+      { label: 'WF Personal Buffer',      amount: 500,  sub: 'rebuilding from ~$879 base' },
+      { label: 'Vanguard Roth IRA',       amount: 325,  sub: '$6,500/yr target' },
+    ],
+
+    notes: [
+      { icon: '✈', title: 'Gap Year Budget — New Baseline',
+        text: '<strong>No rent obligation.</strong> The $2,700 rent share is redistributed: $500 to WF Personal buffer rebuild, $300 to travel fund, $150 to LSAT prep, and the remainder absorbed into discretionary uplift. Discover should be fully paid off from June\'s third paycheck.' },
+      { icon: '💳', title: 'BILT — Stays External',
+        text: 'BILT remains a joint day-to-day card settled between you and Eston. Continue tagging in Statements.html: <strong>J</strong> for yours alone, <strong>E</strong> for Eston\'s (excluded from your budget), <strong>½</strong> + percentage for any shared charge. Your budget only reflects your confirmed share of split bills.' },
+      { icon: '⚖', title: 'Citi — Stay the Course',
+        text: '<strong>$280/mo is fixed through Dec 2027.</strong> With Discover gone and no rent, your fixed obligation load drops from ~$7,500/mo to ~$750/mo — a dramatic shift. Resist the urge to loosen discretionary spend immediately; build the WF buffer to $2,000 first.' },
+    ],
+  },
+};
+
+// ══════════════════════════════════════════════
+// COLORS
+// ══════════════════════════════════════════════
+const GROUP_COLORS = {
+  'Fixed Obligations': { fill: '#8c6878', stroke: 'rgba(140,104,120,0.6)' },
+  'Debt Payments':     { fill: '#c07070', stroke: 'rgba(192,112,112,0.6)' },
+  'Savings & Investing':{ fill: '#7aaa8c', stroke: 'rgba(122,170,140,0.6)' },
+  'Discretionary':     { fill: '#a8a0c8', stroke: 'rgba(168,160,200,0.6)' },
+};
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let activeMonth = 'june';
+
+function fmt(n) {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+function fmt2(n) {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function switchMonth(month, btn) {
+  activeMonth = month;
+  document.querySelectorAll('.month-tab').forEach(b => b.classList.toggle('active', b === btn));
+  renderAll();
+}
+
+function renderAll() {
+  const d = BUDGETS[activeMonth];
+  const recurringTotal = d.lines.reduce((s, l) => s + l.amount, 0);
+  const oneTimeTotal   = d.oneTime.reduce((s, l) => s + l.amount, 0);
+  const totalBudget    = recurringTotal + oneTimeTotal;
+  const net            = d.income - totalBudget;
+
+  // Hero
+  document.getElementById('hero-month').textContent  = activeMonth === 'june' ? 'June 2026' : 'July 2026+';
+  document.getElementById('hero-budget').textContent = fmt(totalBudget);
+  const heroNet = document.getElementById('hero-net');
+  heroNet.textContent = (net >= 0 ? '+' : '') + fmt(net);
+  heroNet.className = 'hs-value ' + (net >= 0 ? 'ok' : 'over');
+
+  // Summary banner
+  document.getElementById('summary-row').innerHTML = `
+    <div class="sum-card income">
+      <p class="sum-eyebrow">Estimated Income</p>
+      <p class="sum-value income">${fmt(d.income)}</p>
+      <p class="sum-sub">${d.incomeNote}</p>
+    </div>
+    <div class="sum-card budget">
+      <p class="sum-eyebrow">Total Budget</p>
+      <p class="sum-value budget">${fmt(totalBudget)}</p>
+      <p class="sum-sub">recurring ${fmt(recurringTotal)}${oneTimeTotal > 0 ? ' + one-time ' + fmt(oneTimeTotal) : ''}</p>
+    </div>
+    <div class="sum-card net">
+      <p class="sum-eyebrow">Net Cashflow</p>
+      <p class="sum-value net ${net >= 0 ? 'surplus' : 'deficit'}">${net >= 0 ? '+' : ''}${fmt(net)}</p>
+      <p class="sum-sub">${net >= 0 ? 'monthly surplus' : 'monthly deficit'}</p>
+    </div>`;
+
+  // One-time section
+  const otEl = document.getElementById('onetime-section');
+  if (d.oneTime.length > 0) {
+    otEl.innerHTML = `
+      <div class="onetime-banner" style="margin-bottom:28px">
+        <span class="onetime-icon">⚠</span>
+        <div class="onetime-body">
+          <p class="onetime-title">One-Time Expenses This Month — ${fmt(oneTimeTotal)} total</p>
+          <p class="onetime-text">These are non-recurring costs on top of your regular budget.</p>
+          <div class="onetime-grid">
+            ${d.oneTime.map(ot => `
+              <div class="onetime-item">
+                <p class="onetime-item-label">${ot.label}</p>
+                <p class="onetime-item-val">${fmt(ot.amount)}</p>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  } else {
+    otEl.innerHTML = '';
+  }
+
+  // Shared bills breakdown
+  renderSharedBills(d.sharedBills || []);
+
+  // Budget line items grouped
+  const groups = {};
+  d.lines.forEach(l => {
+    if (!groups[l.group]) groups[l.group] = [];
+    groups[l.group].push(l);
+  });
+
+  let linesHtml = '';
+  let lineCount = 0;
+  Object.entries(groups).forEach(([grp, items]) => {
+    const grpTotal = items.reduce((s, i) => s + i.amount, 0);
+    const col = GROUP_COLORS[grp] || { fill: '#888' };
+    linesHtml += `
+      <div class="budget-group-header">
+        <span class="bg-label">${grp}</span>
+        <div class="bg-rule"></div>
+        <span class="bg-total">${fmt(grpTotal)}</span>
+      </div>`;
+    items.filter(i => i.amount > 0).forEach(item => {
+      const pct = (item.amount / recurringTotal * 100).toFixed(1);
+      linesHtml += `
+        <div class="budget-row ${item.type}">
+          <span class="br-cat">${item.cat}</span>
+          <span class="br-desc">${item.desc}</span>
+          <span class="br-type type-${item.type}">${item.type}</span>
+          <span class="br-amount">${fmt(item.amount)}</span>
+          <span class="br-pct">${pct}%</span>
+        </div>`;
+      lineCount++;
+    });
+  });
+  document.getElementById('budget-grid').innerHTML = linesHtml;
+  document.getElementById('lines-note').textContent = lineCount + ' line items · recurring only';
+
+  // Donut chart
+  renderDonut(d.lines, recurringTotal);
+
+  // Savings goals
+  const savingsTotal = d.savings.reduce((s, g) => s + g.amount, 0);
+  document.getElementById('savings-note').textContent = fmt(savingsTotal) + '/mo toward goals';
+  document.getElementById('savings-grid').innerHTML = d.savings.map(g => `
+    <div class="savings-card">
+      <p class="sc-label">${g.label}</p>
+      <p class="sc-amount">${fmt(g.amount)}</p>
+      <p class="sc-sub">${g.sub}</p>
+    </div>`).join('');
+
+  // Notes
+  document.getElementById('notes-section').innerHTML = d.notes.map(n => `
+    <div class="note-card" style="margin-bottom:12px">
+      <span class="note-icon">${n.icon}</span>
+      <div>
+        <p class="note-title">${n.title}</p>
+        <p class="note-text">${n.text}</p>
+      </div>
+    </div>`).join('');
+}
+
+function renderSharedBills(bills) {
+  const el = document.getElementById('shared-section');
+  if (!bills || !bills.length) { el.innerHTML = ''; return; }
+  const activeBills = bills.filter(b => b.full > 0);
+  if (!activeBills.length) { el.innerHTML = ''; return; }
+
+  const totalFull = activeBills.reduce((s, b) => s + b.full, 0);
+  const totalMine = activeBills.reduce((s, b) => s + b.yourShare, 0);
+
+  const rows = activeBills.map(b => `
+    <div style="
+      display:grid; grid-template-columns:1fr 60px 100px 100px;
+      align-items:center; gap:16px;
+      padding:13px 20px;
+      border-bottom:1px solid rgba(240,232,216,0.05);
+      transition:background 0.14s;
+    " onmouseenter="this.style.background='rgba(240,232,216,0.05)'"
+       onmouseleave="this.style.background='transparent'">
+      <span style="font-size:0.62rem;letter-spacing:0.03em;color:var(--pearl)">${b.desc}</span>
+      <span style="font-size:0.5rem;letter-spacing:0.1em;text-align:center;color:var(--pearl-ghost)">${b.yourPct}%</span>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300;text-align:right;color:var(--pearl-dim)">${fmt(b.full)}</span>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;text-align:right;color:var(--gold-bright)">${fmt(b.yourShare)}</span>
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="section-header">
+      <h2 class="section-title">Shared Bills</h2>
+      <div class="section-rule"></div>
+      <span class="section-note">your share only counts against budget</span>
+    </div>
+    <div style="
+      background:var(--glass);
+      backdrop-filter:blur(20px) saturate(1.5);
+      -webkit-backdrop-filter:blur(20px) saturate(1.5);
+      border:1px solid var(--glass-border);
+      border-radius:14px; overflow:hidden;
+      box-shadow:0 2px 20px rgba(0,0,0,0.40), inset 0 1px 0 var(--glass-inset);
+    ">
+      <div style="
+        display:grid; grid-template-columns:1fr 60px 100px 100px;
+        gap:16px; padding:9px 20px;
+        background:rgba(240,232,216,0.04);
+        border-bottom:1px solid rgba(240,232,216,0.09);
+      ">
+        <span style="font-size:0.46rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--pearl-ghost)">Bill</span>
+        <span style="font-size:0.46rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--pearl-ghost);text-align:center">Split</span>
+        <span style="font-size:0.46rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--pearl-ghost);text-align:right">Full Bill</span>
+        <span style="font-size:0.46rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold-bright);text-align:right">My Share</span>
+      </div>
+      ${rows}
+      <div style="
+        display:grid; grid-template-columns:1fr 60px 100px 100px;
+        gap:16px; padding:12px 20px;
+        background:rgba(168,160,200,0.07);
+        border-top:1px solid rgba(168,160,200,0.18);
+      ">
+        <span style="font-size:0.46rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--pearl-ghost)">Total</span>
+        <span></span>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300;text-align:right;color:var(--pearl)">${fmt(totalFull)}</span>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;text-align:right;color:var(--gold-bright)">${fmt(totalMine)}</span>
+      </div>
+    </div>`;
+}
+
+function renderDonut(lines, total) {
+  // Group by top-level group
+  const groups = {};
+  lines.filter(l => l.amount > 0).forEach(l => {
+    if (!groups[l.group]) groups[l.group] = 0;
+    groups[l.group] += l.amount;
+  });
+
+  const entries = Object.entries(groups);
+  const r = 40, cx = 50, cy = 50;
+  const circumference = 2 * Math.PI * r;
+  let offset = 0;
+  let svgPaths = '';
+
+  entries.forEach(([grp, amt]) => {
+    const pct = amt / total;
+    const dash = pct * circumference;
+    const gap  = circumference - dash;
+    const col  = (GROUP_COLORS[grp] || { fill: '#888' }).fill;
+    svgPaths += `<circle
+      cx="${cx}" cy="${cy}" r="${r}"
+      fill="none" stroke="${col}" stroke-width="18" stroke-opacity="0.85"
+      stroke-dasharray="${dash} ${gap}"
+      stroke-dashoffset="${-offset}"
+    />`;
+    offset += dash;
+  });
+
+  document.getElementById('donut-svg').innerHTML = svgPaths;
+  document.getElementById('donut-total').textContent = fmt(total);
+
+  // Legend
+  const legend = document.getElementById('wheel-legend');
+  legend.innerHTML = entries.map(([grp, amt]) => {
+    const pct = (amt / total * 100).toFixed(0);
+    const col = (GROUP_COLORS[grp] || { fill: '#888' }).fill;
+    return `
+      <div class="wl-item">
+        <div class="wl-dot" style="background:${col}"></div>
+        <span class="wl-name">${grp}</span>
+        <div class="wl-bar-track">
+          <div class="wl-bar-fill" style="width:${pct}%;background:${col}"></div>
+        </div>
+        <span class="wl-amt">${fmt(amt)}</span>
+      </div>`;
+  }).join('');
+}
+
+// ── INIT ──
+renderAll();
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+</script>
+</body>
+</html>
