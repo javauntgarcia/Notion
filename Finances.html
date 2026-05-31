@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finances</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:       #131110;
+    --charcoal:  #3a3733;
+    --warm-mid:  #84695a;
+    --parchment: #f5e8dc;
+    --cream:     #e9ccb7;
+    --accent:    #c9a27e;
+    --glass-bg:  rgba(19,17,16,0.55);
+    --glass-border: rgba(201,162,126,0.25);
+    --card-bg:   rgba(30,27,24,0.72);
+    --positive:  #7eb89a;
+    --negative:  #c97e7e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--ink);
+    color: var(--parchment);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Finances.jpg');
+    background-size: cover;
+    background-position: center top;
+    filter: brightness(0.42) saturate(0.75);
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 52px;
+    background: rgba(19,17,16,0.80);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .topbar a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .topbar a:hover { color: var(--parchment); }
+  .topbar-date {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--warm-mid);
+    text-transform: uppercase;
+  }
+
+  /* ── PAGE WRAP ── */
+  .page-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 80px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 48px 0 36px;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 48px;
+  }
+  .hero-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    color: var(--parchment);
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  /* ── NET WORTH ── */
+  .net-worth-band {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    border-radius: 14px;
+    padding: 32px 36px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .nw-main {}
+  .nw-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+    margin-bottom: 8px;
+  }
+  .nw-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 6vw, 3.8rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--parchment);
+    line-height: 1;
+  }
+  .nw-value.positive { color: var(--positive); }
+  .nw-value.negative { color: var(--negative); }
+  .nw-breakdown {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .nw-stat {}
+  .nw-stat-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+    margin-bottom: 4px;
+  }
+  .nw-stat-value {
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--cream);
+  }
+  .nw-stat-value.pos { color: var(--positive); }
+  .nw-stat-value.neg { color: var(--negative); }
+
+  /* ── SECTION HEADERS ── */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--parchment);
+    letter-spacing: 0.02em;
+  }
+  .section-rule {
+    flex: 1;
+    height: 1px;
+    background: var(--glass-border);
+  }
+  .section-count {
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: var(--warm-mid);
+    text-transform: uppercase;
+  }
+
+  /* ── ACCOUNTS GRID ── */
+  .accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin-bottom: 48px;
+  }
+  .account-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 20px 22px;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: default;
+  }
+  .account-card:hover {
+    border-color: rgba(201,162,126,0.5);
+    transform: translateY(-2px);
+  }
+  .account-card.debt { border-left: 2px solid var(--negative); }
+  .account-card.asset { border-left: 2px solid var(--positive); }
+  .account-card.checking { border-left: 2px solid var(--accent); }
+  .account-name {
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+    margin-bottom: 6px;
+  }
+  .account-type-tag {
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--charcoal);
+    background: rgba(201,162,126,0.12);
+    border: 1px solid rgba(201,162,126,0.2);
+    border-radius: 4px;
+    padding: 2px 7px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  .account-balance {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.7rem;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--parchment);
+  }
+  .account-balance.neg { color: var(--negative); }
+  .account-balance.pos { color: var(--positive); }
+  .account-updated {
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    color: var(--warm-mid);
+    margin-top: 8px;
+    opacity: 0.7;
+  }
+  .account-delta {
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+  .account-delta.up { color: var(--negative); } /* debt going up = bad */
+  .account-delta.down { color: var(--positive); } /* debt going down = good */
+
+  /* ── BUDGET SECTION ── */
+  .budget-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+    margin-bottom: 48px;
+  }
+  .budget-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 18px 22px;
+  }
+  .budget-cat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .budget-cat-name {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cream);
+  }
+  .budget-cat-nums {
+    font-size: 0.65rem;
+    color: var(--warm-mid);
+  }
+  .budget-bar-bg {
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .budget-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+    background: var(--accent);
+  }
+  .budget-bar-fill.over { background: var(--negative); }
+  .budget-bar-fill.good { background: var(--positive); }
+
+  /* ── GOALS ── */
+  .goals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 48px;
+  }
+  .goal-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .goal-name {
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+    margin-bottom: 8px;
+  }
+  .goal-progress-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--parchment);
+    margin-bottom: 10px;
+    line-height: 1;
+  }
+  .goal-bar-bg {
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .goal-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.7s ease;
+  }
+  .goal-sub {
+    font-size: 0.57rem;
+    letter-spacing: 0.1em;
+    color: var(--warm-mid);
+    text-transform: uppercase;
+  }
+
+  /* ── SUBPAGE NAV ── */
+  .subpage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .subpage-card {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 28px 26px;
+    text-decoration: none;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    display: block;
+  }
+  .subpage-card:hover {
+    border-color: rgba(201,162,126,0.6);
+    transform: translateY(-3px);
+  }
+  .subpage-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .subpage-card:hover::before { opacity: 1; }
+  .subpage-icon {
+    font-size: 1.3rem;
+    margin-bottom: 14px;
+    opacity: 0.8;
+  }
+  .subpage-card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--parchment);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+  .subpage-card-desc {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    line-height: 1.7;
+    color: var(--warm-mid);
+    text-transform: uppercase;
+  }
+  .subpage-arrow {
+    position: absolute;
+    top: 28px;
+    right: 24px;
+    font-size: 0.8rem;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    transform: translateX(-4px);
+  }
+  .subpage-card:hover .subpage-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    text-align: center;
+    padding: 32px 0 0;
+    border-top: 1px solid var(--glass-border);
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--warm-mid);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero           { animation: fadeUp 0.7s ease both; }
+  .net-worth-band { animation: fadeUp 0.7s 0.1s ease both; }
+  .accounts-grid  { animation: fadeUp 0.7s 0.2s ease both; }
+  .budget-grid    { animation: fadeUp 0.7s 0.28s ease both; }
+  .goals-grid     { animation: fadeUp 0.7s 0.34s ease both; }
+  .subpage-grid   { animation: fadeUp 0.7s 0.4s ease both; }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a href="Main Hub.html">← Main Hub</a>
+  <span class="topbar-date" id="topbar-date"></span>
+  <a href="https://javauntgarcia.github.io/Notion/Statements.html">Import Statements →</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <p class="hero-label">Personal Finance Portal</p>
+    <h1>Fi<em>nan</em>ces</h1>
+  </header>
+
+  <!-- NET WORTH -->
+  <section class="net-worth-band">
+    <div class="nw-main">
+      <p class="nw-label">Estimated Net Worth</p>
+      <p class="nw-value" id="net-worth-display">—</p>
+    </div>
+    <div class="nw-breakdown">
+      <div class="nw-stat">
+        <p class="nw-stat-label">Total Assets</p>
+        <p class="nw-stat-value pos" id="total-assets">—</p>
+      </div>
+      <div class="nw-stat">
+        <p class="nw-stat-label">Total Debt</p>
+        <p class="nw-stat-value neg" id="total-debt">—</p>
+      </div>
+      <div class="nw-stat">
+        <p class="nw-stat-label">Last Updated</p>
+        <p class="nw-stat-value" id="last-updated">—</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCOUNTS -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title">Accounts</h2>
+      <div class="section-rule"></div>
+      <span class="section-count">9 linked</span>
+    </div>
+    <div class="accounts-grid" id="accounts-grid">
+      <!-- rendered by JS -->
+    </div>
+  </section>
+
+  <!-- BUDGET -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title">This Month's Budget</h2>
+      <div class="section-rule"></div>
+      <a href="https://javauntgarcia.github.io/Notion/Budget.html" style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);text-decoration:none;">Manage →</a>
+    </div>
+    <div class="budget-grid" id="budget-grid">
+      <!-- rendered by JS -->
+    </div>
+  </section>
+
+  <!-- GOALS -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title">Financial Goals</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="goals-grid" id="goals-grid">
+      <!-- rendered by JS -->
+    </div>
+  </section>
+
+  <!-- SUBPAGE NAV -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title">Tools</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="subpage-grid">
+      <a href="https://javauntgarcia.github.io/Notion/Accounts.html" class="subpage-card">
+        <div class="subpage-icon">◈</div>
+        <p class="subpage-card-title">Accounts</p>
+        <p class="subpage-card-desc">Update balances · View transaction history · Manage all 9 accounts</p>
+        <span class="subpage-arrow">→</span>
+      </a>
+      <a href="https://javauntgarcia.github.io/Notion/Budget.html" class="subpage-card">
+        <div class="subpage-icon">◉</div>
+        <p class="subpage-card-title">Budget</p>
+        <p class="subpage-card-desc">Category limits · Spending progress · Monthly breakdown</p>
+        <span class="subpage-arrow">→</span>
+      </a>
+      <a href="https://javauntgarcia.github.io/Notion/Statements.html" class="subpage-card">
+        <div class="subpage-icon">◎</div>
+        <p class="subpage-card-title">Statements</p>
+        <p class="subpage-card-desc">Upload CSV files · Parse transactions · Auto-categorize spending</p>
+        <span class="subpage-arrow">→</span>
+      </a>
+      <a href="https://javauntgarcia.github.io/Notion/Summaries.html" class="subpage-card">
+        <div class="subpage-icon">◐</div>
+        <p class="subpage-card-title">Summaries</p>
+        <p class="subpage-card-desc">Filter by day · Week · Month · Year · Net worth over time</p>
+        <span class="subpage-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    Finances · Personal Portal · Data stored locally in browser
+  </footer>
+
+</div>
+
+<script>
+// ── DATE ──
+const dateEl = document.getElementById('topbar-date');
+dateEl.textContent = new Date().toLocaleDateString('en-US', {
+  weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+}).toUpperCase();
+
+// ── ACCOUNT DEFINITIONS ──
+// Positive balance = asset. Negative = debt (credit cards).
+const ACCOUNT_DEFS = [
+  // CREDIT CARDS (debt)
+  { key: 'fin_bilt',        name: 'BILT Mastercard',       type: 'Credit Card', class: 'debt' },
+  { key: 'fin_discover',    name: 'Discover It',           type: 'Credit Card', class: 'debt' },
+  { key: 'fin_citi',        name: 'Citi Diamond Preferred',type: 'Credit Card', class: 'debt' },
+  { key: 'fin_chase_sap',   name: 'Chase Sapphire Reserve',type: 'Credit Card', class: 'debt' },
+  // CHECKING / SAVINGS
+  { key: 'fin_wells',       name: 'Wells Fargo',           type: 'Checking',    class: 'checking' },
+  { key: 'fin_chase_chk',   name: 'Chase Checking',        type: 'Checking',    class: 'checking' },
+  { key: 'fin_chase_sav',   name: 'Chase Savings',         type: 'Savings',     class: 'asset' },
+  // HYSA
+  { key: 'fin_wf_hysa',     name: 'Wealthfront HYSA',      type: 'HYSA',        class: 'asset' },
+  { key: 'fin_wf_shared',   name: 'Wealthfront HYSA (Shared)', type: 'HYSA',    class: 'asset' },
+];
+
+// ── LOAD ACCOUNTS ──
+function loadAccounts() {
+  const grid = document.getElementById('accounts-grid');
+  grid.innerHTML = '';
+  let totalAssets = 0, totalDebt = 0;
+  let latestUpdate = null;
+
+  ACCOUNT_DEFS.forEach(def => {
+    const stored = JSON.parse(localStorage.getItem(def.key) || 'null');
+    const balance = stored ? stored.balance : null;
+    const updated = stored ? stored.updated : null;
+    const prev    = stored ? (stored.prev || null) : null;
+
+    // Net worth calculation
+    if (balance !== null) {
+      if (def.class === 'debt') totalDebt += Math.abs(balance);
+      else totalAssets += balance;
+      if (!latestUpdate || new Date(updated) > new Date(latestUpdate)) latestUpdate = updated;
+    }
+
+    // Delta display
+    let deltaHtml = '';
+    if (balance !== null && prev !== null) {
+      const diff = balance - prev;
+      if (diff !== 0) {
+        const sign = diff > 0 ? '+' : '';
+        // For debt cards, going up is bad
+        const cls = def.class === 'debt'
+          ? (diff > 0 ? 'up' : 'down')
+          : (diff > 0 ? 'down' : 'up'); // assets: up = good
+        const colorCls = def.class === 'debt'
+          ? (diff > 0 ? 'up' : 'down')
+          : (diff > 0 ? 'down' : 'up');
+        deltaHtml = `<p class="account-delta ${colorCls}">${sign}${fmt(diff)} from last</p>`;
+      }
+    }
+
+    const balDisplay = balance !== null ? fmt(balance) : '—';
+    const balClass = balance === null ? ''
+      : def.class === 'debt' ? 'neg'
+      : balance >= 0 ? 'pos' : 'neg';
+
+    grid.innerHTML += `
+      <div class="account-card ${def.class}">
+        <p class="account-name">${def.name}</p>
+        <span class="account-type-tag">${def.type}</span>
+        <p class="account-balance ${balClass}">${balDisplay}</p>
+        ${deltaHtml}
+        <p class="account-updated">${updated ? 'Updated ' + fmtDate(updated) : 'No data — visit Accounts'}</p>
+      </div>`;
+  });
+
+  // Net worth display
+  const nw = totalAssets - totalDebt;
+  const nwEl = document.getElementById('net-worth-display');
+  nwEl.textContent = fmt(nw);
+  nwEl.className = 'nw-value ' + (nw >= 0 ? 'positive' : 'negative');
+  document.getElementById('total-assets').textContent = fmt(totalAssets);
+  document.getElementById('total-debt').textContent   = '-' + fmt(totalDebt);
+  document.getElementById('last-updated').textContent = latestUpdate ? fmtDate(latestUpdate) : 'Never';
+}
+
+// ── LOAD BUDGET SUMMARY ──
+function loadBudget() {
+  const grid = document.getElementById('budget-grid');
+  const cats = JSON.parse(localStorage.getItem('fin_budget_categories') || '[]');
+  const txns = JSON.parse(localStorage.getItem('fin_transactions') || '[]');
+
+  if (cats.length === 0) {
+    grid.innerHTML = `<div class="budget-card" style="grid-column:1/-1;opacity:0.5;">
+      <p class="budget-cat-name" style="margin-bottom:8px;">No budget categories set</p>
+      <a href="https://javauntgarcia.github.io/Notion/Budget.html" style="font-size:0.6rem;letter-spacing:0.12em;color:var(--accent);text-decoration:none;text-transform:uppercase;">Set up budget →</a>
+    </div>`;
+    return;
+  }
+
+  // Current month spending by category
+  const now = new Date();
+  const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const spent = {};
+  txns.forEach(t => {
+    if (!t.date || !t.category || !t.date.startsWith(monthStr)) return;
+    spent[t.category] = (spent[t.category] || 0) + Math.abs(t.amount);
+  });
+
+  grid.innerHTML = cats.slice(0, 6).map(cat => {
+    const s = spent[cat.name] || 0;
+    const pct = Math.min((s / cat.limit) * 100, 100);
+    const over = s > cat.limit;
+    const fillClass = over ? 'over' : pct < 70 ? 'good' : '';
+    return `<div class="budget-card">
+      <div class="budget-cat">
+        <span class="budget-cat-name">${cat.name}</span>
+        <span class="budget-cat-nums">${fmt(s)} / ${fmt(cat.limit)}</span>
+      </div>
+      <div class="budget-bar-bg">
+        <div class="budget-bar-fill ${fillClass}" style="width:${pct}%"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── LOAD GOALS ──
+function loadGoals() {
+  const grid = document.getElementById('goals-grid');
+  const goals = JSON.parse(localStorage.getItem('fin_goals') || '[]');
+
+  const defaults = [
+    { name: 'Pay off Discover', target: 3500, current: 0, unit: '$' },
+    { name: 'Pay off Citi Balance Transfer', target: 5600, current: 0, unit: '$' },
+    { name: 'Wealthfront HYSA Target', target: 15000, current: 0, unit: '$' },
+  ];
+
+  const display = goals.length > 0 ? goals : defaults;
+
+  grid.innerHTML = display.map(g => {
+    const pct = Math.min((g.current / g.target) * 100, 100);
+    const remaining = g.target - g.current;
+    return `<div class="goal-card">
+      <p class="goal-name">${g.name}</p>
+      <p class="goal-progress-text">${g.unit}${fmt2(g.current)} <span style="font-size:1rem;color:var(--warm-mid)">/ ${g.unit}${fmt2(g.target)}</span></p>
+      <div class="goal-bar-bg">
+        <div class="goal-bar-fill" style="width:${pct}%"></div>
+      </div>
+      <p class="goal-sub">${pct.toFixed(0)}% complete · ${g.unit}${fmt2(remaining)} remaining</p>
+    </div>`;
+  }).join('');
+}
+
+// ── HELPERS ──
+function fmt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmt2(n) {
+  return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ── INIT ──
+loadAccounts();
+loadBudget();
+loadGoals();
+</script>
+</body>
+</html>
