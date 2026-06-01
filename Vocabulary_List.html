@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+============================================================
+VOCABULARY LIST — GitHub Pages Subpage
+============================================================
+EMBED URL (Notion /embed):
+  https://javauntgarcia.github.io/Notion/Vocabulary%20List.html
+
+LANDMARK SEARCH GUIDE:
+  • Background image URL  → search: "vocabulary list.WEBP"
+  • Color palette          → search: "EDIT: palette"
+  • Dark overlay gradient  → search: "EDIT: overlay"
+  • Word data array        → search: "EDIT: word data"
+  • Add-word form          → search: "EDIT: form"
+  • Table rendering        → search: "EDIT: table"
+  • localStorage keys      → search: "EDIT: localStorage"
+  • Footer phrase          → search: "EDIT: footer"
+============================================================
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vocabulary List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   EDIT: palette — warm library: walnut wood, aged leather,
+   cream linen, terracotta pillow, sage undertone
+   ============================================================ */
+:root {
+  --primary:      #1c1409;
+  --primary-mid:  #2e2014;
+  --accent:       #9a7648;
+  --highlight:    #c47a44;
+  --warm-white:   #f2e9d8;
+  --ivory:        #e8ddc8;
+  --gold:         #c49a3c;
+  --gold-dim:     rgba(196,154,60,0.25);
+  --rust:         #a85c3a;
+  --sage:         #7a8c72;
+  --glass:        rgba(160,120,72,0.13);
+  --glass-hover:  rgba(160,120,72,0.21);
+  --glass-b:      rgba(196,154,60,0.26);
+  --radius:       3px;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Cormorant Garamond', serif;
+  background: var(--primary);
+  color: var(--warm-white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── BACKGROUND ─────────────────────────────────────────── */
+.bg { position: fixed; inset: 0; z-index: 0; }
+/* EDIT: background — change filename here if renamed */
+.bg img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 30%;
+  filter: brightness(0.48) saturate(0.85);
+}
+
+/* EDIT: overlay — walnut + amber tones */
+.bg::after {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 120% 55% at 50% 0%,   rgba(28,20,9,.55) 0%,  transparent 70%),
+    radial-gradient(ellipse 100% 45% at 50% 100%,  rgba(28,20,9,.70) 0%,  transparent 70%),
+    linear-gradient(180deg, rgba(28,20,9,.18) 0%, rgba(28,20,9,.06) 50%, rgba(28,20,9,.22) 100%);
+}
+
+/* ─── TOPBAR ──────────────────────────────────────────────── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 52px;
+  background: rgba(28, 20, 9, 0.44);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(196, 154, 60, 0.10);
+}
+.topbar-back {
+  display: flex; align-items: center; gap: 0.5rem;
+  text-decoration: none; color: var(--warm-white);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+  opacity: 0.72; transition: opacity 0.2s;
+}
+.topbar-back:hover { opacity: 1; }
+.topbar-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem; color: var(--warm-white);
+  opacity: 0.45; letter-spacing: 0.08em;
+}
+
+/* ─── LAYOUT ──────────────────────────────────────────────── */
+.wrap {
+  position: relative; z-index: 10;
+  max-width: 960px; margin: 0 auto;
+  padding: 86px 24px 80px;
+}
+
+/* ─── MASTHEAD ────────────────────────────────────────────── */
+.masthead {
+  text-align: center;
+  margin-bottom: 44px;
+  animation: fadeDown 0.65s ease both;
+}
+.eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--accent); opacity: 0.85; margin-bottom: 14px;
+}
+.masthead h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.6rem, 6vw, 4.2rem);
+  font-weight: 700; color: var(--warm-white);
+  line-height: 1.05; letter-spacing: -0.01em;
+}
+.masthead h1 em {
+  font-style: italic; font-weight: 300; color: var(--highlight);
+}
+.rule {
+  display: flex; align-items: center; gap: 12px;
+  max-width: 220px; margin: 18px auto 0;
+}
+.rule::before,.rule::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+.rule span {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  color: var(--ivory); opacity: 0.4; letter-spacing: 0.2em;
+}
+
+/* ─── STATS BAR ───────────────────────────────────────────── */
+.stats {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 18px;
+  animation: fadeUp 0.5s 0.1s ease both;
+}
+.stat {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(242,233,216,0.5);
+  background: rgba(242,233,216,0.06);
+  border: 1px solid rgba(242,233,216,0.10);
+  padding: 5px 13px; border-radius: 20px;
+}
+.stat b { color: var(--gold); font-weight: 400; }
+
+/* ─── CONTROLS ────────────────────────────────────────────── */
+.controls {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 18px;
+  animation: fadeUp 0.5s 0.12s ease both;
+}
+.search-wrap { flex: 1; min-width: 180px; position: relative; }
+.search-wrap input {
+  width: 100%;
+  background: rgba(242,233,216,.10);
+  border: 1px solid rgba(196,154,60,.25);
+  border-radius: var(--radius);
+  padding: 9px 14px 9px 36px;
+  font-family: 'Cormorant Garamond', serif; font-size: 15px;
+  color: var(--warm-white); outline: none; transition: border-color .2s;
+}
+.search-wrap input::placeholder { color: rgba(242,233,216,.32); }
+.search-wrap input:focus {
+  border-color: rgba(196,154,60,.55);
+  background: rgba(242,233,216,.15);
+}
+.search-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  opacity: 0.35; pointer-events: none;
+}
+.filter-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 8px 15px; border-radius: 99px; cursor: pointer;
+  transition: all .2s; white-space: nowrap;
+  border: 1px solid rgba(196,154,60,.28);
+  background: transparent; color: rgba(242,233,216,.55);
+}
+.filter-btn.active {
+  background: rgba(196,154,60,.16);
+  border-color: var(--gold); color: var(--gold);
+}
+.filter-btn:hover:not(.active) {
+  border-color: rgba(196,154,60,.5); color: var(--warm-white);
+}
+
+/* ─── ADD WORD TOGGLE BUTTON ──────────────────────────────── */
+.add-toggle-row {
+  display: flex; justify-content: flex-end;
+  margin-bottom: 14px;
+  animation: fadeUp 0.5s 0.15s ease both;
+}
+.add-toggle-btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--highlight);
+  background: rgba(196,122,68,.10);
+  border: 1px solid rgba(196,122,68,.32);
+  border-radius: 99px; padding: 0.45rem 1.1rem;
+  cursor: pointer; transition: background 0.2s;
+}
+.add-toggle-btn:hover { background: rgba(196,122,68,.20); }
+.add-toggle-btn svg { transition: transform 0.3s; }
+.add-toggle-btn.open svg { transform: rotate(45deg); }
+
+/* ─── ADD WORD FORM (collapsible) ─────────────────────────── */
+/* EDIT: form */
+.add-drawer {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.38s ease, opacity 0.28s ease, margin-bottom 0.3s ease;
+  margin-bottom: 0;
+}
+.add-drawer.open {
+  max-height: 420px;
+  opacity: 1;
+  margin-bottom: 20px;
+}
+.add-card {
+  background: var(--glass);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-b);
+  border-radius: 10px;
+  padding: 1.6rem 1.75rem 1.4rem;
+}
+.form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+.form-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.form-field.full { grid-column: 1 / -1; }
+.form-field label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.52rem; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--accent); opacity: 0.8;
+}
+.form-field input,
+.form-field select {
+  font-family: 'DM Mono', monospace; font-size: 0.72rem;
+  color: var(--warm-white);
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(196,154,60,.18);
+  border-radius: 6px; padding: 0.55rem 0.8rem;
+  outline: none; transition: border-color .2s; width: 100%;
+}
+.form-field input:focus,
+.form-field select:focus { border-color: rgba(196,154,60,.48); }
+.form-field select option { background: var(--primary-mid); color: var(--warm-white); }
+.form-actions { display: flex; align-items: center; gap: 0.75rem; }
+.btn-save {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--highlight);
+  background: rgba(196,122,68,.10);
+  border: 1px solid rgba(196,122,68,.30);
+  border-radius: 99px; padding: 0.48rem 1.1rem;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-save:hover { background: rgba(196,122,68,.20); }
+.form-msg {
+  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  color: var(--gold); opacity: 0; transition: opacity 0.3s; letter-spacing: 0.1em;
+}
+.form-msg.show { opacity: 1; }
+
+/* ─── TABLE ───────────────────────────────────────────────── */
+/* EDIT: table */
+.table-wrap {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  border: 1px solid rgba(196,154,60,.20);
+  border-radius: 10px; overflow: hidden;
+  animation: fadeUp 0.5s 0.2s ease both;
+}
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+colgroup .col-word { width: 15%; }
+colgroup .col-pos  { width: 8%;  }
+colgroup .col-def  { width: 40%; }
+colgroup .col-src  { width: 12%; }
+colgroup .col-wotd { width: 9%; }
+colgroup .col-del  { width: 7%; }
+
+thead tr {
+  background: rgba(61,43,26,.20);
+  border-bottom: 1.5px solid rgba(196,154,60,.22);
+}
+th {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--gold); padding: 13px 14px;
+  text-align: left; font-weight: 400; white-space: nowrap;
+  cursor: pointer; user-select: none;
+  transition: color 0.15s;
+}
+th:hover { color: var(--warm-white); }
+th.center { text-align: center; cursor: default; }
+th .sort-arrow { opacity: 0.35; font-style: normal; font-size: 0.6em; margin-left: 3px; }
+th.sorted .sort-arrow { opacity: 1; }
+
+tbody tr {
+  border-bottom: 1px solid rgba(107,79,53,.13);
+  transition: background .15s;
+}
+tbody tr:hover { background: rgba(196,154,60,.06); }
+tbody tr:last-child { border-bottom: none; }
+
+td { padding: 12px 14px; vertical-align: top; font-size: 15px; line-height: 1.5; }
+td.word-cell {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-style: italic; font-weight: 600;
+  color: var(--highlight); word-break: break-word;
+}
+td.pos-cell {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 13px;
+  color: var(--ivory); opacity: 0.75; white-space: nowrap;
+}
+td.def-cell { color: var(--warm-white); font-size: 14.5px; line-height: 1.58; opacity: 0.9; }
+td.src-cell {
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  color: var(--ivory); opacity: 0.8; padding-top: 14px;
+}
+td.wotd-cell { text-align: center; vertical-align: middle; }
+td.del-cell  { text-align: center; vertical-align: middle; }
+
+/* Source badges */
+.badge {
+  display: inline-block;
+  font-family: 'DM Mono', monospace; font-size: 0.55rem;
+  letter-spacing: 0.06em; padding: 2px 7px;
+  border-radius: 10px; white-space: nowrap;
+}
+.badge-m    { background: rgba(168,92,58,.15); color: var(--rust);   border: 1px solid rgba(168,92,58,.25); }
+.badge-ggp  { background: rgba(122,140,114,.15); color: var(--sage); border: 1px solid rgba(122,140,114,.28); }
+.badge-both { background: rgba(196,154,60,.12); color: var(--gold);  border: 1px solid rgba(196,154,60,.24); }
+.badge-link {
+  background: rgba(154,118,72,.13); color: var(--accent);
+  border: 1px solid rgba(154,118,72,.26);
+  text-decoration: none; display: inline-flex; align-items: center; gap: 3px;
+}
+.badge-link:hover { background: rgba(154,118,72,.24); }
+
+/* WOTD checkbox */
+.wotd-box {
+  width: 17px; height: 17px;
+  border: 1.5px solid rgba(107,79,53,.4); border-radius: 3px;
+  background: rgba(255,255,255,.35);
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  transition: all .18s; margin: auto;
+}
+.wotd-box.on { background: var(--gold); border-color: var(--gold); }
+.wotd-box.on::after {
+  content: ''; display: block; width: 4px; height: 8px;
+  border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+  transform: rotate(45deg) translate(-1px,-1px);
+}
+
+/* Delete button */
+.del-btn {
+  background: none; border: none; cursor: pointer;
+  padding: 4px; display: inline-flex; align-items: center;
+  color: rgba(168,92,58,0.4); transition: color 0.2s;
+}
+.del-btn:hover { color: var(--rust); }
+
+/* Archive column */
+colgroup .col-arc { width: 10%; }
+td.arc-cell { text-align: center; vertical-align: middle; }
+
+/* Archive toggle box */
+.arc-box {
+  width: 17px; height: 17px;
+  border: 1.5px solid rgba(107,79,53,.4); border-radius: 3px;
+  background: rgba(255,255,255,.35);
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  transition: all .18s; margin: auto;
+}
+.arc-box.on { background: var(--sage); border-color: var(--sage); }
+.arc-box.on::after {
+  content: ''; display: block; width: 5px; height: 9px;
+  border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+  transform: rotate(45deg) translate(-1px,-1px);
+}
+
+/* Archived rows */
+tbody tr.is-archived { opacity: 0.38; }
+tbody tr.is-archived td.word-cell { text-decoration: line-through; }
+
+/* Empty / no results */
+.no-results {
+  text-align: center; padding: 40px;
+  font-style: italic; color: rgba(242,233,216,.38); font-size: 16px; display: none;
+}
+
+/* ─── FOOTER ──────────────────────────────────────────────── */
+footer {
+  position: relative; z-index: 10;
+  text-align: center; padding: 2.5rem 1rem 3rem;
+}
+/* EDIT: footer — change phrase here */
+footer p {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 0.82rem;
+  color: var(--accent); opacity: 0.38;
+}
+
+/* ─── ANIMATIONS ──────────────────────────────────────────── */
+@keyframes fadeDown { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(12px);  } to { opacity:1; transform:translateY(0); } }
+
+/* ─── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(196,154,60,.28); border-radius: 3px; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 76px 12px 60px; }
+  colgroup .col-pos { width: 0; }
+  td.pos-cell { display: none; }
+  colgroup .col-del { width: 8%; }
+  table { font-size: 13px; }
+  td { padding: 10px 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg">
+  <!-- EDIT: background — "vocabulary list.WEBP" exact filename -->
+  <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/vocabulary list.WEBP" alt="" aria-hidden="true" />
+</div>
+
+<!-- Topbar -->
+<nav class="topbar">
+  <a href="Productivity.html" class="topbar-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Productivity
+  </a>
+  <span class="topbar-date" id="topbar-date"></span>
+</nav>
+
+<div class="wrap">
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <p class="eyebrow">Language · Brand</p>
+    <h1>Vocab<em>ulary</em></h1>
+    <div class="rule"><span>&#9670;</span></div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats">
+    <span class="stat"><b id="cTotal">0</b>&nbsp;words</span>
+    <span class="stat"><b id="cShowing">0</b>&nbsp;showing</span>
+    <span class="stat"><b id="cWotd">0</b>&nbsp;used for wotd</span>
+    <span class="stat"><b id="cArchived">0</b>&nbsp;archived</span>
+  </div>
+
+  <!-- Controls: search + filters -->
+  <div class="controls">
+    <div class="search-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Search words or definitions…"
+             oninput="applyFilters()" autocomplete="off" />
+    </div>
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('m',this)">M</button>
+    <button class="filter-btn" onclick="setFilter('ggp',this)">GGP</button>
+    <button class="filter-btn" onclick="setFilter('wotd',this)">WOTD ✓</button>
+    <button class="filter-btn" onclick="setFilter('archived',this)">Archived</button>
+  </div>
+
+  <!-- Add word toggle -->
+  <div class="add-toggle-row">
+    <button class="add-toggle-btn" id="addToggleBtn" onclick="toggleAddForm()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Word
+    </button>
+  </div>
+
+  <!-- Collapsible add-word form -->
+  <!-- EDIT: form -->
+  <div class="add-drawer" id="addDrawer">
+    <div class="add-card">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="f-word">Word</label>
+          <input type="text" id="f-word" placeholder="ephemeral" autocomplete="off" />
+        </div>
+        <div class="form-field">
+          <label for="f-pos">Part of Speech</label>
+          <select id="f-pos">
+            <option value="adj.">Adjective</option>
+            <option value="n.">Noun</option>
+            <option value="v.">Verb</option>
+            <option value="adv.">Adverb</option>
+            <option value="n./adj.">Noun / Adj.</option>
+            <option value="adj./n.">Adj. / Noun</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-field full">
+          <label for="f-def">Definition</label>
+          <input type="text" id="f-def" placeholder="lasting for a very short time" autocomplete="off" />
+        </div>
+        <div class="form-field full">
+          <label for="f-source">Source (book title or URL)</label>
+          <input type="text" id="f-source" placeholder="M Ch. 12 or https://…" autocomplete="off" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="addWord()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Save Word
+        </button>
+        <span class="form-msg" id="form-msg">saved.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Word table -->
+  <!-- EDIT: table -->
+  <div class="table-wrap">
+    <table>
+      <colgroup>
+        <col class="col-word" /><col class="col-pos" /><col class="col-def" />
+        <col class="col-src" /><col class="col-wotd" /><col class="col-arc" /><col class="col-del" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th onclick="sortBy('word')" id="th-word">Word <em class="sort-arrow">↕</em></th>
+          <th onclick="sortBy('pos')"  id="th-pos">POS <em class="sort-arrow">↕</em></th>
+          <th onclick="sortBy('def')"  id="th-def">Definition <em class="sort-arrow">↕</em></th>
+          <th>Source</th>
+          <th class="center">WOTD</th>
+          <th class="center">Archive</th>
+          <th class="center"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="no-results" id="noResults">No matching words found.</div>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <!-- EDIT: footer -->
+  <p>collect words · speak precisely</p>
+</footer>
+
+<script>
+// ── SUPABASE CONFIG ──
+const SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
+const SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
+async function sbGet(table, id) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}&limit=1`,
+      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    const d = await r.json(); return d && d[0] ? d[0] : null;
+  } catch(e) { return null; }
+}
+async function sbUpsert(table, row) {
+  try {
+    await fetch(`${SB_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
+    });
+  } catch(e) {}
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+/* ============================================================
+   EDIT: localStorage
+   Key: vl_words        → JSON array of {word,pos,def,source,wotd,archived}
+                          (also read by Productivity.html flashcards)
+   Key: vocab_state_v2  → legacy wotd toggle state (merged on load)
+   ============================================================ */
+
+// ── Topbar date ────────────────────────────────────────────
+(function(){
+  const el = document.getElementById('topbar-date');
+  if (!el) return;
+  const d = new Date();
+  el.textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
+})();
+
+// ── EDIT: word data — base dataset baked in ────────────────
+// New words added via the form are appended to localStorage
+// and merged with these on every load.
+const BASE = [{"word":"acrid","pos":"adj.","def":"Having an irritatingly strong, unpleasant smell or taste; bitter and cutting in manner.","source":"M Ch. 6"},{"word":"allayed","pos":"v.","def":"Diminished or put at rest (fear, suspicion, worry).","source":"M Ch. 18"},{"word":"amalgam","pos":"n.","def":"A mixture or blend of different elements; an alloy of mercury with another metal.","source":"M Ch. 17"},{"word":"ankylosis","pos":"n.","def":"Abnormal stiffening or immobility of a joint due to fusion of the bones.","source":"M Ch. 11"},{"word":"atavistic","pos":"adj.","def":"Relating to a reversion to ancestral type or to earlier, more primitive behavior.","source":"M Ch. 36"},{"word":"bacchanal","pos":"n.","def":"A wild and drunken celebration; a devotee of Bacchus.","source":"M Ch. 17"},{"word":"balustrade","pos":"n.","def":"A railing supported by balusters, especially on a staircase or balcony.","source":"M Ch. 5"},{"word":"bigamist","pos":"n.","def":"A person who marries a second time while already legally married to another.","source":"M Ch. 26"},{"word":"bivouac","pos":"n./v.","def":"A temporary camp or encampment without tents; to take shelter in such a camp.","source":"M Ch. 31"},{"word":"bog","pos":"n.","def":"Wet, spongy ground; a marsh or swamp. Often used figuratively for a stagnant situation.","source":"M Ch. 2"},{"word":"boreal","pos":"adj.","def":"Of or relating to the north; of the northern forest zone.","source":"M Ch. 32"},{"word":"bovine","pos":"adj.","def":"Of or relating to cattle; slow, dull, and stupid in manner.","source":"M Ch. 7"},{"word":"cabotage","pos":"n.","def":"The right to operate sea, air, or other transport services within a particular territory.","source":"M Ch. 8"},{"word":"caliginous","pos":"adj.","def":"Misty and dark; obscure, gloomy.","source":"M Ch. 13"},{"word":"caprice","pos":"n.","def":"A sudden and unaccountable change of mood or behavior; a whim.","source":"M Ch. 13 & 17"},{"word":"concordat","pos":"n.","def":"An agreement or treaty, especially one between the Vatican and a civil government.","source":"M Ch. 31"},{"word":"convivial","pos":"adj.","def":"Friendly, lively, and enjoyable; fond of feasting, drinking, and good company.","source":"GGP Preface 2"},{"word":"corpulent","pos":"adj.","def":"Fat; having a large, heavy body.","source":"M Ch. 2"},{"word":"corsair","pos":"n.","def":"A pirate or privateer, especially one operating along the North African coast.","source":"M Ch. 17"},{"word":"cortège","pos":"n.","def":"A solemn procession, especially for a funeral.","source":"M Ch. 4"},{"word":"decrepitude","pos":"n.","def":"The state of being weakened or worn out due to age or deterioration.","source":"M Ch. 27"},{"word":"delirium","pos":"n.","def":"An acutely disturbed state of mind characterized by restlessness, illusions, and incoherence.","source":"M Ch. 13"},{"word":"doline","pos":"n.","def":"A depression or hollow in the ground characteristic of a karst landscape.","source":"M Ch. 14"},{"word":"ebullience","pos":"n.","def":"The quality of being cheerful and full of energy; exuberance.","source":"M Ch. 30"},{"word":"ecumenic","pos":"adj.","def":"Representing or seeking unity among the world's Christian churches; universal in scope.","source":"GGP Ch. 1"},{"word":"ecumenical","pos":"adj.","def":"Promoting unity among different religious denominations or peoples; universal in scope.","source":"GGP Ch. 3"},{"word":"encaustic","pos":"n./adj.","def":"A painting technique using heated wax mixed with pigments; relating to this process.","source":"M Ch. 23"},{"word":"enmity","pos":"n.","def":"A state or feeling of active opposition or hostility.","source":"M Ch. 13"},{"word":"enervating","pos":"adj.","def":"Causing one to feel drained of energy or vitality; weakening.","source":"GGP Preface 2"},{"word":"epoch","pos":"n.","def":"A particular period of time marked by distinctive characteristics or memorable events.","source":"M Ch. 30"},{"word":"epistolary","pos":"adj.","def":"Relating to the writing of letters; (of a literary work) in the form of letters.","source":"M Ch. 12"},{"word":"expiation","pos":"n.","def":"The act of making amends or reparation for guilt or wrongdoing; atonement.","source":"M Ch. 30"},{"word":"fervor","pos":"n.","def":"Intense and passionate feeling; ardor, zeal.","source":"M Ch. 4"},{"word":"fetid","pos":"adj.","def":"Smelling extremely unpleasant; putrid, stinking.","source":"M Ch. 2"},{"word":"gaiety","pos":"n.","def":"The state or quality of being lighthearted and cheerful; merriment.","source":"GGP Ch. 3"},{"word":"genteel","pos":"adj.","def":"Polite, refined, and respectable, often in an affected or ostentatious way.","source":"GGP Ch. 3"},{"word":"goliardic","pos":"adj.","def":"Relating to the goliards, wandering medieval scholars known for their satirical, irreverent verse.","source":"M Ch. 28"},{"word":"hedonist","pos":"n.","def":"A person who believes that the pursuit of pleasure is the most important thing in life.","source":"M Ch. 5"},{"word":"implacable","pos":"adj.","def":"Unable to be appeased or satisfied; relentless.","source":"M Ch. 33"},{"word":"imperium","pos":"n.","def":"Absolute power; supreme authority over a territory or people.","source":"M Ch. 17"},{"word":"impetuous","pos":"adj.","def":"Acting or done quickly and without thought or care; rash.","source":"M Ch. 6"},{"word":"indigent","pos":"adj.","def":"Poor; needy; lacking the necessities of life.","source":"M Ch. 17"},{"word":"ineffable","pos":"adj.","def":"Too great or extreme to be expressed in words; unutterable.","source":"M Ch. 12"},{"word":"indefatigable","pos":"adj.","def":"Persisting tirelessly; incapable of being fatigued.","source":"M Ch. 24"},{"word":"infirmity","pos":"n.","def":"Physical or mental weakness; a condition of being feeble.","source":"M Ch. 27"},{"word":"innocuous","pos":"adj.","def":"Not harmful or offensive; unlikely to cause trouble.","source":"M Ch. 7"},{"word":"interstitial","pos":"adj.","def":"Of, forming, or occupying interstices; occurring in small intervals between things.","source":"GGP Ch. 1"},{"word":"irredentist","pos":"n./adj.","def":"Advocating the restoration or annexation of a territory historically related to one's nation.","source":"M Ch. 11"},{"word":"licentious","pos":"adj.","def":"Promiscuous and unprincipled in sexual matters; morally unrestrained.","source":"M Ch. 13"},{"word":"licentiousness","pos":"n.","def":"Absence of moral or sexual restraint; lasciviousness.","source":"M Ch. 17"},{"word":"littoral","pos":"adj./n.","def":"Of, relating to, or situated on the shore; the region lying along a shore.","source":"M Ch. 6"},{"word":"lyceum","pos":"n.","def":"A hall for public lectures; a type of institution providing public education, as in ancient Athens.","source":"M Ch. 30"},{"word":"mastitic","pos":"adj.","def":"Of or relating to mastitis, an inflammation of breast or udder tissue.","source":"M Ch. 36"},{"word":"millenary","pos":"adj./n.","def":"Of or relating to a thousand years; a period of a thousand years.","source":"M Ch. 6"},{"word":"neurasthenic","pos":"adj.","def":"Suffering from neurasthenia; characterized by fatigue, anxiety, and psychosomatic symptoms.","source":"M Ch. 6"},{"word":"obsequious","pos":"adj.","def":"Obedient or attentive to an excessive or servile degree; fawning.","source":"M Ch. 6"},{"word":"oracular","pos":"adj.","def":"Of or relating to an oracle; hard to interpret; prophetic.","source":"M Ch. 28"},{"word":"orgiastic","pos":"adj.","def":"Of, relating to, or resembling an orgy; characterized by unrestrained indulgence.","source":"M Ch. 17"},{"word":"paladin","pos":"n.","def":"A knight renowned for heroism; a champion of a cause.","source":"M Ch. 2"},{"word":"patronymic","pos":"adj./n.","def":"A name derived from the name of a father or ancestor.","source":"M Ch. 2"},{"word":"paucity","pos":"n.","def":"The presence of something only in small or insufficient quantities; scarcity.","source":"GGP Ch. 1"},{"word":"pecuniary","pos":"adj.","def":"Of, relating to, or consisting of money.","source":"GGP Ch. 3"},{"word":"pedantic","pos":"adj.","def":"Excessively concerned with minor details or rules; overly formal and scholastic.","source":"M Ch. 17"},{"word":"pendulous","pos":"adj.","def":"Hanging down loosely; swinging freely.","source":"M Ch. 6"},{"word":"perfunctory","pos":"adj.","def":"Carried out with a minimum of effort; routine and superficial.","source":"GGP Ch. 3"},{"word":"persiflage","pos":"n.","def":"Light and slightly contemptuous mockery or banter.","source":"GGP Ch. 3"},{"word":"pestilential","pos":"adj.","def":"Relating to or tending to cause infectious diseases; morally corrupting.","source":"M Ch. 2"},{"word":"plebiscite","pos":"n.","def":"A direct vote of the electorate on an important political question.","source":"M Ch. 16"},{"word":"plenipotentiary","pos":"n./adj.","def":"A diplomat invested with full authority; having or conferring full authority.","source":"M Ch. 32"},{"word":"pontiff","pos":"n.","def":"The Pope; a bishop; any high priest.","source":"M Ch. 19"},{"word":"portico","pos":"n.","def":"A structure consisting of a roof supported by columns, typically attached to a building.","source":"M Ch. 12"},{"word":"portent","pos":"n.","def":"A sign or warning of a momentous or calamitous event; an omen.","source":"M Ch. 14"},{"word":"postern","pos":"n.","def":"A back or side entrance, especially a small doorway in a fortification.","source":"M Ch. 2"},{"word":"promulgate","pos":"v.","def":"To make known by public declaration; to put a law into effect by formal proclamation.","source":"GGP Ch. 1"},{"word":"prosaic","pos":"adj.","def":"Having the style of prose; commonplace, unromantic, dull.","source":"M Ch. 14"},{"word":"proscenium","pos":"n.","def":"The part of a theater stage in front of the curtain; the arch framing a stage.","source":"M Ch. 28"},{"word":"puerile","pos":"adj.","def":"Childishly silly and trivial; immature.","source":"M Ch. 17"},{"word":"pusillanimous","pos":"adj.","def":"Showing a lack of courage or determination; timid, cowardly.","source":"M Ch. 4"},{"word":"putrefaction","pos":"n.","def":"The process of decay or rotting in a body or organic matter.","source":"M Ch. 11 & 20"},{"word":"putrescence","pos":"n.","def":"The state or process of decaying; rottenness.","source":"M Ch. 7"},{"word":"putrid","pos":"adj.","def":"Decaying or rotting and emitting a fetid smell; morally corrupt.","source":"M Ch. 2"},{"word":"quixotic","pos":"adj.","def":"Exceedingly idealistic; unrealistic and impractical.","source":"M Ch. 12"},{"word":"reprobate","pos":"n./adj.","def":"An unprincipled person; morally depraved and abandoned to sin.","source":"M Ch. 30"},{"word":"rostrum","pos":"n.","def":"A raised platform on which a person stands to make a public speech.","source":"M Ch. 6"},{"word":"sanguinary","pos":"adj.","def":"Involving or causing much bloodshed; bloodthirsty.","source":"M Ch. 2"},{"word":"sanguine","pos":"adj.","def":"Optimistic, especially in a difficult situation; blood-red in color.","source":"M Ch. 18"},{"word":"saraband","pos":"n.","def":"A slow Spanish dance in triple time; the music for such a dance.","source":"M Ch. 35"},{"word":"scion","pos":"n.","def":"A descendant of a notable family; a young shoot or twig cut for grafting.","source":"M Ch. 30"},{"word":"sepulchral","pos":"adj.","def":"Of or relating to a tomb or burial; gloomy, dismal.","source":"M Ch. 13"},{"word":"serpentine","pos":"adj.","def":"Of or like a serpent; winding and twisting like a snake.","source":"M Ch. 19"},{"word":"squalid","pos":"adj.","def":"Extremely dirty and unpleasant; morally corrupt or sordid.","source":"M Ch. 2"},{"word":"stevedore","pos":"n.","def":"A person employed at a dock to load and unload cargo from ships.","source":"M Ch. 4"},{"word":"stolid","pos":"adj.","def":"Calm, dependable, and showing little emotion or animation.","source":"M Ch. 13"},{"word":"syndicalist","pos":"n.","def":"An advocate of syndicalism: a revolutionary movement favoring transfer of industry to labor unions.","source":"M Ch. 24"},{"word":"tedium","pos":"n.","def":"The state of being tedious; boredom from lack of variety.","source":"M Ch. 17"},{"word":"tenacity","pos":"n.","def":"The quality of holding fast; determination and persistence.","source":"M Ch. 4"},{"word":"urbane","pos":"adj.","def":"Suave, courteous, and refined in manner.","source":"M Ch. 29"},{"word":"vacillates","pos":"v.","def":"Wavers between different opinions or actions; is indecisive.","source":"M Ch. 13"},{"word":"velarium","pos":"n.","def":"An awning spread over an ancient Roman amphitheater to shelter spectators.","source":"M Ch. 23"},{"word":"vermillion","pos":"n./adj.","def":"A brilliant red color; a red pigment made from cinnabar.","source":"M Ch. 5"},{"word":"vivacity","pos":"n.","def":"The quality of being attractively lively and animated; liveliness.","source":"GGP Ch. 3"},{"word":"votive","pos":"adj.","def":"Offered or consecrated in fulfillment of a vow; used in religious devotion.","source":"M Ch. 12 & 13"}];
+
+// ── State ──────────────────────────────────────────────────
+let state = { words: [], filter: 'all', sortKey: 'word', sortDir: 1, search: '' };
+
+// ── EDIT: localStorage — load & merge ─────────────────────
+async function loadState() {
+  let merged = BASE.map(w => ({ ...w, wotd: false, archived: false }));
+  // Try Supabase first
+  const row = await sbGet('vocabulary', 'singleton');
+  if (row && row.words && row.words.length) {
+    row.words.forEach(aw => {
+      const m = merged.find(w => w.word === aw.word);
+      if (!m) { merged.push({ word: aw.word, pos: aw.pos||'', def: aw.definition||aw.def||'', source: aw.source||'', wotd: aw.wotd||false, archived: aw.archived||false }); }
+      else { if (aw.wotd) m.wotd = true; if (aw.archived) m.archived = true; }
+    });
+  } else {
+    // Fallback to localStorage
+    try {
+      const legacy = JSON.parse(lsGet('vocab_state_v2') || '[]');
+      legacy.forEach(lw => { const m = merged.find(w => w.word === lw.word); if (m && lw.wotd) m.wotd = true; });
+    } catch(e) {}
+    try {
+      const added = JSON.parse(lsGet('vl_words') || '[]');
+      added.forEach(aw => {
+        const m = merged.find(w => w.word === aw.word);
+        if (!m) { merged.push({ word: aw.word, pos: aw.pos||'', def: aw.definition||aw.def||'', source: aw.source||'', wotd: aw.wotd||false, archived: aw.archived||false }); }
+        else { if (aw.wotd) m.wotd = true; if (aw.archived) m.archived = true; }
+      });
+    } catch(e) {}
+  }
+  state.words = merged;
+}
+
+async function saveState() {
+  const forFlash = state.words.map(w => ({
+    word: w.word, pos: w.pos, definition: w.def, example: '', source: w.source, wotd: w.wotd, archived: w.archived
+  }));
+  // Save to Supabase (both vocabulary and productivity tables for cross-page reads)
+  await sbUpsert('vocabulary', { id: 'singleton', words: forFlash });
+  await sbUpsert('productivity', { id: 'singleton', updated_at: new Date().toISOString() });
+  lsSet('vl_words', JSON.stringify(forFlash));
+  lsSet('vocab_state_v2', JSON.stringify(state.words.map(w => ({ word: w.word, wotd: w.wotd }))));
+}
+
+// ── Source badge ───────────────────────────────────────────
+function isURL(s) { return /^https?:\/\//i.test((s||'').trim()); }
+
+function srcType(src) {
+  const s = (src||'').toUpperCase();
+  if (s.startsWith('GGP') && s.includes('M ')) return 'both';
+  if (s.startsWith('GGP')) return 'ggp';
+  return 'm';
+}
+
+function badgeHtml(src) {
+  if (!src) return '';
+  if (isURL(src)) {
+    const display = src.replace(/^https?:\/\/(www\.)?/,'').split('/')[0];
+    return `<a class="badge badge-link" href="${esc(src)}" target="_blank" rel="noopener">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>${esc(display)}</a>`;
+  }
+  const t = srcType(src);
+  const cls = t === 'ggp' ? 'badge-ggp' : t === 'both' ? 'badge-both' : 'badge-m';
+  return `<span class="badge ${cls}">${esc(src)}</span>`;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Filtering & sorting ────────────────────────────────────
+function getVisible() {
+  let list = state.words;
+  const q = state.search.toLowerCase().trim();
+  if (q) list = list.filter(w => w.word.toLowerCase().includes(q) || w.def.toLowerCase().includes(q));
+  if (state.filter === 'archived') {
+    list = list.filter(w => w.archived);
+  } else {
+    // hide archived words from all other views
+    list = list.filter(w => !w.archived);
+    if (state.filter === 'm')    list = list.filter(w => srcType(w.source) === 'm');
+    else if (state.filter === 'ggp')  list = list.filter(w => srcType(w.source) === 'ggp');
+    else if (state.filter === 'wotd') list = list.filter(w => w.wotd);
+  }
+  const k = state.sortKey;
+  list = [...list].sort((a,b) => {
+    const av = (a[k]||'').toLowerCase(), bv = (b[k]||'').toLowerCase();
+    return av < bv ? -state.sortDir : av > bv ? state.sortDir : 0;
+  });
+  return list;
+}
+
+// ── Render ─────────────────────────────────────────────────
+function render() {
+  const visible = getVisible();
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = visible.map((w,i) => `
+    <tr class="${w.archived ? 'is-archived' : ''}" style="animation:fadeUp ${Math.min(i,20)*0.025+0.04}s ease both">
+      <td class="word-cell">${esc(w.word)}</td>
+      <td class="pos-cell">${esc(w.pos)}</td>
+      <td class="def-cell">${esc(w.def)}</td>
+      <td class="src-cell">${badgeHtml(w.source)}</td>
+      <td class="wotd-cell">
+        <div class="wotd-box ${w.wotd?'on':''}" onclick="toggleWotd('${esc(w.word)}')"></div>
+      </td>
+      <td class="arc-cell">
+        <div class="arc-box ${w.archived?'on':''}" onclick="toggleArchived('${esc(w.word)}')" title="${w.archived ? 'Unarchive' : 'Archive'}"></div>
+      </td>
+      <td class="del-cell">
+        <button class="del-btn" onclick="deleteWord('${esc(w.word)}')" title="Remove word" aria-label="Delete ${esc(w.word)}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/>
+          </svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+
+  document.getElementById('noResults').style.display = visible.length ? 'none' : 'block';
+  document.getElementById('cTotal').textContent    = state.words.filter(w => !w.archived).length;
+  document.getElementById('cShowing').textContent  = visible.length;
+  document.getElementById('cWotd').textContent     = state.words.filter(w => w.wotd && !w.archived).length;
+  document.getElementById('cArchived').textContent = state.words.filter(w => w.archived).length;
+
+  // Sort header indicators
+  ['word','pos','def'].forEach(k => {
+    const th = document.getElementById('th-'+k);
+    if (!th) return;
+    th.classList.toggle('sorted', state.sortKey === k);
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) arrow.textContent = state.sortKey === k ? (state.sortDir === 1 ? '↑' : '↓') : '↕';
+  });
+}
+
+// ── Interactions ───────────────────────────────────────────
+function toggleWotd(word) {
+  const w = state.words.find(x => x.word === word);
+  if (w) { w.wotd = !w.wotd; saveState(); render(); }
+}
+
+function toggleArchived(word) {
+  const w = state.words.find(x => x.word === word);
+  if (w) { w.archived = !w.archived; saveState(); render(); }
+}
+
+function deleteWord(word) {
+  state.words = state.words.filter(w => w.word !== word);
+  saveState(); render();
+}
+
+function setFilter(f, btn) {
+  state.filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function applyFilters() {
+  state.search = document.getElementById('searchInput').value;
+  render();
+}
+
+function sortBy(key) {
+  if (state.sortKey === key) state.sortDir *= -1;
+  else { state.sortKey = key; state.sortDir = 1; }
+  render();
+}
+
+// ── Add word form toggle ───────────────────────────────────
+function toggleAddForm() {
+  const drawer = document.getElementById('addDrawer');
+  const btn    = document.getElementById('addToggleBtn');
+  const open   = drawer.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  if (open) setTimeout(() => document.getElementById('f-word').focus(), 320);
+}
+
+// ── Add word ───────────────────────────────────────────────
+function addWord() {
+  const word = document.getElementById('f-word').value.trim();
+  const pos  = document.getElementById('f-pos').value;
+  const def  = document.getElementById('f-def').value.trim();
+  const src  = document.getElementById('f-source').value.trim();
+  if (!word || !def) { flashMsg('word + definition required.'); return; }
+  if (state.words.find(w => w.word.toLowerCase() === word.toLowerCase())) {
+    flashMsg('word already exists.'); return;
+  }
+  state.words.push({ word, pos, def, source: src, wotd: false, archived: false });
+  saveState();
+  document.getElementById('f-word').value = '';
+  document.getElementById('f-def').value = '';
+  document.getElementById('f-source').value = '';
+  render();
+  flashMsg('saved.');
+}
+
+function flashMsg(txt) {
+  const el = document.getElementById('form-msg');
+  if (!el) return;
+  el.textContent = txt;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// Enter key in word field submits
+document.getElementById('f-word').addEventListener('keydown', e => { if (e.key === 'Enter') addWord(); });
+document.getElementById('f-def').addEventListener('keydown',  e => { if (e.key === 'Enter') addWord(); });
+
+// ── Init ───────────────────────────────────────────────────
+async function initVocab() {
+  await loadState();
+  render();
+}
+initVocab();
+</script>
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Check-In</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Monochrome palette — sampled from the photo's walls, shadows, floor */
+    --ink:       #1c1c1c;   /* near-black for primary text */
+    --charcoal:  #3a3a3a;   /* secondary text */
+    --slate:     #6b6b6b;   /* labels, metadata */
+    --silver:    #a8a8a8;   /* borders, dividers */
+    --mist:      #d4d4d4;   /* subtle borders */
+    --fog:       #ebebeb;   /* card tint */
+    --paper:     #f5f5f5;   /* lightest surface */
+    --white:     #ffffff;
+
+    /* Single accent — cobalt from the wallpaper floral pattern */
+    --accent:    #1a3a6e;
+    --accent-lt: rgba(26,58,110,0.12);
+    --accent-mid: rgba(26,58,110,0.25);
+
+    /* Delta colors — accent for improvement, muted red for regression */
+    --better:    #1a3a6e;   /* cobalt: moving toward goal */
+    --worse:     #8b3a3a;   /* muted burgundy: away from goal */
+
+    --glass-blur: blur(18px);
+    --radius: 13px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    color: var(--ink);
+    background-image: url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/weekly check-in.jpg');
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+  }
+
+  /* ── TOPBAR ── */
+  #topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 50px;
+    background: rgba(28,28,28,0.72);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 18px;
+  }
+  #topbar a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; font-weight: 400; letter-spacing: 0.07em;
+    color: rgba(255,255,255,0.75); text-decoration: none;
+    display: flex; align-items: center; gap: 5px;
+    transition: color 0.2s;
+  }
+  #topbar a:hover { color: #fff; }
+  #topbar .date-label {
+    font-size: 10.5px; color: rgba(255,255,255,0.45);
+    letter-spacing: 0.09em; text-transform: uppercase;
+  }
+
+  /* ── MAIN ── */
+  main {
+    padding: 62px 16px 72px;
+    max-width: 660px;
+    margin: 0 auto;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(64px, 12vw, 110px); font-weight: 600;
+    color: var(--white);
+    text-shadow: 0 2px 16px rgba(0,0,0,0.55);
+    line-height: 1.0;
+    margin-bottom: 4px;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 300;
+  }
+  .subtitle {
+    font-size: 10.5px; color: rgba(255,255,255,0.5);
+    letter-spacing: 0.13em; text-transform: uppercase;
+  }
+
+  /* ── GLASS CARD BASE ── */
+  /* Main readable surfaces: mostly white/paper with slight blur */
+  .card {
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: none;
+    border-radius: var(--radius);
+  }
+  /* Dark variant for snapshot */
+  .card-dark {
+    background: rgba(28,28,28,0.80);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: var(--radius);
+  }
+
+  /* ── SNAPSHOT BANNER ── */
+  #snapshot {
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  #snapshot h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px; font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.03em;
+    margin-bottom: 8px;
+  }
+  .snap-meta {
+    font-size: 9.5px; color: rgba(255,255,255,0.4);
+    letter-spacing: 0.09em; text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .snap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+    gap: 8px;
+  }
+  .snap-item {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .snap-label {
+    font-size: 8.5px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: rgba(255,255,255,0.4);
+    margin-bottom: 3px;
+  }
+  .snap-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px; font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.1;
+  }
+  .snap-val small { font-size: 10px; color: rgba(255,255,255,0.4); margin-left: 1px; }
+  .snap-delta { font-size: 10px; margin-top: 3px; font-weight: 500; }
+  /* Delta accent — cobalt for improvement, muted red for regression */
+  .better { color: #6fa3e8; }   /* lighter cobalt so it reads on dark bg */
+  .worse  { color: #e07a7a; }   /* lighter muted red on dark bg */
+
+  /* ── ADD BUTTON ── */
+  #add-btn {
+    width: 100%;
+    padding: 13px 20px;
+    background: rgba(255,255,255,0.15);
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.45);
+    border-radius: var(--radius);
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px; font-weight: 500; letter-spacing: 0.09em;
+    text-transform: uppercase; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.2s, transform 0.15s;
+    margin-bottom: 12px;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+  #add-btn:hover { background: rgba(255,255,255,0.97); transform: translateY(-1px); }
+
+  /* ── ENTRY FORM ── */
+  #entry-form {
+    display: none;
+    padding: 22px 20px;
+    margin-bottom: 16px;
+  }
+  #entry-form.open { display: block; }
+
+  .form-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px; font-weight: 600; color: var(--white);
+    margin-bottom: 16px;
+  }
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px;
+    margin-bottom: 11px;
+  }
+  .field-grid.wide { grid-template-columns: 1fr; }
+  .field label {
+    display: block; font-size: 9px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.55); margin-bottom: 4px;
+  }
+  .field input, .field textarea {
+    width: 100%; padding: 9px 11px;
+    background: var(--white);
+    border: 1px solid var(--mist);
+    border-radius: 7px;
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    color: var(--ink); outline: none;
+    transition: border-color 0.2s;
+  }
+  .field input:focus, .field textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-lt);
+  }
+  .field textarea { resize: vertical; min-height: 68px; }
+
+  .section-divider {
+    font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin: 14px 0 9px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--mist);
+  }
+
+  .form-actions { display: flex; gap: 9px; margin-top: 16px; }
+  #save-btn {
+    flex: 1; padding: 11px;
+    background: rgba(255,255,255,0.95); color: var(--ink);
+    border: none; border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  #save-btn:hover { opacity: 0.78; }
+  #cancel-btn {
+    padding: 11px 18px;
+    background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.45);
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  #cancel-btn:hover { border-color: var(--silver); }
+
+  /* ── STATS STRIP ── */
+  #stats-strip { display: none; margin-bottom: 16px; }
+  .stats-header {
+    font-size: 9px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); margin-bottom: 9px;
+  }
+  .stats-scroll {
+    display: flex; gap: 9px;
+    overflow-x: auto; padding-bottom: 3px;
+    scrollbar-width: none;
+  }
+  .stats-scroll::-webkit-scrollbar { display: none; }
+  .stat-card {
+    flex: 0 0 auto;
+    min-width: 86px;
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: none;
+    border-radius: 10px;
+    padding: 11px 13px;
+  }
+  .stat-card .lbl {
+    font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); margin-bottom: 5px;
+  }
+  .stat-card .val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px; font-weight: 700; color: var(--white);
+    line-height: 1;
+  }
+  .stat-card .unit { font-size: 9.5px; color: var(--silver); margin-left: 1px; }
+  .stat-card .delta { font-size: 9.5px; margin-top: 4px; font-weight: 500; }
+  /* Delta on light cards: full cobalt / full burgundy */
+  .stat-card .better { color: var(--better); }
+  .stat-card .worse  { color: var(--worse); }
+
+  /* ── HISTORY ── */
+  #history-section { margin-top: 4px; }
+  .history-header {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 600; color: var(--white);
+    margin-bottom: 13px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  }
+  .week-group { margin-bottom: 18px; }
+  .week-label {
+    font-size: 8.5px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); margin-bottom: 8px;
+  }
+  .entry-card {
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: none;
+    border-radius: 11px;
+    padding: 14px 16px;
+    margin-bottom: 9px;
+    position: relative;
+  }
+  .entry-date {
+    font-size: 10.5px; font-weight: 500; color: rgba(255,255,255,0.8);
+    margin-bottom: 10px; letter-spacing: 0.02em;
+  }
+  .entry-metrics {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 2px;
+  }
+  .metric-pill {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 5px; padding: 4px 9px;
+    font-size: 10px; color: rgba(255,255,255,0.8);
+    display: flex; align-items: baseline; gap: 4px;
+  }
+  .metric-pill .m-label { color: rgba(255,255,255,0.45); font-size: 8.5px; letter-spacing: 0.06em; }
+  .metric-pill .m-val   { color: var(--white); font-weight: 500; }
+  /* Accent pills for metrics that changed vs prior week */
+  .metric-pill.changed-better {
+    background: var(--accent-lt);
+    border-color: rgba(26,58,110,0.25);
+  }
+  .metric-pill.changed-better .m-val { color: var(--better); }
+  .metric-pill.changed-worse {
+    background: rgba(139,58,58,0.09);
+    border-color: rgba(139,58,58,0.2);
+  }
+  .metric-pill.changed-worse .m-val { color: var(--worse); }
+  .metric-pill .m-delta {
+    font-size: 9px; margin-left: 2px;
+  }
+
+  .entry-notes {
+    font-size: 10.5px; color: rgba(255,255,255,0.5);
+    font-style: italic; margin-top: 9px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 8px; line-height: 1.5;
+  }
+  .delete-btn {
+    position: absolute; top: 11px; right: 13px;
+    background: none; border: none;
+    font-size: 13px; cursor: pointer; opacity: 0.3;
+    color: var(--white); transition: opacity 0.2s;
+    line-height: 1;
+  }
+  .delete-btn:hover { opacity: 0.6; }
+
+  .empty-state {
+    background: rgba(0,0,0,0.78);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: none;
+    border-radius: var(--radius);
+    text-align: center; padding: 34px 20px;
+    color: rgba(255,255,255,0.4); font-size: 11px; letter-spacing: 0.05em;
+  }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 22px; left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: rgba(28,28,28,0.92);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    color: rgba(255,255,255,0.85);
+    padding: 10px 22px; border-radius: 28px;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 11px; letter-spacing: 0.06em;
+    opacity: 0; transition: opacity 0.28s, transform 0.28s;
+    pointer-events: none; z-index: 200;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<nav id="topbar">
+  <a href="Wellness.html">← Wellness</a>
+  <span class="date-label" id="topbar-date"></span>
+  <a href="Main Hub.html">← Main Hub</a>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Weekly<br><em>Check-In</em></h1>
+    <p class="subtitle">Body · Measurements · Progress</p>
+  </div>
+
+  <!-- SNAPSHOT -->
+  <div id="snapshot" class="card-dark">
+    <h2>Check-in Snapshot</h2>
+    <div class="snap-meta" id="snap-meta"></div>
+    <div class="snap-grid" id="snap-grid"></div>
+  </div>
+
+  <!-- ADD BUTTON -->
+  <button id="add-btn">＋ &nbsp;Log This Week</button>
+
+  <!-- ENTRY FORM -->
+  <div id="entry-form" class="card">
+    <div class="form-title">New Check-In</div>
+    <div class="field-grid">
+      <div class="field"><label>Date</label><input type="date" id="f-date"></div>
+      <div class="field"><label>Weight (lbs)</label><input type="number" id="f-weight" placeholder="0.0" step="0.1"></div>
+    </div>
+    <div class="section-divider">Measurements (inches)</div>
+    <div class="field-grid">
+      <div class="field"><label>Chest</label><input type="number" id="f-chest" placeholder="0.0" step="0.1"></div>
+      <div class="field"><label>Waist</label><input type="number" id="f-waist" placeholder="0.0" step="0.1"></div>
+      <div class="field"><label>Shoulders</label><input type="number" id="f-shoulders" placeholder="0.0" step="0.1"></div>
+      <div class="field"><label>Arms</label><input type="number" id="f-arms" placeholder="0.0" step="0.1"></div>
+      <div class="field"><label>Thighs</label><input type="number" id="f-thighs" placeholder="0.0" step="0.1"></div>
+      <div class="field"><label>Calves</label><input type="number" id="f-calves" placeholder="0.0" step="0.1"></div>
+    </div>
+    <div class="field-grid">
+      <div class="field"><label>Glutes</label><input type="number" id="f-glutes" placeholder="0.0" step="0.1"></div>
+    </div>
+    <div class="section-divider">Notes</div>
+    <div class="field field-grid wide">
+      <textarea id="f-notes" placeholder="How are you feeling this week?"></textarea>
+    </div>
+    <div class="form-actions">
+      <button id="save-btn">Save Entry</button>
+      <button id="cancel-btn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div id="stats-strip">
+    <div class="stats-header">Latest vs Prior Week</div>
+    <div class="stats-scroll" id="stats-scroll"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="history-section">
+    <div class="history-header">Entry History</div>
+    <div id="history-list"></div>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+// ── SUPABASE CONFIG ──
+const SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
+const SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
+async function sbGet(table, id) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}&limit=1`,
+      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    const d = await r.json(); return d && d[0] ? d[0] : null;
+  } catch(e) { return null; }
+}
+async function sbUpsert(table, row) {
+  try {
+    await fetch(`${SB_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
+    });
+  } catch(e) {}
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+const METRICS = [
+  { key: 'weight',    label: 'Weight',    unit: 'lbs', lowerIsBetter: true },
+  { key: 'chest',     label: 'Chest',     unit: 'in',  lowerIsBetter: false },
+  { key: 'waist',     label: 'Waist',     unit: 'in',  lowerIsBetter: true },
+  { key: 'shoulders', label: 'Shoulders', unit: 'in',  lowerIsBetter: false },
+  { key: 'arms',      label: 'Arms',      unit: 'in',  lowerIsBetter: false },
+  { key: 'thighs',    label: 'Thighs',    unit: 'in',  lowerIsBetter: false },
+  { key: 'calves',    label: 'Calves',    unit: 'in',  lowerIsBetter: false },
+  { key: 'glutes',    label: 'Glutes',    unit: 'in',  lowerIsBetter: false },
+];
+
+// ── STATE ──
+let _ciData = { id: 'singleton', entries: [], weight_start: null };
+
+function getEntries() { return _ciData.entries || []; }
+
+async function saveEntries(arr) {
+  _ciData.entries = arr;
+  // Mirror to wellness table so Wellness.html reads it
+  await sbUpsert('wellness', { id: 'singleton', checkin_entries: arr, weight_start: _ciData.weight_start });
+  await sbUpsert('weekly_checkin', _ciData);
+  lsSet('wl_checkin_entries', JSON.stringify(arr));
+  if (_ciData.weight_start) lsSet('wl_weight_start', _ciData.weight_start);
+}
+
+function fmt(v) { const n = parseFloat(v); return isNaN(n) ? '—' : n.toFixed(1); }
+
+// Topbar date
+document.getElementById('topbar-date').textContent =
+  new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+// Form toggle
+document.getElementById('add-btn').addEventListener('click', () => {
+  const f = document.getElementById('entry-form');
+  f.classList.toggle('open');
+  if (f.classList.contains('open') && !document.getElementById('f-date').value)
+    document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
+});
+document.getElementById('cancel-btn').addEventListener('click', () => {
+  document.getElementById('entry-form').classList.remove('open');
+  clearForm();
+});
+function clearForm() {
+  ['f-date','f-weight','f-chest','f-waist','f-shoulders','f-arms',
+   'f-thighs','f-calves','f-glutes','f-notes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+// Save
+document.getElementById('save-btn').addEventListener('click', async () => {
+  const date = document.getElementById('f-date').value;
+  if (!date) { showToast('Please pick a date.'); return; }
+  const entry = {
+    id: Date.now(), date,
+    weight:    parseFloat(document.getElementById('f-weight').value)    || null,
+    chest:     parseFloat(document.getElementById('f-chest').value)     || null,
+    waist:     parseFloat(document.getElementById('f-waist').value)     || null,
+    shoulders: parseFloat(document.getElementById('f-shoulders').value) || null,
+    arms:      parseFloat(document.getElementById('f-arms').value)      || null,
+    thighs:    parseFloat(document.getElementById('f-thighs').value)    || null,
+    calves:    parseFloat(document.getElementById('f-calves').value)    || null,
+    glutes:    parseFloat(document.getElementById('f-glutes').value)    || null,
+    notes:     document.getElementById('f-notes').value.trim(),
+  };
+  const entries = getEntries();
+  if (entries.length === 0 && entry.weight !== null && !_ciData.weight_start) {
+    _ciData.weight_start = entry.weight;
+  }
+  entries.push(entry);
+  entries.sort((a,b) => a.date.localeCompare(b.date));
+  await saveEntries(entries);
+  clearForm();
+  document.getElementById('entry-form').classList.remove('open');
+  render();
+  showToast('Entry saved ✓');
+});
+
+// Render
+function render() {
+  const entries = getEntries();
+  renderSnapshot(entries);
+  renderStats(entries);
+  renderHistory(entries);
+}
+
+function renderSnapshot(entries) {
+  const el = document.getElementById('snapshot');
+  if (entries.length < 2) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const first = entries[0], last = entries[entries.length - 1];
+  const weeks = Math.round(Math.abs(new Date(last.date) - new Date(first.date)) / (7*864e5)) || 1;
+  document.getElementById('snap-meta').textContent =
+    `${first.date} → ${last.date}  ·  ${entries.length} entries  ·  ~${weeks} wk`;
+  const grid = document.getElementById('snap-grid');
+  grid.innerHTML = '';
+  METRICS.forEach(m => {
+    const fv = first[m.key], lv = last[m.key];
+    if (fv === null && lv === null) return;
+    const delta = (fv !== null && lv !== null) ? lv - fv : null;
+    let deltaHtml = '';
+    if (delta !== null) {
+      const better = m.lowerIsBetter ? delta < 0 : delta > 0;
+      const cls = better ? 'better' : 'worse';
+      deltaHtml = `<div class="snap-delta"><span class="${cls}">${delta > 0 ? '+' : ''}${delta.toFixed(1)}</span></div>`;
+    }
+    grid.innerHTML += `
+      <div class="snap-item">
+        <div class="snap-label">${m.label}</div>
+        <div class="snap-val">${fmt(lv)}<small>${m.unit}</small></div>
+        ${deltaHtml}
+      </div>`;
+  });
+}
+
+function renderStats(entries) {
+  const strip = document.getElementById('stats-strip');
+  if (entries.length < 1) { strip.style.display = 'none'; return; }
+  strip.style.display = 'block';
+  const latest = entries[entries.length - 1];
+  const prior  = entries.length >= 2 ? entries[entries.length - 2] : null;
+  const scroll = document.getElementById('stats-scroll');
+  scroll.innerHTML = '';
+  METRICS.forEach(m => {
+    const lv = latest[m.key];
+    if (lv === null) return;
+    const pv    = prior ? prior[m.key] : null;
+    const delta = pv !== null ? lv - pv : null;
+    let deltaHtml = '';
+    if (delta !== null) {
+      const better = m.lowerIsBetter ? delta < 0 : delta > 0;
+      const cls = better ? 'better' : 'worse';
+      deltaHtml = `<div class="delta"><span class="${cls}">${delta > 0 ? '+' : ''}${delta.toFixed(1)}</span></div>`;
+    }
+    scroll.innerHTML += `
+      <div class="stat-card">
+        <div class="lbl">${m.label}</div>
+        <div class="val">${fmt(lv)}<span class="unit">${m.unit}</span></div>
+        ${deltaHtml}
+      </div>`;
+  });
+}
+
+function renderHistory(entries) {
+  const list = document.getElementById('history-list');
+  if (entries.length === 0) {
+    list.innerHTML = '<div class="empty-state">No entries yet — log your first check-in above.</div>';
+    return;
+  }
+  const sorted = [...entries].sort((a,b) => b.date.localeCompare(a.date));
+
+  // Build lookup: for each entry, find the prior chronological entry
+  const chrono = [...entries].sort((a,b) => a.date.localeCompare(b.date));
+  function getPrior(e) {
+    const idx = chrono.findIndex(x => x.id === e.id);
+    return idx > 0 ? chrono[idx - 1] : null;
+  }
+
+  // Group by week
+  const groups = {};
+  sorted.forEach(e => {
+    const wk = getWeekLabel(e.date);
+    if (!groups[wk]) groups[wk] = [];
+    groups[wk].push(e);
+  });
+
+  list.innerHTML = '';
+  Object.entries(groups).forEach(([week, wEntries]) => {
+    let cards = '';
+    wEntries.forEach(e => {
+      const prior = getPrior(e);
+      const pills = METRICS
+        .filter(m => e[m.key] !== null)
+        .map(m => {
+          const pv    = prior ? prior[m.key] : null;
+          const delta = pv !== null ? e[m.key] - pv : null;
+          let pillCls = 'metric-pill';
+          let deltaSpan = '';
+          if (delta !== null && Math.abs(delta) >= 0.05) {
+            const better = m.lowerIsBetter ? delta < 0 : delta > 0;
+            pillCls += better ? ' changed-better' : ' changed-worse';
+            deltaSpan = `<span class="m-delta">${delta > 0 ? '+' : ''}${delta.toFixed(1)}</span>`;
+          }
+          return `<div class="${pillCls}">
+            <span class="m-label">${m.label}</span>
+            <span class="m-val">${fmt(e[m.key])} <span style="font-size:8.5px;opacity:0.55">${m.unit}</span></span>
+            ${deltaSpan}
+          </div>`;
+        }).join('');
+      const notes = e.notes ? `<div class="entry-notes">${e.notes}</div>` : '';
+      cards += `
+        <div class="entry-card">
+          <button class="delete-btn" data-id="${e.id}" title="Delete">✕</button>
+          <div class="entry-date">${formatDate(e.date)}</div>
+          <div class="entry-metrics">${pills}</div>
+          ${notes}
+        </div>`;
+    });
+    list.innerHTML += `<div class="week-group"><div class="week-label">${week}</div>${cards}</div>`;
+  });
+
+  list.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      saveEntries(getEntries().filter(e => e.id !== parseInt(btn.dataset.id)));
+      render();
+      showToast('Entry deleted');
+    });
+  });
+}
+
+function getWeekLabel(dateStr) {
+  const d   = new Date(dateStr + 'T00:00:00');
+  const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  return `Week of ${mon.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${sun.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+}
+function formatDate(dateStr) {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US',{
+    weekday:'long', month:'long', day:'numeric', year:'numeric'
+  });
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ── BOOTSTRAP ──
+async function initCheckin() {
+  const row = await sbGet('weekly_checkin', 'singleton');
+  if (row) { _ciData = { ..._ciData, ...row }; }
+  else {
+    try { _ciData.entries = JSON.parse(lsGet('wl_checkin_entries') || '[]'); } catch(e) {}
+    _ciData.weight_start = parseFloat(lsGet('wl_weight_start')) || null;
+  }
+  render();
+}
+initCheckin();
+</script>
+</body>
+</html>

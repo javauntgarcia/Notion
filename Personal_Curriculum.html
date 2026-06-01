@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  ============================================================
+  PERSONAL CURRICULUM — Subpage of Productivity.html
+  GitHub Pages URL: https://javauntgarcia.github.io/Notion/Personal%20Curriculum.html
+  Notion embed: paste the URL above into a /embed block
+
+  EDIT GUIDE — search these strings to find each section:
+  • "EDIT: palette"         → CSS variables / color scheme
+  • "EDIT: bg-url"          → background image URL
+  • "EDIT: curriculum"      → book list data (JS array)
+  • "EDIT: localStorage"    → all localStorage key names (prefix: cur_)
+  • "EDIT: topbar"          → back link and date
+  • "EDIT: masthead"        → eyebrow + H1 text
+  • "EDIT: footer"          → footer phrase
+  ============================================================
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Personal Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   EDIT: palette — derived from Personal_Curriculum.jpg
+   Warm taupe, amber, dusty sage, dark walnut, linen ivory
+   ============================================================ */
+:root {
+  --primary:        #2e2a26;        /* dark walnut — deepest tone */
+  --primary-mid:    #4a3f34;        /* warm espresso */
+  --accent:         #8c7355;        /* amber oak / book spine */
+  --highlight:      #b89a6e;        /* warm gold / herringbone light */
+  --dusty-sage:     #7a8a78;        /* botanical green */
+  --warm-white:     #f2ede6;        /* linen/ivory wall */
+  --ivory:          #e8e0d4;        /* parchment */
+  --glass:          rgba(46, 42, 38, 0.13);
+  --glass-hover:    rgba(46, 42, 38, 0.22);
+  --glass-b:        rgba(184, 154, 110, 0.28);
+  --topbar-bg:      rgba(30, 26, 22, 0.44);
+  --divider:        rgba(140, 115, 85, 0.18);
+  --text-primary:   #f2ede6;
+  --text-secondary: rgba(242, 237, 230, 0.65);
+  --text-muted:     rgba(242, 237, 230, 0.38);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Mono', monospace;
+  background: var(--primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   PAGE WRAP + BACKGROUND
+   ============================================================ */
+.page-wrap {
+  position: relative;
+  min-height: 100vh;
+}
+
+.bg-layer {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* EDIT: bg-url */
+.bg-layer img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.bg-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(30, 24, 18, 0.62) 0%,
+    rgba(46, 42, 38, 0.52) 40%,
+    rgba(36, 30, 22, 0.70) 100%
+  );
+}
+
+.content-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   TOPBAR — EDIT: topbar
+   ============================================================ */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 2rem;
+  background: var(--topbar-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(184, 154, 110, 0.10);
+}
+
+.topbar-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.topbar-back:hover { color: var(--highlight); }
+.topbar-back svg { flex-shrink: 0; }
+
+.topbar-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+/* ============================================================
+   MASTHEAD — EDIT: masthead
+   ============================================================ */
+.masthead {
+  min-height: 52vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 1rem 2rem;
+}
+
+.eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.4rem;
+  animation: fadeUp 0.7s ease both;
+}
+
+.masthead h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 10vw, 6.5rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--warm-white);
+  animation: fadeUp 0.8s 0.1s ease both;
+}
+.masthead h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--highlight);
+}
+
+.tagline { display: none; }
+
+.scroll-cue {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeUp 1s 0.6s ease both;
+}
+.scroll-cue span {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.scroll-arrow {
+  color: var(--accent);
+  animation: bob 1.8s ease-in-out infinite;
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.sections {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.5rem 6rem;
+}
+
+.section-block {
+  padding: 2.5rem 0 2.5rem;
+  animation: fadeUp 0.8s ease both;
+}
+.section-block:nth-child(1) { animation-delay: 0.1s; }
+.section-block:nth-child(2) { animation-delay: 0.2s; }
+.section-block:nth-child(3) { animation-delay: 0.3s; }
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(140, 115, 85, 0.75);
+  margin-bottom: 2rem;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--divider), transparent);
+  margin: 0;
+}
+
+/* ============================================================
+   YEAR HEADER
+   ============================================================ */
+.year-header {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 600;
+  color: var(--warm-white);
+  margin-bottom: 0.4rem;
+}
+.year-header em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--highlight);
+}
+.year-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2.5rem;
+}
+
+/* ============================================================
+   SEMESTER CARD
+   ============================================================ */
+.semester-card {
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-b);
+  border-radius: 14px;
+  margin-bottom: 1.2rem;
+  overflow: hidden;
+  transition: background 0.3s, transform 0.3s;
+}
+.semester-card:hover {
+  background: var(--glass-hover);
+  transform: translateY(-2px);
+}
+
+.semester-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+.semester-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--highlight);
+}
+.semester-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+.semester-toggle {
+  color: var(--accent);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+.semester-card.open .semester-toggle {
+  transform: rotate(180deg);
+}
+
+.semester-body {
+  display: none;
+  padding: 0 1.5rem 1.5rem;
+}
+.semester-card.open .semester-body {
+  display: block;
+}
+
+/* ============================================================
+   BOOK LIST
+   ============================================================ */
+.book-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.book-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(184, 154, 110, 0.12);
+  background: rgba(46, 42, 38, 0.25);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  text-decoration: none;
+}
+.book-item:hover {
+  background: rgba(140, 115, 85, 0.15);
+  border-color: rgba(184, 154, 110, 0.30);
+  transform: translateX(4px);
+}
+
+.book-status {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+  cursor: pointer;
+}
+.book-status.done {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.book-status svg { display: none; }
+.book-status.done svg { display: block; }
+
+.book-info {
+  flex: 1;
+  min-width: 0;
+}
+.book-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--warm-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.book-author {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+.book-arrow {
+  color: var(--accent);
+  opacity: 0.6;
+  flex-shrink: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.book-item:hover .book-arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+.book-item.read .book-title { opacity: 0.5; text-decoration: line-through; }
+
+/* ADD BOOK FORM */
+.add-book-form {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
+}
+.add-book-form input {
+  flex: 1;
+  min-width: 120px;
+  background: rgba(46, 42, 38, 0.45);
+  border: 1px solid rgba(140, 115, 85, 0.25);
+  border-radius: 8px;
+  padding: 0.55rem 0.8rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--warm-white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.add-book-form input::placeholder { color: var(--text-muted); }
+.add-book-form input:focus { border-color: var(--accent); }
+
+.btn-pill {
+  border-radius: 99px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid rgba(140, 115, 85, 0.30);
+  background: rgba(140, 115, 85, 0.10);
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.btn-pill:hover { background: rgba(140, 115, 85, 0.20); }
+
+/* ============================================================
+   BOOK NOTE MODAL (inline subpage experience)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(20, 16, 12, 0.80);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5rem 1rem 2rem;
+  overflow-y: auto;
+}
+.modal-overlay.open { display: flex; }
+
+.modal-card {
+  background: linear-gradient(160deg, rgba(46, 42, 38, 0.97), rgba(36, 32, 28, 0.98));
+  border: 1px solid var(--glass-b);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 680px;
+  padding: 2.5rem;
+  position: relative;
+  animation: fadeUp 0.35s ease both;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.2rem; right: 1.2rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.3rem;
+  transition: color 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { color: var(--warm-white); }
+
+.modal-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 600;
+  color: var(--warm-white);
+  margin-bottom: 0.3rem;
+  line-height: 1.15;
+}
+.modal-author {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  margin-bottom: 1.8rem;
+}
+
+.modal-section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(140, 115, 85, 0.70);
+  margin-bottom: 0.6rem;
+}
+
+.modal-textarea {
+  width: 100%;
+  min-height: 200px;
+  background: rgba(30, 26, 22, 0.60);
+  border: 1px solid rgba(140, 115, 85, 0.20);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: var(--warm-white);
+  resize: vertical;
+  outline: none;
+  line-height: 1.7;
+  transition: border-color 0.2s;
+  margin-bottom: 0.8rem;
+}
+.modal-textarea::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+.modal-textarea:focus { border-color: var(--accent); }
+
+.modal-quote-textarea {
+  min-height: 120px;
+  margin-bottom: 1.4rem;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.modal-saved {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--dusty-sage);
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.modal-saved.show { opacity: 1; }
+
+.modal-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(140, 115, 85, 0.18), transparent);
+  margin: 1.4rem 0;
+}
+
+/* Read toggle in modal */
+.modal-read-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.4rem;
+}
+.read-toggle {
+  width: 36px; height: 20px;
+  background: rgba(140, 115, 85, 0.15);
+  border: 1px solid rgba(140, 115, 85, 0.30);
+  border-radius: 99px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.read-toggle.on { background: var(--accent); border-color: var(--accent); }
+.read-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--warm-white);
+  transition: transform 0.2s;
+}
+.read-toggle.on::after { transform: translateX(16px); }
+.read-toggle-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+.progress-section {
+  margin-bottom: 1.2rem;
+}
+.progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+.progress-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.progress-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--highlight);
+}
+.progress-bar {
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(140, 115, 85, 0.15);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent), var(--highlight));
+  transition: width 0.4s ease;
+}
+
+/* ============================================================
+   FOOTER — EDIT: footer
+   ============================================================ */
+.site-footer {
+  text-align: center;
+  padding: 3rem 1rem 4rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: rgba(140, 115, 85, 0.35);
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 540px) {
+  .topbar { padding: 0.8rem 1.2rem; }
+  .modal-card { padding: 1.8rem 1.4rem; }
+  .add-book-form { flex-direction: column; }
+  .add-book-form input { min-width: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- EDIT: topbar — back link and live date -->
+<nav class="topbar">
+  <a href="Productivity.html" class="topbar-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 5l-7 7 7 7"/>
+    </svg>
+    Productivity
+  </a>
+  <span class="topbar-date" id="topbar-date"></span>
+</nav>
+
+<div class="page-wrap">
+  <!-- EDIT: bg-url — update filename if image changes -->
+  <div class="bg-layer">
+    <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/b4c480a4315a48dbb52195c3252ef9e648fcf63e/personal%20curriculum.jpg"
+         alt="" aria-hidden="true" />
+  </div>
+
+  <div class="content-layer">
+    <!-- MASTHEAD — EDIT: masthead -->
+    <section class="masthead">
+      <p class="eyebrow">Reading · Study</p>
+      <h1>Personal <em>Curriculum</em></h1>
+      <div class="scroll-cue" aria-hidden="true">
+        <svg class="scroll-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+        <span>scroll</span>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         SECTIONS
+         ====================================================== -->
+    <main class="sections">
+
+      <!-- Overall progress -->
+      <div class="section-block">
+        <p class="section-label">Overall Progress</p>
+        <div id="overall-progress" class="progress-section">
+          <div class="progress-row">
+            <span class="progress-label">Books Completed</span>
+            <span class="progress-pct" id="prog-pct">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ====================================================
+           YEAR / SEMESTER SECTIONS
+           EDIT: curriculum — update years, semesters, books
+           ==================================================== -->
+      <div id="curriculum-root"></div>
+
+    </main>
+
+    <footer class="site-footer">read deeply · think slowly</footer>
+  </div>
+</div>
+
+<!-- ============================================================
+     BOOK NOTE MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <p class="modal-eyebrow" id="modal-eyebrow">Reading Notes</p>
+    <h2 class="modal-title" id="modal-title"></h2>
+    <p class="modal-author" id="modal-author"></p>
+
+    <!-- Read toggle -->
+    <div class="modal-read-row">
+      <div class="read-toggle" id="modal-read-toggle" role="switch" aria-checked="false" tabindex="0"></div>
+      <span class="read-toggle-label">Mark as read</span>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <p class="modal-section-label">Notes</p>
+    <textarea class="modal-textarea" id="modal-notes"
+              placeholder="Your thoughts, arguments, reactions…"></textarea>
+
+    <p class="modal-section-label">Key Quotes</p>
+    <textarea class="modal-textarea modal-quote-textarea" id="modal-quotes"
+              placeholder="Passages worth returning to…"></textarea>
+
+    <div class="modal-actions">
+      <button class="btn-pill" id="modal-save">Save Notes</button>
+      <span class="modal-saved" id="modal-saved-indicator">saved</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+// ── SUPABASE CONFIG ──
+const SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
+const SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
+async function sbGet(table, id) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}&limit=1`,
+      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    const d = await r.json(); return d && d[0] ? d[0] : null;
+  } catch(e) { return null; }
+}
+async function sbUpsert(table, row) {
+  try {
+    await fetch(`${SB_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
+    });
+  } catch(e) {}
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+/* ============================================================
+   EDIT: curriculum — define years, semesters, and default books.
+   Users can also add books via the UI; those are stored in localStorage
+   and merged at render time.
+   ============================================================ */
+const CURRICULUM = [
+  {
+    year: "2026",
+    yearLabel: "Twenty-<em>Twenty-Six</em>",
+    semesters: [
+      {
+        id: "2026-spring",
+        label: "Spring",
+        track: "Political Movements & Theory",
+        books: [
+          { id: "scurati-m",         title: "M: Son of the Century",                    author: "Antonio Scurati" },
+          { id: "oldenburg-great",   title: "The Great Good Place",                     author: "Ray Oldenburg" },
+          { id: "paxton-anatomy",    title: "The Anatomy of Fascism",                   author: "Robert O. Paxton" },
+        ]
+      },
+      {
+        id: "2026-fall",
+        label: "Fall",
+        track: "Upcoming",
+        books: []
+      }
+    ]
+  }
+];
+
+/* ============================================================
+   EDIT: localStorage — all keys use prefix cur_
+   cur_read_{bookId}     → "true" / "false"
+   cur_notes_{bookId}    → freeform text
+   cur_quotes_{bookId}   → key quotes text
+   cur_added_{semId}     → JSON array of user-added {id, title, author}
+   ============================================================ */
+
+// ── SUPABASE STATE ──
+let _cur = { id: 'singleton', read_items: {}, notes: {}, quotes: {}, added: {} };
+
+async function saveCur() {
+  await sbUpsert('personal_curriculum', _cur);
+  // Mirror to localStorage as fallback
+  Object.keys(_cur.read_items).forEach(k => lsSet('cur_read_' + k, _cur.read_items[k]));
+  Object.keys(_cur.notes).forEach(k => lsSet('cur_notes_' + k, _cur.notes[k]));
+  Object.keys(_cur.quotes).forEach(k => lsSet('cur_quotes_' + k, _cur.quotes[k]));
+  Object.keys(_cur.added).forEach(k => lsSet('cur_added_' + k, JSON.stringify(_cur.added[k])));
+}
+
+function lsGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+function lsSet(key, value) { try { localStorage.setItem(key, value); } catch(e) {} }
+function lsGetJSON(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch(e) { return fallback; } }
+
+/* ====== DATE ====== */
+const dateEl = document.getElementById('topbar-date');
+const now = new Date();
+dateEl.textContent = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+
+/* ====== RENDER CURRICULUM ====== */
+function getAllBooks(semester) {
+  const userAdded = _cur.added[semester.id] || lsGetJSON('cur_added_' + semester.id, []);
+  return [...semester.books, ...userAdded];
+}
+
+function bookIsRead(bookId) {
+  return (_cur.read_items[bookId] || lsGet('cur_read_' + bookId)) === 'true';
+}
+
+function countTotals() {
+  let total = 0, done = 0;
+  CURRICULUM.forEach(year => {
+    year.semesters.forEach(sem => {
+      const books = getAllBooks(sem);
+      total += books.length;
+      books.forEach(b => { if (bookIsRead(b.id)) done++; });
+    });
+  });
+  return { total, done };
+}
+
+function updateProgress() {
+  const { total, done } = countTotals();
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+}
+
+function renderCurriculum() {
+  const root = document.getElementById('curriculum-root');
+  root.innerHTML = '';
+
+  CURRICULUM.forEach((year, yi) => {
+    const yearBlock = document.createElement('div');
+    yearBlock.className = 'section-block';
+    yearBlock.style.animationDelay = (0.1 + yi * 0.1) + 's';
+
+    yearBlock.innerHTML = `
+      <p class="section-label">Year</p>
+      <h2 class="year-header">${year.yearLabel}</h2>
+      <p class="year-sub">${year.semesters.map(s => s.label).join(' · ')}</p>
+    `;
+
+    year.semesters.forEach(sem => {
+      const books = getAllBooks(sem);
+      const readCount = books.filter(b => bookIsRead(b.id)).length;
+
+      const card = document.createElement('div');
+      card.className = 'semester-card';
+      card.dataset.semId = sem.id;
+
+      card.innerHTML = `
+        <div class="semester-header" role="button" tabindex="0" aria-expanded="false">
+          <div>
+            <div class="semester-title">${sem.label} — ${sem.track}</div>
+            <div class="semester-count">${readCount} / ${books.length} read</div>
+          </div>
+          <svg class="semester-toggle" width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </div>
+        <div class="semester-body">
+          <ul class="book-list" id="booklist-${sem.id}"></ul>
+          <div class="add-book-form">
+            <input type="text" placeholder="Book title" id="add-title-${sem.id}" />
+            <input type="text" placeholder="Author" id="add-author-${sem.id}" />
+            <button class="btn-pill" onclick="addBook('${sem.id}')">Add</button>
+          </div>
+        </div>
+      `;
+
+      // Toggle open/close
+      const header = card.querySelector('.semester-header');
+      header.addEventListener('click', () => toggleSemester(card));
+      header.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSemester(card); }});
+
+      yearBlock.appendChild(card);
+
+      // Populate book list
+      renderBookList(sem, books);
+    });
+
+    if (yi < CURRICULUM.length - 1) {
+      yearBlock.insertAdjacentHTML('beforeend', '<div class="divider" style="margin-top:3rem"></div>');
+    }
+
+    root.appendChild(yearBlock);
+  });
+
+  updateProgress();
+}
+
+function renderBookList(sem, books) {
+  const list = document.getElementById('booklist-' + sem.id);
+  if (!list) return;
+  list.innerHTML = '';
+  books.forEach(book => {
+    const read = bookIsRead(book.id);
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="book-item${read ? ' read' : ''}" tabindex="0" role="button"
+           data-book-id="${book.id}" data-sem-id="${sem.id}"
+           aria-label="Open notes for ${book.title}">
+        <div class="book-status${read ? ' done' : ''}" data-toggle-id="${book.id}" title="Toggle read">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+               stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <div class="book-info">
+          <div class="book-title">${book.title}</div>
+          <div class="book-author">${book.author}</div>
+        </div>
+        <svg class="book-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </div>
+    `;
+
+    const bookItem = li.querySelector('.book-item');
+    const statusDot = li.querySelector('.book-status');
+
+    // Click dot = toggle read (don't open modal)
+    statusDot.addEventListener('click', e => {
+      e.stopPropagation();
+      const wasRead = bookIsRead(book.id);
+      _cur.read_items[book.id] = wasRead ? 'false' : 'true';
+      saveCur();
+      refreshSemester(sem);
+      updateProgress();
+    });
+
+    // Click row = open modal
+    bookItem.addEventListener('click', () => openModal(book, sem.label));
+    bookItem.addEventListener('keydown', e => { if (e.key === 'Enter') openModal(book, sem.label); });
+
+    list.appendChild(li);
+  });
+}
+
+function refreshSemester(sem) {
+  const books = getAllBooks(sem);
+  renderBookList(sem, books);
+  // update count
+  const card = document.querySelector(`.semester-card[data-sem-id="${sem.id}"]`);
+  if (card) {
+    const readCount = books.filter(b => bookIsRead(b.id)).length;
+    card.querySelector('.semester-count').textContent = `${readCount} / ${books.length} read`;
+  }
+}
+
+function toggleSemester(card) {
+  const isOpen = card.classList.contains('open');
+  card.classList.toggle('open', !isOpen);
+  card.querySelector('.semester-header').setAttribute('aria-expanded', String(!isOpen));
+}
+
+function addBook(semId) {
+  const titleInput = document.getElementById('add-title-' + semId);
+  const authorInput = document.getElementById('add-author-' + semId);
+  const title = titleInput.value.trim();
+  const author = authorInput.value.trim();
+  if (!title) { titleInput.focus(); return; }
+
+  const bookId = 'user-' + semId + '-' + Date.now();
+  const userAdded = _cur.added[semId] || lsGetJSON('cur_added_' + semId, []);
+  userAdded.push({ id: bookId, title, author: author || 'Unknown' });
+  _cur.added[semId] = userAdded;
+  saveCur();
+
+  titleInput.value = '';
+  authorInput.value = '';
+
+  // find sem object to refresh
+  let foundSem = null;
+  CURRICULUM.forEach(y => y.semesters.forEach(s => { if (s.id === semId) foundSem = s; }));
+  if (foundSem) refreshSemester(foundSem);
+  updateProgress();
+}
+
+/* ====== MODAL ====== */
+let currentBookId = null;
+let currentSemLabel = null;
+
+function openModal(book, semLabel) {
+  currentBookId = book.id;
+  currentSemLabel = semLabel;
+
+  document.getElementById('modal-eyebrow').textContent = semLabel + ' — Reading Notes';
+  document.getElementById('modal-title').textContent = book.title;
+  document.getElementById('modal-author').textContent = book.author;
+
+  const notes = _cur.notes[book.id] || lsGet('cur_notes_' + book.id) || '';
+  const quotes = _cur.quotes[book.id] || lsGet('cur_quotes_' + book.id) || '';
+  document.getElementById('modal-notes').value = notes;
+  document.getElementById('modal-quotes').value = quotes;
+
+  const readToggle = document.getElementById('modal-read-toggle');
+  const isRead = bookIsRead(book.id);
+  readToggle.classList.toggle('on', isRead);
+  readToggle.setAttribute('aria-checked', String(isRead));
+
+  document.getElementById('modal-saved-indicator').classList.remove('show');
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  // refresh all book lists to reflect any read toggle changes
+  CURRICULUM.forEach(y => y.semesters.forEach(s => {
+    const list = document.getElementById('booklist-' + s.id);
+    if (list) refreshSemester(s);
+  }));
+  updateProgress();
+  currentBookId = null;
+}
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// Read toggle in modal
+const readToggleBtn = document.getElementById('modal-read-toggle');
+readToggleBtn.addEventListener('click', () => {
+  if (!currentBookId) return;
+  const wasRead = bookIsRead(currentBookId);
+  _cur.read_items[currentBookId] = wasRead ? 'false' : 'true'; saveCur();
+  readToggleBtn.classList.toggle('on', !wasRead);
+  readToggleBtn.setAttribute('aria-checked', String(!wasRead));
+});
+readToggleBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); readToggleBtn.click(); }});
+
+// Save button
+document.getElementById('modal-save').addEventListener('click', () => {
+  if (!currentBookId) return;
+  _cur.notes[currentBookId] = document.getElementById('modal-notes').value; saveCur();
+  _cur.quotes[currentBookId] = document.getElementById('modal-quotes').value; saveCur();
+  const ind = document.getElementById('modal-saved-indicator');
+  ind.classList.add('show');
+  setTimeout(() => ind.classList.remove('show'), 2000);
+});
+
+// Auto-save on input after short delay
+let autoSaveTimer;
+['modal-notes', 'modal-quotes'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+      if (!currentBookId) return;
+      _cur.notes[currentBookId] = document.getElementById('modal-notes').value; saveCur();
+      _cur.quotes[currentBookId] = document.getElementById('modal-quotes').value; saveCur();
+    }, 800);
+  });
+});
+
+/* ====== INIT ====== */
+// ── BOOTSTRAP ──
+async function initCurriculum() {
+  const row = await sbGet('personal_curriculum', 'singleton');
+  if (row) {
+    _cur = { ..._cur, ...row };
+  } else {
+    // Fallback: migrate from localStorage
+    const allKeys = Object.keys(localStorage);
+    allKeys.forEach(k => {
+      try {
+        if (k.startsWith('cur_read_'))   _cur.read_items[k.replace('cur_read_', '')] = localStorage.getItem(k);
+        if (k.startsWith('cur_notes_'))  _cur.notes[k.replace('cur_notes_', '')]     = localStorage.getItem(k);
+        if (k.startsWith('cur_quotes_')) _cur.quotes[k.replace('cur_quotes_', '')]   = localStorage.getItem(k);
+        if (k.startsWith('cur_added_'))  _cur.added[k.replace('cur_added_', '')]     = JSON.parse(localStorage.getItem(k));
+      } catch(e) {}
+    });
+  }
+  renderCurriculum();
+}
+initCurriculum();
+</script>
+</body>
+</html>
