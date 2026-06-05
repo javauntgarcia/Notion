@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monthly Outline — Javaun Garcia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:      #0d1f35;
+      --navy-lt:   #1a3454;
+      --mid:       #2a4a7a;
+      --mid-lt:    #3d6499;
+      --powder:    #7aabcc;
+      --powder-lt: #a8c8e0;
+      --sky:       #b8d4e8;
+      --pale:      #e0eef8;
+      --white:     #f0f6fc;
+
+      --cat-appointments: #4a9090;
+      --cat-birthdays:    #c05878;
+      --cat-events:       #3a5a9a;
+      --cat-work:         #506070;
+      --cat-creative:     #c07030;
+      --cat-activity:     #4a7a3a;
+      --cat-bills:        #9a8020;
+
+      --glass:        rgba(10,24,44,0.62);
+      --glass-border: rgba(122,171,204,0.22);
+      --topbar:       rgba(10,20,38,0.82);
+
+      /* frosted calendar bg */
+      --cal-bg:       rgba(240,246,252,0.50);
+      --cal-border:   rgba(180,210,232,0.6);
+      --cal-text:     #1a2e48;
+      --cal-sub:      #5a7a9a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Mono', monospace;
+      color: var(--pale);
+      overflow-x: hidden;
+      background: var(--navy);
+    }
+
+    .bg-image {
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      z-index: 0;
+    }
+    .bg-scrim {
+      position: fixed; inset: 0;
+      background: linear-gradient(180deg,
+        rgba(10,20,38,0.55) 0%,
+        rgba(10,20,38,0.30) 25%,
+        rgba(10,20,38,0.45) 60%,
+        rgba(10,20,38,0.88) 100%);
+      z-index: 1;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200; height: 52px;
+      background: var(--topbar);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(122,171,204,0.15);
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .topbar-nav { display: flex; gap: 24px; }
+    .topbar-nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.67rem; letter-spacing: 0.13em;
+      text-transform: uppercase; color: var(--powder-lt);
+      text-decoration: none; opacity: 0.8;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .topbar-nav a:hover { opacity: 1; color: var(--white); }
+    .topbar-date { font-size: 0.63rem; letter-spacing: 0.1em; color: var(--powder); opacity: 0.65; }
+
+    /* ── PAGE ── */
+    .page { position: relative; z-index: 10; padding-top: 52px; }
+
+    /* ── HERO ── */
+    .hero-block {
+      position: absolute;
+      top: calc(52px + 28px); right: 36px;
+      text-align: right; pointer-events: none; z-index: 20;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 300; line-height: 0.9;
+      color: var(--white);
+      text-shadow: 0 2px 28px rgba(10,20,38,0.7);
+    }
+    .hero-title em { font-style: italic; color: var(--sky); }
+
+    /* ── CONTENT ── */
+    .content {
+      padding: calc(52px + 32px) 28px 80px;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    /* ── MONTH NAV ── */
+    .month-nav {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px;
+    }
+    .nav-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(122,171,204,0.15);
+      border: 1px solid var(--glass-border);
+      color: var(--powder-lt); font-size: 1.1rem;
+      cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .nav-btn:hover { background: rgba(122,171,204,0.28); color: var(--white); }
+    .month-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 300;
+      color: var(--white); flex: 1; line-height: 1;
+    }
+    .month-label em { font-style: italic; color: var(--sky); }
+    .today-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: rgba(122,171,204,0.18);
+      border: 1px solid var(--glass-border);
+      color: var(--powder-lt); border-radius: 8px;
+      padding: 6px 13px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .today-btn:hover { background: rgba(122,171,204,0.3); color: var(--white); }
+
+    /* ── FROSTED CALENDAR ── */
+    .cal-wrap {
+      background: var(--cal-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--cal-border);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 40px rgba(10,20,38,0.3);
+    }
+
+    /* Legend */
+    .cal-legend {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 14px 18px 0;
+    }
+    .legend-pill {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.57rem; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--cal-sub);
+      cursor: pointer; padding: 3px 8px;
+      border-radius: 20px;
+      border: 1px solid transparent;
+      transition: all 0.18s;
+      user-select: none;
+    }
+    .legend-pill:hover { background: rgba(0,0,0,0.05); }
+    .legend-pill.hidden { opacity: 0.35; }
+    .legend-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Day-of-week headers */
+    .cal-dow-row {
+      display: grid; grid-template-columns: repeat(7,1fr);
+      padding: 12px 12px 6px;
+      border-bottom: 1px solid rgba(180,210,232,0.3);
+    }
+    .cal-dow {
+      font-size: 0.6rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--cal-sub);
+      text-align: center; padding: 4px 0;
+    }
+
+    /* Day grid */
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7,1fr);
+      padding: 6px 10px 14px;
+      gap: 2px;
+    }
+    .cal-day {
+      min-height: 80px;
+      border-radius: 10px;
+      padding: 6px 6px 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+    .cal-day:hover:not(.cal-empty) { background: rgba(122,171,204,0.12); }
+    .cal-day.cal-today { background: rgba(42,74,122,0.1); }
+    .cal-day.cal-today .day-num { color: var(--mid); font-weight: 600; }
+    .cal-day.cal-empty { cursor: default; opacity: 0; pointer-events: none; }
+    .day-num {
+      font-size: 0.72rem; color: var(--cal-text);
+      margin-bottom: 3px; line-height: 1;
+    }
+    .cal-today .day-num {
+      background: var(--mid);
+      color: #fff;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem;
+    }
+    .day-events { display: flex; flex-direction: column; gap: 2px; }
+
+    /* Always-visible chip: color bar + time */
+    .day-event-chip {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+      background: transparent;
+      padding: 1px 2px 1px 0;
+      position: relative;
+    }
+    .day-event-chip:hover { background: rgba(122,171,204,0.1); }
+    .day-event-chip.popover-open { background: rgba(122,171,204,0.14); }
+
+    .chip-bar {
+      width: 3px;
+      flex-shrink: 0;
+      align-self: stretch;
+      min-height: 12px;
+      border-radius: 2px;
+    }
+    .chip-time {
+      font-size: 0.58rem;
+      color: var(--cal-text);
+      line-height: 1.5;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+      font-weight: 500;
+      opacity: 0.82;
+    }
+    .chip-time.no-time {
+      opacity: 0.38;
+      font-size: 0.5rem;
+      font-weight: 400;
+    }
+
+    /* ── EVENT POPOVER ── */
+    .event-popover {
+      position: fixed;
+      z-index: 500;
+      background: rgba(12,26,48,0.98);
+      border: 1px solid rgba(122,171,204,0.28);
+      border-radius: 14px;
+      padding: 14px 16px 12px;
+      min-width: 200px;
+      max-width: 260px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      animation: popIn 0.15s ease both;
+      pointer-events: auto;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.93) translateY(-4px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .popover-color-strip {
+      height: 3px;
+      border-radius: 2px;
+      margin-bottom: 10px;
+    }
+    .popover-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+    .popover-meta {
+      font-size: 0.6rem;
+      color: var(--powder);
+      opacity: 0.75;
+      line-height: 1.6;
+      margin-bottom: 2px;
+    }
+    .popover-notes {
+      font-size: 0.6rem;
+      color: var(--powder-lt);
+      opacity: 0.6;
+      line-height: 1.6;
+      margin-top: 6px;
+      border-top: 1px solid rgba(122,171,204,0.12);
+      padding-top: 6px;
+    }
+    .popover-actions {
+      display: flex;
+      gap: 7px;
+      margin-top: 10px;
+    }
+    .popover-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 5px 11px;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .popover-btn-edit {
+      background: var(--mid);
+      color: var(--white);
+      flex: 1;
+    }
+    .popover-btn-edit:hover { background: var(--mid-lt); }
+    .popover-btn-close {
+      background: rgba(122,171,204,0.12);
+      color: var(--powder-lt);
+      border: 1px solid rgba(122,171,204,0.18);
+    }
+    .popover-btn-close:hover { background: rgba(122,171,204,0.22); }
+    .more-events {
+      font-size: 0.55rem;
+      color: var(--cal-sub);
+      padding: 1px 4px;
+    }
+
+    /* ── ADD EVENT MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,20,38,0.65);
+      backdrop-filter: blur(10px);
+      z-index: 400;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: rgba(12,26,48,0.97);
+      border: 1px solid rgba(122,171,204,0.3);
+      border-radius: 22px;
+      padding: 30px 28px;
+      width: 90%; max-width: 420px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 14px; right: 16px;
+      background: none; border: none;
+      color: var(--powder); font-size: 1.1rem;
+      cursor: pointer; opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .modal-close:hover { opacity: 1; }
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 300;
+      color: var(--white); margin-bottom: 18px;
+    }
+    .modal-title em { font-style: italic; color: var(--sky); }
+
+    .field-label {
+      font-size: 0.57rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--powder);
+      opacity: 0.6; margin-bottom: 5px;
+    }
+    .field-group { margin-bottom: 14px; }
+
+    .modal input[type=text],
+    .modal input[type=date],
+    .modal input[type=time],
+    .modal textarea,
+    .modal select {
+      width: 100%;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      background: rgba(122,171,204,0.07);
+      border: 1px solid rgba(122,171,204,0.2);
+      border-radius: 9px;
+      padding: 9px 12px;
+      color: var(--pale);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal input:focus,
+    .modal textarea:focus,
+    .modal select:focus { border-color: rgba(122,171,204,0.5); }
+    .modal input::placeholder,
+    .modal textarea::placeholder { color: rgba(122,171,204,0.3); }
+    .modal select option { background: #0d1f35; }
+    .modal textarea { resize: none; min-height: 64px; line-height: 1.6; }
+
+    .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* Category swatches in modal */
+    .cat-swatches {
+      display: flex; flex-wrap: wrap; gap: 7px;
+    }
+    .cat-swatch {
+      font-size: 0.57rem; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 11px; border-radius: 20px;
+      border: 2px solid transparent;
+      cursor: pointer; color: #fff;
+      transition: all 0.15s; opacity: 0.65;
+    }
+    .cat-swatch.selected { opacity: 1; border-color: rgba(255,255,255,0.6); }
+
+    .modal-actions { display: flex; gap: 9px; margin-top: 18px; }
+    .btn-primary {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--mid); color: var(--white);
+      border: none; border-radius: 9px;
+      padding: 10px 18px; cursor: pointer;
+      transition: background 0.2s; flex: 1;
+    }
+    .btn-primary:hover { background: var(--mid-lt); }
+    .btn-danger {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(180,50,50,0.35);
+      color: #e8a0a0;
+      border: 1px solid rgba(180,50,50,0.4);
+      border-radius: 9px; padding: 10px 16px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-danger:hover { background: rgba(180,50,50,0.55); }
+
+    /* ── MONTHLY NOTES ── */
+    .section-eyebrow {
+      font-size: 0.58rem; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--powder);
+      opacity: 0.7; margin-bottom: 10px;
+    }
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin-bottom: 12px;
+    }
+    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+
+    .glass-card {
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px; padding: 18px 20px;
+    }
+    .card-label {
+      font-size: 0.57rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--powder);
+      opacity: 0.6; margin-bottom: 8px;
+    }
+    .card-textarea {
+      width: 100%;
+      font-family: 'DM Mono', monospace; font-size: 0.73rem;
+      background: none; border: none; outline: none;
+      color: var(--pale); resize: none;
+      line-height: 1.75; min-height: 80px;
+    }
+    .card-textarea::placeholder { color: rgba(168,200,224,0.22); }
+
+    .divider { border: none; border-top: 1px solid rgba(122,171,204,0.12); margin: 24px 0; }
+
+    /* ── CAT CARDS ── */
+    .cat-grid {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 10px;
+    }
+    @media (max-width: 680px) { .cat-grid { grid-template-columns: repeat(2,1fr); } }
+
+    .cat-card {
+      background: var(--glass);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(122,171,204,0.1);
+      border-top-width: 3px;
+      border-radius: 13px; padding: 14px 16px;
+    }
+    .cat-card-label {
+      font-size: 0.56rem; letter-spacing: 0.16em;
+      text-transform: uppercase; margin-bottom: 7px; font-weight: 500;
+    }
+    .cat-textarea {
+      width: 100%; font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; background: none; border: none;
+      outline: none; color: var(--pale); resize: none;
+      min-height: 64px; line-height: 1.62;
+    }
+    .cat-textarea::placeholder { color: rgba(168,200,224,0.18); }
+
+    /* top border + label colors — 8 planning categories */
+    .cc-work         { border-top-color:#5a8ab8; } .cc-work .cat-card-label         { color:#8ab8e0; }
+    .cc-creative     { border-top-color:#c07030; } .cc-creative .cat-card-label     { color:#e8a870; }
+    .cc-health       { border-top-color:#5a8848; } .cc-health .cat-card-label       { color:#88c870; }
+    .cc-eston        { border-top-color:#b89450; } .cc-eston .cat-card-label        { color:#d8c070; }
+    .cc-growth       { border-top-color:#3a9898; } .cc-growth .cat-card-label       { color:#70c8c8; }
+    .cc-friends      { border-top-color:#b07868; } .cc-friends .cat-card-label      { color:#d8a898; }
+    .cc-family       { border-top-color:#9858a8; } .cc-family .cat-card-label       { color:#c888d8; }
+    .cc-adulting     { border-top-color:#6888a8; } .cc-adulting .cat-card-label     { color:#98b8d8; }
+
+    /* save dot */
+    .save-dot {
+      position: fixed; bottom: 20px; right: 20px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--powder); z-index: 300;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .save-dot.show { opacity: 1; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(122,171,204,0.2); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<img class="bg-image" src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Monthly%20Outline.jpg" alt="" />
+<div class="bg-scrim"></div>
+
+<nav class="topbar">
+  <div class="topbar-nav">
+    <a href="Planning.html">← Planning</a>
+    <a href="Main Hub.html">Main Hub</a>
+  </div>
+  <div class="topbar-date" id="topbarDate"></div>
+  <div class="topbar-nav">
+    <a href="Wellness.html">Wellness</a>
+    <a href="Productivity.html">Productivity</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="hero-block">
+    <div class="hero-title">Monthly <em>Outline</em></div>
+  </div>
+
+  <div class="content">
+
+    <!-- MONTH NAV -->
+    <div class="month-nav">
+      <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+      <div class="month-label" id="monthLabel"></div>
+      <button class="today-btn" onclick="goToToday()">Today</button>
+      <button class="nav-btn" onclick="changeMonth(1)">›</button>
+    </div>
+
+    <!-- FROSTED CALENDAR -->
+    <div class="cal-wrap">
+
+      <!-- Category legend / filters -->
+      <div class="cal-legend" id="calLegend"></div>
+
+      <!-- Day headers -->
+      <div class="cal-dow-row">
+        <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div>
+        <div class="cal-dow">Tue</div><div class="cal-dow">Wed</div>
+        <div class="cal-dow">Thu</div><div class="cal-dow">Fri</div>
+        <div class="cal-dow">Sat</div>
+      </div>
+
+      <!-- Day grid -->
+      <div class="cal-grid" id="calGrid"></div>
+
+    </div>
+
+    <hr class="divider" />
+
+    <!-- MONTHLY GOALS -->
+    <div class="section-eyebrow" style="margin-bottom:12px">This Month</div>
+    <div class="two-col">
+      <div class="glass-card">
+        <div class="card-label">Goals</div>
+        <textarea class="card-textarea" id="monthGoals"
+          placeholder="3–5 goals for this month…&#10;&#10;1. &#10;2. &#10;3. "
+          oninput="saveMonthly()"></textarea>
+      </div>
+      <div class="glass-card">
+        <div class="card-label">Priorities &amp; Focus</div>
+        <textarea class="card-textarea" id="monthFocus"
+          placeholder="Key projects, relationships, habits…"
+          oninput="saveMonthly()"></textarea>
+      </div>
+    </div>
+    <div class="glass-card" style="margin-bottom:12px">
+      <div class="card-label">Reflection &amp; Notes</div>
+      <textarea class="card-textarea" id="monthNotes"
+        placeholder="Mid-month check-ins, wins, lessons…"
+        style="min-height:68px" oninput="saveMonthly()"></textarea>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- CATEGORY INTENTIONS -->
+    <div class="section-eyebrow" style="margin-bottom:12px">Monthly Intentions by Category</div>
+    <div class="cat-grid">
+      <div class="cat-card cc-work">
+        <div class="cat-card-label">Work</div>
+        <textarea class="cat-textarea" id="ci-work" placeholder="SFMTA, Bayview Shuttle, policy…" oninput="saveMonthly()"></textarea>
+      </div>
+      <div class="cat-card cc-creative">
+        <div class="cat-card-label">Creative</div>
+        <textarea class="cat-textarea" id="ci-creative" placeholder="TikTok, content, writing…" oninput="saveMonthly()"></textarea>
+      </div>
+      <div class="cat-card cc-health">
+        <div class="cat-card-label">Health</div>
+        <textarea class="cat-textarea" id="ci-health" placeholder="Workouts, meals, rest…" oninput="saveMonthly()"></textarea>
+      </div>
+      <div class="cat-card cc-eston">
+        <div class="cat-card-label">Eston</div>
+        <textarea class="cat-textarea" id="ci-eston" placeholder="Quality time, wedding planning…" oninput="saveMonthly()"></textarea>
+      </div>
+      <div class="cat-card cc-growth">
+        <div class="cat-card-label">Growth</div>
+        <textarea class="cat-textarea" id="ci-growth" placeholder="Reading, LSAT, learning…" oninput="saveMonthly()"></textarea>
+      </div>
+      <div class="cat-card cc-friends">
+        <div class="cat-card-label">Friends</div>
+        <textarea class="cat-textarea" id="ci-friends" placeholder="Who to see, what to do…" oninput="saveMonthly()"></textarea>
+      </div>
+      <div class="cat-card cc-family">
+        <div class="cat-card-label">Family</div>
+        <textarea class="cat-textarea" id="ci-family" placeholder="Calls, visits, intentions…" oninput="saveMonthly()"></textarea>
+      </div>
+      <div class="cat-card cc-adulting">
+        <div class="cat-card-label">Adulting</div>
+        <textarea class="cat-textarea" id="ci-adulting" placeholder="Bills, errands, logistics…" oninput="saveMonthly()"></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD / EDIT EVENT MODAL -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modalTitle">Add <em>Event</em></div>
+
+    <div class="field-group">
+      <div class="field-label">Title</div>
+      <input type="text" id="evTitle" placeholder="Event name…" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Category</div>
+      <div class="cat-swatches" id="catSwatches"></div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Date</div>
+      <input type="date" id="evDate" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Time (optional)</div>
+      <div class="time-row">
+        <input type="time" id="evStart" />
+        <input type="time" id="evEnd" />
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Notes</div>
+      <textarea id="evNotes" placeholder="Any details…"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="saveEvent()">Save Event</button>
+      <button class="btn-danger" id="deleteBtn" onclick="deleteEvent()" style="display:none">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="save-dot" id="saveDot"></div>
+
+<script>
+// ── SUPABASE CONFIG ──
+const SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
+const SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
+async function sbGet(table, id) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}&limit=1`,
+      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    const d = await r.json(); return d && d[0] ? d[0] : null;
+  } catch(e) { return null; }
+}
+async function sbUpsert(table, row) {
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/${table}?on_conflict=id`, {
+      method: 'POST',
+      headers: {
+        apikey: SB_KEY,
+        Authorization: `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      console.warn(`[sbUpsert ${table}] ${res.status}:`, errText);
+    }
+  } catch(e) { console.warn('[sbUpsert]', e.message); }
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+/* ══════════════════════════════════════
+   CONFIG
+══════════════════════════════════════ */
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+
+const CATEGORIES = [
+  { id:'appointments', label:'Appointments', color:'#4a9090' },
+  { id:'birthdays',    label:'Birthdays',    color:'#c05878' },
+  { id:'events',       label:'Events',       color:'#3a5a9a' },
+  { id:'work',         label:'Work',         color:'#506070' },
+  { id:'creative',     label:'Creative',     color:'#c07030' },
+  { id:'activity',     label:'Activity',     color:'#4a7a3a' },
+  { id:'bills',        label:'Bills & Finance', color:'#9a8020' },
+];
+
+const today     = new Date();
+let viewYear    = today.getFullYear();
+let viewMonth   = today.getMonth();
+let hiddenCats  = new Set();
+let editingId   = null;   // null = new event, string = existing event id
+let clickedDate = null;   // pre-filled date from day click
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('topbarDate').textContent =
+    today.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+
+  const row = await sbGet('monthly_outline', 'singleton');
+  if (row) {
+    _moData = { ..._moData, ...row };
+  } else {
+    try { _moData.cal_events = JSON.parse(lsGet('plan_cal_events') || '[]'); } catch(e) {}
+  }
+
+  buildLegend();
+  buildSwatches();
+  renderCalendar();
+  loadMonthly();
+  // Pull hub-native events and merge into calendar display
+  mergeHubEventsIntoMO();
+});
+
+async function mergeHubEventsIntoMO() {
+  try {
+    const hubRow = await sbGet('main_hub', 'singleton');
+    if (!hubRow) return;
+    const hubEvts = (hubRow.cal_events || []).filter(e => !e.moSource);
+    // Convert hub format to MO format and upsert any missing ones
+    const existing = getAllEvents();
+    const existingIds = new Set(existing.map(e => e.id));
+    const toAdd = hubEvts.filter(e => !existingIds.has(e.id)).map(e => ({
+      id:       e.id,
+      title:    e.title,
+      date:     e.date,
+      cat:      e.cat || 'events',
+      start:    e.startH != null ? String(e.startH).padStart(2,'0') + ':00' : '',
+      end:      e.endH   != null ? String(e.endH).padStart(2,'0')   + ':00' : '',
+      notes:    e.notes || '',
+      allDay:   e.allDay || false,
+      hubSource: true
+    }));
+    if (toAdd.length) {
+      const merged = existing.concat(toAdd);
+      setAllEvents(merged);
+      renderCalendar();
+    }
+  } catch(e) { console.warn('[Hub→MO merge]', e.message); }
+}
+
+// Poll for Hub changes every 30 seconds
+setInterval(mergeHubEventsIntoMO, 30000);
+
+/* ══════════════════════════════════════
+   SUPABASE-BACKED STATE
+══════════════════════════════════════ */
+let _moData = { id: 'singleton', cal_events: [], monthly_notes: {} };
+
+async function saveMo() {
+  await sbUpsert('monthly_outline', _moData);
+  lsSet('plan_cal_events', JSON.stringify(_moData.cal_events));
+}
+
+function getAllEvents()     { return _moData.cal_events || []; }
+function setAllEvents(arr) { _moData.cal_events = arr; saveMo(); }
+
+/* ══════════════════════════════════════
+   HELPERS
+══════════════════════════════════════ */
+function monthKey(yr, mo) { return `${yr}_${mo}`; }
+function dateStr(yr, mo, d){ return `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function flashSave() {
+  const dot = document.getElementById('saveDot');
+  dot.classList.add('show');
+  clearTimeout(dot._t);
+  dot._t = setTimeout(() => dot.classList.remove('show'), 1400);
+}
+function catById(id) { return CATEGORIES.find(c => c.id === id); }
+
+/* ══════════════════════════════════════
+   LEGEND
+══════════════════════════════════════ */
+function buildLegend() {
+  const wrap = document.getElementById('calLegend');
+  wrap.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const pill = document.createElement('div');
+    pill.className = 'legend-pill';
+    pill.dataset.cat = cat.id;
+    pill.innerHTML = `<div class="legend-dot" style="background:${cat.color}"></div>${cat.label}`;
+    pill.onclick = () => toggleCat(cat.id);
+    wrap.appendChild(pill);
+  });
+}
+function toggleCat(id) {
+  if (hiddenCats.has(id)) hiddenCats.delete(id);
+  else hiddenCats.add(id);
+  document.querySelector(`.legend-pill[data-cat="${id}"]`).classList.toggle('hidden', hiddenCats.has(id));
+  renderCalendar();
+}
+
+/* ══════════════════════════════════════
+   MONTH NAV
+══════════════════════════════════════ */
+function updateMonthLabel() {
+  document.getElementById('monthLabel').innerHTML =
+    `${MONTHS[viewMonth]} <em>${viewYear}</em>`;
+}
+function changeMonth(dir) {
+  viewMonth += dir;
+  if (viewMonth < 0)  { viewMonth = 11; viewYear--; }
+  if (viewMonth > 11) { viewMonth = 0;  viewYear++; }
+  updateMonthLabel();
+  renderCalendar();
+  loadMonthly();
+}
+function goToToday() {
+  viewYear = today.getFullYear();
+  viewMonth = today.getMonth();
+  updateMonthLabel();
+  renderCalendar();
+  loadMonthly();
+}
+
+/* ══════════════════════════════════════
+   CALENDAR RENDER
+══════════════════════════════════════ */
+function renderCalendar() {
+  updateMonthLabel();
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const firstDay    = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const allEvents   = getAllEvents();
+
+  // empty leading cells
+  for (let i = 0; i < firstDay; i++) {
+    const e = document.createElement('div');
+    e.className = 'cal-day cal-empty';
+    grid.appendChild(e);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds       = dateStr(viewYear, viewMonth, d);
+    const isToday  = (viewYear === today.getFullYear() &&
+                      viewMonth === today.getMonth() &&
+                      d === today.getDate());
+
+    // events for this day, filtered by hidden cats
+    const dayEvents = allEvents
+      .filter(ev => ev.date === ds && !hiddenCats.has(ev.cat))
+      .sort((a,b) => (a.start||'').localeCompare(b.start||''));
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (isToday ? ' cal-today' : '');
+
+    // day number
+    const numEl = document.createElement('div');
+    numEl.className = 'day-num';
+    numEl.textContent = d;
+    cell.appendChild(numEl);
+
+    // event chips (max 3, then "+N more")
+    const evWrap = document.createElement('div');
+    evWrap.className = 'day-events';
+    const visible = dayEvents.slice(0, 3);
+    visible.forEach(ev => {
+      const cat   = catById(ev.cat);
+      const color = cat?.color || '#444';
+      const chip  = document.createElement('div');
+      chip.className = 'day-event-chip';
+
+      // color bar — always visible
+      const bar = document.createElement('div');
+      bar.className = 'chip-bar';
+      bar.style.background = color;
+
+      // time label — always visible
+      const timeEl = document.createElement('div');
+      if (ev.start) {
+        // format "14:30" → "2:30p" or "9:00a"
+        const [hStr, mStr] = ev.start.split(':');
+        const h = parseInt(hStr, 10);
+        const m = parseInt(mStr, 10);
+        const ampm = h >= 12 ? 'p' : 'a';
+        const h12  = h % 12 || 12;
+        const mPad = m > 0 ? ':' + String(m).padStart(2,'0') : '';
+        timeEl.textContent = h12 + mPad + ampm;
+        timeEl.className = 'chip-time';
+      } else {
+        timeEl.textContent = '·';
+        timeEl.className = 'chip-time no-time';
+      }
+
+      chip.appendChild(bar);
+      chip.appendChild(timeEl);
+
+      // tap → show floating popover
+      chip.onclick = (e) => {
+        e.stopPropagation();
+        showEventPopover(ev, color, chip);
+      };
+      evWrap.appendChild(chip);
+    });
+    if (dayEvents.length > 3) {
+      const more = document.createElement('div');
+      more.className = 'more-events';
+      more.textContent = `+${dayEvents.length - 3} more`;
+      evWrap.appendChild(more);
+    }
+    cell.appendChild(evWrap);
+
+    // click blank area → new event on this date
+    cell.onclick = () => openNewModal(ds);
+
+    grid.appendChild(cell);
+  }
+}
+
+/* ══════════════════════════════════════
+   MODAL — NEW EVENT
+══════════════════════════════════════ */
+function openNewModal(ds) {
+  editingId   = null;
+  clickedDate = ds;
+  document.getElementById('modalTitle').innerHTML = 'Add <em>Event</em>';
+  document.getElementById('evTitle').value  = '';
+  document.getElementById('evDate').value   = ds;
+  document.getElementById('evStart').value  = '';
+  document.getElementById('evEnd').value    = '';
+  document.getElementById('evNotes').value  = '';
+  document.getElementById('deleteBtn').style.display = 'none';
+  selectSwatch(CATEGORIES[0].id);
+  document.getElementById('eventModal').classList.add('open');
+  setTimeout(() => document.getElementById('evTitle').focus(), 80);
+}
+
+/* ══════════════════════════════════════
+   MODAL — EDIT EVENT
+══════════════════════════════════════ */
+function openEditModal(ev) {
+  editingId = ev.id;
+  document.getElementById('modalTitle').innerHTML = 'Edit <em>Event</em>';
+  document.getElementById('evTitle').value  = ev.title;
+  document.getElementById('evDate').value   = ev.date;
+  document.getElementById('evStart').value  = ev.start || '';
+  document.getElementById('evEnd').value    = ev.end   || '';
+  document.getElementById('evNotes').value  = ev.notes || '';
+  document.getElementById('deleteBtn').style.display = 'inline-block';
+  selectSwatch(ev.cat);
+  document.getElementById('eventModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('eventModal').classList.remove('open');
+  editingId = null;
+}
+
+/* ══════════════════════════════════════
+   CATEGORY SWATCHES IN MODAL
+══════════════════════════════════════ */
+function buildSwatches() {
+  const wrap = document.getElementById('catSwatches');
+  CATEGORIES.forEach(cat => {
+    const sw = document.createElement('div');
+    sw.className = 'cat-swatch';
+    sw.dataset.cat = cat.id;
+    sw.style.background = cat.color;
+    sw.textContent = cat.label;
+    sw.onclick = () => selectSwatch(cat.id);
+    wrap.appendChild(sw);
+  });
+}
+function selectSwatch(id) {
+  document.querySelectorAll('.cat-swatch').forEach(s => {
+    s.classList.toggle('selected', s.dataset.cat === id);
+  });
+}
+function selectedCat() {
+  const sel = document.querySelector('.cat-swatch.selected');
+  return sel ? sel.dataset.cat : CATEGORIES[0].id;
+}
+
+/* ══════════════════════════════════════
+   SAVE / DELETE EVENT
+══════════════════════════════════════ */
+function saveEvent() {
+  const title = document.getElementById('evTitle').value.trim();
+  if (!title) { document.getElementById('evTitle').focus(); return; }
+
+  const ev = {
+    id:    editingId || String(Date.now()),
+    title,
+    date:  document.getElementById('evDate').value,
+    cat:   selectedCat(),
+    start: document.getElementById('evStart').value,
+    end:   document.getElementById('evEnd').value,
+    notes: document.getElementById('evNotes').value,
+  };
+
+  let events = getAllEvents();
+  if (editingId) {
+    const idx = events.findIndex(e => e.id === editingId);
+    if (idx > -1) events[idx] = ev; else events.push(ev);
+  } else {
+    events.push(ev);
+  }
+  setAllEvents(events);
+  flashSave();
+  closeModal();
+  renderCalendar();
+  syncEventsToHub(events);
+}
+
+async function syncEventsToHub(moEvts) {
+  try {
+    const hubRow = await sbGet('main_hub', 'singleton') || {};
+    const hubEvts = hubRow.cal_events || [];
+    // Keep hub-native events, replace/add MO-sourced ones
+    var hubNative = hubEvts.filter(function(e){ return !e.moSource; });
+    // Map categories to colors matching Hub palette
+    var catColors = {
+      appointments: '#4a9090', birthdays: '#c05878', events: '#3a5a9a',
+      work: '#506070', creative: '#c07030', activity: '#4a7a3a',
+      bills: '#9a8020', meals: '#8c4a2f'
+    };
+    var hubConverted = moEvts.map(function(e){
+      var startH = 9, endH = 10;
+      if (e.start && e.start.length >= 2) startH = parseInt(e.start.split(':')[0]) || 9;
+      if (e.end   && e.end.length   >= 2) endH   = parseInt(e.end.split(':')[0])   || startH + 1;
+      return {
+        id:       e.id,
+        title:    e.title,
+        date:     e.date,
+        startH:   startH,
+        endH:     endH,
+        allDay:   !e.start && !e.end,
+        color:    catColors[e.cat] || '#6B7F8E',
+        cat:      e.cat,
+        notes:    e.notes || '',
+        moSource: true
+      };
+    });
+    var merged = hubNative.concat(hubConverted);
+    // Preserve other hub fields
+    var payload = Object.assign({}, hubRow, {
+      id: 'singleton',
+      cal_events: merged,
+      updated_at: new Date().toISOString()
+    });
+    await sbUpsert('main_hub', payload);
+  } catch(e) { console.warn('[MO→Hub sync]', e.message); }
+}
+
+function deleteEvent() {
+  if (!editingId) return;
+  let events = getAllEvents().filter(e => e.id !== editingId);
+  setAllEvents(events);
+  flashSave();
+  closeModal();
+  renderCalendar();
+  syncEventsToHub(events);
+}
+
+
+/* ══════════════════════════════════════
+   ROADMAP PRE-FILLS (shown when no saved data exists for a month)
+══════════════════════════════════════ */
+const ROADMAP = {
+  '2026_5': { // June 2026
+    goals: '1. Gym habit crosses 21-day mark\n2. 5:30 AM wake anchor consistent 5x/week\n3. Bayview Shuttle StoryMap published\n4. Budget locked; Discover card payoff timeline confirmed\n5. Oakland apartment fully settled',
+    focus: 'Keystone habits. New city, new home, new routine.',
+    ciWork: 'Bayview Shuttle StoryMap published externally. Bayview Through Our Eyes curriculum.',
+    ciCreative: 'Post 3–4x/week. All pillars active: WOTD, fashion, transit, couple content. Oakland/Merritt "new city" videos.',
+    ciHealth: 'Gym 5x/week — Push/Pull/Legs/Back/Arms/Glutes split. Daily core + mobility. 5:30 AM anchor. Supplements started.',
+    ciEston: 'Settle into Oakland together. Establish shared routines and home rhythm.',
+    ciGrowth: 'Reading curriculum: Track 1 underway (Paxton/Arendt). 3+ hrs/week.',
+    ciFriends: 'Explore Oakland — find your spots in Merritt neighborhood.',
+    ciFamily: 'Check in; share the new Oakland chapter.',
+    ciAdulting: 'Budget locked post-move. Discover card payoff plan confirmed.',
+  },
+  '2026_6': { // July 2026
+    goals: '1. Supplement stack consistent (D3/K2, mag, omega-3, creatine)\n2. Protein target hit 5x/week\n3. Draft first CalMatters op-ed\n4. Emergency fund Month 1 of 3\n5. Analyze first month of content metrics',
+    focus: 'Body recomp foundation. Writing voice emerging. Finance building.',
+    ciWork: 'Draft California Voices op-ed — pitch to Yousef Baig at CalMatters.',
+    ciCreative: 'Analyze Month 1 metrics — double down on top-performing pillar. Oakland neighborhood lifestyle content.',
+    ciHealth: 'Supplement stack dialed. Protein target 5x/week. Body recomp phase active.',
+    ciEston: 'Build shared Oakland routines. Date nights in the new city.',
+    ciGrowth: 'Reading curriculum Track 1 steady. Fulbright country research begins.',
+    ciFriends: 'Host people at the new place. Explore Oakland together.',
+    ciFamily: 'Regular calls.',
+    ciAdulting: 'Emergency fund: Month 1 of 3-month build.',
+  },
+  '2026_7': { // August 2026
+    goals: '1. LSAT diagnostic taken — baseline established\n2. LSAT study platform chosen\n3. Step 3 salary increase — adjust savings\n4. CalMatters pitch sent\n5. Fulbright research begun',
+    focus: 'LSAT era begins. Salary bump redirected. Writing in public.',
+    ciWork: 'CalMatters response. Pitch Streetsblog SF if needed. Step 3 salary — update savings allocations.',
+    ciCreative: '"Why I\'m studying for the LSAT" — seed the law school journey publicly.',
+    ciHealth: 'Gym streak intact. Sleep locked: 10 PM lights out. Wind-down ritual forming.',
+    ciEston: 'Share the LSAT plan with Eston. Align on the big timeline.',
+    ciGrowth: 'LSAT diagnostic. Platform chosen (LSAT Demon, 7Sage, or Blueprint). Fulbright country shortlist.',
+    ciFriends: 'Summer plans. Keep social life alive around new study schedule.',
+    ciFamily: 'Check in.',
+    ciAdulting: 'Emergency fund: Month 2. Passport renewal check.',
+  },
+  '2026_8': { // September 2026
+    goals: '1. 6+ hrs/week LSAT study — Logic Games first\n2. 5,000 TikTok followers\n3. Discover card fully paid off\n4. First byline published\n5. Fulbright program shortlist (2–3 options)',
+    focus: 'Discover card gone. LSAT real. First byline. Halfway to 10K.',
+    ciWork: 'First byline published (CalMatters or Streetsblog). Bayview Through Our Eyes Phase 1.',
+    ciCreative: '5,000 TikTok milestone. Consistency review — is the posting schedule working?',
+    ciHealth: 'Wind-down locked: screens off 9:45, lights out 10 PM. Gym streak.',
+    ciEston: 'Celebrate Discover card payoff together.',
+    ciGrowth: 'LSAT: Logic Games mastery. 6+ hrs/week committed.',
+    ciFriends: 'Fall social plans. Don\'t let LSAT study isolate.',
+    ciFamily: 'Check in.',
+    ciAdulting: 'Discover card PAID OFF. Emergency fund: Month 3 — complete.',
+  },
+  '2026_9': { // October 2026
+    goals: '1. LSAT: Logical Reasoning mastery phase\n2. Roth IRA 2026 contributions toward $7K\n3. Brand pitch deck drafted\n4. Ring research — budget confirmed\n5. Fulbright application requirements reviewed',
+    focus: 'LSAT deepens. Ring research. Roth IRA maxing. Brand outreach.',
+    ciWork: 'Bayview Through Our Eyes curriculum Phase 1 complete. Policy writing pipeline.',
+    ciCreative: 'Brand pitch deck drafted. Outreach to 2–3 aligned brands.',
+    ciHealth: 'Gym split adjusted for fall. Supplement consistency check.',
+    ciEston: 'Ring research together or solo? Settle the approach.',
+    ciGrowth: 'LSAT: Logical Reasoning mastery. Fulbright app requirements mapped.',
+    ciFriends: 'Fall hangouts. Keep the social thread alive.',
+    ciFamily: 'Check in.',
+    ciAdulting: 'Roth IRA 2026 maxing toward $7K by December.',
+  },
+  '2026_10': { // November 2026
+    goals: '1. LSAT: Reading Comprehension mastery\n2. First brand partnership conversation active\n3. Emergency fund fully funded\n4. Second byline published or pitched\n5. Passport renewed',
+    focus: 'LSAT section 3. Brand momentum. Emergency fund complete.',
+    ciWork: 'Second byline published or pitched. Writing portfolio growing.',
+    ciCreative: 'First brand partnership conversation active. Content consistency.',
+    ciHealth: 'Reading curriculum Track 2 (Oldenburg, Klinenberg). Gym unchanged.',
+    ciEston: 'Holiday planning. Quality time as year winds down.',
+    ciGrowth: 'LSAT: Reading Comprehension. Argentine visa requirements researched.',
+    ciFriends: 'Thanksgiving / holiday plans.',
+    ciFamily: 'Thanksgiving. Check in.',
+    ciAdulting: 'Emergency fund fully funded. Passport renewed if needed.',
+  },
+  '2026_11': { // December 2026
+    goals: '1. Roth IRA 2026 fully maxed ($7,000)\n2. 10,000 TikTok followers\n3. Ring purchased\n4. LSAT: full practice tests weekly\n5. Year-end SFMTA review documented',
+    focus: 'Year-end wins. Ring in hand. 10K TikTok. Roth IRA maxed.',
+    ciWork: 'Year-end SFMTA review — document wins for Fulbright + law school narratives.',
+    ciCreative: '10,000 TikTok followers. Year-in-review content.',
+    ciHealth: 'Gym streak intact. 6-month body recomp progress check.',
+    ciEston: 'Ring purchased. Proposal plan forming for Spring 2027.',
+    ciGrowth: 'LSAT: full timed practice tests weekly. Track score trajectory.',
+    ciFriends: 'Holiday season. Celebrate the year.',
+    ciFamily: 'Holidays. Quality time.',
+    ciAdulting: 'Roth IRA 2026 maxed. Year-end budget review.',
+  },
+  '2027_0': { // January 2027
+    goals: '1. Register for June/August 2027 LSAT\n2. Roth IRA 2027 contributions begin\n3. Wedding fund savings begin\n4. First paid brand partnership executed\n5. Fulbright statement of grant purpose v1 drafted',
+    focus: 'LSAT registered. Roth IRA Year 2. Brand paid. Fulbright drafting.',
+    ciWork: 'SFMTA — strong start to 2027. Document wins all year for departure narrative.',
+    ciCreative: 'First paid brand partnership executed. Content pillars all running.',
+    ciHealth: 'New year routine audit. Protect gym, reading, and sleep anchors.',
+    ciEston: 'Wedding fund savings begin. Start talking venues and timelines.',
+    ciGrowth: 'LSAT registered (June/Aug sitting). Full timed practice tests weekly.',
+    ciFriends: 'New year plans. Keep social thread strong.',
+    ciFamily: 'Check in.',
+    ciAdulting: 'Roth IRA 2027 starts ($583/mo). Wedding fund opens.',
+  },
+  '2027_1': { // February 2027
+    goals: '1. LSAT practice score 165+ consistently\n2. Fulbright: affiliates identified\n3. Relationship content deepens as proposal approaches\n4. Longform pitch to Next City or CityLab\n5. Track 1 journalism essay drafted',
+    focus: 'Proposal month approaches. LSAT score climbing. Writing publicly.',
+    ciWork: 'Longform pitch: Next City or CityLab — Bayview equity angle.',
+    ciCreative: 'Relationship content arc deepens — "building a life together" POV as proposal approaches.',
+    ciHealth: 'Gym consistent. Reading curriculum Track 1 — journalism essay drafted.',
+    ciEston: 'Proposal logistics finalized — location, timing, surprise secured.',
+    ciGrowth: 'LSAT: 165+ in practice. Fulbright: affiliates identified in target country.',
+    ciFriends: 'Keep plans. Don\'t disappear into proposal prep.',
+    ciFamily: 'Check in.',
+    ciAdulting: 'Wedding fund building. Living-abroad fund research.',
+  },
+  '2027_2': { // March 2027
+    goals: '1. PROPOSE TO ESTON 💍\n2. Sayulita wedding planning begins\n3. LSAT: 170+ on at least one practice test\n4. Fulbright statement v2 refined\n5. Budget revisited post-engagement',
+    focus: 'THE PROPOSAL. Everything changes this month.',
+    ciWork: 'SFMTA steady. Document program wins.',
+    ciCreative: 'Engagement content — intentional, not performative.',
+    ciHealth: 'Gym and sleep protected through the excitement.',
+    ciEston: 'PROPOSE. Begin wedding planning. Sayulita venue research starts.',
+    ciGrowth: 'LSAT: 170+ hit on practice. Fulbright statement v2.',
+    ciFriends: 'Share the news. Celebrate.',
+    ciFamily: 'Share the news. Celebrate.',
+    ciAdulting: 'Post-engagement: revisit budget — wedding + abroad fund targets confirmed.',
+  },
+  '2027_3': { // April 2027
+    goals: '1. Sayulita venue shortlisted (2–3 options)\n2. LSAT final prep sprint\n3. 3rd byline published\n4. 15K TikTok followers\n5. Fulbright: letters of affiliation outreach',
+    focus: 'LSAT 6 weeks out. Venue hunt. Brand growing.',
+    ciWork: 'SFMTA. 3rd byline published. Bayview Shuttle white paper outline.',
+    ciCreative: '15K TikTok milestone. Engaged life content.',
+    ciHealth: '1-year gym anniversary. Reassess program, set next phase goals.',
+    ciEston: 'Sayulita venue calls and visits. Vendor lists forming.',
+    ciGrowth: 'LSAT final prep sprint — test 6 weeks out. Fulbright affiliation outreach.',
+    ciFriends: 'Engagement celebrations.',
+    ciFamily: 'Engagement celebrations.',
+    ciAdulting: 'Abroad fund target number confirmed.',
+  },
+  '2027_4': { // May 2027
+    goals: '1. Sayulita venue booked — deposit paid, date locked\n2. Photographer and planner outreach\n3. LSAT: peak practice mode\n4. Fulbright: letter of affiliation received\n5. Wedding fund at 30%+',
+    focus: 'Venue locked. LSAT peak. Fulbright affiliation in.',
+    ciWork: 'SFMTA. Policy writing pipeline.',
+    ciCreative: 'Content strategy shift: engaged life + policy + "future law" arc seeded.',
+    ciHealth: 'Gym consistent. Supplement check.',
+    ciEston: 'Venue booked! Photographer and planner outreach begun.',
+    ciGrowth: 'LSAT peak practice — final simulated tests. Fulbright letter received.',
+    ciFriends: 'Summer plans forming.',
+    ciFamily: 'Check in.',
+    ciAdulting: 'Wedding fund at 30%+. Expat CPA research started.',
+  },
+  '2027_5': { // June 2027
+    goals: '1. LSAT SITTING — June 2027\n2. T-14 school list finalized\n3. Fulbright personal statement final draft\n4. Photographer and planner locked\n5. 2–3 published longform pieces in portfolio',
+    focus: 'LSAT DAY. The biggest exam of the decade.',
+    ciWork: 'SFMTA. Bayview white paper moving.',
+    ciCreative: '2–3 published longform pieces in portfolio.',
+    ciHealth: 'Pre-LSAT sleep and nutrition protected. Gym maintained.',
+    ciEston: 'Photographer and planner locked. Vendors 2 and 3 researched.',
+    ciGrowth: 'LSAT sitting. T-14 list finalized: Columbia, NYU, Stanford, Berkeley, Penn.',
+    ciFriends: 'Post-LSAT celebration.',
+    ciFamily: 'Check in.',
+    ciAdulting: 'Roth IRA 2027 on track. Abroad fund savings begun.',
+  },
+  '2027_6': { // July 2027
+    goals: '1. LSAT score arrives — retake assessment\n2. Personal statement: 3 drafts complete\n3. Fulbright application submitted\n4. Wedding catering and florals booked\n5. Buenos Aires content arc outlined',
+    focus: 'Score in hand. Fulbright submitted. Wedding vendors closing out.',
+    ciWork: 'SFMTA. Bayview Shuttle white paper — external publish target.',
+    ciCreative: 'Buenos Aires content arc planned. Travel pillar seeded.',
+    ciHealth: 'Post-LSAT decompression. Gym and routine maintained.',
+    ciEston: 'Wedding catering and florals booked.',
+    ciGrowth: 'LSAT retake decision. Personal statement drafts. Fulbright SUBMITTED.',
+    ciFriends: 'Summer. Keep plans.',
+    ciFamily: 'Check in.',
+    ciAdulting: 'Abroad fund accelerated. Roth IRA steady.',
+  },
+  '2027_7': { // August 2027
+    goals: '1. LSAT retake if needed\n2. Personal statement: strong v3 complete\n3. Step 4 salary — redirect entirely to savings\n4. Save-the-dates sent\n5. 25K TikTok followers',
+    focus: 'Step 4 bump. Save-the-dates out. PS polished.',
+    ciWork: 'Step 4 salary — redirect delta to savings. SFMTA program documentation.',
+    ciCreative: '25K TikTok milestone. Wedding planning content. Save-the-dates going out.',
+    ciHealth: 'Gym and reading consistent. Body check-in.',
+    ciEston: 'Save-the-dates designed and sent. Guest list confirmed.',
+    ciGrowth: 'LSAT retake if needed. PS v3 complete. Rec letter requests going out.',
+    ciFriends: 'Save-the-dates going to friends.',
+    ciFamily: 'Save-the-dates going to family.',
+    ciAdulting: 'Step 4 savings redirect. Wedding fund at 60%+.',
+  },
+  '2027_8': { // September 2027
+    goals: '1. Law school apps: CAS opened, transcripts submitted\n2. Rec letters requested\n3. Formal invitations sent\n4. Bayview Shuttle white paper published\n5. Wedding fund 60%+',
+    focus: 'Apps opening. Invites out. White paper published.',
+    ciWork: 'Bayview Shuttle white paper — conference or external publication.',
+    ciCreative: '"I applied to law school" content — document the application + Fulbright process.',
+    ciHealth: 'Pre-wedding fitness phase begins. Training with a goal in mind.',
+    ciEston: 'Invitations sent. Guest RSVP deadline set. Vendor walkthrough.',
+    ciGrowth: 'CAS application open. All transcripts in. Rec letters requested.',
+    ciFriends: 'Invitations to friends. Fall hangouts.',
+    ciFamily: 'Invitations to family. Fall visits.',
+    ciAdulting: 'Wedding fund 60%+. Law school deposit fund started.',
+  },
+  '2027_9': { // October 2027
+    goals: '1. LAW SCHOOL APPLICATIONS SUBMITTED — all T-14\n2. LRAP research complete\n3. Guest travel logistics confirmed\n4. Roth IRA 2027 fully maxed\n5. Fulbright: interview prep if nominated',
+    focus: 'APPS IN. The biggest professional moment of the decade.',
+    ciWork: 'SFMTA — hold it down. Applications submitted.',
+    ciCreative: 'Buenos Aires content era outlined. 30+ South America videos planned.',
+    ciHealth: 'Pre-wedding training peak. Sleep and nutrition locked.',
+    ciEston: 'Guest travel logistics: flights, hotel blocks in Sayulita confirmed.',
+    ciGrowth: 'Applications submitted. LRAP research per school. Fulbright interview prep.',
+    ciFriends: 'Pre-wedding celebrations beginning.',
+    ciFamily: 'Guest logistics. Excitement building.',
+    ciAdulting: 'Roth IRA 2027 maxed. Roth IRA 2028 plan set.',
+  },
+  '2027_10': { // November 2027
+    goals: '1. Track law school portals for interview invites\n2. Fulbright interview if selected\n3. Final vendor walkthrough\n4. Wedding fund 90%+\n5. Pre-wedding fitness peak',
+    focus: 'Decisions incoming. Fulbright interview. Wedding 4 months out.',
+    ciWork: 'SFMTA. Track law school portal invites.',
+    ciCreative: 'Bayview legacy content — final chapter before departure arc begins.',
+    ciHealth: 'Pre-wedding fitness: training locked, sleep protected, nutrition dialed.',
+    ciEston: 'Final vendor walkthrough. Rehearsal dinner plan taking shape.',
+    ciGrowth: 'Law school interviews. Fulbright interview if selected.',
+    ciFriends: 'Thanksgiving. Pre-wedding celebrations.',
+    ciFamily: 'Thanksgiving. Holiday plans.',
+    ciAdulting: 'Wedding fund 90%+. Law school deposit fund growing.',
+  },
+  '2027_11': { // December 2027
+    goals: '1. First law school decisions may arrive\n2. Fulbright finalist/semifinalist notification\n3. Wedding logistics all locked — nothing left to book\n4. Roth IRA 2028 contributions begin NOW\n5. Year-in-review content',
+    focus: 'Decisions starting. Wedding locked. New year starting strong.',
+    ciWork: 'SFMTA. Year-end review. Transition planning begins quietly.',
+    ciCreative: 'Year-in-review content. Reflect the full arc of 2027.',
+    ciHealth: 'Holiday routine: gym and sleep non-negotiable through disruption.',
+    ciEston: 'Wedding 3 months out — nothing left to book. Celebrate the year.',
+    ciGrowth: 'Law school decisions rolling. Fulbright notification. Waitlist strategy ready.',
+    ciFriends: 'Holiday season. Celebrate.',
+    ciFamily: 'Holidays. Quality time.',
+    ciAdulting: 'Roth IRA 2028 starts immediately — don\'t wait for January.',
+  },
+  '2028_0': { // January 2028
+    goals: '1. Law school decisions — compile offers, compare LRAP\n2. Law school interviews scheduled\n3. Fulbright finalist/alternate notification\n4. Citi card: 3 payments remaining\n5. Pre-wedding fitness peak',
+    focus: 'Decisions in hand. Fitness peak. Wedding 2–3 months out.',
+    ciWork: 'SFMTA. Law school interview prep. Transition plan forming.',
+    ciCreative: '"What I\'m learning from law school decisions" — authentic content.',
+    ciHealth: 'Pre-wedding peak fitness — intentional and sustainable.',
+    ciEston: 'Final attire fittings. Wedding 2–3 months out — last logistics.',
+    ciGrowth: 'LRAP comparison: Columbia vs NYU vs Berkeley. Which serves the path?',
+    ciFriends: 'Pre-wedding celebrations.',
+    ciFamily: 'Pre-wedding energy building.',
+    ciAdulting: 'Citi card: 3 payments left. Pre-wedding financial audit.',
+  },
+  '2028_1': { // February 2028
+    goals: '1. Negotiate law school aid packages\n2. Rehearsal dinner planned\n3. All wedding finances confirmed\n4. Bayview Shuttle retrospective written\n5. Buenos Aires housing research begins',
+    focus: 'Aid negotiation. Wedding final stretch. Retrospective written.',
+    ciWork: 'Bayview Shuttle retrospective — publishable case study for law school + legacy.',
+    ciCreative: '"Why I\'m going to law school" — brand pivot moment. Authentic.',
+    ciHealth: 'Sleep and nutrition locked before wedding. Protect the baseline.',
+    ciEston: 'Rehearsal dinner planned. Sayulita logistics finalized.',
+    ciGrowth: 'Negotiate aid. Competing offers sent. Buenos Aires neighborhoods researched.',
+    ciFriends: 'Last pre-wedding push. Everyone excited.',
+    ciFamily: 'Pre-wedding. Travel logistics.',
+    ciAdulting: 'Pre-wedding financial audit. All funds confirmed in place.',
+  },
+  '2028_2': { // March 2028
+    goals: '1. WEDDING — Sayulita, Mexico 🎉\n2. Honeymoon: Brazil → Argentina\n3. Citi card FINAL PAYMENT — debt free\n4. Law school commitment deposit paid\n5. Document the moment without losing it',
+    focus: 'THE WEDDING. The honeymoon. Everything earned.',
+    ciWork: 'SFMTA on hold — you\'re on leave. Transition plan handed off.',
+    ciCreative: 'Wedding + honeymoon content — document the moment without losing it.',
+    ciHealth: 'Honeymoon movement. Rest. Enjoy.',
+    ciEston: 'WEDDING DAY. Honeymoon: Brazil → Argentina.',
+    ciGrowth: 'Law school commitment letter: deposit paid before or right after honeymoon.',
+    ciFriends: 'Wedding guests. Celebrate.',
+    ciFamily: 'Wedding family. Celebrate.',
+    ciAdulting: 'Citi card DONE. Debt-free. Law school deposit paid.',
+  },
+  '2028_3': { // April 2028
+    goals: '1. Return from honeymoon\n2. Commit to law school — deposit confirmed\n3. Post-wedding financial reset\n4. Gym back day one after honeymoon\n5. "New chapter" content era begins',
+    focus: 'Married. Debt-free. Law school committed. New era.',
+    ciWork: 'SFMTA return. Begin formal transition planning.',
+    ciCreative: '"Married life" content era. New chapter brand pivot.',
+    ciHealth: 'Post-honeymoon routine reentry — gym back immediately.',
+    ciEston: 'Settle into married life in Oakland.',
+    ciGrowth: 'Law school committed. 1L prep reading list started.',
+    ciFriends: 'Share honeymoon stories. Welcome back.',
+    ciFamily: 'Post-wedding check in. Share the photos.',
+    ciAdulting: 'All savings redirect to abroad fund + law school. Financial reset.',
+  },
+  '2028_4': { // May 2028
+    goals: '1. SFMTA formal notice given — last day set for August\n2. SFERS vesting confirmed\n3. Expat CPA identified\n4. Buenos Aires lease signed\n5. Law school housing research',
+    focus: 'Notice given. SFERS locked. Buenos Aires signed. Countdown begins.',
+    ciWork: 'SFMTA formal notice. Begin handoff docs and knowledge transfer.',
+    ciCreative: '"Counting down" to next chapter — last summer in Bay content begins.',
+    ciHealth: 'Health check-in: labs, gut, supplements — entering next chapter strong.',
+    ciEston: 'Eston\'s plan for Buenos Aires and law school city confirmed.',
+    ciGrowth: 'Pre-1L reading. Expat CPA identified — FEIE strategy confirmed.',
+    ciFriends: 'Farewell Bay Area plans beginning.',
+    ciFamily: 'Share the departure timeline.',
+    ciAdulting: 'Buenos Aires lease signed. SFERS vesting confirmed. CPA engaged.',
+  },
+  '2028_5': { // June 2028
+    goals: '1. Last day at SFMTA approaching\n2. All finances in order for law school year\n3. Law school housing confirmed\n4. "Last summer in the Bay" content arc\n5. Rest — protect the baseline before departure',
+    focus: 'The final stretch. 5 years. Everything earned.',
+    ciWork: 'Final weeks at SFMTA. Handoff complete. Legacy documented.',
+    ciCreative: '"Last summer in the Bay" — grateful, intentional goodbye arc.',
+    ciHealth: 'Summer before departure: rest, move, read. Don\'t grind.',
+    ciEston: 'Last Oakland summer. Adventures before the move.',
+    ciGrowth: 'Reflect on 5 years of urban planning. Write the arc.',
+    ciFriends: 'Bay Area farewell season.',
+    ciFamily: 'Bay Area farewell season.',
+    ciAdulting: 'All finances in order. Law school loans set. Budget for 1L built.',
+  },
+};
+
+function loadMonthly() {
+  const key = monthKey(viewYear, viewMonth);
+  const saved = (_moData.monthly_notes && _moData.monthly_notes[key]) ||
+    JSON.parse(lsGet(`plan_monthly_${viewYear}_${viewMonth}`) || 'null');
+
+  // Use saved data if it exists, otherwise fall back to roadmap pre-fills
+  const roadmap = ROADMAP[`${viewYear}_${viewMonth}`] || {};
+  const data = saved || {};
+
+  const setVal = (id, savedVal, roadmapVal) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = savedVal !== undefined ? savedVal : (roadmapVal || '');
+    // If using roadmap data, style placeholder-like (lighter)
+    if (!savedVal && roadmapVal) {
+      el.style.opacity = '0.65';
+      el.addEventListener('focus', function onFocus() {
+        el.style.opacity = '1';
+        el.removeEventListener('focus', onFocus);
+      }, { once: true });
+    } else {
+      el.style.opacity = '1';
+    }
+  };
+
+  setVal('monthGoals',  data.goals,      roadmap.goals);
+  setVal('monthFocus',  data.focus,      roadmap.focus);
+  setVal('monthNotes',  data.notes,      '');
+  setVal('ci-work',     data.ciWork,     roadmap.ciWork);
+  setVal('ci-creative', data.ciCreative, roadmap.ciCreative);
+  setVal('ci-health',   data.ciHealth,   roadmap.ciHealth);
+  setVal('ci-eston',    data.ciEston,    roadmap.ciEston);
+  setVal('ci-growth',   data.ciGrowth,   roadmap.ciGrowth);
+  setVal('ci-friends',  data.ciFriends,  roadmap.ciFriends);
+  setVal('ci-family',   data.ciFamily,   roadmap.ciFamily);
+  setVal('ci-adulting', data.ciAdulting, roadmap.ciAdulting);
+}
+function saveMonthly() {
+  const key = monthKey(viewYear, viewMonth);
+  if (!_moData.monthly_notes) _moData.monthly_notes = {};
+  _moData.monthly_notes[key] = {
+    goals:      document.getElementById('monthGoals').value,
+    focus:      document.getElementById('monthFocus').value,
+    notes:      document.getElementById('monthNotes').value,
+    ciWork:     document.getElementById('ci-work').value,
+    ciCreative: document.getElementById('ci-creative').value,
+    ciHealth:   document.getElementById('ci-health').value,
+    ciEston:    document.getElementById('ci-eston').value,
+    ciGrowth:   document.getElementById('ci-growth').value,
+    ciFriends:  document.getElementById('ci-friends').value,
+    ciFamily:   document.getElementById('ci-family').value,
+    ciAdulting: document.getElementById('ci-adulting').value,
+  };
+  saveMo();
+  flashSave();
+}
+
+/* close modal on overlay click */
+document.getElementById('eventModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* close popover when clicking outside */
+document.addEventListener('click', function() { closePopover(); });
+
+/* ══════════════════════════════════════
+   EVENT POPOVER
+══════════════════════════════════════ */
+let _activePopover = null;
+let _activeChip    = null;
+
+function closePopover() {
+  if (_activePopover) {
+    _activePopover.remove();
+    _activePopover = null;
+  }
+  if (_activeChip) {
+    _activeChip.classList.remove('popover-open');
+    _activeChip = null;
+  }
+}
+
+function showEventPopover(ev, color, chip) {
+  // If tapping the same chip, close and exit
+  if (_activeChip === chip) { closePopover(); return; }
+  closePopover();
+
+  chip.classList.add('popover-open');
+  _activeChip = chip;
+
+  const pop = document.createElement('div');
+  pop.className = 'event-popover';
+  pop.onclick = (e) => e.stopPropagation(); // don't bubble to doc listener
+
+  // color strip
+  const strip = document.createElement('div');
+  strip.className = 'popover-color-strip';
+  strip.style.background = color;
+  pop.appendChild(strip);
+
+  // title
+  const titleEl = document.createElement('div');
+  titleEl.className = 'popover-title';
+  titleEl.textContent = ev.title;
+  pop.appendChild(titleEl);
+
+  // date
+  const dateEl = document.createElement('div');
+  dateEl.className = 'popover-meta';
+  const d = new Date(ev.date + 'T12:00:00');
+  dateEl.textContent = d.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' });
+  pop.appendChild(dateEl);
+
+  // time
+  if (ev.start) {
+    const timeEl = document.createElement('div');
+    timeEl.className = 'popover-meta';
+    function fmtTime(t) {
+      if (!t) return '';
+      const [hStr, mStr] = t.split(':');
+      const h = parseInt(hStr, 10);
+      const m = parseInt(mStr, 10);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12  = h % 12 || 12;
+      const mPad = m > 0 ? ':' + String(m).padStart(2,'0') : '';
+      return h12 + mPad + ' ' + ampm;
+    }
+    timeEl.textContent = '⏱ ' + fmtTime(ev.start) + (ev.end ? ' – ' + fmtTime(ev.end) : '');
+    pop.appendChild(timeEl);
+  }
+
+  // notes
+  if (ev.notes) {
+    const notesEl = document.createElement('div');
+    notesEl.className = 'popover-notes';
+    notesEl.textContent = ev.notes;
+    pop.appendChild(notesEl);
+  }
+
+  // actions
+  const actions = document.createElement('div');
+  actions.className = 'popover-actions';
+
+  const editBtn = document.createElement('button');
+  editBtn.className = 'popover-btn popover-btn-edit';
+  editBtn.textContent = 'Edit';
+  editBtn.onclick = (e) => { e.stopPropagation(); closePopover(); openEditModal(ev); };
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'popover-btn popover-btn-close';
+  closeBtn.textContent = '✕';
+  closeBtn.onclick = (e) => { e.stopPropagation(); closePopover(); };
+
+  actions.appendChild(editBtn);
+  actions.appendChild(closeBtn);
+  pop.appendChild(actions);
+
+  document.body.appendChild(pop);
+  _activePopover = pop;
+
+  // Position: prefer below-right of chip, clamp to viewport
+  const chipRect = chip.getBoundingClientRect();
+  const pw = pop.offsetWidth || 240;
+  const ph = pop.offsetHeight || 160;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  let top  = chipRect.bottom + 6;
+  let left = chipRect.left;
+
+  // flip up if not enough space below
+  if (top + ph > vh - 12) top = chipRect.top - ph - 6;
+  // clamp left
+  if (left + pw > vw - 12) left = vw - pw - 12;
+  if (left < 8) left = 8;
+  // clamp top
+  if (top < 60) top = 60;
+
+  pop.style.top  = top + 'px';
+  pop.style.left = left + 'px';
+}
+</script>
+</body>
+</html>
