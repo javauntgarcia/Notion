@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Javaun — Main Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Calming palette drawn from the photo's serene tones */
+    --denim:       #4A6A8A;
+    --denim-light: #7DA0BC;
+    --slate:       #6B7F8E;
+    --slate-light: #9BB0BE;
+    --sage:        #6B8C6E;
+    --sage-light:  #9AB89C;
+    --ivory:       #F0EBE1;
+    --ivory-dark:  #DDD5C8;
+    --mist:        #C8D8E2;
+    --fog:         #2A3A45;
+    --fog-mid:     #3A4F5C;
+    --ink:         #1A2530;
+    --glass:       rgba(200,216,226,0.13);
+    --glass-border: rgba(200,216,226,0.22);
+    /* semantic aliases */
+    --rust:        #4A6A8A;
+    --rust-light:  #7DA0BC;
+    --navy:        #2A3A45;
+    --navy-mid:    #3A4F5C;
+    --gold:        #6B7F8E;
+    --gold-light:  #C8D8E2;
+    --green:       #6B8C6E;
+    --green-light: #9AB89C;
+    --cream:       #F0EBE1;
+    --cream-dark:  #DDD5C8;
+    --chestnut:    #6B7F8E;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: 'DM Mono', monospace;
+    color: var(--ivory);
+    background: var(--fog);
+    overflow-x: hidden;
+  }
+
+  /* ── BG LAYER — absolute img, scrolls with page (matches subpages) ── */
+  .bg-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    z-index: 0;
+  }
+  .bg-layer img {
+    display: block;
+    width: 100%; height: auto;
+    object-position: center top;
+  }
+  .bg-layer::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(20,30,40,0.45) 0%, rgba(30,50,65,0.22) 45%, rgba(20,30,40,0.60) 100%);
+  }
+
+  /* ── HERO / PAGE ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+  }
+  .hero-content {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    padding: 2.5rem 3rem 3rem;
+  }
+
+  /* ── FIXED TOPBAR (matches subpages) ── */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 2rem;
+    background: rgba(20,30,40,0.42);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(200,216,226,0.10);
+  }
+  .topbar-wordmark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #fff;
+    opacity: 0.95;
+  }
+  .topbar-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--slate-light);
+    opacity: 0.75;
+  }
+
+  /* ── HEADER (in-content, below topbar) ── */
+  .top-bar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    margin-top: 4rem; /* clear fixed topbar */
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .date-stamp {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: #fff;
+    opacity: 0.9;
+    text-align: right;
+    line-height: 1.7;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.7);
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 8vw, 6.5rem);
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4);
+  }
+  .hero-title em {
+    font-style: italic;
+    color: #C4622D;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* ── GLASS CARD ── */
+  .glass {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+  }
+
+  /* ── GRID LAYOUT ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 1rem;
+  }
+
+  /* ── QUOTE / WORD ── */
+  .quote-card {
+    grid-column: 1 / 3;
+    padding: 1.6rem 2rem;
+  }
+  .section-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+    margin-bottom: 0.7rem;
+    opacity: 1;
+  }
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-style: italic;
+    line-height: 1.55;
+    color: #1A2530;
+    margin-bottom: 0.5rem;
+  }
+  .quote-attr {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+    opacity: 0.85;
+  }
+  .word-pill {
+    display: inline-block;
+    margin-top: 1rem;
+    background: rgba(74,106,138,0.12);
+    border: 1px solid rgba(74,106,138,0.3);
+    border-radius: 100px;
+    padding: 0.3rem 1rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+  }
+  .word-of-week {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1A2530;
+    margin-top: 0.25rem;
+    letter-spacing: 0.05em;
+  }
+  .word-def {
+    font-size: 0.65rem;
+    color: #3A4F5C;
+    opacity: 0.8;
+    margin-top: 0.2rem;
+    line-height: 1.5;
+    max-width: 320px;
+  }
+
+  /* ── INVISALIGN TIMER ── */
+  .timer-card {
+    grid-column: 3 / 4;
+    padding: 1.4rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .timer-ring-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.6rem 0;
+  }
+  .timer-svg { position: relative; }
+  .timer-track { fill: none; stroke: rgba(245,239,228,0.12); stroke-width: 6; }
+  .timer-fill {
+    fill: none;
+    stroke: #7DA0BC;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 55;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 1s ease;
+  }
+  .timer-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .timer-hh {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1A2530;
+    line-height: 1;
+  }
+  .timer-label { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: #4A6A8A; opacity: 0.8; }
+  .timer-btns { display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap; }
+  .timer-btn {
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    border: 1px solid rgba(74,106,138,0.3);
+    background: rgba(74,106,138,0.08);
+    color: #1A2530;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .timer-btn:hover { background: rgba(74,106,138,0.2); border-color: #4A6A8A; }
+  .timer-btn.active { background: #4A6A8A; border-color: #4A6A8A; color: #fff; }
+  .timer-liner {
+    font-size: 0.6rem;
+    color: #4A6A8A;
+    text-align: center;
+    margin-top: 0.3rem;
+    opacity: 0.9;
+  }
+
+  /* ── TO-DO ── */
+  .todo-card {
+    grid-column: 1 / 2;
+    padding: 1.4rem 1.6rem;
+  }
+  .todo-input-wrap {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+  .todo-input {
+    flex: 1;
+    background: rgba(74,106,138,0.07);
+    border: 1px solid rgba(74,106,138,0.2);
+    border-radius: 6px;
+    padding: 0.4rem 0.7rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: #1A2530;
+    outline: none;
+    letter-spacing: 0.05em;
+  }
+  .todo-input::placeholder { color: rgba(26,37,48,0.35); }
+  .todo-input:focus { border-color: #4A6A8A; }
+  .add-btn {
+    background: #4A6A8A;
+    border: none;
+    border-radius: 6px;
+    color: var(--ivory);
+    font-size: 1rem;
+    width: 28px; height: 28px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .add-btn:hover { background: #7DA0BC; }
+  .todo-list { list-style: none; max-height: 180px; overflow-y: auto; }
+  .todo-list::-webkit-scrollbar { width: 3px; }
+  .todo-list::-webkit-scrollbar-thumb { background: rgba(196,98,45,0.4); border-radius: 2px; }
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid rgba(74,106,138,0.12);
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    color: #1A2530;
+    opacity: 0.9;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 0.9; transform: none; } }
+  .todo-item.done span { text-decoration: line-through; opacity: 0.35; }
+  .todo-check {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid #4A6A8A;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .todo-check.checked { background: #4A6A8A; border-color: #4A6A8A; }
+  .todo-check.checked::after { content: '✓'; font-size: 8px; color: white; }
+  .todo-del { margin-left: auto; color: rgba(74,106,138,0.3); cursor: pointer; font-size: 0.7rem; transition: color 0.2s; }
+  .todo-del:hover { color: #4A6A8A; }
+
+  /* ── GOAL TRACKER ── */
+  .goals-card {
+    grid-column: 2 / 4;
+    padding: 1.4rem 1.8rem;
+    overflow: hidden;
+  }
+
+  /* ── GOAL CAROUSEL ── */
+  .goal-carousel-wrap {
+    position: relative;
+    margin-top: 0.6rem;
+  }
+  .goal-carousel-viewport {
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  .goal-carousel-track {
+    display: flex;
+    transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+  .goal-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    padding: 0.2rem 0.1rem;
+    box-sizing: border-box;
+  }
+  .goal-item {}
+  .goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.35rem;
+  }
+  .goal-name {
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #1A2530;
+    opacity: 0.75;
+  }
+  .goal-pct {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #4A6A8A;
+  }
+  .goal-bar-track {
+    height: 5px;
+    background: rgba(74,106,138,0.12);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .goal-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .bar-rust  { background: linear-gradient(90deg, #4A6A8A, #7DA0BC); }
+  .bar-navy  { background: linear-gradient(90deg, #3A4F5C, #6B7F8E); }
+  .bar-gold  { background: linear-gradient(90deg, #5A7A8A, #9BB0BE); }
+  .bar-green { background: linear-gradient(90deg, #6B8C6E, #9AB89C); }
+  .bar-cream { background: linear-gradient(90deg, #8A9EA8, #C8D8E2); }
+  .goal-milestone {
+    font-size: 0.52rem;
+    color: #3A4F5C;
+    opacity: 0.55;
+    margin-top: 0.2rem;
+    letter-spacing: 0.05em;
+  }
+  .goal-pct-edit {
+    width: 36px;
+    background: transparent;
+    border: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #4A6A8A;
+    cursor: pointer;
+    text-align: right;
+    outline: none;
+  }
+  /* carousel nav row */
+  .goal-carousel-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+  }
+  .goal-carousel-dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .goal-carousel-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(74,106,138,0.22);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .goal-carousel-dot.active {
+    background: #4A6A8A;
+    transform: scale(1.5);
+  }
+  .goal-carousel-btn {
+    background: rgba(74,106,138,0.10);
+    border: 1px solid rgba(74,106,138,0.22);
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #4A6A8A;
+    font-size: 0.7rem;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .goal-carousel-btn:hover { background: rgba(74,106,138,0.22); }
+  .goal-carousel-btn:disabled { opacity: 0.25; cursor: default; }
+  .goal-sub-label {
+    font-size: 0.5rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+    opacity: 0.65;
+    text-align: center;
+    flex: 1;
+  }
+
+  /* ── NAV TILES — cover image style ── */
+  .nav-strip {
+    grid-column: 1 / 4;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+  }
+  .nav-tile {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.22s;
+    cursor: pointer;
+    position: relative;
+    min-height: 90px;
+  }
+  .nav-tile:hover { transform: translateY(-3px); }
+  .nav-tile-cover {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.35s;
+  }
+  .nav-tile:hover .nav-tile-cover { transform: scale(1.06); }
+  .nav-tile-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(10,20,30,0.35) 0%, rgba(10,20,30,0.65) 100%);
+    transition: background 0.22s;
+  }
+  .nav-tile:hover .nav-tile-overlay { background: linear-gradient(160deg, rgba(10,20,30,0.22) 0%, rgba(10,20,30,0.52) 100%); }
+  .nav-tile-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 1.1rem 0.5rem;
+    width: 100%;
+    height: 100%;
+  }
+  .nav-icon { font-size: 1.4rem; }
+  .nav-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.7);
+  }
+
+  /* ── CALENDAR EMBED ── */
+  .calendar-card {
+    grid-column: 1 / 4;
+    padding: 0;
+    overflow: hidden;
+  }
+  .cal-header {
+    padding: 1rem 1.6rem 0.6rem;
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+    opacity: 0.9;
+  }
+
+  /* ── FOOTER (matches subpages) ── */
+  .footer-bar {
+    text-align: center;
+    padding: 2rem 0 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--ivory);
+    opacity: 0.35;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* ── ANIMATIONS (matches subpages) ── */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── BG TAIL ── */
+  .bg-tail {
+    background: #1a2530;
+    width: 100%;
+    min-height: 4rem;
+  }
+
+  /* ── IDEAL DAY ── */
+  .ideal-day-card {
+    grid-column: 1 / 4;
+    padding: 1.6rem 2rem 1.8rem;
+    overflow: hidden;
+    border-radius: 12px;
+    /* Dark navy — pulls from the background image's deep water tones */
+    background: rgba(18, 28, 40, 0.88) !important;
+    backdrop-filter: blur(18px) saturate(1.1) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.1) !important;
+    border: 1px solid rgba(200,216,226,0.12) !important;
+  }
+  .ideal-day-card .section-label {
+    margin-bottom: 1rem;
+    color: rgba(200,216,226,0.55) !important;
+  }
+
+  /* Phase color palette */
+  /* morning: warm amber  #E8A96A */
+  /* commute: steel blue  #5A8FB5 */
+  /* evening: soft violet #9A82C8 */
+  /* night:   seafoam     #5AAFA8  */
+
+  .id-phase-label {
+    font-size: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 1.1rem 0 0.55rem;
+  }
+  .id-phase-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+  }
+  .id-phase-label.morning  { color: #E8A96A; }
+  .id-phase-label.morning::after  { background: rgba(232,169,106,0.2); }
+  .id-phase-label.commute  { color: #5A8FB5; }
+  .id-phase-label.commute::after  { background: rgba(90,143,181,0.2); }
+  .id-phase-label.evening  { color: #9A82C8; }
+  .id-phase-label.evening::after  { background: rgba(154,130,200,0.2); }
+  .id-phase-label.night    { color: #5AAFA8; }
+  .id-phase-label.night::after    { background: rgba(90,175,168,0.2); }
+
+  .id-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 0.5rem 0.65rem;
+  }
+
+  .id-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    transition: background 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  /* Per-phase block tinting */
+  .id-block.morning {
+    background: rgba(232,169,106,0.07);
+    border: 1px solid rgba(232,169,106,0.16);
+  }
+  .id-block.morning:hover { background: rgba(232,169,106,0.13); border-color: rgba(232,169,106,0.28); }
+
+  .id-block.commute {
+    background: rgba(90,143,181,0.07);
+    border: 1px solid rgba(90,143,181,0.16);
+  }
+  .id-block.commute:hover { background: rgba(90,143,181,0.13); border-color: rgba(90,143,181,0.28); }
+
+  .id-block.evening {
+    background: rgba(154,130,200,0.07);
+    border: 1px solid rgba(154,130,200,0.16);
+  }
+  .id-block.evening:hover { background: rgba(154,130,200,0.13); border-color: rgba(154,130,200,0.28); }
+
+  .id-block.night {
+    background: rgba(90,175,168,0.07);
+    border: 1px solid rgba(90,175,168,0.16);
+  }
+  .id-block.night:hover { background: rgba(90,175,168,0.13); border-color: rgba(90,175,168,0.28); }
+
+  .id-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+    border: 1.5px solid;
+  }
+  .id-dot.morning { background: rgba(232,169,106,0.5); border-color: #E8A96A; box-shadow: 0 0 6px rgba(232,169,106,0.3); }
+  .id-dot.commute { background: rgba(90,143,181,0.5);  border-color: #5A8FB5; box-shadow: 0 0 6px rgba(90,143,181,0.3); }
+  .id-dot.evening { background: rgba(154,130,200,0.5); border-color: #9A82C8; box-shadow: 0 0 6px rgba(154,130,200,0.3); }
+  .id-dot.night   { background: rgba(90,175,168,0.5);  border-color: #5AAFA8; box-shadow: 0 0 6px rgba(90,175,168,0.3); }
+
+  .id-info { flex: 1; min-width: 0; }
+
+  /* Time label color matches the phase */
+  .id-time {
+    font-size: 0.48rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 2px;
+    opacity: 0.9;
+  }
+  .id-block.morning .id-time { color: #E8A96A; }
+  .id-block.commute .id-time { color: #5A8FB5; }
+  .id-block.evening .id-time { color: #9A82C8; }
+  .id-block.night   .id-time { color: #5AAFA8; }
+
+  .id-activity {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.88rem;
+    font-weight: 400;
+    color: rgba(240,235,225,0.92);
+    line-height: 1.25;
+  }
+  .id-dur {
+    font-size: 0.46rem;
+    opacity: 0.4;
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+    color: rgba(200,216,226,0.9);
+  }
+  .id-note {
+    font-size: 0.44rem;
+    opacity: 0.55;
+    font-style: italic;
+    margin-top: 3px;
+    line-height: 1.4;
+    color: rgba(200,216,226,0.9);
+  }
+
+  .id-tag {
+    display: inline-block;
+    font-size: 0.38rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-top: 4px;
+  }
+  .id-tag.keystone { background: rgba(232,169,106,0.15); color: #E8A96A; border: 1px solid rgba(232,169,106,0.3); }
+  .id-tag.habit    { background: rgba(90,175,168,0.12);  color: #5AAFA8; border: 1px solid rgba(90,175,168,0.28); }
+  .id-tag.flex     { background: rgba(154,130,200,0.12); color: #9A82C8; border: 1px solid rgba(154,130,200,0.28); }
+  .id-tag.sacred   { background: rgba(90,143,181,0.12);  color: #5A8FB5; border: 1px solid rgba(90,143,181,0.28); }
+
+  .id-focus-box {
+    margin-top: 1.1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(232,169,106,0.2);
+    border-radius: 8px;
+    background: rgba(232,169,106,0.05);
+  }
+  .id-focus-box p {
+    font-size: 0.55rem;
+    color: rgba(200,216,226,0.6);
+    line-height: 1.75;
+    letter-spacing: 0.03em;
+  }
+  .id-focus-box p strong { color: rgba(240,235,225,0.9); font-weight: 500; }
+  .id-focus-box p em { color: #E8A96A; font-style: italic; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .hero-content { padding: 1.5rem 1.2rem 2rem; }
+    .main-grid { grid-template-columns: 1fr; }
+    .quote-card, .timer-card, .todo-card, .goals-card, .nav-strip, .calendar-card, .ideal-day-card {
+      grid-column: 1 / 2 !important;
+    }
+    .nav-strip { grid-template-columns: repeat(3, 1fr); }
+    .nav-tile { min-height: 75px; }
+    .id-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Fixed topbar (matches subpages) -->
+<div class="topbar">
+  <span class="topbar-wordmark">Javaun · Garcia</span>
+  <div class="topbar-date" id="topbarDate"></div>
+</div>
+
+<div style="position:relative;">
+
+  <div class="bg-layer">
+    <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Main%20Hub.jpg" alt="" />
+  </div>
+
+<div class="hero">
+  <div class="hero-content">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="date-stamp" id="dateStamp">Loading...</div>
+    </div>
+
+    <!-- TITLE -->
+    <h1 class="hero-title">Main <em>Hub</em></h1>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid" style="animation:fadeUp 0.8s ease both;">
+
+      <!-- QUOTE + WORD OF WEEK -->
+      <div class="glass quote-card">
+        <div class="section-label">✦ Quote of the Week</div>
+        <p class="quote-text" id="quoteText" style="opacity:0.3;font-style:italic;">No quote set yet — add one below.</p>
+        <p class="quote-attr" id="quoteAttr"></p>
+
+        <div style="margin-top:1.2rem;">
+          <div class="section-label">✦ Word of the Week</div>
+          <div class="word-pill" id="wotwPill" style="opacity:0.3;">Word · Week —</div>
+          <div class="word-of-week" id="wotw" style="opacity:0.3;">—</div>
+          <div class="word-def" id="wotwDef" style="opacity:0.3;">No word set yet — add one below.</div>
+        </div>
+
+        <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <input id="quoteIn" style="flex:1;min-width:140px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Edit quote…" />
+          <input id="attrIn" style="flex:1;min-width:100px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="— Attribution" />
+          <button onclick="saveQuote()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
+        </div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input id="wotwIn" style="flex:1;min-width:100px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Word of week…" />
+          <input id="wotwDefIn" style="flex:2;min-width:160px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Definition…" />
+          <button onclick="saveWord()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
+        </div>
+        <div style="margin-top:0.4rem;font-family:'DM Mono',monospace;font-size:0.48rem;letter-spacing:0.08em;min-height:1em;" id="hubSaveStatus"></div>
+      </div>
+
+      <!-- INVISALIGN LINER TRACKER -->
+      <div class="glass timer-card">
+        <div class="section-label">✦ Invisalign Tracker</div>
+        <div style="text-align:center;margin:0.8rem 0 0.4rem;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:#1A2530;line-height:1;" id="linerBig">—</div>
+          <div style="font-size:0.52rem;letter-spacing:0.2em;text-transform:uppercase;color:#4A6A8A;margin-top:0.2rem;">Current Liner</div>
+        </div>
+        <div class="timer-liner" id="linerInfo">Liner #— · Day — of 10</div>
+        <div id="dayPips" style="display:flex;gap:4px;justify-content:center;margin:0.6rem 0;flex-wrap:wrap;"></div>
+        <div class="timer-btns" style="margin-top:0.6rem;">
+          <button class="timer-btn" onclick="nextLiner()">New Liner →</button>
+        </div>
+        <div style="margin-top:0.8rem;display:flex;gap:0.4rem;align-items:center;justify-content:center;flex-wrap:wrap;">
+          <span style="font-size:0.52rem;opacity:0.5;letter-spacing:0.1em;">LINER #</span>
+          <input id="linerNum" type="number" min="1" value="1" style="width:40px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:4px;padding:0.2rem 0.4rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:#1A2530;outline:none;text-align:center;" onchange="updateLinerLabel()"/>
+        </div>
+      </div>
+
+      <!-- TO-DO LIST -->
+      <div class="glass todo-card">
+        <div class="section-label">✦ Daily To-Do</div>
+        <div class="todo-input-wrap">
+          <input class="todo-input" id="todoInput" placeholder="Add a task…" onkeydown="if(event.key==='Enter')addTodo()" />
+          <button class="add-btn" onclick="addTodo()">+</button>
+        </div>
+        <ul class="todo-list" id="todoList"></ul>
+      </div>
+
+      <!-- GOAL TRACKER -->
+      <div class="glass goals-card">
+        <div class="section-label">✦ Goal Tracker</div>
+        <div class="goal-carousel-wrap">
+          <div class="goal-carousel-viewport">
+            <div class="goal-carousel-track" id="goalTrack">
+              <!-- slides populated by JS -->
+            </div>
+          </div>
+          <div class="goal-carousel-nav">
+            <button class="goal-carousel-btn" id="goalPrev" onclick="goalCarouselPrev()">&#8592;</button>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;flex:1;">
+              <div class="goal-carousel-dots" id="goalDots"></div>
+              <div class="goal-sub-label" id="goalSubLabel"></div>
+            </div>
+            <button class="goal-carousel-btn" id="goalNext" onclick="goalCarouselNext()">&#8594;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NAV STRIP — cover image tiles -->
+      <!-- EDIT: nav tile links — set each id="nav-*" href via the NAV_URLS config in <script> below -->
+      <div class="nav-strip">
+        <a class="nav-tile" id="nav-wellness" href="https://javauntgarcia.github.io/Notion/Wellness.html" target="_blank">
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Wellness.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-overlay"></div>
+          <div class="nav-tile-content">
+            <span class="nav-label">Wellness</span>
+          </div>
+        </a>
+        <a class="nav-tile" id="nav-growth" href="https://javauntgarcia.github.io/Notion/Growth.html" target="_blank">
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Growth.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-overlay"></div>
+          <div class="nav-tile-content">
+            <span class="nav-label">Growth</span>
+          </div>
+        </a>
+        <a class="nav-tile" id="nav-finances" href="https://javauntgarcia.github.io/Notion/Finances.html" target="_blank">
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Finances.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-overlay"></div>
+          <div class="nav-tile-content">
+            <span class="nav-label">Finances</span>
+          </div>
+        </a>
+        <a class="nav-tile" id="nav-productivity" href="https://javauntgarcia.github.io/Notion/Productivity.html" target="_blank">
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Productivity.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-overlay"></div>
+          <div class="nav-tile-content">
+            <span class="nav-label">Productivity</span>
+          </div>
+        </a>
+        <a class="nav-tile" id="nav-planning" href="https://javauntgarcia.github.io/Notion/Planning.html" target="_blank">
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/planning.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-overlay"></div>
+          <div class="nav-tile-content">
+            <span class="nav-label">Planning</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- CALENDAR EMBED — Weekly View -->
+      <div class="glass calendar-card">
+        <div class="cal-header" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.6rem 0.6rem;">
+          <span>✦ Weekly Outline</span>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <button onclick="calPrevWeek()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A6A8A;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'">‹</button>
+            <span id="calWeekLabel" style="font-size:0.58rem;letter-spacing:0.18em;color:#4A6A8A;min-width:120px;text-align:center;"></span>
+            <button onclick="calNextWeek()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A6A8A;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'">›</button>
+            <button onclick="calGoToday()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#4A6A8A;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'">TODAY</button>
+          </div>
+        </div>
+        <div id="calWeekGrid" style="padding:0 1rem 1rem;"></div>
+      </div>
+
+      <!-- IDEAL DAY -->
+      <div class="ideal-day-card">
+        <div class="section-label">✦ Ideal Day</div>
+
+        <div class="id-phase-label morning">Morning</div>
+        <div class="id-grid">
+          <div class="id-block morning">
+            <div class="id-dot morning"></div>
+            <div class="id-info">
+              <div class="id-time">5:30 AM</div>
+              <div class="id-activity">Wake up + To-Do List</div>
+              <div class="id-dur">5 min</div>
+              <div><span class="id-tag keystone">keystone</span></div>
+            </div>
+          </div>
+          <div class="id-block morning">
+            <div class="id-dot morning"></div>
+            <div class="id-info">
+              <div class="id-time">5:35 AM</div>
+              <div class="id-activity">Gym — workout or run</div>
+              <div class="id-dur">60–75 min</div>
+              <div><span class="id-tag keystone">keystone</span></div>
+              <div class="id-note">Phase 1 focus: build this first.</div>
+            </div>
+          </div>
+          <div class="id-block morning">
+            <div class="id-dot morning"></div>
+            <div class="id-info">
+              <div class="id-time">6:50 AM</div>
+              <div class="id-activity">Smoothie + Shower</div>
+              <div class="id-dur">15 min</div>
+            </div>
+          </div>
+          <div class="id-block morning">
+            <div class="id-dot morning"></div>
+            <div class="id-info">
+              <div class="id-time">7:05 AM</div>
+              <div class="id-activity">Get Ready</div>
+              <div class="id-dur">30 min</div>
+            </div>
+          </div>
+          <div class="id-block morning">
+            <div class="id-dot morning"></div>
+            <div class="id-info">
+              <div class="id-time">7:35 AM</div>
+              <div class="id-activity">Breakfast + Coffee + Reading</div>
+              <div class="id-dur">30–40 min</div>
+              <div><span class="id-tag habit">habit</span></div>
+              <div class="id-note">News or book. Start with 10 pages.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="id-phase-label commute">Commute + Work</div>
+        <div class="id-grid">
+          <div class="id-block commute">
+            <div class="id-dot commute"></div>
+            <div class="id-info">
+              <div class="id-time">8:15 AM</div>
+              <div class="id-activity">Commute — Read or Podcast</div>
+              <div class="id-dur">30–45 min</div>
+              <div><span class="id-tag flex">flex</span></div>
+              <div class="id-note">Book on BART &gt; podcast.</div>
+            </div>
+          </div>
+          <div class="id-block commute">
+            <div class="id-dot commute"></div>
+            <div class="id-info">
+              <div class="id-time">9:00 AM</div>
+              <div class="id-activity">Work</div>
+              <div class="id-dur">~5 hrs</div>
+            </div>
+          </div>
+          <div class="id-block commute">
+            <div class="id-dot commute"></div>
+            <div class="id-info">
+              <div class="id-time">12:30 PM</div>
+              <div class="id-activity">Lunch — Read, Edit, or Podcast</div>
+              <div class="id-dur">45–60 min</div>
+              <div><span class="id-tag flex">flex</span></div>
+            </div>
+          </div>
+          <div class="id-block commute">
+            <div class="id-dot commute"></div>
+            <div class="id-info">
+              <div class="id-time">1:30 PM</div>
+              <div class="id-activity">Work</div>
+              <div class="id-dur">~3 hrs</div>
+            </div>
+          </div>
+          <div class="id-block commute">
+            <div class="id-dot commute"></div>
+            <div class="id-info">
+              <div class="id-time">4:30 PM</div>
+              <div class="id-activity">Commute Home — Read or Podcast</div>
+              <div class="id-dur">30–45 min</div>
+              <div><span class="id-tag flex">flex</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="id-phase-label evening">Evening</div>
+        <div class="id-grid">
+          <div class="id-block evening">
+            <div class="id-dot evening"></div>
+            <div class="id-info">
+              <div class="id-time">5:15 PM</div>
+              <div class="id-activity">Decompress — Chill Hour</div>
+              <div class="id-dur">60–90 min</div>
+              <div><span class="id-tag sacred">sacred</span></div>
+              <div class="id-note">Intentional rest. Not scrolling.</div>
+            </div>
+          </div>
+          <div class="id-block evening">
+            <div class="id-dot evening"></div>
+            <div class="id-info">
+              <div class="id-time">6:45 PM</div>
+              <div class="id-activity">Make + Eat Dinner</div>
+              <div class="id-dur">60 min</div>
+            </div>
+          </div>
+          <div class="id-block evening">
+            <div class="id-dot evening"></div>
+            <div class="id-info">
+              <div class="id-time">7:45 PM</div>
+              <div class="id-activity">TV with Eston</div>
+              <div class="id-dur">60 min</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="id-phase-label night">Wind-Down</div>
+        <div class="id-grid">
+          <div class="id-block night">
+            <div class="id-dot night"></div>
+            <div class="id-info">
+              <div class="id-time">8:45 PM</div>
+              <div class="id-activity">Read a Book</div>
+              <div class="id-dur">45–60 min</div>
+              <div><span class="id-tag habit">habit</span></div>
+              <div class="id-note">Analog only. No screens.</div>
+            </div>
+          </div>
+          <div class="id-block night">
+            <div class="id-dot night"></div>
+            <div class="id-info">
+              <div class="id-time">9:45 PM</div>
+              <div class="id-activity">Wind-Down + Prep for Tomorrow</div>
+              <div class="id-dur">15 min</div>
+              <div class="id-note">Lay out clothes, set intention.</div>
+            </div>
+          </div>
+          <div class="id-block night">
+            <div class="id-dot night"></div>
+            <div class="id-info">
+              <div class="id-time">10:00 PM</div>
+              <div class="id-activity">Lights Out</div>
+              <div class="id-dur">—</div>
+              <div><span class="id-tag keystone">keystone</span></div>
+              <div class="id-note">Everything depends on protecting this.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="id-focus-box">
+          <p><strong>Phase 1 — The only thing that matters right now:</strong> Wake at 5:30. Get to the gym. Don't try to install all habits at once. Once the gym is locked in (2–3 weeks), everything else has a foundation to attach to. <em>Never miss twice.</em></p>
+        </div>
+      </div>
+
+    </div><!-- /main-grid -->
+
+    <div class="footer-bar">every day, becoming</div>
+
+  </div><!-- /hero-content -->
+</div><!-- /hero -->
+
+</div><!-- /position:relative wrapper -->
+<div class="bg-tail"></div>
+
+<script>
+// ============================================================
+// EDIT: NAV TILE URLS
+// Once you've created each subpage as a Notion page with an
+// /embed of the GitHub Pages URL, replace the values below
+// with that Notion page URL (e.g. https://www.notion.so/yourworkspace/Wellness-abc123)
+// so clicking navigates within Notion rather than to GitHub directly.
+//
+// Format: 'tile-id': 'URL'
+// target="_blank" is already set on each tile — it will navigate
+// Notion's top-level window (stays in Notion, no new tab).
+// ============================================================
+var NAV_URLS = {
+  'nav-wellness':    'https://www.notion.so/Wellness-371e14bd86828035bd83f48ea355e954',
+  'nav-growth':      'https://www.notion.so/Growth-371e14bd868280f79c1bde475b0c9524',
+  'nav-finances':    'https://www.notion.so/Finances-371e14bd868280aebf2dc1a9eda22bcd',
+  'nav-productivity':'https://www.notion.so/Productivity-371e14bd868280789fbcecfcd96fcf84',
+  'nav-planning':    'https://www.notion.so/Planning-371e14bd86828004bef4dc4d55d271dd'
+};
+
+// Apply NAV_URLS to each tile
+Object.keys(NAV_URLS).forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.href = NAV_URLS[id];
+});
+
+// ── DATE ──
+function updateDate() {
+  const now = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  const ds = now.toLocaleDateString('en-US', opts);
+  document.getElementById('dateStamp').innerHTML = ds + '<br/>Week ' + getWeekNum(now);
+  const tb = document.getElementById('topbarDate');
+  if (tb) tb.textContent = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+}
+function getWeekNum(d) {
+  const s = new Date(d.getFullYear(), 0, 1);
+  return Math.ceil(((d - s) / 86400000 + s.getDay() + 1) / 7);
+}
+updateDate(); setInterval(updateDate, 60000);
+
+// ── SUPABASE CONFIG ──
+const SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
+const SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
+async function sbGet(table, id) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}&limit=1`, {
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+  });
+  const d = await r.json();
+  return d && d[0] ? d[0] : null;
+}
+async function sbUpsert(table, row) {
+  const res = await fetch(`${SB_URL}/rest/v1/${table}?on_conflict=id`, {
+    method: 'POST',
+    headers: {
+      apikey: SB_KEY,
+      Authorization: `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'resolution=merge-duplicates,return=minimal'
+    },
+    body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    console.warn(`[sbUpsert ${table}] ${res.status}:`, errText);
+    throw new Error(errText);
+  }
+}
+
+// ── LOCAL FALLBACK (session-only if Supabase unreachable) ──
+const _mem = {};
+const local = {
+  get: k => { try { return localStorage.getItem(k); } catch(e) { return _mem[k]||null; } },
+  set: (k,v) => { try { localStorage.setItem(k,v); } catch(e) { _mem[k]=v; } }
+};
+
+// ── HUB STATE ──
+let hubData = { quote:'', quote_attr:'', word:'', word_def:'', todos:[], inv_liner:1, inv_cycle_start:'', cal_events:[] };
+
+async function loadHub() {
+  try {
+    const row = await sbGet('main_hub', 'singleton');
+    if (row) {
+      hubData = { ...hubData, ...row };
+      applyHubToUI();
+      return;
+    }
+  } catch(e) {}
+  // Fallback to localStorage
+  hubData.quote          = local.get('hub_quote') || '';
+  hubData.quote_attr     = local.get('hub_attr') || '';
+  hubData.word           = local.get('hub_wotw') || '';
+  hubData.word_def       = local.get('hub_wotwdef') || '';
+  hubData.todos          = JSON.parse(local.get('hub_todos') || '[]');
+  hubData.inv_liner      = parseInt(local.get('inv_liner')) || 1;
+  hubData.inv_cycle_start= local.get('inv_cycle_start') || '';
+  try { hubData.cal_events = JSON.parse(local.get('hub_cal_events') || '[]'); } catch(e) { hubData.cal_events = []; }
+  applyHubToUI();
+}
+
+function applyHubToUI() {
+  if (hubData.quote) {
+    const el = document.getElementById('quoteText');
+    el.textContent = hubData.quote; el.style.opacity = ''; el.style.fontStyle = '';
+  }
+  if (hubData.quote_attr) document.getElementById('quoteAttr').textContent = hubData.quote_attr;
+  if (hubData.word) {
+    const wEl = document.getElementById('wotw');
+    const pEl = document.getElementById('wotwPill');
+    wEl.textContent = hubData.word; wEl.style.opacity = '';
+    pEl.style.opacity = ''; pEl.textContent = 'Word · Week ' + getWeekNum(new Date());
+  }
+  if (hubData.word_def) { const dEl = document.getElementById('wotwDef'); dEl.textContent = hubData.word_def; dEl.style.opacity = ''; }
+  todos = hubData.todos || [];
+  renderTodos();
+  if (hubData.inv_liner) {
+    document.getElementById('linerNum').value = hubData.inv_liner;
+    // Re-render liner display now that the real value is loaded
+    const day = getCurrentDay();
+    const big = document.getElementById('linerBig');
+    if (big) big.textContent = '#' + hubData.inv_liner;
+    const info = document.getElementById('linerInfo');
+    if (info) info.textContent = 'Liner #' + hubData.inv_liner + ' · Day ' + day + ' of ' + CYCLE_DAYS;
+    renderDayPips(day);
+  }
+  _calEvents = hubData.cal_events || [];
+  renderWeekCalendar();
+  // Also pull Monthly Outline native events and merge for display
+  mergeMOEventsIntoHub();
+}
+
+// ── SAVE STRATEGY ──
+// Both Main Hub and Planning.html write to the same `main_hub` row.
+// To prevent them from clobbering each other's fields, each page
+// only patches the fields it owns:
+//   saveHubMeta()    → quote / word / liner / cal_events  (never todos)
+//   saveTodosToHub() → todos only                         (never meta)
+
+async function saveHubMeta() {
+  const statusEl = document.getElementById('hubSaveStatus');
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  const payload = {
+    id:              'singleton',
+    quote:           hubData.quote           || '',
+    quote_attr:      hubData.quote_attr       || '',
+    word:            hubData.word             || '',
+    word_def:        hubData.word_def         || '',
+    inv_liner:       hubData.inv_liner        || 1,
+    inv_cycle_start: hubData.inv_cycle_start  || '',
+    cal_events:      hubData.cal_events       || []
+  };
+  try {
+    await sbUpsert('main_hub', payload);
+    if (statusEl) { statusEl.textContent = 'saved ✓'; statusEl.style.color = '#4a8a6e'; setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 2500); }
+  } catch(e) {
+    if (statusEl) { statusEl.textContent = 'cloud save failed — local only'; statusEl.style.color = '#b05050'; }
+    console.warn('[Hub] Meta save failed:', e.message);
+  }
+  local.set('hub_quote',       hubData.quote);
+  local.set('hub_attr',        hubData.quote_attr);
+  local.set('hub_wotw',        hubData.word);
+  local.set('hub_wotwdef',     hubData.word_def);
+  local.set('inv_liner',       hubData.inv_liner);
+  local.set('inv_cycle_start', hubData.inv_cycle_start);
+  local.set('hub_cal_events',  JSON.stringify(hubData.cal_events || []));
+}
+
+async function saveTodosToHub() {
+  try {
+    await sbUpsert('main_hub', { id: 'singleton', todos: hubData.todos || [] });
+  } catch(e) {
+    console.warn('[Hub] Todos save failed:', e.message);
+  }
+  local.set('hub_todos', JSON.stringify(hubData.todos || []));
+}
+
+// saveHub() is used by calendar/liner callers — route to meta-only save
+function saveHub() { return saveHubMeta(); }
+
+// ── QUOTE / WORD ──
+function saveQuote() {
+  const q = document.getElementById('quoteIn').value.trim();
+  const a = document.getElementById('attrIn').value.trim();
+  if (q) { const el = document.getElementById('quoteText'); el.textContent = q; el.style.opacity = ''; el.style.fontStyle = ''; hubData.quote = q; }
+  if (a) { document.getElementById('quoteAttr').textContent = a; hubData.quote_attr = a; }
+  document.getElementById('quoteIn').value = '';
+  document.getElementById('attrIn').value = '';
+  saveHubMeta();
+}
+function saveWord() {
+  const w = document.getElementById('wotwIn').value.trim();
+  const d = document.getElementById('wotwDefIn').value.trim();
+  const wEl = document.getElementById('wotw');
+  const pEl = document.getElementById('wotwPill');
+  const dEl = document.getElementById('wotwDef');
+  if (w) {
+    wEl.textContent = w; wEl.style.opacity = '';
+    pEl.style.opacity = ''; pEl.textContent = 'Word · Week ' + getWeekNum(new Date());
+    hubData.word = w;
+  }
+  if (d) { dEl.textContent = d; dEl.style.opacity = ''; hubData.word_def = d; }
+  document.getElementById('wotwIn').value = '';
+  document.getElementById('wotwDefIn').value = '';
+  saveHubMeta();
+}
+loadHub();
+
+// ── TO-DO ──
+let todos = [];
+function saveTodos() { hubData.todos = todos; saveTodosToHub(); }
+function renderTodos() {
+  const ul = document.getElementById('todoList');
+  ul.innerHTML = '';
+  todos.forEach((t, i) => {
+    const li = document.createElement('li');
+    li.className = 'todo-item' + (t.done ? ' done' : '');
+    li.innerHTML = `
+      <div class="todo-check ${t.done?'checked':''}" onclick="toggleTodo(${i})"></div>
+      <span>${t.text}</span>
+      <span class="todo-del" onclick="deleteTodo(${i})">✕</span>
+    `;
+    ul.appendChild(li);
+  });
+}
+function addTodo() {
+  const inp = document.getElementById('todoInput');
+  const v = inp.value.trim();
+  if (!v) return;
+  todos.unshift({ text: v, done: false });
+  saveTodos(); renderTodos();
+  inp.value = '';
+}
+function toggleTodo(i) { todos[i].done = !todos[i].done; saveTodos(); renderTodos(); }
+function deleteTodo(i) { todos.splice(i, 1); saveTodos(); renderTodos(); }
+
+// ── GOALS — carousel grouped by subpage ──
+// Each "slide" represents one subpage's goals, synced from its localStorage keys.
+const subpageURLs = {
+  'Wellness':    'https://javauntgarcia.github.io/Notion/Wellness.html',
+  'Productivity':'https://javauntgarcia.github.io/Notion/Productivity.html',
+  'Finances':    'https://javauntgarcia.github.io/Notion/Finances.html',
+  'Growth':      'https://javauntgarcia.github.io/Notion/Growth.html',
+  'Planning':    'https://javauntgarcia.github.io/Notion/Planning.html',
+};
+
+const goalSlides = [
+  {
+    subpage: 'Wellness',
+    color: '#2d5ba8',
+    goals: [
+      {
+        name: 'Consistency',
+        color: 'bar-green',
+        milestone: 'Active 75% of year',
+        compute: function() {
+          var activeDays = parseInt(hubData._wellness ? hubData._wellness.active_days : 0) || 0;
+          var now = new Date();
+          var elapsed = Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000);
+          var target = Math.round(elapsed * 0.75);
+          return { pct: target > 0 ? Math.min(100, Math.round(activeDays/target*100)) : 0,
+                   meta: activeDays + ' active days' };
+        }
+      },
+      {
+        name: 'Body — 165 lbs',
+        color: 'bar-rust',
+        milestone: 'Reach 165 lbs',
+        compute: function() {
+          var wrow = hubData._wellness || {};
+          var cur = parseFloat(wrow.weight) || 0;
+          if (!cur && wrow.checkin_entries && wrow.checkin_entries.length) {
+            var sorted = wrow.checkin_entries.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+            cur = parseFloat(sorted[0].weight) || 0;
+          }
+          if (!cur) return { pct: 0, meta: 'No weight logged' };
+          var start = parseFloat(wrow.weight_start) || cur;
+          var totalToLose = Math.abs(start - 165);
+          var pct = totalToLose > 0 ? Math.min(100, Math.round(Math.abs(cur-start)/totalToLose*100)) : (cur<=165?100:0);
+          if (cur <= 165) pct = 100;
+          return { pct: pct, meta: cur + ' lbs current' };
+        }
+      },
+      {
+        name: 'Strength — 50 Push-Ups',
+        color: 'bar-navy',
+        milestone: 'Achieve 50 push-ups',
+        compute: function() {
+          var n = parseInt((hubData._wellness||{}).pushups) || 0;
+          return { pct: Math.min(100, Math.round(n/50*100)), meta: n ? n+' max reps' : 'Not logged yet' };
+        }
+      }
+    ]
+  },
+  {
+    subpage: 'Productivity',
+    color: '#7a1a1a',
+    goals: [
+      {
+        name: 'Curriculum',
+        color: 'bar-gold',
+        milestone: '2 self-designed curriculums',
+        compute: function() {
+          var n = Math.min(2, parseInt((hubData._productivity||{}).prod_curr_done) || 0);
+          return { pct: Math.round(n/2*100), meta: n+' of 2 completed' };
+        }
+      },
+      {
+        name: 'Social Media',
+        color: 'bar-navy',
+        milestone: 'Publish every week in 2026',
+        compute: function() {
+          var n = Math.min(52, parseInt((hubData._productivity||{}).prod_social_weeks) || 0);
+          return { pct: Math.round(n/52*100), meta: n+' of 52 weeks' };
+        }
+      },
+      {
+        name: 'Depop',
+        color: 'bar-rust',
+        milestone: 'Sell 25 items',
+        compute: function() {
+          var n = Math.min(25, parseInt((hubData._productivity||{}).prod_dep_sold) || 0);
+          return { pct: Math.round(n/25*100), meta: n+' of 25 sold' };
+        }
+      },
+      {
+        name: 'Journalism',
+        color: 'bar-green',
+        milestone: 'Publish freelance article',
+        compute: function() {
+          var done = (hubData._productivity||{}).prod_jour_done === 1;
+          return { pct: done?100:0, meta: done?'Published ✓':'In progress' };
+        }
+      }
+    ]
+  }
+];
+
+var goalCarouselIdx = 0;
+
+function buildGoalCarousel() {
+  var track = document.getElementById('goalTrack');
+  var dots  = document.getElementById('goalDots');
+  track.innerHTML = '';
+  dots.innerHTML  = '';
+
+  goalSlides.forEach(function(slide, si) {
+    // Compute all goal values
+    var slide_goals = slide.goals.map(function(g) {
+      var res = g.compute();
+      return { name: g.name, color: g.color, milestone: g.milestone, pct: res.pct, meta: res.meta };
+    });
+
+    var slideEl = document.createElement('div');
+    slideEl.className = 'goal-slide';
+
+    // Multi-goal layout: 2-column mini grid if 3+ goals, single-column if 1-2
+    var inner = slide_goals.map(function(g, gi) {
+      return '<div class="goal-item" style="margin-bottom:0.55rem;">' +
+        '<div class="goal-header">' +
+          '<span class="goal-name">' + g.name + '</span>' +
+          '<span class="goal-pct-edit" style="cursor:default;">' + g.pct + '%</span>' +
+        '</div>' +
+        '<div class="goal-bar-track"><div class="goal-bar-fill ' + g.color + '" style="width:0%" id="gbar_' + si + '_' + gi + '"></div></div>' +
+        '<div class="goal-milestone">' + g.meta + '</div>' +
+      '</div>';
+    }).join('');
+
+    slideEl.innerHTML = '<div style="display:grid;grid-template-columns:'+(slide_goals.length > 2 ? '1fr 1fr' : '1fr')+';gap:0.5rem 1rem;">' + inner + '</div>';
+    track.appendChild(slideEl);
+
+    // Dot
+    var dot = document.createElement('div');
+    dot.className = 'goal-carousel-dot' + (si === 0 ? ' active' : '');
+    dot.dataset.idx = si;
+    dot.addEventListener('click', function() { goalCarouselGoTo(parseInt(this.dataset.idx)); });
+    dots.appendChild(dot);
+  });
+
+  updateGoalCarouselState();
+  // Animate bars after render
+  setTimeout(animateGoalBars, 220);
+}
+
+function animateGoalBars() {
+  goalSlides.forEach(function(slide, si) {
+    slide.goals.forEach(function(g, gi) {
+      var res = g.compute();
+      var el = document.getElementById('gbar_' + si + '_' + gi);
+      if (el) el.style.width = res.pct + '%';
+    });
+  });
+}
+
+function goalCarouselGoTo(idx) {
+  if (idx < 0 || idx >= goalSlides.length) return;
+  goalCarouselIdx = idx;
+  document.getElementById('goalTrack').style.transform = 'translateX(-' + (idx * 100) + '%)';
+  document.querySelectorAll('.goal-carousel-dot').forEach(function(d, i) {
+    d.classList.toggle('active', i === idx);
+  });
+  updateGoalCarouselState();
+}
+
+function updateGoalCarouselState() {
+  var prev = document.getElementById('goalPrev');
+  var next = document.getElementById('goalNext');
+  var label = document.getElementById('goalSubLabel');
+  if (prev) prev.disabled = goalCarouselIdx === 0;
+  if (next) next.disabled = goalCarouselIdx === goalSlides.length - 1;
+  if (label) {
+    var sp = goalSlides[goalCarouselIdx].subpage;
+    var url = subpageURLs[sp] || '#';
+    label.innerHTML = '<a href="' + url + '" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(74,106,138,0.35);padding-bottom:1px;transition:border-color 0.2s;" onmouseover="this.style.borderColor=\'#7DA0BC\'" onmouseout="this.style.borderColor=\'rgba(74,106,138,0.35)\'">' + sp + ' goals ↗</a>';
+  }
+}
+
+function goalCarouselPrev() { goalCarouselGoTo(goalCarouselIdx - 1); }
+function goalCarouselNext() { goalCarouselGoTo(goalCarouselIdx + 1); }
+
+// Touch swipe support
+(function() {
+  var vp, startX, startY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function() {
+    vp = document.querySelector('.goal-carousel-viewport');
+    if (!vp) return;
+    vp.addEventListener('touchstart', function(e) {
+      startX = e.touches[0].clientX; startY = e.touches[0].clientY; dragging = false;
+    }, { passive: true });
+    vp.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].clientX - startX;
+      var dy = e.changedTouches[0].clientY - startY;
+      if (Math.abs(dx) > 36 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        if (dx < 0) goalCarouselNext(); else goalCarouselPrev();
+      }
+    }, { passive: true });
+  });
+})();
+
+buildGoalCarousel();
+
+// Load wellness + productivity data for goal carousel
+(async function() {
+  try {
+    hubData._wellness    = await sbGet('wellness', 'singleton');
+    hubData._productivity = await sbGet('productivity', 'singleton');
+    buildGoalCarousel();
+  } catch(e) {}
+})();
+
+
+// ── INVISALIGN LINER TRACKER ──
+const CYCLE_DAYS = 10;
+
+function getCycleStart() {
+  let s = hubData.inv_cycle_start;
+  if (!s) {
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    s = twoDaysAgo.toDateString();
+    hubData.inv_cycle_start = s;
+    saveHub();
+  }
+  return new Date(s);
+}
+
+function getCurrentDay() {
+  const start = getCycleStart();
+  const today = new Date();
+  const diff = Math.floor((today - start) / 86400000);
+  return Math.min(diff + 1, CYCLE_DAYS);
+}
+
+function renderDayPips(currentDay) {
+  const wrap = document.getElementById('dayPips');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= CYCLE_DAYS; i++) {
+    const pip = document.createElement('div');
+    pip.style.cssText = `width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(245,239,228,0.3);background:${i<currentDay?'#4A6A8A':i===currentDay?'#C8D8E2':'transparent'};box-shadow:${i===currentDay?'0 0 6px rgba(200,216,226,0.5)':'none'};transition:background 0.3s;cursor:default;`;
+    pip.title = `Day ${i}`;
+    wrap.appendChild(pip);
+  }
+}
+
+function updateLinerLabel() {
+  const num = document.getElementById('linerNum').value;
+  const day = getCurrentDay();
+  document.getElementById('linerInfo').textContent = `Liner #${num} · Day ${day} of ${CYCLE_DAYS}`;
+  const big = document.getElementById('linerBig');
+  if (big) big.textContent = '#' + num;
+  hubData.inv_liner = parseInt(num);
+  saveHub();
+  renderDayPips(day);
+}
+
+function nextLiner() {
+  hubData.inv_cycle_start = new Date().toDateString();
+  const n = document.getElementById('linerNum');
+  n.value = +n.value + 1;
+  hubData.inv_liner = parseInt(n.value);
+  saveHub();
+  updateLinerLabel();
+}
+
+// Init liner tracker — called inside applyHubToUI() after data loads
+
+// ── WEEKLY CALENDAR ──
+let _calEvents = [];
+function loadCalEvents() { return _calEvents; }
+function saveCalEvents(evts) {
+  _calEvents = evts;
+  hubData.cal_events = evts;
+  saveHub();
+  // Cross-sync: write merged events to monthly_outline so it stays current
+  syncEventsToMonthlyOutline(evts);
+}
+
+async function syncEventsToMonthlyOutline(hubEvts) {
+  try {
+    const moRow = await sbGet('monthly_outline', 'singleton') || {};
+    const moEvts = moRow.cal_events || [];
+    // Hub events use startH/endH integers; convert to MO format { id, title, date, cat, start, end, notes }
+    // Keep any MO-native events (those without a hubSource flag), replace hub-sourced ones
+    const moNative = moEvts.filter(function(e){ return !e.hubSource; });
+    const hubConverted = hubEvts.map(function(e){
+      return {
+        id:        e.id,
+        title:     e.title,
+        date:      e.date,
+        cat:       e.cat || 'events',
+        start:     e.startH != null ? (e.startH < 10 ? '0'+e.startH : ''+e.startH) + ':00' : '',
+        end:       e.endH  != null ? (e.endH  < 10 ? '0'+e.endH  : ''+e.endH)  + ':00' : '',
+        notes:     e.notes || '',
+        allDay:    e.allDay || false,
+        hubSource: true
+      };
+    });
+    const merged = moNative.concat(hubConverted);
+    await sbUpsert('monthly_outline', { id: 'singleton', cal_events: merged });
+  } catch(e) { console.warn('[Hub→MO sync]', e.message); }
+}
+
+const HOURS = Array.from({length: 21}, (_, i) => i + 4); // 4am–12am
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+let calWeekOffset = 0; // 0 = current week
+
+function getWeekStart(offset) {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - day + (offset * 7));
+  monday.setHours(0,0,0,0);
+  return monday;
+}
+
+function dateKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+async function mergeMOEventsIntoHub() {
+  try {
+    const moRow = await sbGet('monthly_outline', 'singleton');
+    if (!moRow) return;
+    const moEvts = (moRow.cal_events || []).filter(function(e){ return !e.hubSource; });
+    // Convert MO format to Hub format for rendering
+    const converted = moEvts.map(function(e){
+      var startH = 9;
+      var endH   = 10;
+      if (e.start && e.start.length >= 2) startH = parseInt(e.start.split(':')[0]) || 9;
+      if (e.end   && e.end.length   >= 2) endH   = parseInt(e.end.split(':')[0])   || startH + 1;
+      // Map MO category to a color
+      var catColors = {
+        appointments: '#4a9090', birthdays: '#c05878', events: '#3a5a9a',
+        work: '#506070', creative: '#c07030', activity: '#4a7a3a',
+        bills: '#9a8020', meals: '#8c4a2f'
+      };
+      return {
+        id:       e.id,
+        title:    e.title,
+        date:     e.date,
+        startH:   startH,
+        endH:     endH,
+        allDay:   e.allDay || (!e.start && !e.end),
+        color:    catColors[e.cat] || '#6B7F8E',
+        cat:      e.cat,
+        notes:    e.notes || '',
+        moSource: true
+      };
+    });
+    // Merge: keep hub-native events, replace/add MO-sourced ones
+    var hubNative = _calEvents.filter(function(e){ return !e.moSource; });
+    _calEvents = hubNative.concat(converted);
+    renderWeekCalendar();
+  } catch(e) { console.warn('[MO→Hub merge]', e.message); }
+}
+
+// Poll for Monthly Outline changes every 30 seconds
+setInterval(mergeMOEventsIntoHub, 30000);
+
+function renderWeekCalendar() {
+  const ws = getWeekStart(calWeekOffset);
+  const we = new Date(ws); we.setDate(ws.getDate() + 6);
+  document.getElementById('calWeekLabel').textContent =
+    MONTHS[ws.getMonth()] + ' ' + ws.getDate() + ' – ' + MONTHS[we.getMonth()] + ' ' + we.getDate() + ', ' + we.getFullYear();
+
+  const evts = loadCalEvents();
+  const today = dateKey(new Date());
+  const grid = document.getElementById('calWeekGrid');
+
+  // Build days array (Sun-Sat)
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(ws);
+    d.setDate(ws.getDate() + i);
+    days.push(d);
+  }
+
+  // Color palette for events
+  const colors = ['#4A6A8A','#6B8C6E','#7DA0BC','#9AB89C','#6B7F8E','#5A7A8A','#3A5878'];
+
+  let html = '<div style="display:grid;grid-template-columns:38px repeat(7,1fr);gap:0;border:1px solid rgba(74,106,138,0.18);border-radius:8px;overflow:hidden;font-size:0.52rem;">';
+
+  // Header row
+  html += '<div style="background:rgba(74,106,138,0.06);border-bottom:1px solid rgba(74,106,138,0.18);"></div>';
+  days.forEach(function(d) {
+    const isToday = dateKey(d) === today;
+    html += '<div style="padding:0.45rem 0.3rem;text-align:center;background:' +
+      (isToday ? 'rgba(74,106,138,0.18)' : 'rgba(74,106,138,0.06)') +
+      ';border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.18);">' +
+      '<div style="letter-spacing:0.15em;text-transform:uppercase;color:' + (isToday ? '#4A6A8A' : '#3A4F5C') + ';font-weight:' + (isToday ? '500' : '400') + ';">' + DAYS_SHORT[d.getDay()] + '</div>' +
+      '<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.9rem;font-weight:' + (isToday ? '700' : '400') + ';color:' + (isToday ? '#4A6A8A' : '#1A2530') + ';line-height:1.2;">' + d.getDate() + '</div>' +
+      '</div>';
+  });
+
+  // All-day row — events spanning the day (startH < 0 or endH < 0)
+  const allDayEvts = evts.filter(function(e) { return e.allDay; });
+  html += '<div style="padding:0.35rem 0.25rem;text-align:right;background:rgba(74,106,138,0.03);border-bottom:1px solid rgba(74,106,138,0.12);color:#4A6A8A;opacity:0.5;font-size:0.45rem;letter-spacing:0.1em;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;">ALL DAY</div>';
+  days.forEach(function(d) {
+    const dk = dateKey(d);
+    const dayAllDay = allDayEvts.filter(function(e){ return e.date === dk; });
+    html += '<div style="border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.12);padding:0.2rem;min-height:22px;background:rgba(74,106,138,0.02);">';
+    dayAllDay.forEach(function(e) {
+      html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="deleteCalEvent(\'' + e.id + '\')" title="Click to remove: ' + e.title + '">' + e.title + '</div>';
+    });
+    html += '</div>';
+  });
+
+  // Hour rows
+  HOURS.forEach(function(h) {
+    const label = h === 12 ? '12p' : h > 12 ? (h-12)+'p' : h+'a';
+    html += '<div style="padding:0.25rem 0.3rem 0 0;text-align:right;color:#4A6A8A;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(74,106,138,0.07);line-height:1;padding-top:0.3rem;">' + label + '</div>';
+    days.forEach(function(d) {
+      const dk = dateKey(d);
+      const isToday = dk === today;
+      const hourEvts = evts.filter(function(e){ return e.date===dk && !e.allDay && parseInt(e.startH)===h; });
+      html += '<div style="border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.07);min-height:28px;background:' +
+        (isToday ? 'rgba(74,106,138,0.04)' : 'transparent') +
+        ';position:relative;padding:1px 2px;" ondblclick="quickAddEvent(\'' + dk + '\',' + h + ')">';
+      hourEvts.forEach(function(e) {
+        var dur = Math.max(1, (parseInt(e.endH)||h+1) - h);
+        html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;position:absolute;left:2px;right:2px;top:1px;z-index:2;" onclick="deleteCalEvent(\'' + e.id + '\')" title="Click to remove: ' + e.title + '">' + e.title + '</div>';
+      });
+      html += '</div>';
+    });
+  });
+
+  html += '</div>';
+
+  // Add event form
+  html += '<div style="margin-top:0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">' +
+    '<input id="calEvtTitle" placeholder="Event title…" style="flex:2;min-width:110px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" />' +
+    '<input id="calEvtDate" type="date" style="flex:1;min-width:120px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;" />' +
+    '<select id="calEvtStart" style="background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;">' +
+    HOURS.map(function(h){ var l=h===12?'12:00p':h>12?(h-12)+':00p':h+':00a'; return '<option value="'+h+'">'+l+'</option>'; }).join('') +
+    '</select>' +
+    '<select id="calEvtEnd" style="background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;">' +
+    HOURS.map(function(h){ var l=h===12?'12:00p':h>12?(h-12)+':00p':h+':00a'; return '<option value="'+h+'">'+l+'</option>'; }).join('') +
+    '</select>' +
+    '<label style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" style="width:10px;height:10px;" /> All-day</label>' +
+    '<button onclick="addCalEvent()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
+    '</div>';
+
+  grid.innerHTML = html;
+
+  // Set today's date as default
+  const todayInput = document.getElementById('calEvtDate');
+  if (todayInput && !todayInput.value) todayInput.value = dateKey(new Date());
+}
+
+function calPrevWeek() { calWeekOffset--; renderWeekCalendar(); }
+function calNextWeek() { calWeekOffset++; renderWeekCalendar(); }
+function calGoToday() { calWeekOffset = 0; renderWeekCalendar(); }
+
+function addCalEvent() {
+  const title = document.getElementById('calEvtTitle').value.trim();
+  if (!title) return;
+  const evts = loadCalEvents();
+  const colors = ['#4A6A8A','#6B8C6E','#7DA0BC','#9AB89C','#6B7F8E'];
+  const newEvt = {
+    id: Date.now() + '' + Math.floor(Math.random()*1000),
+    date: document.getElementById('calEvtDate').value,
+    startH: parseInt(document.getElementById('calEvtStart').value),
+    endH: parseInt(document.getElementById('calEvtEnd').value) + 1,
+    allDay: document.getElementById('calEvtAllDay').checked,
+    title: title,
+    color: colors[evts.length % colors.length],
+    cat: 'events',
+    notes: '',
+    hubNative: true
+  };
+  evts.push(newEvt);
+  saveCalEvents(evts);
+  document.getElementById('calEvtTitle').value = '';
+  renderWeekCalendar();
+}
+
+function deleteCalEvent(id) {
+  if (!confirm('Remove this event?')) return;
+  const evts = loadCalEvents().filter(function(e){ return e.id !== id; });
+  // Also remove from in-memory MO-sourced display list
+  _calEvents = _calEvents.filter(function(e){ return e.id !== id; });
+  saveCalEvents(evts);
+  // Remove from MO table too
+  deleteEventFromMO(id);
+  renderWeekCalendar();
+}
+
+async function deleteEventFromMO(id) {
+  try {
+    const moRow = await sbGet('monthly_outline', 'singleton');
+    if (!moRow) return;
+    moRow.cal_events = (moRow.cal_events || []).filter(function(e){ return e.id !== id; });
+    await sbUpsert('monthly_outline', { id: 'singleton', cal_events: moRow.cal_events });
+  } catch(e) { console.warn('[Hub delete→MO]', e.message); }
+}
+
+function quickAddEvent(dateStr, hour) {
+  const title = prompt('Event title for ' + dateStr + ' at ' + (hour > 12 ? (hour-12)+'pm' : hour+'am') + ':');
+  if (!title || !title.trim()) return;
+  const evts = loadCalEvents();
+  const colors = ['#4A6A8A','#6B8C6E','#7DA0BC','#9AB89C','#6B7F8E'];
+  evts.push({
+    id: Date.now() + '' + Math.floor(Math.random()*1000),
+    date: dateStr, startH: hour, endH: hour+1, allDay: false,
+    title: title.trim(), color: colors[evts.length % colors.length],
+    cat: 'events', notes: '', hubNative: true
+  });
+  saveCalEvents(evts);
+  renderWeekCalendar();
+}
+
+renderWeekCalendar();
+// Cold-start liner render (overwritten by applyHubToUI once Supabase data loads)
+(function() {
+  var day = getCurrentDay();
+  var big = document.getElementById('linerBig');
+  var num = document.getElementById('linerNum');
+  var info = document.getElementById('linerInfo');
+  var linerVal = (num ? parseInt(num.value) : 1) || 1;
+  if (big) big.textContent = '#' + linerVal;
+  if (info) info.textContent = 'Liner #' + linerVal + ' · Day ' + day + ' of ' + CYCLE_DAYS;
+  renderDayPips(day);
+})();
+</script>
+</body>
+</html>
