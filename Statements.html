@@ -288,6 +288,11 @@
   .owner-btn.eston { background:rgba(126,184,154,0.12); border-color:rgba(126,184,154,0.25); color:var(--positive); }
   .owner-btn.split { background:rgba(138,138,138,0.1); border-color:rgba(138,138,138,0.25); color:var(--light-grey); }
   .owner-btn.inactive { background:transparent; border-color:var(--rule); color:var(--warm-grey); opacity:0.5; }
+  .owner-btn.delete-btn {
+    background:transparent; border-color:rgba(201,126,126,0.25); color:var(--negative);
+    opacity:0.55; margin-left:2px;
+  }
+  .owner-btn.delete-btn:hover { opacity:1; background:rgba(201,126,126,0.15); border-color:rgba(201,126,126,0.4); }
   .share-pct-wrap {
     display:none; align-items:center; gap:4px; margin-top:4px;
   }
@@ -781,10 +786,11 @@ function renderTable() {
       <span class="t-cat ${cc}">${t.category}</span>
       <span class="t-amt">$${t.amount.toFixed(2)}</span>
       <span class="t-owner" style="flex-direction:column;align-items:flex-start;gap:3px;">
-        <span style="display:flex;gap:4px;">
+        <span style="display:flex;gap:4px;align-items:center;">
           <button class="owner-btn ${t.owner==='javaun'?'javaun':'inactive'}" onclick="setOwner(${start+i},'javaun',event)">J</button>
           <button class="owner-btn ${t.owner==='eston'?'eston':'inactive'}" onclick="setOwner(${start+i},'eston',event)">E</button>
           <button class="owner-btn ${t.owner==='split'?'split':'inactive'}" onclick="setOwner(${start+i},'split',event)">½</button>
+          <button class="owner-btn delete-btn" title="Delete transaction" onclick="deleteTransaction(${start+i},event)">✕</button>
         </span>
         <span class="share-pct-wrap ${t.owner==='split'?'visible':''}" id="spw-${start+i}">
           <span class="share-pct-label">my %</span>
@@ -797,25 +803,48 @@ function renderTable() {
   }).join('');
 }
 
-function setOwner(idx, owner, e) {
+function setOwner(filteredIdx, owner, e) {
   e.stopPropagation();
+  const txn = filtered[filteredIdx];
+  if (!txn) return;
+  const idx = allTxns.indexOf(txn);
+  if (idx === -1) return;
   allTxns[idx].owner = owner;
   // default sharePct to 50 when first tagging as split
   if (owner === 'split' && !allTxns[idx].sharePct) allTxns[idx].sharePct = 50;
   saveTransactions();
   // toggle share % picker inline without full re-render
-  const wrap = document.getElementById('spw-' + idx);
+  const wrap = document.getElementById('spw-' + filteredIdx);
   if (wrap) wrap.classList.toggle('visible', owner === 'split');
   // re-render to refresh button states
   applyFilters();
   showToast('Owner → ' + owner + (owner === 'split' ? ' (' + (allTxns[idx].sharePct||50) + '% yours)' : ''));
 }
 
-function setSharePct(idx, pct, e) {
+function setSharePct(filteredIdx, pct, e) {
   e.stopPropagation();
+  const txn = filtered[filteredIdx];
+  if (!txn) return;
+  const idx = allTxns.indexOf(txn);
+  if (idx === -1) return;
   allTxns[idx].sharePct = parseInt(pct);
   saveTransactions();
   showToast('Share → ' + pct + '% yours · $' + (allTxns[idx].amount * parseInt(pct) / 100).toFixed(2));
+}
+
+function deleteTransaction(filteredIdx, e) {
+  e.stopPropagation();
+  const txn = filtered[filteredIdx];
+  if (!txn) return;
+  const ok = confirm(`Delete "${txn.desc}" — ${txn.date} · $${txn.amount.toFixed(2)}?\n\nThis cannot be undone.`);
+  if (!ok) return;
+  const idx = allTxns.indexOf(txn);
+  if (idx === -1) return;
+  allTxns.splice(idx, 1);
+  saveTransactions();
+  applyFilters();
+  updateHero();
+  showToast('Deleted: ' + txn.desc + ' ($' + txn.amount.toFixed(2) + ')');
 }
 
 function changePage(dir) {
