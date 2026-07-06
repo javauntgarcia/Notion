@@ -844,7 +844,7 @@
     <div class="section-header">
       <h2 class="section-title">Monthly Trend</h2>
       <div class="section-rule"></div>
-      <span class="section-note">Jan – May 2026</span>
+      <span class="section-note">Jan – Jun 2026</span>
     </div>
     <div class="trend-wrap">
       <div class="trend-chart" id="trend-chart"></div>
@@ -907,7 +907,7 @@
     <div class="section-header">
       <h2 class="section-title">Spending by Day of Week</h2>
       <div class="section-rule"></div>
-      <span class="section-note">all transactions Jan–May 2026</span>
+      <span class="section-note">all transactions Jan–Jun 2026</span>
     </div>
 
     <div class="dow-stats" id="dow-stats"></div>
@@ -956,7 +956,7 @@
 // ─────────────────────────────────────────────
 // DATA — sourced from Chase Sapphire, BILT,
 // Chase Checking, Wealthfront Personal &
-// Joint statements Jan–May 2026
+// Joint statements Jan–Jun 2026
 // ─────────────────────────────────────────────
 
 const MONTHS = {
@@ -1098,8 +1098,39 @@ const MONTHS = {
   },
 };
 
+
+  'Jun 2026': {
+    income: {
+      'SFMTA Payroll':    { amt: 5654.05, note: '4 deposits · CHK $2,304 + WF $3,350' },
+      'Wealthfront Dep.': { amt: 1750.00, note: 'Eston joint deposit ($1,650 + $100)' },
+      'Depop Sales':      { amt:  168.27, note: 'WF personal · 5 sales' },
+    },
+    spending: {
+      'Rent':           { amt: 4972.19,  txns: 2,  color:'#c9a27e', pill:'pill-other'        },
+      'Home/Reno':      { amt: 1172.39,  txns: 8,  color:'#a07e6e', pill:'pill-other'        },
+      'Shopping':       { amt: 1088.77,  txns: 33, color:'#b87e9a', pill:'pill-shopping'     },
+      'Dining Out':     { amt:  800.59,  txns: 27, color:'#c9927e', pill:'pill-dining'       },
+      'Groceries':      { amt:  656.59,  txns: 11, color:'#7eb89a', pill:'pill-groceries'    },
+      'Beauty':         { amt:  612.97,  txns: 4,  color:'#c97eb8', pill:'pill-other'        },
+      'Entertainment':  { amt:  510.94,  txns: 6,  color:'#a87eb8', pill:'pill-other'        },
+      'Subscriptions':  { amt:  388.88,  txns: 9,  color:'#7e7eb8', pill:'pill-subscriptions'},
+      'Utilities':      { amt:  254.37,  txns: 1,  color:'#b8b87e', pill:'pill-other'        },
+      'Transportation': { amt:  228.76,  txns: 36, color:'#7e9ab8', pill:'pill-transport'    },
+      'Bars & Night.':  { amt:  179.59,  txns: 3,  color:'#9a7eb8', pill:'pill-bars'         },
+      'Insurance':      { amt:   84.07,  txns: 2,  color:'#b87e7e', pill:'pill-other'        },
+      'Interest':       { amt:   32.46,  txns: 1,  color:'#c07070', pill:'pill-other'        },
+    },
+    merchants: [
+      { name:'Amazon (net)',        cat:'Shopping',  pill:'pill-shopping',  amt: 728.04 },
+      { name:'Paradise Services',   cat:'Home/Reno', pill:'pill-other',     amt: 863.91 },
+      { name:'Ulta Beauty',         cat:'Beauty',    pill:'pill-other',     amt: 479.22 },
+      { name:'Whole Foods Market',  cat:'Groceries', pill:'pill-groceries', amt: 435.96 },
+      { name:'Ariana Grande / RA',  cat:'Entertain.',pill:'pill-other',     amt: 470.16 },
+    ],
+  },
+
 const MONTH_KEYS = Object.keys(MONTHS);
-let activeMonth = 'May 2026';
+let activeMonth = 'Jun 2026';
 
 // ── HELPERS ──
 function fmt(n) {

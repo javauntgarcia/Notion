@@ -551,7 +551,7 @@
       </a>
       <a id="nav-budget" href="https://javauntgarcia.github.io/Notion/Budget.html" target="_blank" class="subpage-card" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Budget.jpg');">
         <p class="subpage-card-title">Budget</p>
-        <p class="subpage-card-desc">June & July · Shared bills · Debt paydown</p>
+        <p class="subpage-card-desc">July forward · BILT tracking begins</p>
         <span class="subpage-arrow">→</span>
       </a>
       <a id="nav-statements" href="https://javauntgarcia.github.io/Notion/Statements.html" target="_blank" class="subpage-card" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Statements.jpg');">
@@ -613,15 +613,15 @@ function fmtDate(iso) {
 
 // ── REAL ACCOUNT DATA (as of May 31, 2026) ──
 const ACCOUNTS = [
-  { name: 'BILT Mastercard',        type: 'Credit Card', class: 'debt',     balance: -1219.14 },
-  { name: 'Discover It',            type: 'Credit Card', class: 'debt',     balance: -2059.57 },
-  { name: 'Citi Diamond Preferred', type: 'Credit Card', class: 'debt',     balance: -5459.99 },
-  { name: 'Chase Sapphire Reserve', type: 'Credit Card', class: 'debt',     balance: -88.02   },
-  { name: 'Chase Checking',         type: 'Checking',    class: 'checking', balance:  3801.95  },
+  { name: 'BILT Mastercard',        type: 'Credit Card', class: 'debt',     balance: -3528.22 },
+  { name: 'Discover It',            type: 'Credit Card', class: 'debt',     balance: -1185.95 },
+  { name: 'Citi Diamond Preferred', type: 'Credit Card', class: 'debt',     balance: -5179.99 },
+  { name: 'Chase Sapphire Reserve', type: 'Credit Card', class: 'debt',     balance: -983.35   },
+  { name: 'Chase Checking',         type: 'Checking',    class: 'checking', balance:  850.0  },
   { name: 'Chase Savings',          type: 'Savings',     class: 'asset',    balance:  21.03    },
-  { name: 'Wealthfront Joint',      type: 'HYSA',        class: 'asset',    balance:  1371.91  },
-  { name: 'Wealthfront Personal',   type: 'HYSA',        class: 'asset',    balance:  879.69   },
-  { name: 'Vanguard Roth IRA',      type: 'Investment',  class: 'asset',    balance:  18857.00 },
+  { name: 'Wealthfront Joint',      type: 'HYSA',        class: 'asset',    balance:  1720.0  },
+  { name: 'Wealthfront Personal',   type: 'HYSA',        class: 'asset',    balance:  350.0   },
+  { name: 'Vanguard Roth IRA',      type: 'Investment',  class: 'asset',    balance:  18857.0 },
 ];
 
 function loadAccounts() {
@@ -639,7 +639,7 @@ function loadAccounts() {
         <p class="account-name">${a.name}</p>
         <span class="account-type-tag">${a.type}</span>
         <p class="account-balance ${balClass}">${display}</p>
-        <p class="account-updated">As of May 31, 2026</p>
+        <p class="account-updated">As of Jun 30, 2026</p>
       </div>`;
   }).join('');
 
@@ -649,17 +649,17 @@ function loadAccounts() {
   nwEl.className = 'nw-value ' + (nw >= 0 ? 'positive' : 'negative');
   document.getElementById('total-assets').textContent = fmt(totalAssets);
   document.getElementById('total-debt').textContent   = '-' + fmt(totalDebt);
-  document.getElementById('last-updated').textContent = 'May 31, 2026';
+  document.getElementById('last-updated').textContent = 'Jun 30, 2026';
 }
 
-// ── BUDGET SUMMARY (June 2026) ──
+// ── BUDGET SUMMARY (June 2026 — Actuals) ──
 const BUDGET_CATS = [
-  { name: 'Housing',      spent: 2700, limit: 2700 },
-  { name: 'Debt Payoff',  spent:  280, limit: 2340 },
-  { name: 'Savings',      spent: 1350, limit: 1675 },
-  { name: 'Groceries',    spent:  487, limit:  400 },
-  { name: 'Dining Out',   spent:  343, limit:  300 },
-  { name: 'Transport',    spent:  128, limit:  120 },
+  { name: 'Housing',    spent: 2983, limit: 2700 },
+  { name: 'Debt Payoff',spent: 1280, limit: 2340 },
+  { name: 'Savings',    spent: 1350, limit: 1675 },
+  { name: 'Groceries',  spent:  657, limit:  400 },
+  { name: 'Dining Out', spent:  801, limit:  300 },
+  { name: 'Transport',  spent:  229, limit:  120 },
 ];
 
 function loadBudget() {
@@ -682,10 +682,10 @@ function loadBudget() {
 
 // ── GOALS ──
 const GOALS = [
-  { name: 'Pay Off Discover',         current: 2059.57, target: 2059.57, note: 'lump-sum June 2026' },
-  { name: 'Pay Off Citi (21 mo.)',     current:  140.00, target: 5459.99, note: '$280/mo · Dec 2027' },
+  { name: 'Pay Off Discover',         current:  873.62, target: 2059.57, note: '$1,000 pmt Jun · $1,186 remaining' },
+  { name: 'Pay Off Citi (21 mo.)',     current:  280.00, target: 5459.99, note: '$280/mo · $5,180 remaining' },
   { name: 'Roth IRA — 2026',          current: 1300.00, target: 6500.00, note: '$325 biweekly' },
-  { name: 'WF Personal Buffer',        current:  879.69, target: 2000.00, note: 'rebuilding post-move' },
+  { name: 'WF Personal Buffer',        current:  350.00, target: 2000.00, note: 'low — heavy June transfers' },
 ];
 
 function loadGoals() {
