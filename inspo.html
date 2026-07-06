@@ -214,6 +214,10 @@ option { background: #120810; }
 .lb-btn:hover { border-color: rgba(192,19,90,0.5); color: var(--cream-dim); }
 .lb-btn.danger:hover { border-color: rgba(200,80,80,0.4); color: rgba(220,100,100,0.7); }
 
+.lb-note { max-width: 680px; width: 100%; margin-top: 1.1rem; padding: 0.9rem 1rem; border-radius: 12px; background: rgba(255,255,255,0.03); border: 0.5px dashed rgba(192,19,90,0.3); }
+.lb-note-label { font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--magenta-bright); opacity: 0.85; margin-bottom: 6px; }
+.lb-note-body { font-size: 12px; line-height: 1.65; color: var(--cream-dim); white-space: pre-wrap; }
+
 /* EMPTY STATE */
 .empty-state { max-width: 1000px; margin: 3rem auto; text-align: center; padding: 0 1.5rem; }
 .empty-state p { font-family: var(--font-display); font-size: 1.2rem; font-style: italic; color: rgba(192,19,90,0.25); line-height: 1.7; }
@@ -233,6 +237,8 @@ option { background: #120810; }
 
 .toast { position: fixed; left: 50%; bottom: 5.5rem; transform: translateX(-50%) translateY(10px); z-index: 300; background: rgba(12,6,10,0.97); border: 0.5px solid rgba(192,19,90,0.4); border-radius: 12px; padding: 10px 18px; font-size: 10px; letter-spacing: 0.05em; color: var(--cream); box-shadow: 0 12px 40px rgba(0,0,0,0.5); backdrop-filter: blur(16px); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; max-width: 90vw; text-align: center; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.loading-more { text-align: center; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream-ghost); padding: 1.5rem 0 0.5rem; }
 </style>
 </head>
 <body>
@@ -273,6 +279,8 @@ option { background: #120810; }
   <div class="empty-state" id="empty-state" style="display:none;">
     <p>Your vision board begins here.<br>Add images, videos, notes, or links.</p>
   </div>
+  <div id="board-sentinel" style="height:1px;"></div>
+  <div class="loading-more" id="loading-more" style="display:none;">loading more…</div>
 </div>
 
 <!-- ADD MODAL -->
@@ -390,6 +398,12 @@ option { background: #120810; }
       </div>
     </div>
 
+    <!-- PRIVATE NOTE (all types) -->
+    <div class="modal-field">
+      <label class="modal-label">Private Note <span style="opacity:0.55;">(only visible when you open the card)</span></label>
+      <textarea class="modal-textarea" id="m-note" placeholder="A thought only you'll see…" style="min-height:70px;"></textarea>
+    </div>
+
     <div class="modal-error" id="modal-error"></div>
 
     <div class="modal-footer">
@@ -427,6 +441,10 @@ option { background: #120810; }
       <a class="lb-btn" id="lb-open-btn" href="#" target="_blank" style="display:none;">↗ Source</a>
       <button class="lb-btn danger" onclick="deleteCard()">Delete</button>
     </div>
+  </div>
+  <div class="lb-note" id="lb-note-wrap" style="display:none;">
+    <div class="lb-note-label">Private Note</div>
+    <div class="lb-note-body" id="lb-note-body"></div>
   </div>
 </div>
 
@@ -473,22 +491,9 @@ async function sbGet(table, id) {
   } catch(e) { return null; }
 }
 
-async function sbUpsert(table, row) {
-  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
-    method: 'POST',
-    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
-      'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
-    body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
-  });
-  if (!r.ok) {
-    const errText = await r.text().catch(() => '');
-    throw new Error(`Cloud save failed (${r.status}): ${errText || 'row-level security may be blocking writes'}`);
-  }
-}
-
 // Uploads an actual file (image/video) to Supabase Storage and returns its public URL.
 // This replaces embedding base64 blobs directly in the database row, which is what
-// was bloating the payload and tripping the storage/row-level-security error.
+// was bloating the payload and tripping the statement-timeout/RLS errors.
 async function sbUploadFile(file, cardId) {
   const extGuess = (file.name && file.name.includes('.')) ? file.name.split('.').pop() : (file.type.split('/')[1] || 'bin');
   const ext = extGuess.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
@@ -508,6 +513,133 @@ async function sbUploadFile(file, cardId) {
     throw new Error(`Upload failed (${r.status}): ${errText || 'check that the "inspo-media" storage bucket exists and allows anon uploads'}`);
   }
   return `${SB_URL}/storage/v1/object/public/${SB_BUCKET}/${path}`;
+}
+
+// ── NEW: one row per card, instead of one giant row holding every card ──
+// This is what actually fixes the 57014 "statement timeout" — the old design
+// re-sent the entire board (every image/video) on every single save, and that
+// payload kept growing until Postgres gave up. Now each save only touches the
+// rows that changed, and rows never hold big base64 blobs (see migrateCardMedia).
+const CARDS_TABLE = 'inspo_cards';
+
+const PAGE_SIZE = 60;
+
+// Fetches one page of cards, optionally filtered by category server-side, and
+// reads the total matching count from the Content-Range header (Prefer: count=exact).
+// This is what lets the board scale to years of cards without ever loading them all at once.
+async function sbFetchPage(offset, filter) {
+  let url = `${SB_URL}/rest/v1/${CARDS_TABLE}?select=*&order=order_index.asc&limit=${PAGE_SIZE}&offset=${offset}`;
+  if (filter && filter !== 'All') url += `&cat=eq.${encodeURIComponent(filter)}`;
+  const r = await fetch(url, {
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: 'count=exact' }
+  });
+  if (!r.ok) {
+    const errText = await r.text().catch(() => '');
+    throw new Error(`Load failed (${r.status}): ${errText}`);
+  }
+  const rows = await r.json();
+  let total = null;
+  const range = r.headers.get('content-range');
+  if (range && range.includes('/')) {
+    const t = range.split('/')[1];
+    total = t === '*' ? null : parseInt(t, 10);
+  }
+  return { rows, total };
+}
+
+async function sbUpsertRows(table, rows) {
+  if (!rows.length) return;
+  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+    body: JSON.stringify(rows)
+  });
+  if (!r.ok) {
+    const errText = await r.text().catch(() => '');
+    throw new Error(`Cloud save failed (${r.status}): ${errText || 'row-level security may be blocking writes'}`);
+  }
+}
+
+async function sbDeleteRow(table, id) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+  });
+  if (!r.ok) {
+    const errText = await r.text().catch(() => '');
+    throw new Error(`Cloud delete failed (${r.status}): ${errText}`);
+  }
+}
+
+function cardToRow(card) {
+  return {
+    id: card.id, type: card.type || 'image', cat: card.cat || null,
+    subcat: card.subcat || null, color: card.color || null, date: card.date || null,
+    title: card.title || null, body: card.body || null, url: card.url || null,
+    src: card.src || null, note: card.note || null, order_index: card.order_index
+  };
+}
+function rowToCard(row) {
+  const card = { id: row.id, type: row.type, cat: row.cat, subcat: row.subcat || '', color: row.color || '', date: row.date || '', order_index: row.order_index };
+  if (row.title) card.title = row.title;
+  if (row.body) card.body = row.body;
+  if (row.url) card.url = row.url;
+  if (row.src) card.src = row.src;
+  if (row.note) card.note = row.note;
+  return card;
+}
+
+// Extracts the storage object path back out of a public URL, so a deleted card
+// can also remove its file from Storage instead of leaving it there forever.
+function storagePathFromUrl(url) {
+  if (typeof url !== 'string') return null;
+  const marker = `/object/public/${SB_BUCKET}/`;
+  const idx = url.indexOf(marker);
+  return idx === -1 ? null : url.slice(idx + marker.length);
+}
+async function sbDeleteFile(path) {
+  if (!path) return;
+  const r = await fetch(`${SB_URL}/storage/v1/object/${SB_BUCKET}/${path}`, {
+    method: 'DELETE',
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+  });
+  if (!r.ok) {
+    const errText = await r.text().catch(() => '');
+    throw new Error(`Storage cleanup failed (${r.status}): ${errText}`);
+  }
+}
+
+function dataUrlToBlob(dataUrl) {
+  const [header, b64] = dataUrl.split(',');
+  const mime = (header.match(/data:(.*?);base64/) || [,'application/octet-stream'])[1];
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+// If an old card still has a raw base64 data: URL (from before Storage uploads existed),
+// push it into the storage bucket now and swap in the public URL, so it stops bloating saves.
+async function migrateCardMedia(card) {
+  if ((card.type === 'image' || card.type === 'video') && typeof card.src === 'string' && card.src.startsWith('data:')) {
+    try {
+      const blob = dataUrlToBlob(card.src);
+      const ext = card.type === 'video' ? 'mp4' : 'jpg';
+      const file = new File([blob], `${card.id}.${ext}`, { type: blob.type });
+      card.src = await sbUploadFile(file, card.id);
+    } catch (e) { console.error('Could not migrate legacy media for card', card.id, e); }
+  }
+  return card;
+}
+
+async function recoverLegacyCards() {
+  try {
+    const row = await sbGet('inspo', 'singleton');
+    if (row && Array.isArray(row.images) && row.images.length) return row.images;
+  } catch (e) {}
+  try { const s = lsGet('inspo_images'); if (s) { const parsed = JSON.parse(s); if (Array.isArray(parsed)) return parsed; } } catch (e) {}
+  return [];
 }
 
 function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
@@ -545,11 +677,31 @@ let pendingVidFile = null;
 let modalColor = 'none';
 let modalSubcat = '';
 let dragSrcId = null;
+let pageOffset = 0;
+let hasMore = true;
+let loadingPage = false;
+let totalCount = 0;
 
+// Bulk write — only used for the one-time legacy migration, where many rows
+// genuinely need to be created at once. Not used for everyday add/edit/reorder.
 async function persist() {
   lsSet('inspo_images', JSON.stringify(cards));
   try {
-    await sbUpsert('inspo', { id: 'singleton', images: cards });
+    const rows = cards.map(c => cardToRow(c));
+    await sbUpsertRows(CARDS_TABLE, rows);
+  } catch (e) {
+    console.error(e);
+    showToast('Saved locally, but cloud sync failed: ' + e.message);
+  }
+}
+
+// Everyday saves (add one card, recolor one card, reorder one card) only ever
+// touch that single row — this is what keeps writes fast forever, regardless
+// of how many thousands of cards the board eventually holds.
+async function persistOne(card) {
+  lsSet('inspo_images', JSON.stringify(cards));
+  try {
+    await sbUpsertRows(CARDS_TABLE, [cardToRow(card)]);
   } catch (e) {
     console.error(e);
     showToast('Saved locally, but cloud sync failed: ' + e.message);
@@ -557,19 +709,77 @@ async function persist() {
 }
 
 async function initInspo() {
-  const row = await sbGet('inspo', 'singleton');
-  if (row && row.images) { cards = row.images; }
-  else { try { const s = lsGet('inspo_images'); if (s) cards = JSON.parse(s); } catch(e) {} }
+  try {
+    const { rows, total } = await sbFetchPage(0, 'All');
+    if (rows.length || (total && total > 0)) {
+      cards = rows.map(rowToCard);
+      pageOffset = rows.length;
+      hasMore = rows.length === PAGE_SIZE;
+      totalCount = total ?? rows.length;
+    } else {
+      let legacy = await recoverLegacyCards();
+      if (legacy.length) {
+        showToast('Migrating your board to the new storage format…');
+        legacy = await Promise.all(legacy.map(migrateCardMedia));
+        const base = -Date.now();
+        legacy = legacy.map((c, i) => ({ ...c, order_index: base + i }));
+        cards = legacy;
+        await persist();
+        pageOffset = cards.length;
+        hasMore = false;
+        totalCount = cards.length;
+      } else {
+        cards = []; pageOffset = 0; hasMore = false; totalCount = 0;
+      }
+    }
+    lsSet('inspo_images', JSON.stringify(cards));
+  } catch (e) {
+    console.error(e);
+    try { const s = lsGet('inspo_images'); if (s) cards = JSON.parse(s); } catch (_) {}
+    showToast('Could not reach the cloud — showing your last local copy.');
+  }
   renderBoard();
 }
 initInspo();
+
+const sentinelEl = document.getElementById('board-sentinel');
+if (sentinelEl && 'IntersectionObserver' in window) {
+  new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) loadMore();
+  }, { rootMargin: '800px' }).observe(sentinelEl);
+}
+
+// Loads the next page for the current filter; called on scroll via the sentinel below.
+async function loadMore() {
+  if (loadingPage || !hasMore) return;
+  loadingPage = true;
+  const lm = document.getElementById('loading-more');
+  if (lm) lm.style.display = 'block';
+  try {
+    const { rows, total } = await sbFetchPage(pageOffset, currentFilter);
+    if (typeof total === 'number') totalCount = total;
+    cards = cards.concat(rows.map(rowToCard));
+    pageOffset += rows.length;
+    if (rows.length < PAGE_SIZE) hasMore = false;
+    lsSet('inspo_images', JSON.stringify(cards));
+    renderBoard();
+  } catch (e) {
+    console.error(e);
+    showToast('Could not load more: ' + e.message);
+  } finally {
+    loadingPage = false;
+    if (lm) lm.style.display = 'none';
+  }
+}
 
 // ── FILTER ──
 function setFilter(cat, el) {
   currentFilter = cat;
   document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
+  cards = []; pageOffset = 0; hasMore = true; totalCount = 0;
   renderBoard();
+  loadMore();
 }
 
 // ── RENDER ──
@@ -577,11 +787,11 @@ function renderBoard() {
   const board = document.getElementById('board');
   const empty = document.getElementById('empty-state');
   board.innerHTML = '';
-  const filtered = currentFilter === 'All' ? cards : cards.filter(c => c.cat === currentFilter);
-  document.getElementById('count-label').textContent = cards.length + (cards.length === 1 ? ' card' : ' cards');
-  if (filtered.length === 0) { empty.style.display = 'block'; return; }
+  const shown = totalCount || cards.length;
+  document.getElementById('count-label').textContent = shown + (shown === 1 ? ' card' : ' cards');
+  if (cards.length === 0) { empty.style.display = loadingPage ? 'none' : 'block'; return; }
   empty.style.display = 'none';
-  filtered.forEach(card => board.appendChild(buildTile(card)));
+  cards.forEach(card => board.appendChild(buildTile(card)));
 }
 
 function buildTile(card) {
@@ -615,7 +825,13 @@ function buildTile(card) {
     const [moved] = cards.splice(fromIdx, 1);
     cards.splice(toIdx, 0, moved);
     dragSrcId = null;
-    persist(); renderBoard();
+    const prev = cards[toIdx - 1];
+    const next = cards[toIdx + 1];
+    if (prev && next) moved.order_index = (prev.order_index + next.order_index) / 2;
+    else if (prev) moved.order_index = prev.order_index - 1000;
+    else if (next) moved.order_index = next.order_index + 1000;
+    else moved.order_index = -Date.now();
+    persistOne(moved); renderBoard();
   });
 
   tile.addEventListener('contextmenu', e => { e.preventDefault(); openCtx(e, card.id); });
@@ -676,6 +892,7 @@ function openAddModal() {
   document.getElementById('m-text-body').value = '';
   document.getElementById('m-link-url').value = '';
   document.getElementById('m-link-title').value = '';
+  document.getElementById('m-note').value = '';
   document.getElementById('m-cat').value = 'Fashion';
   document.getElementById('m-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('subcat-field').style.display = 'none';
@@ -720,27 +937,76 @@ function pickModalColor(color, el) {
 function dzOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('dragover'); }
 function dzLeave(id) { document.getElementById(id).classList.remove('dragover'); }
 
+// Downscales + re-encodes an image client-side before it ever reaches Storage.
+// This is the single biggest lever for "years of uploads" — most phone photos
+// are 3-5MB at resolutions far higher than this board ever displays them at.
+async function compressImageFile(file, maxDim = 1600, quality = 0.82) {
+  if (file.type === 'image/gif') return file; // preserve animation
+  try {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+    const img = await new Promise((resolve, reject) => {
+      const im = new Image();
+      im.onload = () => resolve(im);
+      im.onerror = reject;
+      im.src = dataUrl;
+    });
+    const { width, height } = img;
+    if (width <= maxDim && height <= maxDim && file.size < 400 * 1024) return file; // already small
+    const scale = Math.min(1, maxDim / Math.max(width, height));
+    const targetW = Math.round(width * scale);
+    const targetH = Math.round(height * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = targetW; canvas.height = targetH;
+    canvas.getContext('2d').drawImage(img, 0, 0, targetW, targetH);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+    if (!blob || blob.size >= file.size) return file; // compression didn't actually help
+    const newName = (file.name || 'image').replace(/\.[^.]+$/, '') + '.jpg';
+    return new File([blob], newName, { type: 'image/jpeg' });
+  } catch (e) {
+    console.error('Image compression failed, using original file', e);
+    return file;
+  }
+}
+
 function imgInput(input) { if (input.files[0]) loadImg(input.files[0]); input.value = ''; }
 function imgDrop(e) { e.preventDefault(); dzLeave('drop-zone'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) loadImg(f); }
-function loadImg(file) {
-  pendingImgFile = file;
+async function loadImg(file) {
   clearModalError();
+  const originalKb = Math.round(file.size / 1024);
+  const compressed = await compressImageFile(file);
+  pendingImgFile = compressed;
+  if (compressed !== file) {
+    const savedPct = Math.round((1 - compressed.size / file.size) * 100);
+    if (savedPct > 5) showToast(`Compressed ${originalKb}KB → ${Math.round(compressed.size/1024)}KB (${savedPct}% smaller)`);
+  }
   const r = new FileReader(); r.onload = e => {
     pendingImg = e.target.result;
     const p = document.getElementById('drop-preview'); p.src = pendingImg; p.style.display = 'block';
     document.getElementById('dz-img-content').style.display = 'none';
-  }; r.readAsDataURL(file);
+  }; r.readAsDataURL(compressed);
 }
 function resetImgZone() {
   const p = document.getElementById('drop-preview'); p.src = ''; p.style.display = 'none';
   document.getElementById('dz-img-content').style.display = '';
 }
 
+const MAX_VIDEO_MB = 150;
 function vidInput(input) { if (input.files[0]) loadVid(input.files[0]); input.value = ''; }
 function vidDrop(e) { e.preventDefault(); dzLeave('dz-vid'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('video/')) loadVid(f); }
 function loadVid(file) {
-  pendingVidFile = file;
   clearModalError();
+  // Real video compression needs a heavy encoder library that isn't practical to
+  // ship in this single-file app, so we just warn on very large files instead —
+  // trimming/compressing on-device before picking it here goes a long way.
+  if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
+    showModalError(`This video is ${Math.round(file.size/1024/1024)}MB — consider trimming it first so Storage doesn't fill up as fast.`);
+  }
+  pendingVidFile = file;
   const r = new FileReader(); r.onload = e => {
     pendingVid = e.target.result;
     const v = document.getElementById('drop-preview-vid'); v.src = pendingVid; v.style.display = 'block'; v.play();
@@ -786,8 +1052,15 @@ async function saveCard() {
       card.title = document.getElementById('m-link-title').value.trim();
     }
 
-    cards.unshift(card);
-    await persist();
+    const note = document.getElementById('m-note').value.trim();
+    if (note) card.note = note;
+
+    card.order_index = -Date.now();
+    if (currentFilter === 'All' || card.cat === currentFilter) {
+      cards.unshift(card);
+      totalCount += 1;
+    }
+    await persistOne(card);
     closeAddModal(); renderBoard();
   } catch (err) {
     console.error(err);
@@ -839,6 +1112,9 @@ function openLb(id) {
   if (card.subcat) { sc.textContent = card.subcat; sc.style.display = ''; } else { sc.style.display = 'none'; }
   document.getElementById('lb-date').textContent = card.date
     ? new Date(card.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) : '';
+  const noteWrap = document.getElementById('lb-note-wrap');
+  if (card.note) { document.getElementById('lb-note-body').textContent = card.note; noteWrap.style.display = ''; }
+  else { noteWrap.style.display = 'none'; }
   document.getElementById('lightbox').classList.add('open');
 }
 
@@ -850,8 +1126,17 @@ function closeLightbox() {
 function lbBackdrop(e) { if (e.target === document.getElementById('lightbox')) closeLightbox(); }
 function deleteCard() {
   if (!activeLbId || !confirm('Remove this card?')) return;
-  cards = cards.filter(c => c.id !== activeLbId);
-  persist(); closeLightbox(); renderBoard();
+  const id = activeLbId;
+  const card = cards.find(c => c.id === id);
+  cards = cards.filter(c => c.id !== id);
+  totalCount = Math.max(0, totalCount - 1);
+  lsSet('inspo_images', JSON.stringify(cards));
+  sbDeleteRow(CARDS_TABLE, id).catch(e => { console.error(e); showToast('Deleted locally, but cloud delete failed: ' + e.message); });
+  if (card) {
+    const path = storagePathFromUrl(card.src);
+    if (path) sbDeleteFile(path).catch(e => console.error('storage cleanup failed', e));
+  }
+  closeLightbox(); renderBoard();
 }
 
 // ── CONTEXT MENU ──
@@ -871,13 +1156,22 @@ function ctxColor(color, el) {
   if (!ctxCardId) return;
   const card = cards.find(c => c.id === ctxCardId); if (!card) return;
   card.color = color !== 'none' ? color : '';
-  persist(); renderBoard(); closeCtx();
+  persistOne(card); renderBoard(); closeCtx();
 }
 function ctxOpen() { if (!ctxCardId) return; openLb(ctxCardId); closeCtx(); }
 function ctxDelete() {
   if (!ctxCardId || !confirm('Remove this card?')) return;
-  cards = cards.filter(c => c.id !== ctxCardId);
-  persist(); renderBoard(); closeCtx();
+  const id = ctxCardId;
+  const card = cards.find(c => c.id === id);
+  cards = cards.filter(c => c.id !== id);
+  totalCount = Math.max(0, totalCount - 1);
+  lsSet('inspo_images', JSON.stringify(cards));
+  sbDeleteRow(CARDS_TABLE, id).catch(e => { console.error(e); showToast('Deleted locally, but cloud delete failed: ' + e.message); });
+  if (card) {
+    const path = storagePathFromUrl(card.src);
+    if (path) sbDeleteFile(path).catch(e => console.error('storage cleanup failed', e));
+  }
+  renderBoard(); closeCtx();
 }
 
 // ── KEYBOARD ──
