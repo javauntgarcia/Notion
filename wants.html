@@ -380,6 +380,7 @@ option { background: #111; }
 // ── SUPABASE CONFIG ──
 const SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
 const SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
+const IMAGE_BUCKET = 'wants-images'; // EDIT: must exist as a PUBLIC bucket in Supabase Storage
 async function sbGet(table, id) {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}&limit=1`,
@@ -397,17 +398,63 @@ async function sbUpsert(table, row) {
     });
   } catch(e) {}
 }
+
+// ── NEW: image compression + Storage upload (replaces base64-in-row) ──
+function compressImage(file, maxWidth = 700, quality = 0.75) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxWidth / img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob); else reject(new Error('compression failed'));
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => reject(new Error('image load failed'));
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => reject(new Error('file read failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function sbUploadImage(blob, filename) {
+  try {
+    const r = await fetch(`${SB_URL}/storage/v1/object/${IMAGE_BUCKET}/${filename}`, {
+      method: 'POST',
+      headers: {
+        apikey: SB_KEY,
+        Authorization: `Bearer ${SB_KEY}`,
+        'Content-Type': 'image/jpeg',
+        'x-upsert': 'true'
+      },
+      body: blob
+    });
+    if (!r.ok) { console.error('Storage upload failed', r.status, await r.text()); return null; }
+    return `${SB_URL}/storage/v1/object/public/${IMAGE_BUCKET}/${filename}`;
+  } catch(e) { console.error('Storage upload error', e); return null; }
+}
+
 function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
 
 const CATS = ['Fashion','Experience','Career','Personal','Travel','Home'];
 let wants = [];
 let currentFilter = 'All';
-let pendingImgData = null;
+let pendingImgBlob = null;      // compressed JPEG blob awaiting upload on save
+let pendingImgPreviewUrl = null;
 let detailId = null;
 let editingId = null;
 
 async function persist() {
+  // `wants` now only ever stores small text fields + a Storage URL string per
+  // image, so this row stays tiny no matter how many wishlist items exist.
   await sbUpsert('wants', { id: 'singleton', items: wants });
   lsSet('wants_v2', JSON.stringify(wants));
 }
@@ -484,7 +531,8 @@ function quickToggle(id, el) {
 /* ── ADD MODAL ── */
 function openAddModal() {
   editingId = null;
-  pendingImgData = null;
+  pendingImgBlob = null;
+  if (pendingImgPreviewUrl) { URL.revokeObjectURL(pendingImgPreviewUrl); pendingImgPreviewUrl = null; }
   document.getElementById('modal-title').textContent = 'New Want';
   document.getElementById('m-name').value = '';
   document.getElementById('m-cat').value = '';
@@ -505,33 +553,50 @@ document.getElementById('add-modal').addEventListener('click', e => {
 function handleImgUpload(input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    pendingImgData = e.target.result;
+  const label = document.getElementById('upload-label');
+  label.textContent = 'Compressing…';
+  label.style.display = '';
+  compressImage(file).then((compressed) => {
+    pendingImgBlob = compressed;
+    if (pendingImgPreviewUrl) URL.revokeObjectURL(pendingImgPreviewUrl);
+    pendingImgPreviewUrl = URL.createObjectURL(compressed);
     const preview = document.getElementById('modal-img-preview');
-    preview.src = pendingImgData;
+    preview.src = pendingImgPreviewUrl;
     preview.style.display = 'block';
-    document.getElementById('upload-label').style.display = 'none';
-  };
-  reader.readAsDataURL(file);
+    label.style.display = 'none';
+  }).catch(err => {
+    console.error('Image compression failed', err);
+    label.textContent = 'Upload failed — try again';
+  });
 }
 
 function handleCardImg(id, input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
+  compressImage(file).then(async (compressed) => {
+    const filename = `item-${id}-${Date.now()}.jpg`;
+    const url = await sbUploadImage(compressed, filename);
+    if (!url) return; // upload failed; leave existing image untouched
     const w = wants.find(x => x.id === id);
-    if (w) { w.img = e.target.result; persist(); renderGrid(); }
-  };
-  reader.readAsDataURL(file);
+    if (w) { w.img = url; persist(); renderGrid(); }
+  }).catch(err => console.error('Image compression failed', err));
 }
 
-function saveWant() {
+async function saveWant() {
   const name = document.getElementById('m-name').value.trim();
   if (!name) { document.getElementById('m-name').focus(); return; }
   let url = document.getElementById('m-url').value.trim();
   if (url && !url.startsWith('http')) url = 'https://' + url;
+
+  const saveBtn = document.querySelector('.modal-confirm');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+
+  let imageUrl = null;
+  if (pendingImgBlob) {
+    const filename = `item-${editingId || Date.now()}-${Date.now()}.jpg`;
+    imageUrl = await sbUploadImage(pendingImgBlob, filename);
+    // if upload fails, imageUrl stays null; existing image (on edit) is preserved below
+  }
 
   if (editingId) {
     const w = wants.find(x => x.id === editingId);
@@ -540,11 +605,12 @@ function saveWant() {
     w.cost = document.getElementById('m-cost').value.trim();
     w.url = url;
     w.notes = document.getElementById('m-notes').value.trim();
-    if (pendingImgData) w.img = pendingImgData;
+    if (imageUrl) w.img = imageUrl;
   } else {
-    wants.unshift({ id: Date.now(), name, cat: document.getElementById('m-cat').value, cost: document.getElementById('m-cost').value.trim(), url, notes: document.getElementById('m-notes').value.trim(), img: pendingImgData, acquired: false });
+    wants.unshift({ id: Date.now(), name, cat: document.getElementById('m-cat').value, cost: document.getElementById('m-cost').value.trim(), url, notes: document.getElementById('m-notes').value.trim(), img: imageUrl, acquired: false });
   }
-  persist();
+  await persist();
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
   closeAddModal();
   renderGrid();
   if (detailId) openDetail(editingId || wants[0].id);
@@ -579,7 +645,8 @@ function openEditModal() {
   const w = wants.find(x => x.id === detailId);
   if (!w) return;
   editingId = detailId;
-  pendingImgData = null;
+  pendingImgBlob = null;
+  if (pendingImgPreviewUrl) { URL.revokeObjectURL(pendingImgPreviewUrl); pendingImgPreviewUrl = null; }
   closeDetail();
   document.getElementById('modal-title').textContent = 'Edit Want';
   document.getElementById('m-name').value = w.name;
