@@ -337,6 +337,114 @@
     }
     .btn-ghost:hover { border-color: rgba(201,176,138,0.5); color: var(--cream); }
 
+    /* ── HABIT TRACKER ── */
+    .habit-section {
+      padding: 4px 24px 16px;
+      border-top: 1px solid rgba(201,160,110,0.1);
+    }
+    .habit-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0 10px;
+    }
+    .habit-title {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--sand);
+      opacity: 0.7;
+    }
+    .habit-add-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .habit-input {
+      flex: 1;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      background: rgba(242,234,216,0.06);
+      border: 1px solid rgba(242,234,216,0.14);
+      border-radius: 8px;
+      padding: 7px 11px;
+      color: var(--cream);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .habit-input::placeholder { color: rgba(201,176,138,0.35); }
+    .habit-input:focus { border-color: rgba(201,176,138,0.45); background: rgba(242,234,216,0.1); }
+    .habit-add-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--olive);
+      color: var(--cream);
+      border: none;
+      border-radius: 8px;
+      padding: 7px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .habit-add-btn:hover { background: var(--olive-lt); }
+    .habit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .habit-list::-webkit-scrollbar { width: 3px; }
+    .habit-list::-webkit-scrollbar-thumb { background: rgba(201,176,138,0.2); border-radius: 3px; }
+    .habit-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: rgba(242,234,216,0.05);
+      border: 1px solid rgba(242,234,216,0.08);
+      transition: background 0.18s;
+    }
+    .habit-item:hover { background: rgba(242,234,216,0.09); }
+    .habit-text {
+      flex: 1;
+      font-size: 0.75rem;
+      color: var(--cream);
+      line-height: 1.35;
+    }
+    .habit-item.done .habit-text {
+      opacity: 0.4;
+      text-decoration: line-through;
+      text-decoration-color: rgba(201,176,138,0.4);
+    }
+    .habit-streak {
+      font-size: 0.6rem;
+      color: var(--gold-lt);
+      opacity: 0.85;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .habit-del {
+      background: none; border: none;
+      color: rgba(201,176,138,0.3);
+      cursor: pointer; font-size: 0.85rem;
+      padding: 2px 3px;
+      flex-shrink: 0;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    .habit-del:hover { color: rgba(201,176,138,0.7); }
+    .habit-empty {
+      text-align: center;
+      padding: 14px;
+      color: rgba(201,176,138,0.3);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+    }
+
     /* ── ARCHIVE TOGGLE BAR ── */
     .archive-toggle-bar {
       position: relative;
@@ -562,6 +670,19 @@
 
       <div class="task-list" id="taskList"></div>
 
+      <div class="habit-section">
+        <div class="habit-header">
+          <span class="habit-title">Daily Habits</span>
+        </div>
+        <div class="habit-add-row">
+          <input class="habit-input" id="habitInput" type="text"
+            placeholder="Add a recurring habit…"
+            onkeydown="if(event.key==='Enter')addHabit()" />
+          <button class="habit-add-btn" onclick="addHabit()">+ Habit</button>
+        </div>
+        <div class="habit-list" id="habitList"></div>
+      </div>
+
       <div class="panel-footer">
         <button class="btn-ghost" onclick="clearDone()">Clear Done</button>
         <button class="btn-ghost" onclick="archiveDay()">Archive Day →</button>
@@ -699,15 +820,66 @@ function flashSave(usedLocal = false) {
 
 // ── TASK STATE ──
 let _tasks = [];
+// ── HABIT STATE ──
+let _habits = [];
+let _lastSeen = null;
+
+const DEFAULT_HABITS = [
+  'Wake up before 6 AM',
+  'Go to the gym',
+  'Eat breakfast',
+  'Make it to work by 9:30 AM',
+  'Lunch at home',
+  'Read for 30 minutes',
+  'Make dinner',
+  'Post on TikTok',
+  'Do to-do list',
+  'Night skincare routine',
+  'Hairline treatment',
+  'New Invisalign'
+];
 
 async function loadAndRenderTasks() {
   try {
     const row = await sbGet('main_hub', 'singleton');
-    _tasks = (row && row.todos) ? row.todos : [];
+    _tasks   = (row && row.todos)  ? row.todos  : [];
+    _habits  = (row && row.habits) ? row.habits : [];
+    _lastSeen = (row && row.last_seen) ? row.last_seen : null;
   } catch(e) {
     try { _tasks = JSON.parse(localStorage.getItem('hub_todos')||'[]'); } catch(e2) { _tasks = []; }
+    try { _habits = JSON.parse(localStorage.getItem('hub_habits')||'[]'); } catch(e2) { _habits = []; }
+    _lastSeen = localStorage.getItem('hub_last_seen') || null;
   }
+  // First time opening the tracker (no habits saved yet) — seed the default list
+  if (!_habits.length) {
+    _habits = DEFAULT_HABITS.map((text, i) => ({ id: Date.now() + i, text, done: false }));
+    await saveHabits();
+  }
+  // Load archive first so habit streaks render correctly on first paint
+  await loadArchive();
+  await maybeRolloverDay();
   renderTasks();
+  renderHabits();
+}
+
+// If it's a new day since last visit, snapshot yesterday's habit
+// completion into the archive (habits-only patch, doesn't touch
+// any task archive entry that may already exist for that day),
+// then reset today's habit checkmarks.
+async function maybeRolloverDay() {
+  const key = todayKey();
+  if (_lastSeen === key) return;
+  if (_lastSeen && _habits.length) {
+    const entry = {
+      id: _lastSeen,
+      habits: _habits.map(h => ({ text: h.text, done: !!h.done })),
+      archived_at: new Date().toISOString()
+    };
+    try { await sbUpsert('planning_archive', entry); } catch(e) {}
+  }
+  _habits = _habits.map(h => ({ ...h, done: false }));
+  _lastSeen = key;
+  await saveHabits();
 }
 
 async function saveTasks() {
@@ -773,6 +945,78 @@ function clearDone() {
   saveTasks(); renderTasks();
 }
 
+// ── HABITS ──
+async function saveHabits() {
+  const payload = { id: 'singleton', habits: _habits, last_seen: _lastSeen || todayKey() };
+  try {
+    await sbUpsert('main_hub', payload);
+    flashSave(false);
+  } catch(e) {
+    console.warn('[saveHabits]', e.message);
+    try {
+      localStorage.setItem('hub_habits', JSON.stringify(_habits));
+      localStorage.setItem('hub_last_seen', _lastSeen || todayKey());
+    } catch(e2) {}
+    flashSave(true);
+  }
+}
+
+function addHabit() {
+  const input = document.getElementById('habitInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  _habits.push({ id: Date.now(), text, done: false });
+  saveHabits();
+  input.value = '';
+  renderHabits();
+}
+
+function toggleHabit(id) {
+  const h = _habits.find(x => x.id === id);
+  if (h) { h.done = !h.done; saveHabits(); renderHabits(); }
+}
+
+function deleteHabit(id) {
+  _habits = _habits.filter(x => x.id !== id);
+  saveHabits(); renderHabits();
+}
+
+// Consecutive-day streak for a habit, walking backward through
+// today's live status and then the archive (newest first).
+function habitStreak(habitText) {
+  const current = _habits.find(h => h.text === habitText);
+  if (!current || !current.done) return 0;
+  let streak = 1;
+  for (const day of _archive) {
+    if (!day.habits) continue;
+    const h = day.habits.find(x => x.text === habitText);
+    if (h && h.done) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function renderHabits() {
+  const list = document.getElementById('habitList');
+  if (!_habits.length) {
+    list.innerHTML = '<div class="habit-empty">✦ &nbsp; No habits yet</div>';
+    return;
+  }
+  list.innerHTML = '';
+  _habits.forEach(h => {
+    const streak = habitStreak(h.text);
+    const row = document.createElement('div');
+    row.className = 'habit-item' + (h.done ? ' done' : '');
+    row.innerHTML = `
+      <input type="checkbox" class="task-check" ${h.done?'checked':''} onchange="toggleHabit(${h.id})" />
+      <span class="habit-text">${escHtml(h.text)}</span>
+      ${streak > 0 ? `<span class="habit-streak">🔥 ${streak}</span>` : ''}
+      <button class="habit-del" onclick="deleteHabit(${h.id})">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
 // ── ARCHIVE ──
 let _archive = [];
 
@@ -793,6 +1037,7 @@ async function archiveDay() {
   const entry = {
     id: todayKey(),
     tasks,
+    habits: _habits.map(h => ({ text: h.text, done: !!h.done })),
     archived_at: new Date().toISOString(),
     label: today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})
   };
@@ -811,6 +1056,7 @@ async function archiveDay() {
   _tasks = [];
   await saveTasks();
   renderTasks();
+  renderHabits();
   if (document.getElementById('archiveDrawer').classList.contains('open')) {
     await loadArchive(); renderArchive();
   }
