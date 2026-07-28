@@ -420,10 +420,12 @@
       text-decoration: line-through;
       text-decoration-color: rgba(201,176,138,0.4);
     }
-    .habit-streak {
-      font-size: 0.6rem;
+    .habit-tag {
+      font-size: 0.55rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
       color: var(--gold-lt);
-      opacity: 0.85;
+      opacity: 0.75;
       white-space: nowrap;
       flex-shrink: 0;
     }
@@ -651,7 +653,7 @@
 
       <div class="panel-header">
         <div class="panel-date" id="panelDate"></div>
-        <div class="panel-title">Daily <em>Tasks</em></div>
+        <div class="panel-title">Daily <em>Checklist</em></div>
       </div>
 
       <div class="progress-wrap">
@@ -672,13 +674,13 @@
 
       <div class="habit-section">
         <div class="habit-header">
-          <span class="habit-title">Daily Habits</span>
+          <span class="habit-title">Daily Tasks</span>
         </div>
         <div class="habit-add-row">
           <input class="habit-input" id="habitInput" type="text"
-            placeholder="Add a recurring habit…"
+            placeholder="Add a recurring daily task…"
             onkeydown="if(event.key==='Enter')addHabit()" />
-          <button class="habit-add-btn" onclick="addHabit()">+ Habit</button>
+          <button class="habit-add-btn" onclick="addHabit()">+ Task</button>
         </div>
         <div class="habit-list" id="habitList"></div>
       </div>
@@ -762,13 +764,16 @@ Object.keys(NAV_URLS).forEach(function(id) {
   if (el) el.href = NAV_URLS[id];
 });
 
-const today = new Date();
+function updateDateHeaders() {
+  const now = new Date();
+  document.getElementById('topbarDate').textContent =
+    now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('panelDate').textContent =
+    now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+}
 
 window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('topbarDate').textContent =
-    today.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-  document.getElementById('panelDate').textContent =
-    today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+  updateDateHeaders();
   loadAndRenderTasks();
 });
 
@@ -805,8 +810,9 @@ async function sbDelete(table, id) {
   });
 }
 
-function todayKey() {
-  return `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+function todayKey(d) {
+  const date = d || new Date();
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function flashSave(usedLocal = false) {
@@ -824,20 +830,61 @@ let _tasks = [];
 let _habits = [];
 let _lastSeen = null;
 
-const DEFAULT_HABITS = [
+// Fixed tasks that show up every single day
+const DEFAULT_TASKS = [
   'Wake up before 6 AM',
   'Go to the gym',
   'Eat breakfast',
   'Make it to work by 9:30 AM',
-  'Lunch at home',
+  'Lunch (home)',
   'Read for 30 minutes',
   'Make dinner',
   'Post on TikTok',
   'Do to-do list',
-  'Night skincare routine',
   'Hairline treatment',
-  'New Invisalign'
+  'Compliment Eston',
+  'Nightcare routine'
 ];
+
+// Tasks that only appear on specific days of the week (0=Sun … 6=Sat)
+const CONDITIONAL_TASKS = [
+  { day: 1, text: 'Voice memo Devon' },        // Monday
+  { day: 6, text: 'Edit Content Calendar' },    // Saturday
+  { day: 0, text: 'Financial tracker' },        // Sunday
+  { day: 0, text: 'Update weekly outline' }     // Sunday
+];
+const DOW_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function conditionalTasksForDate(d) {
+  return CONDITIONAL_TASKS.filter(c => c.day === d.getDay());
+}
+function conditionalTextsForDate(d) {
+  return conditionalTasksForDate(d).map(c => c.text);
+}
+
+// Keeps _habits (the "Daily Tasks" list) in sync with today's roster:
+// tags legacy/untagged entries, makes sure every default task exists,
+// and swaps in whichever conditional task belongs to today.
+function syncTasksForToday() {
+  _habits = _habits.map(h => {
+    if (h.type) return h;
+    if (DEFAULT_TASKS.includes(h.text)) return { ...h, type: 'default' };
+    if (CONDITIONAL_TASKS.some(c => c.text === h.text)) return { ...h, type: 'conditional' };
+    return { ...h, type: 'custom' };
+  });
+  DEFAULT_TASKS.forEach((text, i) => {
+    if (!_habits.some(h => h.type === 'default' && h.text === text)) {
+      _habits.push({ id: Date.now() + 500 + i, text, done: false, type: 'default' });
+    }
+  });
+  const todays = conditionalTasksForDate(new Date());
+  _habits = _habits.filter(h => h.type !== 'conditional' || todays.some(c => c.text === h.text));
+  todays.forEach((c, i) => {
+    if (!_habits.some(h => h.type === 'conditional' && h.text === c.text)) {
+      _habits.push({ id: Date.now() + 3000 + i, text: c.text, done: false, type: 'conditional', day: c.day });
+    }
+  });
+}
 
 async function loadAndRenderTasks() {
   try {
@@ -850,22 +897,27 @@ async function loadAndRenderTasks() {
     try { _habits = JSON.parse(localStorage.getItem('hub_habits')||'[]'); } catch(e2) { _habits = []; }
     _lastSeen = localStorage.getItem('hub_last_seen') || null;
   }
-  // First time opening the tracker (no habits saved yet) — seed the default list
+  // First time opening the tracker (no tasks saved yet) — seed the fixed list
   if (!_habits.length) {
-    _habits = DEFAULT_HABITS.map((text, i) => ({ id: Date.now() + i, text, done: false }));
-    await saveHabits();
+    _habits = DEFAULT_TASKS.map((text, i) => ({ id: Date.now() + i, text, done: false, type: 'default' }));
   }
-  // Load archive first so habit streaks render correctly on first paint
+  // Always self-heal: tag legacy entries, ensure every default task exists,
+  // and make sure today's conditional task (if any) is present.
+  syncTasksForToday();
+  await saveHabits();
+  // Load archive so the habit log / weekly view render with history
   await loadArchive();
   await maybeRolloverDay();
   renderTasks();
   renderHabits();
+  scheduleRolloverWatch();
 }
 
-// If it's a new day since last visit, snapshot yesterday's habit
-// completion into the archive (habits-only patch, doesn't touch
-// any task archive entry that may already exist for that day),
-// then reset today's habit checkmarks.
+// If it's a new day since last visit, snapshot yesterday's completed
+// daily tasks into the archive (this is the permanent "log of daily
+// activities completed" that the Main Hub reads from), then reset
+// today's checkmarks and swap in whichever conditional task belongs
+// to the new day.
 async function maybeRolloverDay() {
   const key = todayKey();
   if (_lastSeen === key) return;
@@ -876,10 +928,25 @@ async function maybeRolloverDay() {
       archived_at: new Date().toISOString()
     };
     try { await sbUpsert('planning_archive', entry); } catch(e) {}
+    await loadArchive();
   }
   _habits = _habits.map(h => ({ ...h, done: false }));
+  syncTasksForToday();
   _lastSeen = key;
   await saveHabits();
+}
+
+// Checks every minute whether the calendar date has changed since the
+// tracker was last synced, so the daily task list auto-archives and
+// resets right at midnight even if the tab is left open overnight.
+function scheduleRolloverWatch() {
+  setInterval(async () => {
+    if (_lastSeen !== todayKey()) {
+      await maybeRolloverDay();
+      renderHabits();
+      updateDateHeaders();
+    }
+  }, 60 * 1000);
 }
 
 async function saveTasks() {
@@ -965,7 +1032,7 @@ function addHabit() {
   const input = document.getElementById('habitInput');
   const text  = input.value.trim();
   if (!text) return;
-  _habits.push({ id: Date.now(), text, done: false });
+  _habits.push({ id: Date.now(), text, done: false, type: 'custom' });
   saveHabits();
   input.value = '';
   renderHabits();
@@ -981,36 +1048,22 @@ function deleteHabit(id) {
   saveHabits(); renderHabits();
 }
 
-// Consecutive-day streak for a habit, walking backward through
-// today's live status and then the archive (newest first).
-function habitStreak(habitText) {
-  const current = _habits.find(h => h.text === habitText);
-  if (!current || !current.done) return 0;
-  let streak = 1;
-  for (const day of _archive) {
-    if (!day.habits) continue;
-    const h = day.habits.find(x => x.text === habitText);
-    if (h && h.done) streak++;
-    else break;
-  }
-  return streak;
-}
-
 function renderHabits() {
   const list = document.getElementById('habitList');
   if (!_habits.length) {
-    list.innerHTML = '<div class="habit-empty">✦ &nbsp; No habits yet</div>';
+    list.innerHTML = '<div class="habit-empty">✦ &nbsp; No tasks yet</div>';
     return;
   }
   list.innerHTML = '';
   _habits.forEach(h => {
-    const streak = habitStreak(h.text);
     const row = document.createElement('div');
     row.className = 'habit-item' + (h.done ? ' done' : '');
+    const dayTag = h.type === 'conditional' && h.day !== undefined
+      ? `<span class="habit-tag">${DOW_NAMES[h.day]} only</span>` : '';
     row.innerHTML = `
       <input type="checkbox" class="task-check" ${h.done?'checked':''} onchange="toggleHabit(${h.id})" />
       <span class="habit-text">${escHtml(h.text)}</span>
-      ${streak > 0 ? `<span class="habit-streak">🔥 ${streak}</span>` : ''}
+      ${dayTag}
       <button class="habit-del" onclick="deleteHabit(${h.id})">✕</button>
     `;
     list.appendChild(row);
@@ -1039,7 +1092,7 @@ async function archiveDay() {
     tasks,
     habits: _habits.map(h => ({ text: h.text, done: !!h.done })),
     archived_at: new Date().toISOString(),
-    label: today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})
+    label: new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})
   };
   // Save archive entry
   try {

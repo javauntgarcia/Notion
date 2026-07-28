@@ -479,6 +479,102 @@
     flex: 1;
   }
 
+  .habit-log-sub {
+    font-size: 0.55rem;
+    letter-spacing: 0.05em;
+    color: #4A6A8A;
+    opacity: 0.7;
+    margin-bottom: 0.7rem;
+  }
+  .habit-log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  .habit-log-list::-webkit-scrollbar { width: 3px; }
+  .habit-log-list::-webkit-scrollbar-thumb { background: rgba(74,106,138,0.25); border-radius: 3px; }
+  .habit-log-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 0.56rem;
+    color: #1A2530;
+  }
+  .habit-log-date {
+    min-width: 84px;
+    opacity: 0.75;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .habit-log-bar-track {
+    flex: 1;
+    height: 6px;
+    border-radius: 4px;
+    background: rgba(74,106,138,0.12);
+    overflow: hidden;
+  }
+  .habit-log-bar-fill {
+    height: 100%;
+    background: #4A6A8A;
+    border-radius: 4px;
+  }
+  .habit-log-frac {
+    min-width: 38px;
+    text-align: right;
+    opacity: 0.65;
+    font-size: 0.52rem;
+    flex-shrink: 0;
+  }
+  .week-look-sub {
+    font-size: 0.52rem;
+    letter-spacing: 0.04em;
+    color: #4A6A8A;
+    opacity: 0.7;
+    margin-bottom: 0.7rem;
+    line-height: 1.4;
+  }
+  .week-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 90px;
+  }
+  .week-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+  }
+  .week-bar-count {
+    font-size: 0.44rem;
+    color: #1A2530;
+    opacity: 0.55;
+    margin-bottom: 2px;
+    min-height: 1em;
+  }
+  .week-bar {
+    width: 100%;
+    max-width: 20px;
+    border-radius: 4px 4px 2px 2px;
+    background: rgba(74,106,138,0.22);
+    transition: height 0.4s ease;
+  }
+  .week-bar.today { background: #4A6A8A; }
+  .week-bar-label {
+    font-size: 0.46rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #4A6A8A;
+    opacity: 0.65;
+    margin-top: 0.35rem;
+  }
+
   /* ── NAV TILES — cover image style ── */
   .nav-strip {
     grid-column: 1 / 4;
@@ -907,6 +1003,21 @@
           </div>
         </div>
         <div id="calWeekGrid" style="padding:0 1rem 1rem;"></div>
+
+        <div style="display:flex;gap:1.6rem;flex-wrap:wrap;padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(74,106,138,0.14);margin-top:0.2rem;">
+          <div style="flex:1.3;min-width:230px;">
+            <div class="section-label" style="margin-bottom:0.5rem;">✦ Habit Tracker</div>
+            <div class="habit-log-sub">Log of daily tasks completed, most recent first</div>
+            <div class="habit-log-list" id="habitLogList">
+              <div style="font-size:0.56rem;color:#4A6A8A;opacity:0.5;text-align:center;padding:1rem 0;">Loading…</div>
+            </div>
+          </div>
+          <div style="flex:1;min-width:180px;">
+            <div class="section-label" style="margin-bottom:0.5rem;">✦ Weekly Look</div>
+            <div class="week-look-sub" id="weekLookSub">Loading…</div>
+            <div class="week-chart" id="weekChart"></div>
+          </div>
+        </div>
       </div>
 
       <!-- IDEAL DAY -->
@@ -1839,6 +1950,115 @@ function quickAddEvent(dateStr, hour) {
   saveCalEvents(evts);
   renderWeekCalendar();
 }
+
+// ── HABIT TRACKER (log) + WEEKLY LOOK (chart) ──
+// The "Daily Tasks" list lives in Planning.html (_habits, stored on the
+// shared main_hub row as `habits`). Each midnight it auto-archives into
+// planning_archive — that archive is the permanent completion log this
+// section reads from, rather than tracking a streak.
+async function loadPlanningArchive() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/planning_archive?order=archived_at.desc&limit=60`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+    });
+    return await r.json() || [];
+  } catch(e) { return []; }
+}
+
+function dayStats(dayEntry) {
+  const habits = (dayEntry && dayEntry.habits) || [];
+  const total = habits.length;
+  const done  = habits.filter(function(h){ return h.done; }).length;
+  return { done: done, total: total };
+}
+
+function escapeLogLabel(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function refreshHabitInsights() {
+  try {
+    const row = await sbGet('main_hub', 'singleton');
+    if (row && row.habits) hubData.habits = row.habits;
+  } catch(e) {}
+  const archive = await loadPlanningArchive();
+  renderHabitLog(archive);
+  renderWeekLook(archive);
+}
+
+function renderHabitLog(archive) {
+  const list = document.getElementById('habitLogList');
+  if (!list) return;
+  const todayId = dateKey(new Date());
+  const rows = [];
+  if (hubData.habits && hubData.habits.length) {
+    const total = hubData.habits.length;
+    const done  = hubData.habits.filter(function(h){ return h.done; }).length;
+    rows.push({ label: 'Today', done: done, total: total });
+  }
+  archive.forEach(function(day) {
+    if (day.id === todayId) return; // avoid duplicating today before it's archived
+    const s = dayStats(day);
+    if (!s.total) return;
+    rows.push({ label: day.label || day.id, done: s.done, total: s.total });
+  });
+  if (!rows.length) {
+    list.innerHTML = '<div style="font-size:0.56rem;color:#4A6A8A;opacity:0.5;text-align:center;padding:1rem 0;">No habit history yet</div>';
+    return;
+  }
+  list.innerHTML = rows.slice(0, 14).map(function(r) {
+    const pct = r.total ? Math.round((r.done / r.total) * 100) : 0;
+    return '<div class="habit-log-row">' +
+      '<span class="habit-log-date">' + escapeLogLabel(r.label) + '</span>' +
+      '<div class="habit-log-bar-track"><div class="habit-log-bar-fill" style="width:' + pct + '%"></div></div>' +
+      '<span class="habit-log-frac">' + r.done + '/' + r.total + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function renderWeekLook(archive) {
+  const chart = document.getElementById('weekChart');
+  const sub   = document.getElementById('weekLookSub');
+  if (!chart) return;
+  const ws = getWeekStart(0);
+  const now = new Date();
+  const todayId = dateKey(now);
+  const byId = {};
+  archive.forEach(function(d){ byId[d.id] = d; });
+
+  let totalDone = 0, totalTasks = 0, daysCounted = 0, html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(ws);
+    d.setDate(ws.getDate() + i);
+    const key = dateKey(d);
+    const isToday = key === todayId;
+    let done = 0, total = 0, have = false;
+    if (isToday && hubData.habits && hubData.habits.length) {
+      total = hubData.habits.length;
+      done  = hubData.habits.filter(function(h){ return h.done; }).length;
+      have = true;
+    } else if (byId[key] && byId[key].habits && byId[key].habits.length) {
+      const s = dayStats(byId[key]);
+      done = s.done; total = s.total; have = true;
+    }
+    if (have) { totalDone += done; totalTasks += total; daysCounted++; }
+    const pct = have ? Math.max(4, Math.round((done / Math.max(total,1)) * 100)) : 0;
+    html += '<div class="week-bar-col">' +
+      '<div class="week-bar-count">' + (have ? done : '') + '</div>' +
+      '<div class="week-bar' + (isToday ? ' today' : '') + '" style="height:' + (have ? pct : 3) + '%"></div>' +
+      '<div class="week-bar-label">' + DAYS_SHORT[i] + '</div>' +
+      '</div>';
+  }
+  chart.innerHTML = html;
+  if (sub) {
+    sub.textContent = daysCounted
+      ? totalDone + ' of ' + totalTasks + ' daily tasks completed this week'
+      : 'No completions logged yet this week';
+  }
+}
+
+refreshHabitInsights();
+setInterval(refreshHabitInsights, 30000);
 
 renderWeekCalendar();
 // Cold-start liner render (overwritten by applyHubToUI once Supabase data loads)
