@@ -1000,6 +1000,7 @@
             <span id="calWeekLabel" style="font-size:0.58rem;letter-spacing:0.18em;color:#4A6A8A;min-width:120px;text-align:center;"></span>
             <button onclick="calNextWeek()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A6A8A;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'">›</button>
             <button onclick="calGoToday()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#4A6A8A;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'">TODAY</button>
+            <button id="calSyncBtn" onclick="syncCurrentWeekWithMO()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#4A6A8A;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'" title="Sync this week with Monthly Outline">⟲ SYNC</button>
           </div>
         </div>
         <div id="calWeekGrid" style="padding:0 1rem 1rem;"></div>
@@ -1201,29 +1202,10 @@
 
 <script>
 // ============================================================
-// EDIT: NAV TILE URLS
-// Once you've created each subpage as a Notion page with an
-// /embed of the GitHub Pages URL, replace the values below
-// with that Notion page URL (e.g. https://www.notion.so/yourworkspace/Wellness-abc123)
-// so clicking navigates within Notion rather than to GitHub directly.
-//
-// Format: 'tile-id': 'URL'
-// target="_blank" is already set on each tile — it will navigate
-// Notion's top-level window (stays in Notion, no new tab).
+// Nav tile links point straight to the GitHub Pages subpages
+// (already set as each tile's href attribute above) — no Notion
+// redirect layer.
 // ============================================================
-var NAV_URLS = {
-  'nav-wellness':    'https://www.notion.so/Wellness-371e14bd86828035bd83f48ea355e954',
-  'nav-growth':      'https://www.notion.so/Growth-371e14bd868280f79c1bde475b0c9524',
-  'nav-finances':    'https://www.notion.so/Finances-371e14bd868280aebf2dc1a9eda22bcd',
-  'nav-productivity':'https://www.notion.so/Productivity-371e14bd868280789fbcecfcd96fcf84',
-  'nav-planning':    'https://www.notion.so/Planning-371e14bd86828004bef4dc4d55d271dd'
-};
-
-// Apply NAV_URLS to each tile
-Object.keys(NAV_URLS).forEach(function(id) {
-  var el = document.getElementById(id);
-  if (el) el.href = NAV_URLS[id];
-});
 
 // ── DATE ──
 function updateDate() {
@@ -1305,6 +1287,7 @@ function applyHubToUI() {
     el.textContent = hubData.quote; el.style.opacity = ''; el.style.fontStyle = '';
   }
   if (hubData.quote_attr) document.getElementById('quoteAttr').textContent = hubData.quote_attr;
+  if (hubData.quote) syncQuoteToVocabulary(hubData.quote, hubData.quote_attr);
   if (hubData.word) {
     const wEl = document.getElementById('wotw');
     const pEl = document.getElementById('wotwPill');
@@ -1312,6 +1295,7 @@ function applyHubToUI() {
     pEl.style.opacity = ''; pEl.textContent = 'Word · Week ' + getWeekNum(new Date());
   }
   if (hubData.word_def) { const dEl = document.getElementById('wotwDef'); dEl.textContent = hubData.word_def; dEl.style.opacity = ''; }
+  if (hubData.word) syncWordToVocabulary(hubData.word, hubData.word_def);
   todos = hubData.todos || [];
   renderTodos();
   if (hubData.inv_liner) {
@@ -1332,38 +1316,99 @@ function applyHubToUI() {
 
 // ── SAVE STRATEGY ──
 // Both Main Hub and Planning.html write to the same `main_hub` row.
-// To prevent them from clobbering each other's fields, each page
-// only patches the fields it owns:
-//   saveHubMeta()    → quote / word / liner / cal_events  (never todos)
-//   saveTodosToHub() → todos only                         (never meta)
+// To prevent them from clobbering each other's fields — and to stop
+// one field's save issue from blocking an unrelated one — every widget
+// patches ONLY the column(s) it owns, in its own request:
+//   saveQuoteMeta()  → quote / quote_attr
+//   saveWordMeta()   → word / word_def
+//   saveLinerMeta()  → inv_liner / inv_cycle_start
+//   saveCalMeta()    → cal_events
+//   saveTodosToHub() → todos
+//   Planning.html    → habits / last_seen / todos
 
-async function saveHubMeta() {
-  const statusEl = document.getElementById('hubSaveStatus');
+async function patchHub(fields, statusElId) {
+  const statusEl = statusElId ? document.getElementById(statusElId) : null;
   if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
-  const payload = {
-    id:              'singleton',
-    quote:           hubData.quote           || '',
-    quote_attr:      hubData.quote_attr       || '',
-    word:            hubData.word             || '',
-    word_def:        hubData.word_def         || '',
-    inv_liner:       hubData.inv_liner        || 1,
-    inv_cycle_start: hubData.inv_cycle_start  || '',
-    cal_events:      hubData.cal_events       || []
-  };
   try {
-    await sbUpsert('main_hub', payload);
+    await sbUpsert('main_hub', Object.assign({ id: 'singleton' }, fields));
     if (statusEl) { statusEl.textContent = 'saved ✓'; statusEl.style.color = '#4a8a6e'; setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 2500); }
+    return true;
   } catch(e) {
     if (statusEl) { statusEl.textContent = 'cloud save failed — local only'; statusEl.style.color = '#b05050'; }
-    console.warn('[Hub] Meta save failed:', e.message);
+    console.warn('[Hub] save failed for', Object.keys(fields), ':', e.message);
+    return false;
   }
-  local.set('hub_quote',       hubData.quote);
-  local.set('hub_attr',        hubData.quote_attr);
-  local.set('hub_wotw',        hubData.word);
-  local.set('hub_wotwdef',     hubData.word_def);
+}
+
+// Each widget saves ONLY the field(s) it owns, in its own request.
+// (Previously all of quote/word/liner/cal_events were bundled into one
+// request — if cal_events ever failed to serialize/save, it silently
+// took the word-of-week and Invisalign updates down with it. Splitting
+// them means a calendar hiccup can no longer block a word or liner save.)
+async function saveQuoteMeta() {
+  await patchHub({ quote: hubData.quote || '', quote_attr: hubData.quote_attr || '' }, 'hubSaveStatus');
+  local.set('hub_quote', hubData.quote);
+  local.set('hub_attr',  hubData.quote_attr);
+}
+
+// Keeps the Vocabulary List's "Quotes of the Week" tab in sync with
+// whatever quote is currently set here: adds it if it isn't already
+// tracked there, and checks it off + files it into the archive since
+// it's now a quote that's actually been used.
+async function syncQuoteToVocabulary(quote, attr) {
+  if (!quote) return;
+  try {
+    const row = await sbGet('vocabulary', 'singleton');
+    const quotes = (row && row.quotes) ? row.quotes : [];
+    const match = quotes.find(function(x){ return x.quote.toLowerCase() === quote.toLowerCase(); });
+    if (match) {
+      match.qotw = true;
+      match.archived = true;
+      if (attr && !match.attr) match.attr = attr;
+    } else {
+      quotes.push({ quote: quote, attr: attr || '', source: 'Main Hub', qotw: true, archived: true });
+    }
+    await sbUpsert('vocabulary', { id: 'singleton', quotes: quotes });
+  } catch(e) {
+    console.warn('[Hub→Vocabulary quote sync]', e.message);
+  }
+}
+async function saveWordMeta() {
+  await patchHub({ word: hubData.word || '', word_def: hubData.word_def || '' }, 'hubSaveStatus');
+  local.set('hub_wotw',    hubData.word);
+  local.set('hub_wotwdef', hubData.word_def);
+}
+
+// Keeps Vocabulary List (a separate subpage, same Supabase project) in
+// sync with whatever word is currently set as Word of the Week here:
+// adds it if it isn't already tracked there, and checks it off + files
+// it into the archive since it's now a word that's actually been used.
+async function syncWordToVocabulary(word, def) {
+  if (!word) return;
+  try {
+    const row = await sbGet('vocabulary', 'singleton');
+    const words = (row && row.words) ? row.words : [];
+    const match = words.find(function(w){ return w.word.toLowerCase() === word.toLowerCase(); });
+    if (match) {
+      match.wotd = true;
+      match.archived = true;
+      if (def && !match.def) match.def = def;
+    } else {
+      words.push({ word: word, pos: '', def: def || '', source: 'Main Hub', wotd: true, archived: true });
+    }
+    await sbUpsert('vocabulary', { id: 'singleton', words: words });
+  } catch(e) {
+    console.warn('[Hub→Vocabulary sync]', e.message);
+  }
+}
+async function saveLinerMeta() {
+  await patchHub({ inv_liner: hubData.inv_liner || 1, inv_cycle_start: hubData.inv_cycle_start || '' });
   local.set('inv_liner',       hubData.inv_liner);
   local.set('inv_cycle_start', hubData.inv_cycle_start);
-  local.set('hub_cal_events',  JSON.stringify(hubData.cal_events || []));
+}
+async function saveCalMeta() {
+  await patchHub({ cal_events: hubData.cal_events || [] });
+  local.set('hub_cal_events', JSON.stringify(hubData.cal_events || []));
 }
 
 async function saveTodosToHub() {
@@ -1375,9 +1420,6 @@ async function saveTodosToHub() {
   local.set('hub_todos', JSON.stringify(hubData.todos || []));
 }
 
-// saveHub() is used by calendar/liner callers — route to meta-only save
-function saveHub() { return saveHubMeta(); }
-
 // ── QUOTE / WORD ──
 function saveQuote() {
   const q = document.getElementById('quoteIn').value.trim();
@@ -1386,23 +1428,27 @@ function saveQuote() {
   if (a) { document.getElementById('quoteAttr').textContent = a; hubData.quote_attr = a; }
   document.getElementById('quoteIn').value = '';
   document.getElementById('attrIn').value = '';
-  saveHubMeta();
+  saveQuoteMeta();
+  if (hubData.quote) syncQuoteToVocabulary(hubData.quote, hubData.quote_attr);
 }
 function saveWord() {
-  const w = document.getElementById('wotwIn').value.trim();
-  const d = document.getElementById('wotwDefIn').value.trim();
+  const wIn = document.getElementById('wotwIn').value.trim();
+  const dIn = document.getElementById('wotwDefIn').value.trim();
   const wEl = document.getElementById('wotw');
   const pEl = document.getElementById('wotwPill');
   const dEl = document.getElementById('wotwDef');
-  if (w) {
-    wEl.textContent = w; wEl.style.opacity = '';
+  if (wIn) {
+    wEl.textContent = wIn; wEl.style.opacity = '';
     pEl.style.opacity = ''; pEl.textContent = 'Word · Week ' + getWeekNum(new Date());
-    hubData.word = w;
+    hubData.word = wIn;
   }
-  if (d) { dEl.textContent = d; dEl.style.opacity = ''; hubData.word_def = d; }
+  if (dIn) { dEl.textContent = dIn; dEl.style.opacity = ''; hubData.word_def = dIn; }
   document.getElementById('wotwIn').value = '';
   document.getElementById('wotwDefIn').value = '';
-  saveHubMeta();
+  saveWordMeta();
+  // Keep the Vocabulary List in sync: add the word if it's not there yet,
+  // and check it off (+ archive it) as a used Word of the Week.
+  if (hubData.word) syncWordToVocabulary(hubData.word, hubData.word_def);
 }
 loadHub();
 
@@ -1659,7 +1705,7 @@ function getCycleStart() {
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
     s = twoDaysAgo.toDateString();
     hubData.inv_cycle_start = s;
-    saveHub();
+    saveLinerMeta();
   }
   return new Date(s);
 }
@@ -1689,7 +1735,7 @@ function updateLinerLabel() {
   const big = document.getElementById('linerBig');
   if (big) big.textContent = '#' + num;
   hubData.inv_liner = parseInt(num);
-  saveHub();
+  saveLinerMeta();
   renderDayPips(day);
 }
 
@@ -1698,7 +1744,7 @@ function nextLiner() {
   const n = document.getElementById('linerNum');
   n.value = +n.value + 1;
   hubData.inv_liner = parseInt(n.value);
-  saveHub();
+  saveLinerMeta();
   updateLinerLabel();
 }
 
@@ -1710,7 +1756,7 @@ function loadCalEvents() { return _calEvents; }
 function saveCalEvents(evts) {
   _calEvents = evts;
   hubData.cal_events = evts;
-  saveHub();
+  saveCalMeta();
   // Cross-sync: write merged events to monthly_outline so it stays current
   syncEventsToMonthlyOutline(evts);
 }
@@ -1892,6 +1938,25 @@ function renderWeekCalendar() {
 function calPrevWeek() { calWeekOffset--; renderWeekCalendar(); }
 function calNextWeek() { calWeekOffset++; renderWeekCalendar(); }
 function calGoToday() { calWeekOffset = 0; renderWeekCalendar(); }
+
+// Manually forces this week to reconcile with Monthly Outline right now,
+// instead of waiting for the 30-second background poll: pushes any
+// Hub-native events up, then pulls Monthly Outline's latest back down.
+async function syncCurrentWeekWithMO() {
+  const btn = document.getElementById('calSyncBtn');
+  const orig = btn ? btn.textContent : '⟲ SYNC';
+  if (btn) { btn.textContent = 'Syncing…'; btn.disabled = true; }
+  try {
+    await syncEventsToMonthlyOutline(loadCalEvents());
+    await mergeMOEventsIntoHub();
+  } catch(e) {
+    console.warn('[Sync Week]', e.message);
+  }
+  if (btn) {
+    btn.textContent = '✓ Synced';
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1600);
+  }
+}
 
 function addCalEvent() {
   const title = document.getElementById('calEvtTitle').value.trim();

@@ -155,6 +155,28 @@ body {
 }
 .stat b { color: var(--gold); font-weight: 400; }
 
+/* ─── VIEW TABS (Words / Quotes) ──────────────────────────── */
+.view-tabs {
+  display: flex; justify-content: center; gap: 8px;
+  margin-bottom: 30px;
+  animation: fadeUp 0.5s 0.05s ease both;
+}
+.view-tab {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
+  padding: 9px 20px; border-radius: 99px; cursor: pointer;
+  transition: all .2s;
+  border: 1px solid rgba(196,154,60,.28);
+  background: transparent; color: rgba(242,233,216,.55);
+}
+.view-tab.active {
+  background: rgba(196,154,60,.16);
+  border-color: var(--gold); color: var(--gold);
+}
+.view-tab:hover:not(.active) {
+  border-color: rgba(196,154,60,.5); color: var(--warm-white);
+}
+
 /* ─── CONTROLS ────────────────────────────────────────────── */
 .controls {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -401,6 +423,23 @@ td.arc-cell { text-align: center; vertical-align: middle; }
 /* Archived rows */
 tbody tr.is-archived { opacity: 0.38; }
 tbody tr.is-archived td.word-cell { text-decoration: line-through; }
+tbody tr.is-archived td.quote-cell { text-decoration: line-through; }
+
+/* Quote table cells */
+colgroup .col-quote { width: 42%; }
+colgroup .col-attr  { width: 18%; }
+td.quote-cell {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15.5px; font-style: italic; line-height: 1.58;
+  color: var(--warm-white); opacity: 0.92; word-break: break-word;
+}
+td.quote-cell::before { content: '“'; opacity: 0.5; }
+td.quote-cell::after  { content: '”'; opacity: 0.5; }
+td.attr-cell {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13.5px; color: var(--highlight); opacity: 0.85;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
 /* Empty / no results */
 .no-results {
@@ -433,6 +472,8 @@ footer p {
   .wrap { padding: 76px 12px 60px; }
   colgroup .col-pos { width: 0; }
   td.pos-cell { display: none; }
+  colgroup .col-attr { width: 0; }
+  td.attr-cell { display: none; }
   colgroup .col-del { width: 8%; }
   table { font-size: 13px; }
   td { padding: 10px 10px; }
@@ -467,6 +508,15 @@ footer p {
     <h1>Vocab<em>ulary</em></h1>
     <div class="rule"><span>&#9670;</span></div>
   </header>
+
+  <!-- View tabs -->
+  <div class="view-tabs">
+    <button class="view-tab active" id="tabWords" onclick="switchView('words')">Words</button>
+    <button class="view-tab" id="tabQuotes" onclick="switchView('quotes')">Quotes of the Week</button>
+  </div>
+
+  <!-- ═══════════════ WORDS VIEW ═══════════════ -->
+  <div id="wordsView">
 
   <!-- Stats -->
   <div class="stats">
@@ -570,6 +620,101 @@ footer p {
     </table>
     <div class="no-results" id="noResults">No matching words found.</div>
   </div>
+
+  </div><!-- /wordsView -->
+
+  <!-- ═══════════════ QUOTES VIEW ═══════════════ -->
+  <div id="quotesView" style="display:none;">
+
+  <!-- Stats -->
+  <div class="stats">
+    <span class="stat"><b id="qcTotal">0</b>&nbsp;quotes</span>
+    <span class="stat"><b id="qcShowing">0</b>&nbsp;showing</span>
+    <span class="stat"><b id="qcQotw">0</b>&nbsp;used for qotw</span>
+    <span class="stat"><b id="qcArchived">0</b>&nbsp;archived</span>
+  </div>
+
+  <!-- Controls: search + filters -->
+  <div class="controls">
+    <div class="search-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="quoteSearchInput" placeholder="Search quotes or attributions…"
+             oninput="applyQuoteFilters()" autocomplete="off" />
+    </div>
+    <button class="filter-btn active" onclick="setQuoteFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setQuoteFilter('m',this)">M</button>
+    <button class="filter-btn" onclick="setQuoteFilter('ggp',this)">GGP</button>
+    <button class="filter-btn" onclick="setQuoteFilter('qotw',this)">QOTW ✓</button>
+    <button class="filter-btn" onclick="setQuoteFilter('archived',this)">Archived</button>
+  </div>
+
+  <!-- Add quote toggle -->
+  <div class="add-toggle-row">
+    <button class="add-toggle-btn" id="addQuoteToggleBtn" onclick="toggleAddQuoteForm()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Add Quote
+    </button>
+  </div>
+
+  <!-- Collapsible add-quote form -->
+  <div class="add-drawer" id="addQuoteDrawer">
+    <div class="add-card">
+      <div class="form-grid">
+        <div class="form-field full">
+          <label for="q-quote">Quote</label>
+          <input type="text" id="q-quote" placeholder="The unexamined life is not worth living." autocomplete="off" />
+        </div>
+        <div class="form-field">
+          <label for="q-attr">Attribution</label>
+          <input type="text" id="q-attr" placeholder="Socrates" autocomplete="off" />
+        </div>
+        <div class="form-field">
+          <label for="q-source">Source (book title or URL)</label>
+          <input type="text" id="q-source" placeholder="M Ch. 12 or https://…" autocomplete="off" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="addQuote()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Save Quote
+        </button>
+        <span class="form-msg" id="quote-form-msg">saved.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote table -->
+  <div class="table-wrap">
+    <table>
+      <colgroup>
+        <col class="col-quote" /><col class="col-attr" />
+        <col class="col-src" /><col class="col-wotd" /><col class="col-arc" /><col class="col-del" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th onclick="sortQuoteBy('quote')" id="qth-quote">Quote <em class="sort-arrow">↕</em></th>
+          <th onclick="sortQuoteBy('attr')"  id="qth-attr">Attribution <em class="sort-arrow">↕</em></th>
+          <th>Source</th>
+          <th class="center">QOTW</th>
+          <th class="center">Archive</th>
+          <th class="center"></th>
+        </tr>
+      </thead>
+      <tbody id="qtbody"></tbody>
+    </table>
+    <div class="no-results" id="qNoResults">No matching quotes found.</div>
+  </div>
+
+  </div><!-- /quotesView -->
 
 </div><!-- /wrap -->
 
@@ -780,7 +925,7 @@ function deleteWord(word) {
 
 function setFilter(f, btn) {
   state.filter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   render();
 }
@@ -824,13 +969,178 @@ function addWord() {
   flashMsg('saved.');
 }
 
-function flashMsg(txt) {
-  const el = document.getElementById('form-msg');
+function flashMsg(txt, elId) {
+  const el = document.getElementById(elId || 'form-msg');
   if (!el) return;
   el.textContent = txt;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2200);
 }
+
+// ── View switcher (Words / Quotes of the Week) ─────────────
+function switchView(view) {
+  const wordsBtn  = document.getElementById('tabWords');
+  const quotesBtn = document.getElementById('tabQuotes');
+  const wordsView = document.getElementById('wordsView');
+  const quotesView= document.getElementById('quotesView');
+  const showQuotes = view === 'quotes';
+  wordsView.style.display  = showQuotes ? 'none' : '';
+  quotesView.style.display = showQuotes ? '' : 'none';
+  wordsBtn.classList.toggle('active', !showQuotes);
+  quotesBtn.classList.toggle('active', showQuotes);
+}
+
+// ════════════════════════════════════════════════════════════
+// QUOTES OF THE WEEK
+// Mirrors the word list above: quotes are stored alongside words
+// in the same `vocabulary` Supabase row (a `quotes` array field),
+// each with { quote, attr, source, qotw, archived }. `qotw` marks
+// a quote as having been used as Quote of the Week (the quote
+// equivalent of WOTD); Main Hub also syncs into this list whenever
+// its Quote of the Week is set.
+// ════════════════════════════════════════════════════════════
+let quoteState = { quotes: [], filter: 'all', sortKey: 'quote', sortDir: 1, search: '' };
+
+async function loadQuoteState() {
+  let list = [];
+  try {
+    const row = await sbGet('vocabulary', 'singleton');
+    if (row && row.quotes && row.quotes.length) list = row.quotes;
+    else {
+      const legacy = JSON.parse(lsGet('vl_quotes') || '[]');
+      list = legacy;
+    }
+  } catch(e) {
+    try { list = JSON.parse(lsGet('vl_quotes') || '[]'); } catch(e2) { list = []; }
+  }
+  quoteState.quotes = list.map(q => ({
+    quote: q.quote || '', attr: q.attr || q.attribution || '',
+    source: q.source || '', qotw: !!q.qotw, archived: !!q.archived
+  }));
+}
+
+async function saveQuoteState() {
+  await sbUpsert('vocabulary', { id: 'singleton', quotes: quoteState.quotes });
+  lsSet('vl_quotes', JSON.stringify(quoteState.quotes));
+}
+
+function getVisibleQuotes() {
+  let list = quoteState.quotes;
+  const q = quoteState.search.toLowerCase().trim();
+  if (q) list = list.filter(x => x.quote.toLowerCase().includes(q) || x.attr.toLowerCase().includes(q));
+  if (quoteState.filter === 'archived') {
+    list = list.filter(x => x.archived);
+  } else {
+    list = list.filter(x => !x.archived);
+    if (quoteState.filter === 'm')    list = list.filter(x => srcType(x.source) === 'm');
+    else if (quoteState.filter === 'ggp')  list = list.filter(x => srcType(x.source) === 'ggp');
+    else if (quoteState.filter === 'qotw') list = list.filter(x => x.qotw);
+  }
+  const k = quoteState.sortKey;
+  list = [...list].sort((a,b) => {
+    const av = (a[k]||'').toLowerCase(), bv = (b[k]||'').toLowerCase();
+    return av < bv ? -quoteState.sortDir : av > bv ? quoteState.sortDir : 0;
+  });
+  return list;
+}
+
+function renderQuotes() {
+  const visible = getVisibleQuotes();
+  const tbody = document.getElementById('qtbody');
+  tbody.innerHTML = visible.map((q,i) => `
+    <tr class="${q.archived ? 'is-archived' : ''}" style="animation:fadeUp ${Math.min(i,20)*0.025+0.04}s ease both">
+      <td class="quote-cell">${esc(q.quote)}</td>
+      <td class="attr-cell">${esc(q.attr)}</td>
+      <td class="src-cell">${badgeHtml(q.source)}</td>
+      <td class="wotd-cell">
+        <div class="wotd-box ${q.qotw?'on':''}" onclick="toggleQotw('${esc(q.quote)}')"></div>
+      </td>
+      <td class="arc-cell">
+        <div class="arc-box ${q.archived?'on':''}" onclick="toggleQuoteArchived('${esc(q.quote)}')" title="${q.archived ? 'Unarchive' : 'Archive'}"></div>
+      </td>
+      <td class="del-cell">
+        <button class="del-btn" onclick="deleteQuote('${esc(q.quote)}')" title="Remove quote" aria-label="Delete quote">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/>
+          </svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+
+  document.getElementById('qNoResults').style.display = visible.length ? 'none' : 'block';
+  document.getElementById('qcTotal').textContent    = quoteState.quotes.filter(x => !x.archived).length;
+  document.getElementById('qcShowing').textContent  = visible.length;
+  document.getElementById('qcQotw').textContent     = quoteState.quotes.filter(x => x.qotw && !x.archived).length;
+  document.getElementById('qcArchived').textContent = quoteState.quotes.filter(x => x.archived).length;
+
+  ['quote','attr'].forEach(k => {
+    const th = document.getElementById('qth-'+k);
+    if (!th) return;
+    th.classList.toggle('sorted', quoteState.sortKey === k);
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) arrow.textContent = quoteState.sortKey === k ? (quoteState.sortDir === 1 ? '↑' : '↓') : '↕';
+  });
+}
+
+function toggleQotw(quote) {
+  const q = quoteState.quotes.find(x => x.quote === quote);
+  if (q) { q.qotw = !q.qotw; saveQuoteState(); renderQuotes(); }
+}
+function toggleQuoteArchived(quote) {
+  const q = quoteState.quotes.find(x => x.quote === quote);
+  if (q) { q.archived = !q.archived; saveQuoteState(); renderQuotes(); }
+}
+function deleteQuote(quote) {
+  quoteState.quotes = quoteState.quotes.filter(x => x.quote !== quote);
+  saveQuoteState(); renderQuotes();
+}
+function setQuoteFilter(f, btn) {
+  quoteState.filter = f;
+  btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuotes();
+}
+function applyQuoteFilters() {
+  quoteState.search = document.getElementById('quoteSearchInput').value;
+  renderQuotes();
+}
+function sortQuoteBy(key) {
+  if (quoteState.sortKey === key) quoteState.sortDir *= -1;
+  else { quoteState.sortKey = key; quoteState.sortDir = 1; }
+  renderQuotes();
+}
+
+function toggleAddQuoteForm() {
+  const drawer = document.getElementById('addQuoteDrawer');
+  const btn    = document.getElementById('addQuoteToggleBtn');
+  const open   = drawer.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  if (open) setTimeout(() => document.getElementById('q-quote').focus(), 320);
+}
+
+function addQuote() {
+  const quote = document.getElementById('q-quote').value.trim();
+  const attr  = document.getElementById('q-attr').value.trim();
+  const src   = document.getElementById('q-source').value.trim();
+  if (!quote) { flashMsg('quote text required.', 'quote-form-msg'); return; }
+  if (quoteState.quotes.find(x => x.quote.toLowerCase() === quote.toLowerCase())) {
+    flashMsg('quote already exists.', 'quote-form-msg'); return;
+  }
+  quoteState.quotes.push({ quote, attr, source: src, qotw: false, archived: false });
+  saveQuoteState();
+  document.getElementById('q-quote').value = '';
+  document.getElementById('q-attr').value = '';
+  document.getElementById('q-source').value = '';
+  renderQuotes();
+  flashMsg('saved.', 'quote-form-msg');
+}
+
+document.getElementById('q-quote').addEventListener('keydown', e => { if (e.key === 'Enter') addQuote(); });
+document.getElementById('q-attr').addEventListener('keydown',  e => { if (e.key === 'Enter') addQuote(); });
 
 // Enter key in word field submits
 document.getElementById('f-word').addEventListener('keydown', e => { if (e.key === 'Enter') addWord(); });
@@ -840,6 +1150,8 @@ document.getElementById('f-def').addEventListener('keydown',  e => { if (e.key =
 async function initVocab() {
   await loadState();
   render();
+  await loadQuoteState();
+  renderQuotes();
 }
 initVocab();
 </script>
