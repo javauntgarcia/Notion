@@ -37,6 +37,7 @@
       --accent:        #5b6fff;
       --highlight:     #e8a030;
       --warm-white:    #e8eaff;
+      --warm-white-light: #e8eaff;
       --ivory:         #f0f2ff;
       --glass:         rgba(91, 111, 255, 0.09);
       --glass-hover:   rgba(91, 111, 255, 0.17);
@@ -61,10 +62,34 @@
     }
 
     /* ======================================================
-       PAGE WRAP + BACKGROUND
-       EDIT: background — change image filename in src below
+       PAGE WRAP
        ====================================================== */
     .page-wrap { position: relative; min-height: 100vh; }
+
+    .content { position: relative; z-index: 1; }
+
+    /* ======================================================
+       CALENDAR SURFACE + BACKGROUND
+       EDIT: background — change image filename in src below
+       The image now lives behind the calendar card only.
+       ====================================================== */
+    .calendar-surface {
+      --warm-white: var(--warm-white-light);
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid var(--glass-b);
+      padding: 2.5rem 1.25rem 3rem;
+      min-height: 760px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background: var(--primary-mid);
+    }
+
+    @media (max-width: 700px) {
+      .calendar-surface { min-height: 520px; padding: 1.5rem 1rem 2rem; }
+    }
 
     .bg-layer {
       position: absolute;
@@ -77,29 +102,30 @@
     .bg-layer img {
       width: 100%; height: 100%;
       object-fit: cover;
-      object-position: center center; /* EDIT: shifted to center so heart is visible behind calendar */
+      object-position: center center;
       display: block;
     }
 
-    /* EDIT: overlay — cobalt/indigo tint matching image */
+    /* EDIT: overlay — lightened so the full image (including the heart/teeth detail) reads clearly */
     .bg-layer::after {
       content: '';
       position: absolute;
       inset: 0;
       background: linear-gradient(
-        170deg,
-        rgba(5, 8, 32, 0.58) 0%,
-        rgba(8, 13, 42, 0.48) 45%,
-        rgba(12, 10, 28, 0.65) 100%
+        180deg,
+        rgba(5, 8, 32, 0.06) 0%,
+        rgba(8, 13, 42, 0.14) 55%,
+        rgba(6, 8, 26, 0.42) 100%
       );
     }
 
-    .content { position: relative; z-index: 1; }
+    .calendar-inner { position: relative; z-index: 1; }
 
     /* ======================================================
        TOPBAR
        ====================================================== */
     .topbar {
+      --warm-white: var(--warm-white-light);
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
@@ -182,7 +208,7 @@
     .masthead-calendar {
       margin-top: 3rem;
       width: 100%;
-      max-width: 980px;
+      max-width: 1180px;
       padding: 0 1.5rem;
     }
 
@@ -422,6 +448,8 @@
        MODALS
        ====================================================== */
     .modal-overlay {
+      --warm-white: var(--warm-white-light);
+      --highlight: #e8a030;
       display: none;
       position: fixed;
       inset: 0; z-index: 200;
@@ -605,8 +633,61 @@
     }
 
     /* ======================================================
-       EDIT: ideas — Ideas tab
+       EDIT: ideas — draggable Idea Bank board (7 color-themed panels)
        ====================================================== */
+    .ideas-board {
+      position: relative;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      /* height grows to fit whatever panels are dragged lowest/rightmost */
+      min-height: 920px;
+    }
+
+    @media (max-width: 700px) {
+      .ideas-board { min-height: 0; }
+      .idea-bank { position: static !important; width: 100% !important; margin-bottom: 1rem; }
+    }
+
+    .idea-bank {
+      position: absolute;
+      width: 260px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(5,8,32,0.18);
+      overflow: hidden;
+      user-select: none;
+    }
+    .idea-bank.dragging { box-shadow: 0 18px 40px rgba(5,8,32,0.32); z-index: 50; opacity: 0.96; }
+
+    .bank-drag-handle {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.85rem 1.1rem 0.6rem;
+      cursor: grab;
+      touch-action: none;
+    }
+    .bank-drag-handle:active { cursor: grabbing; }
+
+    .bank-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--warm-white);
+      line-height: 1.15;
+    }
+
+    .bank-drag-dots {
+      display: flex; gap: 3px; flex-shrink: 0; opacity: 0.5;
+    }
+    .bank-drag-dots span {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--warm-white);
+    }
+
+    .idea-bank .ideas-list { padding: 0 1.1rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .idea-bank .ideas-add-bar { padding: 0.9rem 1.1rem 1.1rem; margin-top: 0; display: flex; justify-content: flex-end; }
+    .idea-bank .empty-state { padding: 1.2rem 0 1.6rem; font-size: 0.56rem; }
+
     .ideas-list { display: flex; flex-direction: column; gap: 0.7rem; }
 
     .idea-card {
@@ -614,6 +695,15 @@
       border: 1px solid var(--glass-b);
       border-radius: 12px;
       overflow: hidden;
+      cursor: grab;
+    }
+    .idea-card.dragging { opacity: 0.35; }
+
+    .idea-bank .ideas-list.drag-over {
+      background: rgba(255,255,255,0.30);
+      border-radius: 10px;
+      outline: 1.5px dashed rgba(0,0,0,0.18);
+      outline-offset: -4px;
     }
 
     .idea-header {
@@ -809,12 +899,6 @@
 <body>
 <div class="page-wrap">
 
-  <!-- EDIT: background — filename in src (space-encoded first, underscore fallback) -->
-  <div class="bg-layer">
-    <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Content%20Calendar.jpg" alt=""
-         onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/javauntgarcia/Notion/main/Content_Calendar.jpg'" />
-  </div>
-
   <div class="content">
 
     <!-- TOPBAR -->
@@ -829,37 +913,36 @@
 
     <!-- MASTHEAD — title + calendar centered in hero -->
     <section class="masthead">
-      <div class="eyebrow">Brand · Schedule</div>
       <h1>Content <em>Calendar</em></h1>
 
-      <!-- Calendar lives HERE inside the masthead so it sits on the image -->
+      <!-- Calendar lives HERE inside the masthead; the background image now sits behind this card only -->
       <div class="masthead-calendar" style="animation: fadeUp 0.8s ease both; animation-delay: 0.15s;">
-        <div class="week-nav">
-          <button class="btn btn-sm" onclick="shiftWeek(-1)">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:2px"><polyline points="15 18 9 12 15 6"/></svg>
-            Prev
-          </button>
-          <span class="week-label" id="week-label"></span>
-          <button class="btn btn-sm" onclick="shiftWeek(1)">
-            Next
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-left:2px"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
+        <div class="calendar-surface">
+          <!-- EDIT: background — filename in src (space-encoded first, underscore fallback) -->
+          <div class="bg-layer">
+            <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Content%20Calendar.jpg" alt=""
+                 onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/javauntgarcia/Notion/main/Content_Calendar.jpg'" />
+          </div>
+          <div class="calendar-inner">
+            <div class="week-nav">
+              <button class="btn btn-sm" onclick="shiftWeek(-1)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:2px"><polyline points="15 18 9 12 15 6"/></svg>
+                Prev
+              </button>
+              <span class="week-label" id="week-label"></span>
+              <button class="btn btn-sm" onclick="shiftWeek(1)">
+                Next
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-left:2px"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <div class="week-grid" id="week-grid"></div>
+          </div>
         </div>
-        <div class="week-grid" id="week-grid"></div>
       </div>
     </section>
 
-    <!-- IDEAS SECTION -->
-    <div class="section" style="animation: fadeUp 0.8s ease both; animation-delay: 0.3s;">
-      <div class="section-label">Ideas</div>
-      <div class="ideas-list" id="ideas-list"></div>
-      <div class="ideas-add-bar">
-        <button class="btn" onclick="openIdeaModal()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          New Idea
-        </button>
-      </div>
-    </div>
+    <!-- IDEA BANKS -->
+    <div class="ideas-board" id="ideas-board"></div>
 
     <div class="divider"></div>
     <footer>plan · create · share</footer>
@@ -1021,12 +1104,12 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
   })();
 
   /* ---- Supabase-backed state ---- */
-  let _ccData = { id: 'singleton', calendar: {}, ideas: [] };
+  let _ccData = { id: 'singleton', calendar: {}, ideas: [], ideaBoard: {} };
 
   async function saveCal() {
     await sbUpsert('content_calendar', _ccData);
     try { localStorage.setItem('cc_calendar', JSON.stringify(_ccData.calendar)); } catch(e) {}
-    try { localStorage.setItem('cc_ideas', JSON.stringify(_ccData.ideas)); } catch(e) {}
+    try { localStorage.setItem('cc_ideaboard', JSON.stringify(_ccData.ideaBoard)); } catch(e) {}
   }
 
   /* ============================================================
@@ -1233,13 +1316,13 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     document.getElementById('vm-title').value = '';
     ['vm-film','vm-edit','vm-post'].forEach(id => document.getElementById(id).checked = false);
 
-    // Populate idea picker from cc_ideas
-    const ideas = getIdeas();
+    // Populate idea picker from all idea banks
+    const ideas = allIdeasFlat();
     const pickerList = document.getElementById('idea-picker-list');
     pickerList.innerHTML = '';
 
     if (!ideas.length) {
-      pickerList.innerHTML = '<div class="idea-picker-empty">No ideas yet — add some in the Ideas section below.</div>';
+      pickerList.innerHTML = '<div class="idea-picker-empty">No ideas yet — add some in the Idea Banks below.</div>';
     } else {
       ideas.forEach((idea, idx) => {
         const item = document.createElement('div');
@@ -1329,26 +1412,126 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
   });
 
   /* ============================================================
-     IDEAS
-     EDIT: localStorage key → cc_ideas
+     IDEA BANKS — 7 draggable, color-themed panels
+     EDIT: localStorage key → cc_ideaboard
      ============================================================ */
-  function getIdeas() { return _ccData.ideas || []; }
-  function setIdeas(arr) { _ccData.ideas = arr; saveCal(); }
+  const BANK_CONFIG = [
+    { id: 'wotd',     title: 'Word of the Day',    bg: '#dde3ff', ink: '#20255c', accent: '#3b4fd6', highlight: '#3b4fd6', glassB: 'rgba(59,79,214,0.24)',  x:  20, y:  20 },
+    { id: 'fashion',  title: 'Fashion',             bg: '#fbe3b8', ink: '#5c3d05', accent: '#a15c00', highlight: '#a15c00', glassB: 'rgba(161,92,0,0.24)',   x: 300, y:  60 },
+    { id: 'politics', title: 'Politics & Resources',bg: '#e3e6f7', ink: '#23264a', accent: '#4b4f8f', highlight: '#4b4f8f', glassB: 'rgba(75,79,143,0.24)',  x: 580, y:  20 },
+    { id: 'transit',  title: 'Transit & Work',      bg: '#c9f2e2', ink: '#0d4632', accent: '#0f8a63', highlight: '#0f8a63', glassB: 'rgba(15,138,99,0.24)',  x: 860, y:  70 },
+    { id: 'couple',   title: 'Couple Content',      bg: '#f3d7f9', ink: '#4a1450', accent: '#a53fc4', highlight: '#a53fc4', glassB: 'rgba(165,63,196,0.24)', x:  20, y: 440 },
+    { id: 'travel',   title: 'Travel & Local',      bg: '#fdf3c9', ink: '#2b2408', accent: '#8a6a00', highlight: '#8a6a00', glassB: 'rgba(138,106,0,0.22)',  x: 300, y: 480 },
+    { id: 'misc',     title: 'Miscellaneous',       bg: '#fbdcd0', ink: '#5c2410', accent: '#c1541f', highlight: '#c1541f', glassB: 'rgba(193,84,31,0.24)',  x: 580, y: 440 },
+  ];
 
-  function renderIdeas() {
-    const ideas = getIdeas();
-    const list  = document.getElementById('ideas-list');
+  function getBoard() { return _ccData.ideaBoard || (_ccData.ideaBoard = {}); }
+
+  function getBankState(id) {
+    const board = getBoard();
+    const cfg = BANK_CONFIG.find(b => b.id === id);
+    if (!board[id]) board[id] = { ideas: [], x: cfg.x, y: cfg.y };
+    if (board[id].x === undefined) board[id].x = cfg.x;
+    if (board[id].y === undefined) board[id].y = cfg.y;
+    if (!board[id].ideas) board[id].ideas = [];
+    return board[id];
+  }
+
+  function getBankIdeas(id) { return getBankState(id).ideas; }
+  function setBankIdeas(id, arr) { getBankState(id).ideas = arr; saveCal(); }
+  function setBankPos(id, x, y) { const s = getBankState(id); s.x = x; s.y = y; saveCal(); }
+
+  function allIdeasFlat() {
+    return BANK_CONFIG.flatMap(cfg => getBankIdeas(cfg.id));
+  }
+
+  function renderIdeaBanks() {
+    const board = document.getElementById('ideas-board');
+    board.innerHTML = '';
+
+    BANK_CONFIG.forEach(cfg => {
+      const state = getBankState(cfg.id);
+      const panel = document.createElement('div');
+      panel.className = 'idea-bank';
+      panel.id = 'bank-' + cfg.id;
+      panel.style.left = state.x + 'px';
+      panel.style.top  = state.y + 'px';
+      panel.style.background = cfg.bg;
+      panel.style.setProperty('--warm-white', cfg.ink);
+      panel.style.setProperty('--accent', cfg.accent);
+      panel.style.setProperty('--highlight', cfg.highlight);
+      panel.style.setProperty('--glass', 'rgba(255,255,255,0.45)');
+      panel.style.setProperty('--glass-hover', 'rgba(255,255,255,0.68)');
+      panel.style.setProperty('--glass-b', cfg.glassB);
+
+      panel.innerHTML = `
+        <div class="bank-drag-handle">
+          <span class="bank-title">${cfg.title}</span>
+          <span class="bank-drag-dots"><span></span><span></span><span></span></span>
+        </div>
+        <div class="ideas-list" id="ideas-list-${cfg.id}"></div>
+        <div class="ideas-add-bar">
+          <button class="btn btn-sm" onclick="openIdeaModal(undefined, '${cfg.id}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Idea
+          </button>
+        </div>`;
+
+      board.appendChild(panel);
+      renderBankIdeas(cfg.id);
+      makeBankDraggable(panel, cfg.id, board);
+      setupIdeaDropZone(document.getElementById('ideas-list-' + cfg.id), cfg.id);
+    });
+  }
+
+  // ── Drag idea cards between banks ──
+  function setupIdeaDropZone(listEl, bankId) {
+    listEl.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      listEl.classList.add('drag-over');
+    });
+    listEl.addEventListener('dragleave', e => {
+      if (!listEl.contains(e.relatedTarget)) listEl.classList.remove('drag-over');
+    });
+    listEl.addEventListener('drop', e => {
+      e.preventDefault();
+      listEl.classList.remove('drag-over');
+      try {
+        const { bankId: fromBank, idx: fromIdx } = JSON.parse(e.dataTransfer.getData('text/plain'));
+        if (fromBank === bankId) return; // dropped back on its own bank — no-op
+        moveIdea(fromBank, parseInt(fromIdx), bankId);
+      } catch(_) {}
+    });
+  }
+
+  function moveIdea(fromBank, fromIdx, toBank) {
+    const fromIdeas = getBankIdeas(fromBank);
+    if (!fromIdeas[fromIdx]) return;
+    const [idea] = fromIdeas.splice(fromIdx, 1);
+    setBankIdeas(fromBank, fromIdeas);
+    const toIdeas = getBankIdeas(toBank);
+    toIdeas.push(idea);
+    setBankIdeas(toBank, toIdeas);
+    renderBankIdeas(fromBank);
+    renderBankIdeas(toBank);
+  }
+
+  function renderBankIdeas(bankId) {
+    const ideas = getBankIdeas(bankId);
+    const list  = document.getElementById('ideas-list-' + bankId);
+    if (!list) return;
     list.innerHTML = '';
 
     if (!ideas.length) {
-      list.innerHTML = '<div class="empty-state">No ideas yet — add your first one below.</div>';
+      list.innerHTML = '<div class="empty-state">No ideas yet.</div>';
       return;
     }
 
     ideas.forEach((idea, idx) => {
       const card = document.createElement('div');
       card.className = 'idea-card';
-      card.id = 'idea-card-' + idx;
+      card.id = 'idea-card-' + bankId + '-' + idx;
 
       const platforms = (idea.platforms || []).map(p =>
         `<span class="platform-tag">${p}</span>`).join('');
@@ -1378,7 +1561,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
         </div>` : '';
 
       card.innerHTML = `
-        <div class="idea-header" onclick="toggleIdea(${idx})">
+        <div class="idea-header" onclick="toggleIdea('${bankId}', ${idx})">
           <svg class="idea-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           <span class="idea-title-text">${idea.title || 'Untitled'}</span>
           <div class="idea-platforms">${platforms}</div>
@@ -1388,35 +1571,77 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
             ${urlHTML}
             ${shotsSection}
             <div class="idea-actions">
-              <button class="btn btn-sm" onclick="editIdea(${idx})">
+              <button class="btn btn-sm" onclick="editIdea('${bankId}', ${idx})">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 Edit
               </button>
-              <button class="btn btn-sm btn-danger" onclick="deleteIdea(${idx})">Delete</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteIdea('${bankId}', ${idx})">Delete</button>
             </div>
           </div>
         </div>`;
+      card.setAttribute('draggable', 'true');
+      card.addEventListener('dragstart', e => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', JSON.stringify({ bankId, idx }));
+        setTimeout(() => card.classList.add('dragging'), 0);
+      });
+      card.addEventListener('dragend', () => card.classList.remove('dragging'));
       list.appendChild(card);
     });
   }
 
-  function toggleIdea(idx) {
-    document.getElementById('idea-card-'+idx).classList.toggle('expanded');
+  function toggleIdea(bankId, idx) {
+    document.getElementById('idea-card-' + bankId + '-' + idx).classList.toggle('expanded');
   }
-  function deleteIdea(idx) {
-    const ideas = getIdeas();
+  function deleteIdea(bankId, idx) {
+    const ideas = getBankIdeas(bankId);
     ideas.splice(idx, 1);
-    setIdeas(ideas);
-    renderIdeas();
+    setBankIdeas(bankId, ideas);
+    renderBankIdeas(bankId);
+  }
+
+  /* ---- Drag to reposition a bank panel ---- */
+  function makeBankDraggable(panelEl, bankId, boardEl) {
+    const handle = panelEl.querySelector('.bank-drag-handle');
+    let dragging = false, startX = 0, startY = 0, origX = 0, origY = 0;
+
+    handle.addEventListener('pointerdown', e => {
+      dragging = true;
+      startX = e.clientX; startY = e.clientY;
+      origX = parseFloat(panelEl.style.left) || 0;
+      origY = parseFloat(panelEl.style.top)  || 0;
+      panelEl.classList.add('dragging');
+      handle.setPointerCapture(e.pointerId);
+    });
+    handle.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const boardRect = boardEl.getBoundingClientRect();
+      let nx = origX + (e.clientX - startX);
+      let ny = origY + (e.clientY - startY);
+      nx = Math.max(0, Math.min(nx, boardRect.width  - panelEl.offsetWidth));
+      ny = Math.max(0, ny);
+      panelEl.style.left = nx + 'px';
+      panelEl.style.top  = ny + 'px';
+    });
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      panelEl.classList.remove('dragging');
+      setBankPos(bankId, parseFloat(panelEl.style.left) || 0, parseFloat(panelEl.style.top) || 0);
+    }
+    handle.addEventListener('pointerup', endDrag);
+    handle.addEventListener('pointercancel', endDrag);
   }
 
   /* ---- Idea modal ---- */
   let _editIdeaIdx = null;
+  let _editIdeaBank = null;
   let _shotCount   = 0;
 
-  function openIdeaModal(existingIdx) {
-    _editIdeaIdx = existingIdx !== undefined ? existingIdx : null;
-    _shotCount   = 0;
+  function openIdeaModal(existingIdx, bankId) {
+    _editIdeaIdx  = existingIdx !== undefined ? existingIdx : null;
+    _editIdeaBank = bankId;
+    _shotCount    = 0;
     document.getElementById('idea-modal-title').textContent = _editIdeaIdx !== null ? 'Edit Idea' : 'New Idea';
     document.getElementById('im-title').value = '';
     document.getElementById('im-url').value   = '';
@@ -1425,7 +1650,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     document.getElementById('shots-builder').innerHTML = '';
 
     if (_editIdeaIdx !== null) {
-      const idea = getIdeas()[_editIdeaIdx];
+      const idea = getBankIdeas(_editIdeaBank)[_editIdeaIdx];
       document.getElementById('im-title').value = idea.title || '';
       document.getElementById('im-url').value   = idea.url   || '';
       (idea.platforms || []).forEach(p => {
@@ -1441,7 +1666,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     setTimeout(() => document.getElementById('im-title').focus(), 60);
   }
 
-  function editIdea(idx) { openIdeaModal(idx); }
+  function editIdea(bankId, idx) { openIdeaModal(idx, bankId); }
   function closeIdeaModal() { document.getElementById('idea-modal').classList.remove('open'); }
   document.getElementById('idea-modal').addEventListener('click', function(e) {
     if (e.target===this) closeIdeaModal();
@@ -1472,13 +1697,14 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
       .map(i => i.value.trim()).filter(Boolean);
 
     const idea  = { title, url, platforms, shots };
-    const ideas = getIdeas();
+    const bankId = _editIdeaBank || 'misc';
+    const ideas  = getBankIdeas(bankId);
     if (_editIdeaIdx !== null) ideas[_editIdeaIdx] = idea;
     else ideas.push(idea);
 
-    setIdeas(ideas);
+    setBankIdeas(bankId, ideas);
     closeIdeaModal();
-    renderIdeas();
+    renderBankIdeas(bankId);
   }
 
   /* ---- Init ---- */
@@ -1486,12 +1712,19 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     const row = await sbGet('content_calendar', 'singleton');
     if (row) {
       _ccData = { ..._ccData, ...row };
+      if (!_ccData.ideaBoard) _ccData.ideaBoard = {};
     } else {
-      try { _ccData.calendar = JSON.parse(localStorage.getItem('cc_calendar') || '{}'); } catch(e) {}
-      try { _ccData.ideas    = JSON.parse(localStorage.getItem('cc_ideas')    || '[]'); } catch(e) {}
+      try { _ccData.calendar  = JSON.parse(localStorage.getItem('cc_calendar')  || '{}'); } catch(e) {}
+      try { _ccData.ideaBoard = JSON.parse(localStorage.getItem('cc_ideaboard') || '{}'); } catch(e) {}
+    }
+    // Migrate any legacy flat "ideas" array into the Miscellaneous bank
+    if (_ccData.ideas && _ccData.ideas.length) {
+      const misc = getBankState('misc');
+      misc.ideas = misc.ideas.concat(_ccData.ideas);
+      _ccData.ideas = [];
     }
     renderCalendar();
-    renderIdeas();
+    renderIdeaBanks();
   })();
 </script>
 </body>
