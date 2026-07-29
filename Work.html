@@ -2163,6 +2163,75 @@ function renderDeliverables() {
   });
 }
 
+// ── TASKS: default seed, derived from the 7/27 to-do list (most recent week) ──
+// Each week in the to-do doc supersedes the weeks below it, so this reflects
+// only the still-open items as of 7/27, plus that week's completions.
+const DEFAULT_TASKS = [
+  // Bayview Shuttle — CARB
+  { id: 'dt1',  title: 'Follow-up with Lillian re: timeline', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  { id: 'dt2',  title: 'Prepare quarterly report for CARB', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  // Bayview Shuttle — Transit emergency planning
+  { id: 'dt3',  title: 'Follow-up on 56 Rutland memo', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  // Bayview Shuttle — FIMPS Device Issues
+  { id: 'dt4',  title: 'Follow-up on fare readers PO', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  // Bayview Shuttle — Project Updates
+  { id: 'dt5',  title: 'Storymap finalization', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  { id: 'dt6',  title: 'DPH Shuttle adoption analysis/evaluation', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  // Bayview Shuttle — Community partners
+  { id: 'dt7',  title: 'Update the Bayview Shuttle pamphlets', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  // Access for All
+  { id: 'dt8',  title: 'CPUC quarterly reports — DUE August 15th', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  { id: 'dt9',  title: 'CPUC Annual report — DUE September 15th', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  { id: 'dt10', title: 'Create agenda for SF Taxi and Green Cab', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  // Admin
+  { id: 'dt11', title: 'Ask former Pecha Kucha presenters if they can judge', project: 'Admin', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  { id: 'dt12', title: 'Look at swag items we can give out', project: 'Admin', status: 'not-started', createdAt: Date.parse('2026-07-27') },
+  // Completed this week (7/27)
+  { id: 'dt13', title: 'Follow-up re: the SFGH ridership', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-07-20'), completedAt: Date.parse('2026-07-27') },
+  { id: 'dt14', title: 'Cycle 6 Notice Letter', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-07-13'), completedAt: Date.parse('2026-07-27') },
+  { id: 'dt15', title: 'Deliver Docusign to CPUC (Julie)', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-07-13'), completedAt: Date.parse('2026-07-27') },
+  { id: 'dt16', title: "Check on Green Cab's invoicing", project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-07-20'), completedAt: Date.parse('2026-07-27') },
+  { id: 'dt17', title: 'Send out the Intern Committee Pecha Kucha details', project: 'Admin', status: 'completed', createdAt: Date.parse('2026-07-20'), completedAt: Date.parse('2026-07-27') },
+
+  // ── Gaps found in earlier weeks (back through 6/29) not yet reflected on the board ──
+  // Still-open items from 7/20/7/13 that never got crossed out and don't appear in 7/27
+  { id: 'dt18', title: 'Create a sole source justification outline', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
+  { id: 'dt19', title: 'Develop a follow-up memo to upper management (transit emergency planning)', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-13') },
+  { id: 'dt20', title: 'Review the SFAAACD curriculum', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-06-15') },
+  { id: 'dt21', title: 'Schedule meeting with SFAAACD about Community Congress', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
+  { id: 'dt22', title: 'Send TRC flyer to Maritza and connect with TRC folks', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
+  { id: 'dt23', title: 'Community Congress agenda — reach out to James Bryant', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
+  { id: 'dt24', title: 'Community Congress agenda — reach out to the other three delegates', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
+  { id: 'dt25', title: 'Community Congress — create a draft questionnaire to send', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
+  { id: 'dt26', title: 'Send out reminder for the ramp taxi document', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-20') },
+  { id: 'dt27', title: 'Review ramp taxi document content', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-20') },
+  { id: 'dt28', title: 'Send FAQ page out to Mona/Meher', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-13') },
+
+  // Completed deliverables from 6/29–7/3 that never made it onto the board
+  { id: 'dt29', title: '56 Rutland Via ridership analysis — synopsis for Transit team', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-06-29'), completedAt: Date.parse('2026-07-03') },
+  { id: 'dt30', title: 'Via Second Amendment — updated rate & flexibility language draft', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-07-03') },
+  { id: 'dt31', title: 'DPH Shuttle adoption memo — revised per Jonathan\'s comments', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-07-03') },
+  { id: 'dt32', title: 'Via Second Amendment PowerPoint — MTAB timeline & growth-since-Nov.-2024 update', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-06-29') },
+  { id: 'dt33', title: 'A4A RFP proposal review — 1-pager and presentation', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-06-29'), completedAt: Date.parse('2026-07-03') },
+  { id: 'dt34', title: 'A4A RFP budget proposal scoring', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-06-29') },
+  { id: 'dt35', title: 'APTA Conference write-up for Maddy', project: 'Accessibility', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-07-03') },
+  { id: 'dt36', title: 'NAD Conference reels + webpage coordination', project: 'Accessibility', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-06-29') },
+  { id: 'dt37', title: 'Travel training videos SOW review', project: 'Accessibility', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-06-29') },
+];
+
+// ── SKILLS logged against the completed deliverables above ────
+const DEFAULT_TASK_SKILLS = [
+  { id: 'dts1', skillName: 'Policy Analysis',       taskId: 'dt29', taskTitle: '56 Rutland Via ridership analysis — synopsis for Transit team', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-07-03') },
+  { id: 'dts2', skillName: 'Policy Analysis',       taskId: 'dt30', taskTitle: 'Via Second Amendment — updated rate & flexibility language draft', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-07-03') },
+  { id: 'dts3', skillName: 'Policy Analysis',       taskId: 'dt31', taskTitle: 'DPH Shuttle adoption memo — revised per Jonathan\'s comments', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-07-03') },
+  { id: 'dts4', skillName: 'Policy Analysis',       taskId: 'dt32', taskTitle: 'Via Second Amendment PowerPoint — MTAB timeline & growth-since-Nov.-2024 update', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-06-29') },
+  { id: 'dts5', skillName: 'Grant Writing',         taskId: 'dt33', taskTitle: 'A4A RFP proposal review — 1-pager and presentation', taskProject: 'Access for All', completedAt: Date.parse('2026-07-03') },
+  { id: 'dts6', skillName: 'Grant Writing',         taskId: 'dt34', taskTitle: 'A4A RFP budget proposal scoring', taskProject: 'Access for All', completedAt: Date.parse('2026-06-29') },
+  { id: 'dts7', skillName: 'Community Engagement',  taskId: 'dt35', taskTitle: 'APTA Conference write-up for Maddy', taskProject: 'Accessibility', completedAt: Date.parse('2026-07-03') },
+  { id: 'dts8', skillName: 'Community Engagement',  taskId: 'dt36', taskTitle: 'NAD Conference reels + webpage coordination', taskProject: 'Accessibility', completedAt: Date.parse('2026-06-29') },
+  { id: 'dts9', skillName: 'Policy Analysis',       taskId: 'dt37', taskTitle: 'Travel training videos SOW review', taskProject: 'Accessibility', completedAt: Date.parse('2026-06-29') },
+];
+
 // ── SKILLS ────────────────────────────────────────────────────
 const DEFAULT_SKILLS = [
   { id: 'sk1', name: 'Policy Analysis', category: 'Planning', pct: 80 },
@@ -2339,14 +2408,14 @@ async function initWork() {
   const row = await sbGet('work', 'singleton');
   if (row) {
     _wkData = { ..._wkData, ...row };
-    tasks      = _wkData.tasks      || [];
+    tasks      = _wkData.tasks && _wkData.tasks.length ? _wkData.tasks : DEFAULT_TASKS;
     archived   = _wkData.archived   || [];
-    taskSkills = Array.isArray(_wkData.task_skills) ? _wkData.task_skills : [];
+    taskSkills = Array.isArray(_wkData.task_skills) && _wkData.task_skills.length ? _wkData.task_skills : DEFAULT_TASK_SKILLS;
     skills     = _wkData.skills && _wkData.skills.length ? _wkData.skills : DEFAULT_SKILLS;
   } else {
-    tasks      = lsFallback('wk_tasks', []);
+    tasks      = lsFallback('wk_tasks', DEFAULT_TASKS);
     archived   = lsFallback('wk_archived', []);
-    taskSkills = Array.isArray(lsFallback('wk_task_skills', [])) ? lsFallback('wk_task_skills', []) : [];
+    taskSkills = Array.isArray(lsFallback('wk_task_skills', DEFAULT_TASK_SKILLS)) ? lsFallback('wk_task_skills', DEFAULT_TASK_SKILLS) : DEFAULT_TASK_SKILLS;
     skills     = lsFallback('wk_skills', DEFAULT_SKILLS);
     _wkData.resume_notes = lsGet('wk_resume_notes') || '';
   }
