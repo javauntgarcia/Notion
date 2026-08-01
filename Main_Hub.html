@@ -1490,6 +1490,32 @@ const subpageURLs = {
   'Planning':    'https://javauntgarcia.github.io/Notion/Planning.html',
 };
 
+// Combines archived days (planning_archive) with today's live, not-yet-archived
+// habit list so goal computations reflect same-day progress too.
+function getAllDaysForGoals() {
+  var days = (hubData._planningArchive || []).slice();
+  var todayId = dateKey(new Date());
+  var hasToday = days.some(function(d) { return d.id === todayId; });
+  if (!hasToday && hubData.habits && hubData.habits.length) {
+    days.push({ id: todayId, habits: hubData.habits });
+  }
+  return days;
+}
+
+// Tallies how many logged days include a given habit text, and how many
+// of those were marked done — used by the Growth goals below, which are
+// tracked via the Daily Tasks / habit tracker in Planning.html rather
+// than their own localStorage keys.
+function habitOccurrenceStats(habitText) {
+  var days = getAllDaysForGoals();
+  var done = 0, total = 0;
+  days.forEach(function(d) {
+    var h = (d.habits || []).find(function(x) { return x.text === habitText; });
+    if (h) { total++; if (h.done) done++; }
+  });
+  return { done: done, total: total };
+}
+
 const goalSlides = [
   {
     subpage: 'Wellness',
@@ -1576,6 +1602,37 @@ const goalSlides = [
         compute: function() {
           var done = (hubData._productivity||{}).prod_jour_done === 1;
           return { pct: done?100:0, meta: done?'Published ✓':'In progress' };
+        }
+      }
+    ]
+  },
+  {
+    subpage: 'Growth',
+    color: '#4A6A8A',
+    goals: [
+      {
+        // Tracked via the "Wake up before 6 AM" daily task in Planning.html's
+        // habit tracker (archived nightly to planning_archive).
+        name: 'Wake Up Before 6 AM',
+        color: 'bar-navy',
+        milestone: 'Consistent early wake-ups',
+        compute: function() {
+          var s = habitOccurrenceStats('Wake up before 6 AM');
+          return { pct: s.total ? Math.round(s.done / s.total * 100) : 0,
+                   meta: s.total ? (s.done + ' of ' + s.total + ' days') : 'No data yet' };
+        }
+      },
+      {
+        // Tracked via the Sunday-only "Update weekly outline" task in
+        // Planning.html's habit tracker.
+        name: 'Update Weekly Outline',
+        color: 'bar-gold',
+        milestone: 'Every Sunday in 2026',
+        compute: function() {
+          var s = habitOccurrenceStats('Update weekly outline');
+          var target = 52;
+          return { pct: Math.min(100, Math.round(s.done / target * 100)),
+                   meta: s.done + ' of ' + target + ' weeks' };
         }
       }
     ]
@@ -1690,6 +1747,9 @@ buildGoalCarousel();
   try {
     hubData._wellness    = await sbGet('wellness', 'singleton');
     hubData._productivity = await sbGet('productivity', 'singleton');
+    var hubRow = await sbGet('main_hub', 'singleton');
+    if (hubRow && hubRow.habits) hubData.habits = hubRow.habits;
+    hubData._planningArchive = await loadPlanningArchive();
     buildGoalCarousel();
   } catch(e) {}
 })();
@@ -2047,8 +2107,10 @@ async function refreshHabitInsights() {
     if (row && row.habits) hubData.habits = row.habits;
   } catch(e) {}
   const archive = await loadPlanningArchive();
+  hubData._planningArchive = archive;
   renderHabitLog(archive);
   renderWeekLook(archive);
+  buildGoalCarousel();
 }
 
 function renderHabitLog(archive) {
