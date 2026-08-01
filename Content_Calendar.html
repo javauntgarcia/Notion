@@ -388,6 +388,7 @@
       border: 1px solid rgba(91,111,255,0.18);
       border-radius: 8px;
       padding: 0.38rem 0.48rem;
+      touch-action: none; /* let our JS own the gesture instead of the page scrolling under a finger-drag */
     }
 
     .video-pill-top {
@@ -643,38 +644,39 @@
     /* ======================================================
        EDIT: ideas — draggable Idea Bank board (7 color-themed panels)
        ====================================================== */
+    /* Banks now live in a responsive CSS grid instead of freeform absolute
+       positioning. This guarantees panels can never overlap — the grid
+       reflows every panel's position based on the actual rendered height of
+       its neighbors, so adding items to one category just grows that cell
+       and pushes nothing else out of place. It also collapses to a single
+       column automatically on narrow (iPhone-width) screens. */
     .ideas-board {
-      position: relative;
       max-width: 1180px;
       margin: 0 auto;
       padding: 0 1.5rem;
-      /* height grows to fit whatever panels are dragged lowest/rightmost */
-      min-height: 920px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+      align-items: start;
     }
 
     @media (max-width: 700px) {
-      .ideas-board { min-height: 0; }
-      .idea-bank { position: static !important; width: 100% !important; margin-bottom: 1rem; }
+      .ideas-board { padding: 0 1rem; gap: 1rem; grid-template-columns: 1fr; }
     }
 
     .idea-bank {
-      position: absolute;
-      width: 260px;
+      width: 100%;
       border-radius: 18px;
       box-shadow: 0 10px 30px rgba(5,8,32,0.18);
       overflow: hidden;
       user-select: none;
     }
-    .idea-bank.dragging { box-shadow: 0 18px 40px rgba(5,8,32,0.32); z-index: 50; opacity: 0.96; }
 
     .bank-drag-handle {
       display: flex; align-items: center; justify-content: space-between;
       gap: 0.5rem;
       padding: 0.85rem 1.1rem 0.6rem;
-      cursor: grab;
-      touch-action: none;
     }
-    .bank-drag-handle:active { cursor: grabbing; }
 
     .bank-title {
       font-family: 'Cormorant Garamond', serif;
@@ -682,14 +684,6 @@
       font-weight: 600;
       color: var(--warm-white);
       line-height: 1.15;
-    }
-
-    .bank-drag-dots {
-      display: flex; gap: 3px; flex-shrink: 0; opacity: 0.5;
-    }
-    .bank-drag-dots span {
-      width: 3px; height: 3px; border-radius: 50%;
-      background: var(--warm-white);
     }
 
     .idea-bank .ideas-list { padding: 0 1.1rem; display: flex; flex-direction: column; gap: 0.55rem; }
@@ -704,8 +698,22 @@
       border-radius: 12px;
       overflow: hidden;
       cursor: grab;
+      touch-action: none; /* let our JS own the gesture instead of the page scrolling under a finger-drag */
     }
     .idea-card.dragging { opacity: 0.35; }
+
+    /* Floating clone shown under the pointer/finger while dragging an idea
+       card or video pill. Fixed-position + translate() keeps this cheap to
+       animate on mobile Safari. */
+    .drag-ghost {
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.92;
+      box-shadow: 0 16px 34px rgba(5,8,32,0.4);
+      transform-origin: top left;
+    }
 
     .idea-bank .ideas-list.drag-over {
       background: rgba(255,255,255,0.30);
@@ -841,9 +849,9 @@
     /* ======================================================
        DRAG-AND-DROP
        ====================================================== */
-    .video-pill[draggable="true"] { cursor: grab; }
-    .video-pill[draggable="true"]:active { cursor: grabbing; }
-    .video-pill.dragging { opacity: 0.35; pointer-events: none; }
+    .video-pill { cursor: grab; }
+    .video-pill:active { cursor: grabbing; }
+    .video-pill.dragging { opacity: 0.35; }
 
     .day-col.drag-over {
       border-color: rgba(91,111,255,0.7);
@@ -1124,6 +1132,85 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
   }
 
   /* ============================================================
+     UNIVERSAL DRAG & DROP
+     Works with mouse AND touch (iPhone Safari does not fire the old
+     HTML5 dragstart/dragover/drop events for touch input, which is why
+     dragging into a category previously appeared to "not save" on phone —
+     the drop event simply never happened). Pointer Events fire consistently
+     on every platform, so this single implementation replaces the old
+     dataTransfer-based drag code for both video pills and idea cards.
+     ============================================================ */
+  function enableDragReorder(el, { getPayload, zoneSelector, onDrop }) {
+    let pointerId = null, startX = 0, startY = 0, dragging = false, ghost = null, activeZone = null;
+
+    el.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (e.target.closest('button, a, input, .status-chip')) return; // don't hijack taps on controls
+      pointerId = e.pointerId;
+      startX = e.clientX; startY = e.clientY;
+      dragging = false;
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+      document.addEventListener('pointercancel', onCancel);
+    });
+
+    function startDrag(e) {
+      dragging = true;
+      el.classList.add('dragging');
+      const rect = el.getBoundingClientRect();
+      ghost = el.cloneNode(true);
+      ghost.classList.add('drag-ghost');
+      ghost.style.width = rect.width + 'px';
+      ghost.style.left = rect.left + 'px';
+      ghost.style.top = rect.top + 'px';
+      document.body.appendChild(ghost);
+      try { el.setPointerCapture(pointerId); } catch (_) {}
+    }
+
+    function onMove(e) {
+      if (e.pointerId !== pointerId) return;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      if (!dragging) {
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        startDrag(e);
+      }
+      e.preventDefault();
+      if (ghost) ghost.style.transform = `translate(${dx}px, ${dy}px)`;
+      if (activeZone) activeZone.classList.remove('drag-over');
+      ghost.style.display = 'none';
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      ghost.style.display = '';
+      activeZone = under && under.closest(zoneSelector);
+      if (activeZone) activeZone.classList.add('drag-over');
+    }
+
+    function onUp(e) {
+      if (e.pointerId !== pointerId) return;
+      cleanupListeners();
+      if (dragging) {
+        if (activeZone) onDrop(activeZone, getPayload());
+        finishDrag();
+      }
+    }
+    function onCancel(e) {
+      if (e.pointerId !== pointerId) return;
+      cleanupListeners();
+      if (dragging) finishDrag();
+    }
+    function finishDrag() {
+      el.classList.remove('dragging');
+      if (activeZone) { activeZone.classList.remove('drag-over'); activeZone = null; }
+      if (ghost) { ghost.remove(); ghost = null; }
+      dragging = false;
+    }
+    function cleanupListeners() {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      document.removeEventListener('pointercancel', onCancel);
+    }
+  }
+
+  /* ============================================================
      CALENDAR
      ============================================================ */
   let weekOffset = 0;
@@ -1171,6 +1258,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
 
       const col = document.createElement('div');
       col.className = 'day-col' + (isToday ? ' today-col' : '');
+      col.dataset.key = key;
       col.innerHTML = `
         <div class="day-name">${DAY_NAMES[i]}</div>
         <div class="day-num">${date.getDate()}</div>
@@ -1178,7 +1266,6 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
         <button class="add-video-btn" onclick="openVideoModal('${key}')">+ schedule</button>
       `;
       grid.appendChild(col);
-      setupDayDropZone(col, key);
 
       const vidsEl = col.querySelector('#vids-'+key);
       videos.forEach((v, vi) => renderVideoPill(vidsEl, key, vi, v));
@@ -1188,7 +1275,6 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
   function renderVideoPill(container, dk, idx, v) {
     const pill = document.createElement('div');
     pill.className = 'video-pill' + (v.archived ? ' archived' : '');
-    pill.setAttribute('draggable', 'true');
     pill.dataset.dk = dk;
     pill.dataset.idx = idx;
 
@@ -1216,13 +1302,15 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
       </div>
       <div class="status-row">${statusHTML}</div>`;
 
-    // ── Drag-and-drop ──
-    pill.addEventListener('dragstart', e => {
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', JSON.stringify({ dk, idx }));
-      setTimeout(() => pill.classList.add('dragging'), 0);
+    // ── Drag-and-drop (mouse + touch, incl. iPhone) ──
+    enableDragReorder(pill, {
+      getPayload: () => ({ dk, idx }),
+      zoneSelector: '.day-col',
+      onDrop: (zone, payload) => {
+        const toDk = zone.dataset.key;
+        if (toDk && toDk !== payload.dk) moveVideo(payload.dk, payload.idx, toDk);
+      }
     });
-    pill.addEventListener('dragend', () => pill.classList.remove('dragging'));
 
     container.appendChild(pill);
   }
@@ -1234,27 +1322,6 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     cal[dk][idx].archived = !cal[dk][idx].archived;
     setCalData(cal);
     renderCalendar();
-  }
-
-  // ── Drag-over / drop on day columns ──
-  function setupDayDropZone(colEl, key) {
-    colEl.addEventListener('dragover', e => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      colEl.classList.add('drag-over');
-    });
-    colEl.addEventListener('dragleave', e => {
-      if (!colEl.contains(e.relatedTarget)) colEl.classList.remove('drag-over');
-    });
-    colEl.addEventListener('drop', e => {
-      e.preventDefault();
-      colEl.classList.remove('drag-over');
-      try {
-        const { dk: fromDk, idx: fromIdx } = JSON.parse(e.dataTransfer.getData('text/plain'));
-        if (fromDk === key) return; // same day — no-op
-        moveVideo(fromDk, parseInt(fromIdx), key);
-      } catch(_) {}
-    });
   }
 
   // Move a video from one date key to another
@@ -1427,30 +1494,26 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
      EDIT: localStorage key → cc_ideaboard
      ============================================================ */
   const BANK_CONFIG = [
-    { id: 'wotd',     title: 'Word of the Day',    bg: '#dde3ff', ink: '#20255c', accent: '#3b4fd6', highlight: '#3b4fd6', glassB: 'rgba(59,79,214,0.24)',  x:  20, y:  20 },
-    { id: 'fashion',  title: 'Fashion',             bg: '#fbe3b8', ink: '#5c3d05', accent: '#a15c00', highlight: '#a15c00', glassB: 'rgba(161,92,0,0.24)',   x: 300, y:  60 },
-    { id: 'politics', title: 'Politics & Resources',bg: '#e3e6f7', ink: '#23264a', accent: '#4b4f8f', highlight: '#4b4f8f', glassB: 'rgba(75,79,143,0.24)',  x: 580, y:  20 },
-    { id: 'transit',  title: 'Transit & Work',      bg: '#c9f2e2', ink: '#0d4632', accent: '#0f8a63', highlight: '#0f8a63', glassB: 'rgba(15,138,99,0.24)',  x: 860, y:  70 },
-    { id: 'couple',   title: 'Couple Content',      bg: '#f3d7f9', ink: '#4a1450', accent: '#a53fc4', highlight: '#a53fc4', glassB: 'rgba(165,63,196,0.24)', x:  20, y: 440 },
-    { id: 'travel',   title: 'Travel & Local',      bg: '#fdf3c9', ink: '#2b2408', accent: '#8a6a00', highlight: '#8a6a00', glassB: 'rgba(138,106,0,0.22)',  x: 300, y: 480 },
-    { id: 'misc',     title: 'Miscellaneous',       bg: '#fbdcd0', ink: '#5c2410', accent: '#c1541f', highlight: '#c1541f', glassB: 'rgba(193,84,31,0.24)',  x: 580, y: 440 },
+    { id: 'wotd',     title: 'Word of the Day',    bg: '#dde3ff', ink: '#20255c', accent: '#3b4fd6', highlight: '#3b4fd6', glassB: 'rgba(59,79,214,0.24)'  },
+    { id: 'fashion',  title: 'Fashion',             bg: '#fbe3b8', ink: '#5c3d05', accent: '#a15c00', highlight: '#a15c00', glassB: 'rgba(161,92,0,0.24)'   },
+    { id: 'politics', title: 'Politics & Resources',bg: '#e3e6f7', ink: '#23264a', accent: '#4b4f8f', highlight: '#4b4f8f', glassB: 'rgba(75,79,143,0.24)'  },
+    { id: 'transit',  title: 'Transit & Work',      bg: '#c9f2e2', ink: '#0d4632', accent: '#0f8a63', highlight: '#0f8a63', glassB: 'rgba(15,138,99,0.24)'  },
+    { id: 'couple',   title: 'Couple Content',      bg: '#f3d7f9', ink: '#4a1450', accent: '#a53fc4', highlight: '#a53fc4', glassB: 'rgba(165,63,196,0.24)' },
+    { id: 'travel',   title: 'Travel & Local',      bg: '#fdf3c9', ink: '#2b2408', accent: '#8a6a00', highlight: '#8a6a00', glassB: 'rgba(138,106,0,0.22)'  },
+    { id: 'misc',     title: 'Miscellaneous',       bg: '#fbdcd0', ink: '#5c2410', accent: '#c1541f', highlight: '#c1541f', glassB: 'rgba(193,84,31,0.24)'  },
   ];
 
   function getBoard() { return _ccData.ideaBoard || (_ccData.ideaBoard = {}); }
 
   function getBankState(id) {
     const board = getBoard();
-    const cfg = BANK_CONFIG.find(b => b.id === id);
-    if (!board[id]) board[id] = { ideas: [], x: cfg.x, y: cfg.y };
-    if (board[id].x === undefined) board[id].x = cfg.x;
-    if (board[id].y === undefined) board[id].y = cfg.y;
+    if (!board[id]) board[id] = { ideas: [] };
     if (!board[id].ideas) board[id].ideas = [];
     return board[id];
   }
 
   function getBankIdeas(id) { return getBankState(id).ideas; }
   function setBankIdeas(id, arr) { getBankState(id).ideas = arr; saveCal(); }
-  function setBankPos(id, x, y) { const s = getBankState(id); s.x = x; s.y = y; saveCal(); }
 
   function allIdeasFlat() {
     return BANK_CONFIG.flatMap(cfg => getBankIdeas(cfg.id));
@@ -1461,12 +1524,9 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     board.innerHTML = '';
 
     BANK_CONFIG.forEach(cfg => {
-      const state = getBankState(cfg.id);
       const panel = document.createElement('div');
       panel.className = 'idea-bank';
       panel.id = 'bank-' + cfg.id;
-      panel.style.left = state.x + 'px';
-      panel.style.top  = state.y + 'px';
       panel.style.background = cfg.bg;
       panel.style.setProperty('--warm-white', cfg.ink);
       panel.style.setProperty('--accent', cfg.accent);
@@ -1478,9 +1538,8 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
       panel.innerHTML = `
         <div class="bank-drag-handle">
           <span class="bank-title">${cfg.title}</span>
-          <span class="bank-drag-dots"><span></span><span></span><span></span></span>
         </div>
-        <div class="ideas-list" id="ideas-list-${cfg.id}"></div>
+        <div class="ideas-list" id="ideas-list-${cfg.id}" data-bank="${cfg.id}"></div>
         <div class="ideas-add-bar">
           <button class="btn btn-sm" onclick="openIdeaModal(undefined, '${cfg.id}')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -1490,29 +1549,6 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
 
       board.appendChild(panel);
       renderBankIdeas(cfg.id);
-      makeBankDraggable(panel, cfg.id, board);
-      setupIdeaDropZone(document.getElementById('ideas-list-' + cfg.id), cfg.id);
-    });
-  }
-
-  // ── Drag idea cards between banks ──
-  function setupIdeaDropZone(listEl, bankId) {
-    listEl.addEventListener('dragover', e => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      listEl.classList.add('drag-over');
-    });
-    listEl.addEventListener('dragleave', e => {
-      if (!listEl.contains(e.relatedTarget)) listEl.classList.remove('drag-over');
-    });
-    listEl.addEventListener('drop', e => {
-      e.preventDefault();
-      listEl.classList.remove('drag-over');
-      try {
-        const { bankId: fromBank, idx: fromIdx } = JSON.parse(e.dataTransfer.getData('text/plain'));
-        if (fromBank === bankId) return; // dropped back on its own bank — no-op
-        moveIdea(fromBank, parseInt(fromIdx), bankId);
-      } catch(_) {}
     });
   }
 
@@ -1590,13 +1626,14 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
             </div>
           </div>
         </div>`;
-      card.setAttribute('draggable', 'true');
-      card.addEventListener('dragstart', e => {
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', JSON.stringify({ bankId, idx }));
-        setTimeout(() => card.classList.add('dragging'), 0);
+      enableDragReorder(card, {
+        getPayload: () => ({ bankId, idx }),
+        zoneSelector: '.ideas-list',
+        onDrop: (zone, payload) => {
+          const toBank = zone.dataset.bank;
+          if (toBank && toBank !== payload.bankId) moveIdea(payload.bankId, payload.idx, toBank);
+        }
       });
-      card.addEventListener('dragend', () => card.classList.remove('dragging'));
       list.appendChild(card);
     });
   }
@@ -1609,39 +1646,6 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     ideas.splice(idx, 1);
     setBankIdeas(bankId, ideas);
     renderBankIdeas(bankId);
-  }
-
-  /* ---- Drag to reposition a bank panel ---- */
-  function makeBankDraggable(panelEl, bankId, boardEl) {
-    const handle = panelEl.querySelector('.bank-drag-handle');
-    let dragging = false, startX = 0, startY = 0, origX = 0, origY = 0;
-
-    handle.addEventListener('pointerdown', e => {
-      dragging = true;
-      startX = e.clientX; startY = e.clientY;
-      origX = parseFloat(panelEl.style.left) || 0;
-      origY = parseFloat(panelEl.style.top)  || 0;
-      panelEl.classList.add('dragging');
-      handle.setPointerCapture(e.pointerId);
-    });
-    handle.addEventListener('pointermove', e => {
-      if (!dragging) return;
-      const boardRect = boardEl.getBoundingClientRect();
-      let nx = origX + (e.clientX - startX);
-      let ny = origY + (e.clientY - startY);
-      nx = Math.max(0, Math.min(nx, boardRect.width  - panelEl.offsetWidth));
-      ny = Math.max(0, ny);
-      panelEl.style.left = nx + 'px';
-      panelEl.style.top  = ny + 'px';
-    });
-    function endDrag(e) {
-      if (!dragging) return;
-      dragging = false;
-      panelEl.classList.remove('dragging');
-      setBankPos(bankId, parseFloat(panelEl.style.left) || 0, parseFloat(panelEl.style.top) || 0);
-    }
-    handle.addEventListener('pointerup', endDrag);
-    handle.addEventListener('pointercancel', endDrag);
   }
 
   /* ---- Idea modal ---- */
