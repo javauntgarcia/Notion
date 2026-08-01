@@ -756,9 +756,7 @@
 
     <!-- MASTHEAD -->
     <div class="masthead">
-      <p class="eyebrow">Personal Dashboard</p>
       <h1>Produc<em>tivity</em></h1>
-      <p class="tagline">build · ship · grow</p>
       <div class="scroll-cue">
         <span>scroll</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1039,12 +1037,13 @@ Object.keys(NAV_URLS).forEach(function(id) {
     }).then(function(r){ return r.json(); }).then(function(d){ cb(d && d[0] ? d[0] : null); }).catch(function(){ cb(null); });
   }
   function sbUpsert(table, row) {
-    fetch(SB_URL+'/rest/v1/'+table, {
+    fetch(SB_URL+'/rest/v1/'+table+'?on_conflict=id', {
       method: 'POST',
       headers: { apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY,
-        'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+        'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify(Object.assign({}, row, { updated_at: new Date().toISOString() }))
-    }).catch(function(){});
+    }).then(function(r){ if (!r.ok) return r.text().then(function(t){ console.warn('[sbUpsert '+table+']', r.status, t); }); })
+      .catch(function(e){ console.warn('[sbUpsert '+table+']', e.message); });
   }
 
   /* ── LOCAL FALLBACK ── */
