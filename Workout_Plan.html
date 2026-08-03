@@ -64,16 +64,7 @@
   .page-title h1 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(46px, 10vw, 78px); line-height: 0.92; color: #fff; }
   .page-title h1 em { font-style: italic; font-weight: 300; display: block; color: rgba(255,255,255,0.60); }
 
-  /* PRINCIPLES */
-  .principles-card {
-    background: var(--card-bg); backdrop-filter: var(--card-blur); -webkit-backdrop-filter: var(--card-blur);
-    border-radius: var(--radius); padding: 22px 20px; margin-bottom: 28px;
-  }
   .section-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; display: block; }
-  .principles-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-  .principle { border-left: 2px solid var(--gold-mid); padding-left: 12px; }
-  .principle .p-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; display: block; }
-  .principle .p-val { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 400; color: rgba(255,255,255,0.85); line-height: 1.3; }
 
   /* WEEK STRIP */
   .week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 28px; }
@@ -152,8 +143,6 @@
   }
   .strength-label::after { content: ''; flex: 1; height: 1px; background: var(--txt-faint); }
 
-  .day-intro { font-size: 11px; color: rgba(255,255,255,0.34); font-style: italic; line-height: 1.65; margin-bottom: 14px; }
-
   /* EXERCISE TABLE */
   .ex-table { width: 100%; border-collapse: collapse; }
   .ex-table thead th {
@@ -183,11 +172,8 @@
   .mobility-item .m-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 400; color: #fff; margin-bottom: 2px; display: block; }
   .mobility-item .m-detail { font-size: 10px; color: var(--txt-dim); }
   .mobility-item .m-cue { font-size: 10px; color: rgba(255,255,255,0.28); font-style: italic; margin-top: 3px; display: block; }
-  .mobility-note { font-size: 11px; color: rgba(255,255,255,0.34); font-style: italic; line-height: 1.7; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--txt-faint); }
-
   @media (max-width: 640px) {
     .week-strip { grid-template-columns: repeat(4,1fr); }
-    .principles-grid { grid-template-columns: 1fr 1fr; }
     .mobility-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 420px) { .week-strip { grid-template-columns: repeat(3,1fr); } }
@@ -207,46 +193,28 @@
     <h1>Workout<em>Plan</em></h1>
   </div>
 
-  <div class="principles-card">
-    <span class="section-label">Training Principles</span>
-    <div class="principles-grid">
-      <div class="principle">
-        <span class="p-label">Structure</span>
-        <span class="p-val">Core/mobility daily + targeted strength focus</span>
-      </div>
-      <div class="principle">
-        <span class="p-label">Split</span>
-        <span class="p-val">Push · Pull · Legs · Back & Chest · Arms · Glutes</span>
-      </div>
-      <div class="principle">
-        <span class="p-label">Cardio</span>
-        <span class="p-val">Running and outdoor cardio kept separate from gym sessions</span>
-      </div>
-    </div>
-  </div>
-
   <span class="section-label">Weekly Split</span>
   <div class="week-strip">
-    <a class="day-pill" href="#day-1" onclick="activatePill(0)"><span class="dow">Mon</span><span class="split-name">Push</span><span class="dot"></span></a>
-    <a class="day-pill" href="#day-2" onclick="activatePill(1)"><span class="dow">Tue</span><span class="split-name">Pull</span><span class="dot"></span></a>
-    <a class="day-pill" href="#day-3" onclick="activatePill(2)"><span class="dow">Wed</span><span class="split-name">Legs</span><span class="dot"></span></a>
-    <a class="day-pill" href="#day-4" onclick="activatePill(3)"><span class="dow">Thu</span><span class="split-name">Back & Chest</span><span class="dot"></span></a>
-    <a class="day-pill" href="#day-5" onclick="activatePill(4)"><span class="dow">Fri</span><span class="split-name">Arms</span><span class="dot"></span></a>
-    <a class="day-pill" href="#day-6" onclick="activatePill(5)"><span class="dow">Sat</span><span class="split-name">Glutes</span><span class="dot"></span></a>
-    <a class="day-pill mobility-day" href="#day-7" onclick="activatePill(6)"><span class="dow">Sun</span><span class="split-name">Mobility</span><span class="dot"></span></a>
+    <a class="day-pill" href="#day-1" onclick="activatePill(0)"><span class="dow">Mon</span><span class="split-name">Upper A</span><span class="dot"></span></a>
+    <a class="day-pill mobility-day" href="#day-2" onclick="activatePill(1)"><span class="dow">Tue</span><span class="split-name">Run</span><span class="dot"></span></a>
+    <a class="day-pill" href="#day-3" onclick="activatePill(2)"><span class="dow">Wed</span><span class="split-name">Lower A</span><span class="dot"></span></a>
+    <a class="day-pill mobility-day" href="#day-4" onclick="activatePill(3)"><span class="dow">Thu</span><span class="split-name">Run</span><span class="dot"></span></a>
+    <a class="day-pill" href="#day-5" onclick="activatePill(4)"><span class="dow">Fri</span><span class="split-name">Upper B</span><span class="dot"></span></a>
+    <a class="day-pill mobility-day" href="#day-6" onclick="activatePill(5)"><span class="dow">Sat</span><span class="split-name">Run</span><span class="dot"></span></a>
+    <a class="day-pill" href="#day-7" onclick="activatePill(6)"><span class="dow">Sun</span><span class="split-name">Lower B</span><span class="dot"></span></a>
   </div>
 
-  <!-- DAY 1: PUSH -->
+  <!-- DAY 1: UPPER A -->
   <div class="day-section" id="day-1">
     <div class="day-header" onclick="toggleDay('day-1')">
       <span class="day-num">1</span>
       <div class="day-header-body">
         <div class="day-name">Monday</div>
-        <div class="split-title">Push</div>
+        <div class="split-title">Upper A</div>
         <div class="meta-pills">
-          <span class="meta-pill teal">Core: Plank · Ab Wheel · Side Plank</span>
-          <span class="meta-pill gold">Chest · Shoulders · Triceps</span>
-          <span class="meta-pill">~60 min</span>
+          <span class="meta-pill teal">Core: Plank · Ab Wheel · Pallof Press</span>
+          <span class="meta-pill gold">Chest · Back · Shoulders</span>
+          <span class="meta-pill">~65 min</span>
         </div>
       </div>
       <span class="day-chevron">▶</span>
@@ -270,98 +238,100 @@
             </div>
           </div>
           <div class="core-ex">
-            <span class="core-ex-name">Side Plank</span>
+            <span class="core-ex-name">Pallof Press</span>
             <div>
-              <div class="core-ex-detail">2 × 30 s each side · 20 s rest</div>
-              <div class="core-ex-cue">Hips stacked, straight line head to heel, obliques engaged</div>
+              <div class="core-ex-detail">3 × 10 each side · 45 s rest</div>
+              <div class="core-ex-cue">Resist rotation — builds the anti-rotation strength that protects the lower back</div>
             </div>
           </div>
         </div>
       </div>
-      <div class="strength-label">Strength — Push</div>
-      <p class="day-intro">Horizontal and vertical pressing for chest thickness and shoulder width. Heavy compound first, isolation finishes the session.</p>
+      <div class="strength-label">Strength — Chest, Back & Shoulders</div>
       <table class="ex-table">
         <thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th></tr></thead>
         <tbody>
           <tr><td class="ex-name-cell"><span class="ex-name">Barbell Bench Press</span><span class="ex-cue">Retract scapula, drive feet into floor, touch chest lightly</span></td><td><span class="sets-reps">4 × 6–8</span></td><td class="rest-time">3 min</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Incline Dumbbell Press</span><span class="ex-cue">30–45° incline, elbows at 45° to torso, controlled descent</span></td><td><span class="sets-reps">3 × 10</span></td><td class="rest-time">90 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Cable Fly</span><span class="ex-cue">Slight forward lean, long arc, squeeze hard at center</span></td><td><span class="sets-reps">3 × 12–15</span></td><td class="rest-time">60 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Overhead Dumbbell Press</span><span class="ex-cue">Brace core, press straight up, full lockout overhead</span></td><td><span class="sets-reps">3 × 10–12</span></td><td class="rest-time">90 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Dumbbell Lateral Raise</span><span class="ex-cue">Lead with elbows, slight forward tilt, 2-second descent</span></td><td><span class="sets-reps">4 × 15</span></td><td class="rest-time">60 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Tricep Rope Pushdown</span><span class="ex-cue">Elbows pinned, spread rope at bottom, full extension</span></td><td><span class="sets-reps">3 × 12–15</span></td><td class="rest-time">60 s</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Pull-ups</span><span class="ex-cue">Full hang, depress scapula first, chin over bar, slow descent</span></td><td><span class="sets-reps">4 × max</span></td><td class="rest-time">2 min</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Overhead Dumbbell Press</span><span class="ex-cue">Brace core, press straight up, full lockout overhead</span></td><td><span class="sets-reps">3 × 10</span></td><td class="rest-time">90 s</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Barbell Row</span><span class="ex-cue">Hinge to 45°, overhand grip, pull to lower chest, squeeze hard</span></td><td><span class="sets-reps">3 × 8–10</span></td><td class="rest-time">2 min</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Incline Dumbbell Press</span><span class="ex-cue">30–45° incline, elbows at 45° to torso, controlled descent</span></td><td><span class="sets-reps">3 × 10–12</span></td><td class="rest-time">90 s</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Dumbbell Lateral Raise</span><span class="ex-cue">Lead with elbows, slight forward tilt, 2-second descent</span></td><td><span class="sets-reps">3 × 15</span></td><td class="rest-time">60 s</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Face Pull</span><span class="ex-cue">Rope to eye level, external rotation at finish — balances the pressing</span></td><td><span class="sets-reps">3 × 15</span></td><td class="rest-time">60 s</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- DAY 2: PULL -->
+  <!-- DAY 2: RUN + MOBILITY (HIPS & LOWER BACK) -->
   <div class="day-section" id="day-2">
     <div class="day-header" onclick="toggleDay('day-2')">
       <span class="day-num">2</span>
       <div class="day-header-body">
         <div class="day-name">Tuesday</div>
-        <div class="split-title">Pull</div>
+        <div class="split-title mobility">Run + Mobility</div>
         <div class="meta-pills">
-          <span class="meta-pill teal">Core: Hanging Leg Raise · Pallof Press · Dead Bug</span>
-          <span class="meta-pill gold">Lats · Upper Back · Biceps</span>
-          <span class="meta-pill">~60 min</span>
+          <span class="meta-pill teal">Hip Flexors · Lower Back</span>
+          <span class="meta-pill">Run 25–35 min moderate + ~20 min stretch</span>
         </div>
       </div>
       <span class="day-chevron">▶</span>
     </div>
-    <div class="day-body">
-      <div class="core-block">
-        <div class="core-block-label">Core & Mobility — 10–15 min</div>
-        <div class="core-exercises">
-          <div class="core-ex">
-            <span class="core-ex-name">Hanging Leg Raise</span>
-            <div>
-              <div class="core-ex-detail">3 × 12 · 60 s rest</div>
-              <div class="core-ex-cue">Dead hang start, posterior pelvic tilt, controlled descent</div>
-            </div>
-          </div>
-          <div class="core-ex">
-            <span class="core-ex-name">Pallof Press</span>
-            <div>
-              <div class="core-ex-detail">3 × 10 each side · 45 s rest</div>
-              <div class="core-ex-cue">Cable at chest height, press out and hold — resist the rotation</div>
-            </div>
-          </div>
-          <div class="core-ex">
-            <span class="core-ex-name">Dead Bug</span>
-            <div>
-              <div class="core-ex-detail">3 × 8 each side · 30 s rest</div>
-              <div class="core-ex-cue">Lower back pressed to floor the entire time, slow and deliberate</div>
-            </div>
-          </div>
+    <div class="mobility-body">
+      <div class="mobility-grid">
+        <div class="mobility-item">
+          <span class="m-name">Run — Moderate Effort</span>
+          <span class="m-detail">25–35 min, conversational pace</span>
+          <span class="m-cue">Legs already worked Monday — keep this aerobic, not a hard effort</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Kneeling Hip Flexor Stretch</span>
+          <span class="m-detail">2 × 60 s each side</span>
+          <span class="m-cue">Tuck pelvis under, push hips forward, reach same-side arm overhead</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Couch Stretch</span>
+          <span class="m-detail">2 × 60 s each side</span>
+          <span class="m-cue">Back foot up on a couch or wall, front foot forward in a lunge</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">90/90 Hip Stretch</span>
+          <span class="m-detail">2 × 60 s each side</span>
+          <span class="m-cue">Both legs at 90°, sit tall, lean forward over the front shin</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Cat-Cow</span>
+          <span class="m-detail">2 × 10 slow reps</span>
+          <span class="m-cue">Breathe with the movement — inhale to arch, exhale to round through the lower back</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Child's Pose</span>
+          <span class="m-detail">2 × 60 s</span>
+          <span class="m-cue">Arms extended, breathe into the lower back, let it decompress</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Standing Quad Stretch</span>
+          <span class="m-detail">2 × 45 s each side</span>
+          <span class="m-cue">Hold ankle, knees together, posterior tilt for a deeper hip flexor stretch too</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Pelvic Floor — Kegels</span>
+          <span class="m-detail">2 × 10 reps, 5 s hold / 5 s release</span>
+          <span class="m-cue">Do these lying down after the run, separate from the stretching flow</span>
         </div>
       </div>
-      <div class="strength-label">Strength — Pull</div>
-      <p class="day-intro">Vertical and horizontal pulling for lat width and mid-back thickness. Face pulls balance Monday's pressing volume and protect the shoulder joint.</p>
-      <table class="ex-table">
-        <thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th></tr></thead>
-        <tbody>
-          <tr><td class="ex-name-cell"><span class="ex-name">Pull-ups</span><span class="ex-cue">Full hang, depress scapula first, chin over bar, slow descent</span></td><td><span class="sets-reps">4 × max</span></td><td class="rest-time">2 min</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Lat Pulldown</span><span class="ex-cue">Wide grip, slight lean back, pull bar to upper chest</span></td><td><span class="sets-reps">3 × 10–12</span></td><td class="rest-time">90 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Seated Cable Row</span><span class="ex-cue">Sit tall, neutral grip, drive elbows back, hard squeeze</span></td><td><span class="sets-reps">3 × 10–12</span></td><td class="rest-time">90 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Dumbbell Row</span><span class="ex-cue">Brace on bench, row to hip, elbow stays tight to body</span></td><td><span class="sets-reps">3 × 10 ea.</span></td><td class="rest-time">75 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Face Pull</span><span class="ex-cue">Rope to eye level, external rotation at finish</span></td><td><span class="sets-reps">3 × 15</span></td><td class="rest-time">60 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Barbell Curl</span><span class="ex-cue">Elbows fixed at sides, supinate at top, 3-second negative</span></td><td><span class="sets-reps">3 × 10</span></td><td class="rest-time">75 s</td></tr>
-        </tbody>
-      </table>
     </div>
   </div>
 
-  <!-- DAY 3: LEGS -->
+  <!-- DAY 3: LOWER A -->
   <div class="day-section" id="day-3">
     <div class="day-header" onclick="toggleDay('day-3')">
       <span class="day-num">3</span>
       <div class="day-header-body">
         <div class="day-name">Wednesday</div>
-        <div class="split-title">Legs</div>
+        <div class="split-title">Lower A</div>
         <div class="meta-pills">
           <span class="meta-pill teal">Core: Cable Crunch · Side Plank · Bird Dog</span>
-          <span class="meta-pill gold">Quads · Hamstrings · Calves</span>
+          <span class="meta-pill gold">Quads · Hamstrings · Glutes</span>
           <span class="meta-pill">~65 min</span>
         </div>
       </div>
@@ -394,14 +364,14 @@
           </div>
         </div>
       </div>
-      <div class="strength-label">Strength — Legs</div>
-      <p class="day-intro">Full quad and hamstring emphasis. Squat pattern anchors the session. Strong legs support every run — don't treat this as optional.</p>
+      <div class="strength-label">Strength — Quads, Hamstrings & Glutes</div>
       <table class="ex-table">
         <thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th></tr></thead>
         <tbody>
           <tr><td class="ex-name-cell"><span class="ex-name">Barbell Back Squat</span><span class="ex-cue">Brace hard, knees track toes, depth to parallel or below</span></td><td><span class="sets-reps">4 × 6–8</span></td><td class="rest-time">3 min</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Barbell Hip Thrust</span><span class="ex-cue">Bar padded, shoulders on bench, drive through heels, squeeze hard at top</span></td><td><span class="sets-reps">4 × 10</span></td><td class="rest-time">90 s</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Romanian Deadlift</span><span class="ex-cue">Hinge at hips, soft knees, feel the hamstring-glute stretch before pulling back</span></td><td><span class="sets-reps">3 × 10</span></td><td class="rest-time">90 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Leg Press</span><span class="ex-cue">Mid foot placement, full range, don't let knees cave</span></td><td><span class="sets-reps">3 × 12</span></td><td class="rest-time">90 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Romanian Deadlift</span><span class="ex-cue">Hinge at hips, soft knees, feel the hamstring stretch before pulling back</span></td><td><span class="sets-reps">3 × 10</span></td><td class="rest-time">90 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Leg Curl</span><span class="ex-cue">Full range, 2-second pause at contraction</span></td><td><span class="sets-reps">3 × 12–15</span></td><td class="rest-time">60 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Walking Lunges</span><span class="ex-cue">Long stride, front knee at 90°, upright torso</span></td><td><span class="sets-reps">3 × 12 ea.</span></td><td class="rest-time">75 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Calf Raise</span><span class="ex-cue">Full stretch at bottom, 1-second pause at top, no bouncing</span></td><td><span class="sets-reps">4 × 15–20</span></td><td class="rest-time">45 s</td></tr>
@@ -410,75 +380,77 @@
     </div>
   </div>
 
-  <!-- DAY 4: BACK & CHEST -->
+  <!-- DAY 4: RUN + MOBILITY (GLUTES & ROTATION) -->
   <div class="day-section" id="day-4">
     <div class="day-header" onclick="toggleDay('day-4')">
       <span class="day-num">4</span>
       <div class="day-header-body">
         <div class="day-name">Thursday</div>
-        <div class="split-title">Back & Chest</div>
+        <div class="split-title mobility">Run + Mobility</div>
         <div class="meta-pills">
-          <span class="meta-pill teal">Core: Ab Wheel · Plank · Hollow Hold</span>
-          <span class="meta-pill gold">Upper Back · Lower Back · Chest</span>
-          <span class="meta-pill">~65 min</span>
+          <span class="meta-pill teal">Glutes · Thoracic & Lower Back Rotation</span>
+          <span class="meta-pill">Run 25–35 min moderate + ~20 min stretch</span>
         </div>
       </div>
       <span class="day-chevron">▶</span>
     </div>
-    <div class="day-body">
-      <div class="core-block">
-        <div class="core-block-label">Core & Mobility — 10–15 min</div>
-        <div class="core-exercises">
-          <div class="core-ex">
-            <span class="core-ex-name">Ab Wheel Rollout</span>
-            <div>
-              <div class="core-ex-detail">3 × 10 · 60 s rest</div>
-              <div class="core-ex-cue">Brace before moving, stop before lumbar hyperextends</div>
-            </div>
-          </div>
-          <div class="core-ex">
-            <span class="core-ex-name">Plank</span>
-            <div>
-              <div class="core-ex-detail">3 × 45 s · 30 s rest</div>
-              <div class="core-ex-cue">Squeeze everything — glutes, abs, quads — don't just endure it</div>
-            </div>
-          </div>
-          <div class="core-ex">
-            <span class="core-ex-name">Hollow Hold</span>
-            <div>
-              <div class="core-ex-detail">3 × 30 s · 30 s rest</div>
-              <div class="core-ex-cue">Lower back pressed flat, arms overhead, legs low but not touching floor</div>
-            </div>
-          </div>
+    <div class="mobility-body">
+      <div class="mobility-grid">
+        <div class="mobility-item">
+          <span class="m-name">Run — Moderate Effort</span>
+          <span class="m-detail">25–35 min, conversational pace</span>
+          <span class="m-cue">Two days out from squats, one day out from hip thrusts — keep it easy</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Pigeon Pose</span>
+          <span class="m-detail">2 × 90 s each side</span>
+          <span class="m-cue">Deep glute and external rotator stretch — hits what Wednesday's session worked hard</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Figure-4 Stretch</span>
+          <span class="m-detail">2 × 45 s each side</span>
+          <span class="m-cue">Lying on back, ankle crossed over opposite knee, pull thigh toward chest</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Seated Spinal Twist</span>
+          <span class="m-detail">2 × 30 s each side</span>
+          <span class="m-cue">Rotate from the ribs, keep both sit bones grounded, exhale into the twist</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Thoracic Rotation (Open Book)</span>
+          <span class="m-detail">2 × 10 each side</span>
+          <span class="m-cue">Side-lying, knees stacked, rotate top arm toward the floor behind you</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Standing Torso Rotation</span>
+          <span class="m-detail">2 × 12 each side</span>
+          <span class="m-cue">Feet planted, rotate through the trunk — controlled, not ballistic</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">90/90 Hip Stretch</span>
+          <span class="m-detail">2 × 60 s each side</span>
+          <span class="m-cue">Both legs at 90°, lean forward over the front shin, switch sides slowly</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Pelvic Floor — Kegels</span>
+          <span class="m-detail">2 × 10 reps, 5 s hold / 5 s release</span>
+          <span class="m-cue">Lying down, relaxed breathing, done separately from the stretch flow</span>
         </div>
       </div>
-      <div class="strength-label">Strength — Back & Chest</div>
-      <p class="day-intro">Heavy posterior chain with deadlift and rows, paired with chest volume. Superset a push and pull if time is tight — the pairing is intentional.</p>
-      <table class="ex-table">
-        <thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th></tr></thead>
-        <tbody>
-          <tr><td class="ex-name-cell"><span class="ex-name">Conventional Deadlift</span><span class="ex-cue">Bar over mid-foot, brace and pull — hips and shoulders rise together</span></td><td><span class="sets-reps">4 × 5</span></td><td class="rest-time">3 min</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Barbell Row</span><span class="ex-cue">Hinge to 45°, overhand grip, pull to lower chest, squeeze hard</span></td><td><span class="sets-reps">3 × 8</span></td><td class="rest-time">2 min</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Chest-Supported Row</span><span class="ex-cue">Incline bench, chest supported — isolates mid-back, lower back removed</span></td><td><span class="sets-reps">3 × 12</span></td><td class="rest-time">90 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Back Extension</span><span class="ex-cue">45° bench, hinge at hips, squeeze glutes and lower back at top</span></td><td><span class="sets-reps">3 × 15</span></td><td class="rest-time">60 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Dumbbell Bench Press</span><span class="ex-cue">Full range, slight arc, lower to chest level, controlled press</span></td><td><span class="sets-reps">3 × 10</span></td><td class="rest-time">90 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Cable Fly</span><span class="ex-cue">Long arc, squeeze at center, slight forward lean</span></td><td><span class="sets-reps">3 × 12–15</span></td><td class="rest-time">60 s</td></tr>
-        </tbody>
-      </table>
     </div>
   </div>
 
-  <!-- DAY 5: ARMS -->
+  <!-- DAY 5: UPPER B -->
   <div class="day-section" id="day-5">
     <div class="day-header" onclick="toggleDay('day-5')">
       <span class="day-num">5</span>
       <div class="day-header-body">
         <div class="day-name">Friday</div>
-        <div class="split-title">Arms</div>
+        <div class="split-title">Upper B</div>
         <div class="meta-pills">
           <span class="meta-pill teal">Core: Hanging Leg Raise · Side Plank · Pallof Press</span>
-          <span class="meta-pill gold">Biceps · Triceps · Forearms</span>
-          <span class="meta-pill">~60 min</span>
+          <span class="meta-pill gold">Biceps · Triceps · Chest · Back</span>
+          <span class="meta-pill">~65 min</span>
         </div>
       </div>
       <span class="day-chevron">▶</span>
@@ -510,33 +482,93 @@
           </div>
         </div>
       </div>
-      <div class="strength-label">Strength — Arms</div>
-      <p class="day-intro">Dedicated arm day — biceps and triceps get full attention without fatigue from compound lifts. Alternate push and pull exercises to maintain blood flow and save time.</p>
+      <div class="strength-label">Strength — Arms, Chest & Back</div>
       <table class="ex-table">
         <thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th></tr></thead>
         <tbody>
+          <tr><td class="ex-name-cell"><span class="ex-name">Incline Dumbbell Press</span><span class="ex-cue">30–45° incline, elbows at 45° to torso, controlled descent</span></td><td><span class="sets-reps">3 × 10</span></td><td class="rest-time">90 s</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Chest-Supported Row</span><span class="ex-cue">Incline bench, chest supported — isolates mid-back, lower back removed</span></td><td><span class="sets-reps">3 × 12</span></td><td class="rest-time">90 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Barbell Curl</span><span class="ex-cue">Elbows fixed at sides, supinate at top, 3-second negative</span></td><td><span class="sets-reps">4 × 10</span></td><td class="rest-time">75 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Skull Crushers</span><span class="ex-cue">EZ-bar, lower to forehead, elbows vertical, controlled</span></td><td><span class="sets-reps">4 × 10</span></td><td class="rest-time">75 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Incline Dumbbell Curl</span><span class="ex-cue">Arms hang fully for long head stretch, slow 3-second negative</span></td><td><span class="sets-reps">3 × 12</span></td><td class="rest-time">60 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Tricep Overhead Extension</span><span class="ex-cue">Dumbbell or cable, full stretch overhead, elbows stay in</span></td><td><span class="sets-reps">3 × 12</span></td><td class="rest-time">60 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Hammer Curl</span><span class="ex-cue">Neutral grip, brachialis focus, alternate arms, full extension</span></td><td><span class="sets-reps">3 × 12 ea.</span></td><td class="rest-time">60 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Tricep Rope Pushdown</span><span class="ex-cue">Elbows pinned, spread rope at bottom, squeeze at full extension</span></td><td><span class="sets-reps">3 × 15</span></td><td class="rest-time">60 s</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- DAY 6: GLUTES -->
+  <!-- DAY 6: RUN + MOBILITY (FULL BODY & PELVIC FLOOR) -->
   <div class="day-section" id="day-6">
     <div class="day-header" onclick="toggleDay('day-6')">
       <span class="day-num">6</span>
       <div class="day-header-body">
         <div class="day-name">Saturday</div>
-        <div class="split-title">Glutes</div>
+        <div class="split-title mobility">Run + Mobility</div>
+        <div class="meta-pills">
+          <span class="meta-pill teal">Full Body · Pelvic Floor · Foam Roll</span>
+          <span class="meta-pill">Run 25–35 min moderate + ~20 min stretch</span>
+        </div>
+      </div>
+      <span class="day-chevron">▶</span>
+    </div>
+    <div class="mobility-body">
+      <div class="mobility-grid">
+        <div class="mobility-item">
+          <span class="m-name">Run — Moderate Effort</span>
+          <span class="m-detail">25–35 min, conversational pace</span>
+          <span class="m-cue">Last run before Sunday's glute session — keep it easy, not a race pace effort</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Foam Roll — Full Body</span>
+          <span class="m-detail">10–15 min</span>
+          <span class="m-cue">Quads, IT band, upper back, lats, glutes — slow passes, pause on tender spots</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Doorway Chest Opener</span>
+          <span class="m-detail">3 × 30 s</span>
+          <span class="m-cue">Arms at 90°, gentle forward lean — counteracts the week's pressing volume</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Couch Stretch</span>
+          <span class="m-detail">2 × 60 s each side</span>
+          <span class="m-cue">Back foot elevated, front foot forward — deep hip flexor release before Sunday</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Standing Hamstring Stretch</span>
+          <span class="m-detail">2 × 45 s each side</span>
+          <span class="m-cue">Heel on a low surface, hinge from the hips, flat back</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Thoracic Rotation</span>
+          <span class="m-detail">2 × 10 each side</span>
+          <span class="m-cue">Seated or kneeling, rotate from mid-back, not the lower back</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Child's Pose</span>
+          <span class="m-detail">2 × 60 s</span>
+          <span class="m-cue">Arms extended, breathe into the lower back, let it decompress</span>
+        </div>
+        <div class="mobility-item">
+          <span class="m-name">Pelvic Floor — Kegels</span>
+          <span class="m-detail">2 × 10 reps, 5 s hold / 5 s release</span>
+          <span class="m-cue">Lying down, relaxed breathing — third session this week, consistency matters more than intensity here</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 7: LOWER B -->
+  <div class="day-section" id="day-7">
+    <div class="day-header" onclick="toggleDay('day-7')">
+      <span class="day-num">7</span>
+      <div class="day-header-body">
+        <div class="day-name">Sunday</div>
+        <div class="split-title">Lower B</div>
         <div class="meta-pills">
           <span class="meta-pill teal">Core: Dead Bug · Bird Dog · Cable Crunch</span>
           <span class="meta-pill gold">Glutes · Hip Abductors · Posterior Chain</span>
-          <span class="meta-pill">~60 min</span>
+          <span class="meta-pill">~65 min</span>
         </div>
       </div>
       <span class="day-chevron">▶</span>
@@ -568,80 +600,18 @@
           </div>
         </div>
       </div>
-      <div class="strength-label">Strength — Glutes</div>
-      <p class="day-intro">Dedicated glute session targeting all three gluteal muscles plus hip abductors. Strong glutes directly improve running power, protect the lower back, and build the posterior chain from the ground up.</p>
+      <div class="strength-label">Strength — Glutes & Posterior Chain</div>
       <table class="ex-table">
         <thead><tr><th>Exercise</th><th>Sets × Reps</th><th>Rest</th></tr></thead>
         <tbody>
-          <tr><td class="ex-name-cell"><span class="ex-name">Barbell Hip Thrust</span><span class="ex-cue">Bar padded, shoulders on bench, drive through heels, squeeze hard at top</span></td><td><span class="sets-reps">4 × 10–12</span></td><td class="rest-time">90 s</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Sumo Deadlift</span><span class="ex-cue">Wide stance, toes flared, sit into hips — inner thigh and glute emphasis</span></td><td><span class="sets-reps">4 × 6–8</span></td><td class="rest-time">2 min</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Bulgarian Split Squat</span><span class="ex-cue">Rear foot elevated, long front stride, front knee tracks toes</span></td><td><span class="sets-reps">3 × 10 ea.</span></td><td class="rest-time">90 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Romanian Deadlift</span><span class="ex-cue">Hinge deep, feel the hamstring-glute stretch, squeeze to standing</span></td><td><span class="sets-reps">3 × 10</span></td><td class="rest-time">90 s</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Back Extension</span><span class="ex-cue">45° bench, hinge at hips, squeeze glutes and lower back at top</span></td><td><span class="sets-reps">3 × 15</span></td><td class="rest-time">60 s</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Cable Kickback</span><span class="ex-cue">Ankle attachment, slight forward hinge, extend leg fully behind, squeeze at top</span></td><td><span class="sets-reps">3 × 15 ea.</span></td><td class="rest-time">60 s</td></tr>
-          <tr><td class="ex-name-cell"><span class="ex-name">Sumo Deadlift</span><span class="ex-cue">Wide stance, toes flared, sit into hips — inner thigh and glute emphasis</span></td><td><span class="sets-reps">3 × 8</span></td><td class="rest-time">2 min</td></tr>
           <tr><td class="ex-name-cell"><span class="ex-name">Abductor Machine</span><span class="ex-cue">Controlled tempo, full range, don't use momentum</span></td><td><span class="sets-reps">3 × 15</span></td><td class="rest-time">60 s</td></tr>
+          <tr><td class="ex-name-cell"><span class="ex-name">Standing Calf Raise</span><span class="ex-cue">Full stretch at bottom, 1-second pause at top, no bouncing</span></td><td><span class="sets-reps">3 × 15–20</span></td><td class="rest-time">45 s</td></tr>
         </tbody>
       </table>
-    </div>
-  </div>
-
-  <!-- DAY 7: MOBILITY -->
-  <div class="day-section" id="day-7">
-    <div class="day-header" onclick="toggleDay('day-7')">
-      <span class="day-num">7</span>
-      <div class="day-header-body">
-        <div class="day-name">Sunday</div>
-        <div class="split-title mobility">Mobility</div>
-        <div class="meta-pills">
-          <span class="meta-pill teal">Full Body · Stretching · Recovery</span>
-          <span class="meta-pill">~30–45 min</span>
-        </div>
-      </div>
-      <span class="day-chevron">▶</span>
-    </div>
-    <div class="mobility-body">
-      <div class="mobility-grid">
-        <div class="mobility-item">
-          <span class="m-name">Hip Flexor Stretch</span>
-          <span class="m-detail">2 × 60 s each side</span>
-          <span class="m-cue">Kneeling lunge, posterior tilt, reach arm overhead for deeper stretch</span>
-        </div>
-        <div class="mobility-item">
-          <span class="m-name">Thoracic Rotation</span>
-          <span class="m-detail">2 × 10 each side</span>
-          <span class="m-cue">Seated or kneeling, rotate from mid-back, not the lower back</span>
-        </div>
-        <div class="mobility-item">
-          <span class="m-name">90/90 Hip Stretch</span>
-          <span class="m-detail">2 × 60 s each side</span>
-          <span class="m-cue">Both legs at 90°, sit tall, lean forward over front shin</span>
-        </div>
-        <div class="mobility-item">
-          <span class="m-name">Doorway Chest Opener</span>
-          <span class="m-detail">3 × 30 s</span>
-          <span class="m-cue">Arms at 90°, gentle forward lean — counteracts pressing volume</span>
-        </div>
-        <div class="mobility-item">
-          <span class="m-name">Cat-Cow</span>
-          <span class="m-detail">2 × 10 slow reps</span>
-          <span class="m-cue">Breathe with the movement — inhale to arch, exhale to round</span>
-        </div>
-        <div class="mobility-item">
-          <span class="m-name">Pigeon Pose</span>
-          <span class="m-detail">2 × 90 s each side</span>
-          <span class="m-cue">Deep glute and external rotator stretch — essential after Saturday's session</span>
-        </div>
-        <div class="mobility-item">
-          <span class="m-name">Foam Roll — Full Body</span>
-          <span class="m-detail">10–15 min</span>
-          <span class="m-cue">Quads, IT band, upper back, lats — slow passes, pause on tender spots</span>
-        </div>
-        <div class="mobility-item">
-          <span class="m-name">Child's Pose</span>
-          <span class="m-detail">2 × 60 s</span>
-          <span class="m-cue">Arms extended, breathe into the lower back, let it decompress</span>
-        </div>
-      </div>
-      <p class="mobility-note">No strength work today. If you ran this week, add a standing quad stretch and seated hamstring stretch. Zone 2 walking is fine if you want to move — keep heart rate conversational.</p>
     </div>
   </div>
 

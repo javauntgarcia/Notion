@@ -357,7 +357,27 @@
       </div>
       <div class="form-group">
         <label for="f-session-name">Session Label <span style="opacity:.4">(optional)</span></label>
-        <input type="text" id="f-session-name" placeholder="e.g. Push Day, Long Run…">
+        <select id="f-session-name" onchange="handleLabelChange()">
+          <option value="">— None —</option>
+          <optgroup label="Gym Days">
+            <option value="Upper A">Upper A</option>
+            <option value="Lower A">Lower A</option>
+            <option value="Upper B">Upper B</option>
+            <option value="Lower B">Lower B</option>
+          </optgroup>
+          <optgroup label="Run + Mobility Days">
+            <option value="Run + Mobility — Hip Flexors & Lower Back">Run + Mobility — Hip Flexors & Lower Back</option>
+            <option value="Run + Mobility — Glutes & Rotation">Run + Mobility — Glutes & Rotation</option>
+            <option value="Run + Mobility — Full Body & Pelvic Floor">Run + Mobility — Full Body & Pelvic Floor</option>
+          </optgroup>
+          <option value="__custom__">+ Custom…</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid" id="custom-label-row" style="display:none;">
+      <div class="form-group full">
+        <label for="f-session-name-custom">Custom Label</label>
+        <input type="text" id="f-session-name-custom" placeholder="e.g. Push Day, Long Run…">
       </div>
     </div>
     <div class="form-group" style="margin-bottom:14px;">
@@ -436,7 +456,7 @@ const EXERCISE_CATEGORIES = [
     'Dumbbell Lateral Raise','Cable Lateral Raise','Upright Row','Rear Delt Fly','Shrug',
   ]},
   { label: 'Triceps', exercises: [
-    'Tricep Rope Pushdown','Skull Crushers','Dips',
+    'Tricep Rope Pushdown','Skull Crushers','Dips','Tricep Overhead Extension',
   ]},
   { label: 'Back', exercises: [
     'Pull-ups','Lat Pulldown','Seated Cable Row','Barbell Row','Dumbbell Row',
@@ -449,21 +469,43 @@ const EXERCISE_CATEGORIES = [
     'Barbell Back Squat','Leg Press','Romanian Deadlift','Leg Curl','Leg Extension',
     'Walking Lunges','Calf Raise','Hip Thrust',
   ]},
+  { label: 'Glutes', exercises: [
+    'Sumo Deadlift','Bulgarian Split Squat','Back Extension','Cable Kickback','Abductor Machine',
+  ]},
   { label: 'Core', exercises: [
     'Plank','Ab Wheel Rollout','Cable Crunch','Hanging Leg Raise',
     'Bird Dogs','Dead Bugs','Hollow Hold','Palloff Press','Side Plank','Side Plank w/ Hip Dips',
+  ]},
+  { label: 'Mobility & Stretching', exercises: [
+    'Kneeling Hip Flexor Stretch','Couch Stretch','90/90 Hip Stretch','Cat-Cow',
+    "Child's Pose",'Standing Quad Stretch','Pigeon Pose','Figure-4 Stretch',
+    'Seated Spinal Twist','Thoracic Rotation','Standing Torso Rotation',
+    'Foam Roll — Full Body','Doorway Chest Opener','Standing Hamstring Stretch',
+    'Pelvic Floor — Kegels',
   ]},
   { label: 'Conditioning', exercises: [
     'Sprint Intervals','Jump Rope','Box Jumps','Burpees','Battle Ropes',
     'Rowing Machine','Assault Bike','Sled Push',
   ]},
   { label: 'Running', exercises: [
-    'Run','Tempo Run','Easy Run','Long Run','Intervals',
+    'Run','Run — Moderate Effort','Tempo Run','Easy Run','Long Run','Intervals',
   ]},
 ];
 // Flat list, derived from the categories above, used wherever a plain
 // array of names is needed (e.g. matching a saved exercise to its group).
 const EXERCISE_LIBRARY = EXERCISE_CATEGORIES.flatMap(c => c.exercises);
+
+// Known day/workout-plan names offered in the Session Label picker.
+const SESSION_LABELS = [
+  'Upper A','Lower A','Upper B','Lower B',
+  'Run + Mobility — Hip Flexors & Lower Back',
+  'Run + Mobility — Glutes & Rotation',
+  'Run + Mobility — Full Body & Pelvic Floor',
+];
+function handleLabelChange(){
+  const v=document.getElementById('f-session-name').value;
+  document.getElementById('custom-label-row').style.display = v==='__custom__'?'grid':'none';
+}
 
 // ── NAV DATE ─────────────────────────────────────────────────────────────────
 const today = new Date();
@@ -585,7 +627,10 @@ function editSession(id){
   document.getElementById('custom-type-row').style.display = knownType==='custom'?'grid':'none';
   document.getElementById('f-date').value=s.date;
   document.getElementById('f-duration').value=s.duration||'';
-  document.getElementById('f-session-name').value=s.label||'';
+  const knownLabel = s.label && SESSION_LABELS.includes(s.label) ? s.label : (s.label ? '__custom__' : '');
+  document.getElementById('f-session-name').value=knownLabel;
+  document.getElementById('f-session-name-custom').value=knownLabel==='__custom__'?s.label:'';
+  document.getElementById('custom-label-row').style.display=knownLabel==='__custom__'?'grid':'none';
   document.getElementById('f-notes').value=s.notes||'';
   document.getElementById('f-pushups').value=s.pushups||'';
 
@@ -606,6 +651,8 @@ function resetForm(){
   document.getElementById('custom-type-row').style.display='none';
   document.getElementById('f-duration').value='';
   document.getElementById('f-session-name').value='';
+  document.getElementById('f-session-name-custom').value='';
+  document.getElementById('custom-label-row').style.display='none';
   document.getElementById('f-notes').value='';
   document.getElementById('f-pushups').value='';
   document.getElementById('f-date').value=today.toISOString().slice(0,10);
@@ -618,10 +665,6 @@ function resetForm(){
 function handleTypeChange(){
   const v=document.getElementById('f-type').value;
   document.getElementById('custom-type-row').style.display = v==='custom'?'grid':'none';
-  const gymOnly=v==='Gym';
-  document.getElementById('exercises-section-title').style.display=gymOnly?'block':'none';
-  document.getElementById('exercises-block').style.display=gymOnly?'block':'none';
-  document.querySelector('.add-exercise-btn').style.display=gymOnly?'block':'none';
 }
 function updatePBNote(){
   const pb=getPB();
@@ -706,31 +749,31 @@ function saveSession(){
   let type=document.getElementById('f-type').value;
   if(type==='custom') type=document.getElementById('f-type-custom').value.trim();
   const duration=document.getElementById('f-duration').value;
-  const label=document.getElementById('f-session-name').value.trim();
+  const labelSel=document.getElementById('f-session-name').value;
+  const label=labelSel==='__custom__'
+    ?document.getElementById('f-session-name-custom').value.trim()
+    :labelSel;
   const notes=document.getElementById('f-notes').value.trim();
   const pushups=parseInt(document.getElementById('f-pushups').value||'0',10);
 
   if(!date||!type){ showToast('Date and type required'); return; }
 
-  // Collect exercises (only for Gym type)
+  // Collect exercises (any session type may log exercises/stretches now)
   const exercises=[];
-  if(document.getElementById('f-type').value==='Gym'||
-    (document.getElementById('f-type').value!=='Run'&&document.getElementById('f-type').value!=='custom')){
-    document.querySelectorAll('#exercises-block .exercise-row').forEach(row=>{
-      const nameSel=row.querySelector('.ex-name').value;
-      const name=nameSel==='__custom__'
-        ?row.querySelector('.ex-custom-name').value.trim()
-        :nameSel;
-      if(!name) return;
-      exercises.push({
-        name,
-        sets: row.querySelector('.ex-sets').value||null,
-        reps: row.querySelector('.ex-reps').value||null,
-        weight: row.querySelector('.ex-weight').value||null,
-        note: row.querySelector('.ex-note').value.trim()||null,
-      });
+  document.querySelectorAll('#exercises-block .exercise-row').forEach(row=>{
+    const nameSel=row.querySelector('.ex-name').value;
+    const name=nameSel==='__custom__'
+      ?row.querySelector('.ex-custom-name').value.trim()
+      :nameSel;
+    if(!name) return;
+    exercises.push({
+      name,
+      sets: row.querySelector('.ex-sets').value||null,
+      reps: row.querySelector('.ex-reps').value||null,
+      weight: row.querySelector('.ex-weight').value||null,
+      note: row.querySelector('.ex-note').value.trim()||null,
     });
-  }
+  });
 
   let newPB=false;
   if(pushups&&pushups>getPB()){ savePB(pushups); newPB=true; }
