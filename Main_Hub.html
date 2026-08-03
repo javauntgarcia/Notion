@@ -1603,6 +1603,19 @@ const goalSlides = [
           var done = (hubData._productivity||{}).prod_jour_done === 1;
           return { pct: done?100:0, meta: done?'Published ✓':'In progress' };
         }
+      },
+      {
+        // Tracked via the `vocabulary` Supabase row (same singleton the
+        // Word of the Day widget and Vocabulary List page write to).
+        name: 'Vocabulary',
+        color: 'bar-gold',
+        milestone: 'Build the word bank — 52 words',
+        compute: function() {
+          var words = ((hubData._vocabulary||{}).words) || [];
+          var n = words.filter(function(w) { return !w.archived; }).length;
+          var target = 52;
+          return { pct: Math.min(100, Math.round(n/target*100)), meta: n+' of '+target+' words' };
+        }
       }
     ]
   },
@@ -1747,6 +1760,7 @@ buildGoalCarousel();
   try {
     hubData._wellness    = await sbGet('wellness', 'singleton');
     hubData._productivity = await sbGet('productivity', 'singleton');
+    hubData._vocabulary  = await sbGet('vocabulary', 'singleton');
     var hubRow = await sbGet('main_hub', 'singleton');
     if (hubRow && hubRow.habits) hubData.habits = hubRow.habits;
     hubData._planningArchive = await loadPlanningArchive();

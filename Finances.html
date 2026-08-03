@@ -574,25 +574,6 @@
 </div>
 
 <script>
-// ============================================================
-// EDIT: NAV URLS — replace GitHub Pages URLs with Notion page
-// URLs once each subpage has a /embed Notion page set up.
-// target="_blank" is already set on every link.
-// ============================================================
-var NAV_URLS = {
-  'back-main-hub':      'https://www.notion.so/2026-Hub-371e14bd8682801fbef6fd4f2104237d',
-  'nav-statements-top': 'https://www.notion.so/Statements-371e14bd868280d3afbecd5538c2a0ec',
-  'nav-budget-manage':  'https://www.notion.so/Budget-371e14bd86828010818beb13630b3a43',
-  'nav-accounts':       'https://www.notion.so/Accounts-371e14bd86828027b7a1c852244e5a46',
-  'nav-budget':         'https://www.notion.so/Budget-371e14bd86828010818beb13630b3a43',
-  'nav-statements':     'https://www.notion.so/Statements-371e14bd868280d3afbecd5538c2a0ec',
-  'nav-summaries':      'https://www.notion.so/Summaries-371e14bd868280a394b0f2719dd149aa'
-};
-Object.keys(NAV_URLS).forEach(function(id) {
-  var el = document.getElementById(id);
-  if (el) el.href = NAV_URLS[id];
-});
-
 // ── DATE ──
 const dateEl = document.getElementById('topbar-date');
 dateEl.textContent = new Date().toLocaleDateString('en-US', {

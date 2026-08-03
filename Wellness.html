@@ -737,23 +737,6 @@
   <div class="bg-tail"></div>
 
   <script>
-  // ============================================================
-  // EDIT: NAV URLS — once each subpage has its own Notion page
-  // with a /embed block, replace the GitHub Pages URLs below
-  // with the Notion page URL. target="_blank" is already set on
-  // every link so navigation stays within Notion.
-  // ============================================================
-  var NAV_URLS = {
-    'back-main-hub':       'https://www.notion.so/2026-Hub-371e14bd8682801fbef6fd4f2104237d',
-    'nav-weekly-checkin':  'https://www.notion.so/Weekly-Check-in-371e14bd868280df99dcd83d3a8758c3',
-    'nav-workout-plan':    'https://www.notion.so/Workout-Plan-371e14bd8682805daaadcac282bed107',
-    'nav-workout-tracker': 'https://www.notion.so/Workout-Tracker-371e14bd8682804f86bcf51064377fc4'
-  };
-  Object.keys(NAV_URLS).forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.href = NAV_URLS[id];
-  });
-
   (function () {
 
     /* ── SUPABASE CONFIG ── */

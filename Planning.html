@@ -747,23 +747,6 @@
 <div class="save-dot" id="saveDot"></div>
 
 <script>
-// ============================================================
-// EDIT: NAV URLS — replace GitHub Pages URLs with Notion page
-// URLs once each subpage has a /embed Notion page set up.
-// target="_blank" is already set on every link.
-// ============================================================
-var NAV_URLS = {
-  'back-main-hub':       'https://www.notion.so/2026-Hub-371e14bd8682801fbef6fd4f2104237d',
-  'nav-wellness':        'https://www.notion.so/Wellness-371e14bd86828035bd83f48ea355e954',
-  'nav-productivity':    'https://www.notion.so/Productivity-371e14bd868280789fbcecfcd96fcf84',
-  'nav-monthly-outline': 'https://www.notion.so/Monthly-Outline-371e14bd868280998934c2c7c7d6de84',
-  'nav-yearly-outlook':  'https://www.notion.so/Yearly-Outlook-371e14bd86828023b656d1fe6e961038'
-};
-Object.keys(NAV_URLS).forEach(function(id) {
-  var el = document.getElementById(id);
-  if (el) el.href = NAV_URLS[id];
-});
-
 function updateDateHeaders() {
   const now = new Date();
   document.getElementById('topbarDate').textContent =
