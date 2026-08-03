@@ -164,6 +164,33 @@
       letter-spacing: 0.08em;
     }
 
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .save-status {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .save-status.show { opacity: 0.75; }
+    .save-status.saving { color: var(--warm-white); }
+    .save-status.saved { color: #6fe0a8; }
+    .save-status.error { color: #ff8a8a; }
+    .save-status .dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
     /* ======================================================
        MASTHEAD — shorter so calendar pulls up into view
        ====================================================== */
@@ -927,7 +954,10 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         Productivity
       </a>
-      <span class="topbar-date" id="topbar-date"></span>
+      <span class="topbar-right">
+        <span class="save-status" id="save-status"></span>
+        <span class="topbar-date" id="topbar-date"></span>
+      </span>
     </nav>
 
     <!-- MASTHEAD — title + calendar centered in hero -->
@@ -1101,14 +1131,17 @@ async function sbGet(table, id) {
   } catch(e) { return null; }
 }
 async function sbUpsert(table, row) {
-  try {
-    await fetch(`${SB_URL}/rest/v1/${table}`, {
-      method: 'POST',
-      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
-        'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
-      body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
-    });
-  } catch(e) {}
+  const res = await fetch(`${SB_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    keepalive: true, // let the write finish even if the tab is closing (e.g. right after a drag)
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+    body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`sbUpsert ${table} failed: ${res.status} ${text}`);
+  }
 }
 function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
@@ -1125,10 +1158,56 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
   /* ---- Supabase-backed state ---- */
   let _ccData = { id: 'singleton', calendar: {}, ideas: [], ideaBoard: {} };
 
+  function setSaveStatus(state) {
+    const el = document.getElementById('save-status');
+    if (!el) return;
+    el.className = 'save-status show ' + state;
+    const label = state === 'saving' ? 'Saving…' : state === 'saved' ? 'Saved' : 'Save failed — retrying';
+    el.innerHTML = `<span class="dot"></span>${label}`;
+    if (state === 'saved') {
+      clearTimeout(el._hideTimer);
+      el._hideTimer = setTimeout(() => el.classList.remove('show'), 1600);
+    }
+  }
+
+  // Every mutation (adding, editing, deleting, or MOVING an idea between
+  // categories) funnels through here. localStorage is written first and
+  // synchronously, so a move is never lost even if the network call below
+  // fails or the tab closes mid-request. The Supabase write is retried once
+  // automatically since a dropped/failed request was the main reason moves
+  // could silently fail to persist across devices/reloads.
+  let _saveInFlight = null;
+  let _savePending = false;
+
   async function saveCal() {
-    await sbUpsert('content_calendar', _ccData);
     try { localStorage.setItem('cc_calendar', JSON.stringify(_ccData.calendar)); } catch(e) {}
     try { localStorage.setItem('cc_ideaboard', JSON.stringify(_ccData.ideaBoard)); } catch(e) {}
+
+    // Coalesce rapid-fire saves (e.g. a drag move touches two banks in a
+    // row) into a single in-flight request instead of racing two POSTs.
+    if (_saveInFlight) { _savePending = true; return; }
+
+    _saveInFlight = (async () => {
+      setSaveStatus('saving');
+      const snapshot = JSON.parse(JSON.stringify(_ccData));
+      try {
+        await sbUpsert('content_calendar', snapshot);
+        setSaveStatus('saved');
+      } catch (e) {
+        console.warn('Content Calendar: save failed, retrying once', e);
+        try {
+          await sbUpsert('content_calendar', snapshot);
+          setSaveStatus('saved');
+        } catch (e2) {
+          console.error('Content Calendar: save failed after retry', e2);
+          setSaveStatus('error');
+        }
+      } finally {
+        _saveInFlight = null;
+        if (_savePending) { _savePending = false; saveCal(); }
+      }
+    })();
+    return _saveInFlight;
   }
 
   /* ============================================================
@@ -1556,10 +1635,11 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     const fromIdeas = getBankIdeas(fromBank);
     if (!fromIdeas[fromIdx]) return;
     const [idea] = fromIdeas.splice(fromIdx, 1);
-    setBankIdeas(fromBank, fromIdeas);
     const toIdeas = getBankIdeas(toBank);
     toIdeas.push(idea);
-    setBankIdeas(toBank, toIdeas);
+    // Mutate both banks first, then save once — avoids firing two
+    // near-simultaneous network requests for a single move.
+    saveCal();
     renderBankIdeas(fromBank);
     renderBankIdeas(toBank);
   }
