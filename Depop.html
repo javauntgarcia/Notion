@@ -1007,16 +1007,24 @@ const SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
 const SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
 const IMAGE_BUCKET = 'depop-images'; // EDIT: must exist as a PUBLIC bucket in Supabase Storage
 
+// Wraps fetch with a hard timeout so a blocked/hanging request can never
+// leave the page waiting forever with nothing rendered.
+function fetchWithTimeout(url, options = {}, ms = 5000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
 async function sbGet(table, id) {
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}&limit=1`,
+    const r = await fetchWithTimeout(`${SB_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}&limit=1`,
       { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
     const d = await r.json(); return d && d[0] ? d[0] : null;
   } catch(e) { return null; }
 }
 async function sbUpsert(table, row) {
   try {
-    await fetch(`${SB_URL}/rest/v1/${table}`, {
+    await fetchWithTimeout(`${SB_URL}/rest/v1/${table}`, {
       method: 'POST',
       headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
         'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
@@ -1052,7 +1060,7 @@ function compressImage(file, maxWidth = 500, quality = 0.72) {
 
 async function sbUploadImage(blob, filename) {
   try {
-    const r = await fetch(`${SB_URL}/storage/v1/object/${IMAGE_BUCKET}/${filename}`, {
+    const r = await fetchWithTimeout(`${SB_URL}/storage/v1/object/${IMAGE_BUCKET}/${filename}`, {
       method: 'POST',
       headers: {
         apikey: SB_KEY,
@@ -1060,7 +1068,7 @@ async function sbUploadImage(blob, filename) {
         'Content-Type': 'image/jpeg'
       },
       body: blob
-    });
+    }, 15000);
     if (!r.ok) { console.error('Storage upload failed', r.status, await r.text()); return null; }
     return `${SB_URL}/storage/v1/object/public/${IMAGE_BUCKET}/${filename}`;
   } catch(e) { console.error('Storage upload error', e); return null; }
@@ -1092,13 +1100,80 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     lsSet('dep_items', JSON.stringify(items));
   }
 
+  /* ---- EDIT: CHECKLIST RECONCILE — package numbers from your checklist ----
+     Matches items already in inventory by name and updates ONLY their
+     packaged/pkgCount fields — name/link/image/shipped are left untouched.
+     Safe/idempotent to run on every load. Any entry with no match in
+     current inventory gets added as a new item. ---- */
+  const CHECKLIST_V1 = [
+    { match: ["h&m denim pants"],                                                canonical: "H&M Denim Pants",               pkgCount: 1  },
+    { match: ["rustler denim jeans"],                                            canonical: "Rustler Denim Jeans",           pkgCount: 2  },
+    { match: ["martini glass pants"],                                            canonical: "Martini Glass Pants",           pkgCount: 3  },
+    { match: ["roberto cavalli pants"],                                          canonical: "Roberto Cavalli Pants",         pkgCount: 5  },
+    { match: ["hollister red chinos"],                                           canonical: "Hollister Red Chinos",          pkgCount: 6  },
+    { match: [],                                                                 canonical: "Red Plaid Pants",               pkgCount: 7  },
+    { match: ["hollister green pants"],                                          canonical: "Hollister Green Pants",         pkgCount: 8  },
+    { match: ["banana republic women's pants","banana republic womens pants"],   canonical: "Banana Republic Women's Pants", pkgCount: 9  },
+    { match: ["navy plaid pants"],                                               canonical: "Navy Plaid Pants",              pkgCount: 10 },
+    { match: ["h&m denim shorts"],                                               canonical: "H&M Denim Shorts",              pkgCount: 11 },
+    { match: ["denim shorts"],                                                   canonical: "Denim Shorts",                  pkgCount: 12 },
+    { match: ["levi's khakis","levis khakis"],                                   canonical: "Levi's Khakis",                 pkgCount: 13 },
+    { match: ["american eagle flex khakis"],                                     canonical: "American Eagle Flex Khakis",    pkgCount: 14 },
+    { match: ["aeropostale skinny khakis"],                                      canonical: "Aeropostale Skinny Khakis",     pkgCount: 15 },
+    { match: ["grey denim capris"],                                              canonical: "Grey Denim Capris",             pkgCount: 16 },
+    { match: ["plaid skirt"],                                                    canonical: "Plaid Skirt",                   pkgCount: 17 },
+    { match: ["vineyard vines swimming trunks"],                                 canonical: "Vineyard Vines Swimming Trunks",pkgCount: 18 },
+    { match: ["pink swim trunks"],                                               canonical: "Pink Swim Trunks",              pkgCount: 19 },
+    { match: ["red shorts"],                                                     canonical: "Red Shorts",                    pkgCount: 21 },
+    { match: ["vintage disco shirt"],                                            canonical: "Vintage Disco Shirt",           pkgCount: 22 },
+    { match: ["pink crop top"],                                                  canonical: "Pink Crop Top",                 pkgCount: 23 },
+    { match: ["orange flared pants"],                                            canonical: "Orange Flared Pants",           pkgCount: 26 },
+    { match: ["orange 70s jacket"],                                              canonical: "Orange 70s Jacket",             pkgCount: 27 },
+    { match: ["onesie"],                                                         canonical: "Onesie",                        pkgCount: 28 },
+    { match: ["lavender corduroy"],                                              canonical: "Lavender Corduroy",             pkgCount: 29 }
+  ];
+
+  function normalizeName(s) {
+    return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  function reconcileChecklistV1() {
+    const used = new Set();
+    CHECKLIST_V1.forEach(entry => {
+      const targets = [normalizeName(entry.canonical), ...entry.match.map(normalizeName)];
+      const found = items.find(i => !used.has(i.id) && targets.includes(normalizeName(i.name)));
+      if (found) {
+        found.packaged = true;
+        found.pkgCount = entry.pkgCount;
+        used.add(found.id);
+      } else {
+        items.push({
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          name: entry.canonical,
+          link: "",
+          packaged: true,
+          pkgCount: entry.pkgCount,
+          shipped: false,
+          image: null
+        });
+      }
+    });
+  }
+
   /* ---- Init ---- */
   (async function() {
-    const row = await sbGet('depop', 'singleton');
-    if (row && row.items && row.items.length) { items = row.items; }
-    else {
-      try { items = JSON.parse(lsGet('dep_items') || '[]'); } catch(e) { items = []; }
-      if (items.length === 0) seedNotionData();
+    try {
+      const row = await sbGet('depop', 'singleton');
+      if (row && row.items && row.items.length) { items = row.items; }
+      else {
+        try { items = JSON.parse(lsGet('dep_items') || '[]'); } catch(e) { items = []; }
+        if (items.length === 0) seedNotionData();
+      }
+      reconcileChecklistV1();
+      await persist();
+    } catch (e) {
+      console.error('Init error, falling back to seed data:', e);
+      if (!items || items.length === 0) seedNotionData();
     }
     render();
   })();
@@ -1320,32 +1395,33 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
   /* ---- EDIT: SEED DATA — pre-populated from Notion inventory ---- */
   function seedNotionData() {
     const notionItems = [
-      { id: 1728764109616, name: "H&M Denim Pants",                  link: "https://depop.app.link/EWTVH50EpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728764368090, name: "Rustler Denim Jeans",               link: "https://depop.app.link/t1YcO87EpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728764558599, name: "Martini Glass Pants",               link: "https://depop.app.link/NTgxT8lFpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728764877218, name: "Roberto Cavalli Pants",             link: "https://depop.app.link/rSzMRAJFpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728765166495, name: "Hollister Red Chinos",              link: "https://depop.app.link/45VHLvQFpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
+      { id: 1728764109616, name: "H&M Denim Pants",                  link: "https://depop.app.link/EWTVH50EpXb", packaged: true, pkgCount: 1,  shipped: false, image: null },
+      { id: 1728764368090, name: "Rustler Denim Jeans",               link: "https://depop.app.link/t1YcO87EpXb", packaged: true, pkgCount: 2,  shipped: false, image: null },
+      { id: 1728764558599, name: "Martini Glass Pants",               link: "https://depop.app.link/NTgxT8lFpXb", packaged: true, pkgCount: 3,  shipped: false, image: null },
+      { id: 1728764877218, name: "Roberto Cavalli Pants",             link: "https://depop.app.link/rSzMRAJFpXb", packaged: true, pkgCount: 5,  shipped: false, image: null },
+      { id: 1728765166495, name: "Hollister Red Chinos",              link: "https://depop.app.link/45VHLvQFpXb", packaged: true, pkgCount: 6,  shipped: false, image: null },
       { id: 1728765100772, name: "Patterned Joggers",                 link: "https://depop.app.link/6u5jBF0FpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728765218176, name: "Hollister Green Pants",             link: "https://depop.app.link/7DbHQbbGpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728765369570, name: "Banana Republic Women's Pants",     link: "https://depop.app.link/3YwWGdqGpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728765500249, name: "Navy Plaid Pants",                  link: "https://depop.app.link/A9JbzXuGpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728765650548, name: "H&M Denim Shorts",                  link: "https://depop.app.link/J3JyuQIGpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728765732874, name: "Denim Shorts",                      link: "https://depop.app.link/d4Rj8HLGpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728765922708, name: "Levi's Khakis",                     link: "https://depop.app.link/3Aei5BZGpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728765993204, name: "American Eagle Flex Khakis",        link: "https://depop.app.link/Ddhjww5GpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728766116948, name: "Aeropostale Skinny Khakis",         link: "https://depop.app.link/k6h1oPcHpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728766260948, name: "Grey Denim Capris",                 link: "https://depop.app.link/6vyh37nHpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728774287740, name: "Plaid Skirt",                       link: "https://depop.app.link/XYDzd2dXpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728779638807, name: "Vineyard Vines Swimming Trunks",    link: "",                                   packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728779952309, name: "Pink Swim Trunks",                  link: "https://depop.app.link/xrGyMprXpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728780287026, name: "Red Shorts",                        link: "https://depop.app.link/n8Qhbw5XpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728780455422, name: "Vintage Disco Shirt",               link: "https://depop.app.link/LuJljxjYpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728780520193, name: "Pink Crop Top",                     link: "https://depop.app.link/emBtj4qYpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
+      { id: 1728765218176, name: "Hollister Green Pants",             link: "https://depop.app.link/7DbHQbbGpXb", packaged: true, pkgCount: 8,  shipped: false, image: null },
+      { id: 1728765369570, name: "Banana Republic Women's Pants",     link: "https://depop.app.link/3YwWGdqGpXb", packaged: true, pkgCount: 9,  shipped: false, image: null },
+      { id: 1728765500249, name: "Navy Plaid Pants",                  link: "https://depop.app.link/A9JbzXuGpXb", packaged: true, pkgCount: 10, shipped: false, image: null },
+      { id: 1728765650548, name: "H&M Denim Shorts",                  link: "https://depop.app.link/J3JyuQIGpXb", packaged: true, pkgCount: 11, shipped: false, image: null },
+      { id: 1728765732874, name: "Denim Shorts",                      link: "https://depop.app.link/d4Rj8HLGpXb", packaged: true, pkgCount: 12, shipped: false, image: null },
+      { id: 1728765922708, name: "Levi's Khakis",                     link: "https://depop.app.link/3Aei5BZGpXb", packaged: true, pkgCount: 13, shipped: false, image: null },
+      { id: 1728765993204, name: "American Eagle Flex Khakis",        link: "https://depop.app.link/Ddhjww5GpXb", packaged: true, pkgCount: 14, shipped: false, image: null },
+      { id: 1728766116948, name: "Aeropostale Skinny Khakis",         link: "https://depop.app.link/k6h1oPcHpXb", packaged: true, pkgCount: 15, shipped: false, image: null },
+      { id: 1728766260948, name: "Grey Denim Capris",                 link: "https://depop.app.link/6vyh37nHpXb", packaged: true, pkgCount: 16, shipped: false, image: null },
+      { id: 1728774287740, name: "Plaid Skirt",                       link: "https://depop.app.link/XYDzd2dXpXb", packaged: true, pkgCount: 17, shipped: false, image: null },
+      { id: 1728779638807, name: "Vineyard Vines Swimming Trunks",    link: "",                                   packaged: true, pkgCount: 18, shipped: false, image: null },
+      { id: 1728779952309, name: "Pink Swim Trunks",                  link: "https://depop.app.link/xrGyMprXpXb", packaged: true, pkgCount: 19, shipped: false, image: null },
+      { id: 1728780287026, name: "Red Shorts",                        link: "https://depop.app.link/n8Qhbw5XpXb", packaged: true, pkgCount: 21, shipped: false, image: null },
+      { id: 1728780455422, name: "Vintage Disco Shirt",               link: "https://depop.app.link/LuJljxjYpXb", packaged: true, pkgCount: 22, shipped: false, image: null },
+      { id: 1728780520193, name: "Pink Crop Top",                     link: "https://depop.app.link/emBtj4qYpXb", packaged: true, pkgCount: 23, shipped: false, image: null },
       { id: 1728780562237, name: "Butterfly Top",                     link: "https://depop.app.link/SuFqeAsYpXb", packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728781280249, name: "Orange Flared Pants",               link: "",                                   packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728781318576, name: "Orange 70s Jacket",                 link: "",                                   packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728781466028, name: "Onesie",                            link: "",                                   packaged: false, pkgCount: 1, shipped: false, image: null },
-      { id: 1728781589576, name: "Lavender Corduroy",                 link: "https://depop.app.link/5kbUhRx2pXb", packaged: false, pkgCount: 1, shipped: false, image: null }
+      { id: 1728781280249, name: "Orange Flared Pants",               link: "",                                   packaged: true, pkgCount: 26, shipped: false, image: null },
+      { id: 1728781318576, name: "Orange 70s Jacket",                 link: "",                                   packaged: true, pkgCount: 27, shipped: false, image: null },
+      { id: 1728781466028, name: "Onesie",                            link: "",                                   packaged: true, pkgCount: 28, shipped: false, image: null },
+      { id: 1728781589576, name: "Lavender Corduroy",                 link: "https://depop.app.link/5kbUhRx2pXb", packaged: true, pkgCount: 29, shipped: false, image: null },
+      { id: 1728781700001, name: "Red Plaid Pants",                   link: "",                                   packaged: true, pkgCount: 7,  shipped: false, image: null }
     ];
     items = notionItems;
     persist();
