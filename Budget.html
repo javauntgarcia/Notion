@@ -616,15 +616,15 @@ body {
 
   <!-- MONTH TOGGLE -->
   <div class="month-toggle">
-    <button class="month-tab active" onclick="switchMonth('june', this)">
-      <p class="month-tab-label">Transition Month</p>
-      <p class="month-tab-name">June 2026</p>
-      <p class="month-tab-sub">Last month at current place · Moving out</p>
-    </button>
-    <button class="month-tab" onclick="switchMonth('july', this)">
+    <button class="month-tab active" onclick="switchMonth('july', this)">
       <p class="month-tab-label">New Baseline</p>
-      <p class="month-tab-name">July 2026+</p>
-      <p class="month-tab-sub">Gap year begins · New budget template</p>
+      <p class="month-tab-name">July 2026</p>
+      <p class="month-tab-sub">Gap year begins · new budget template</p>
+    </button>
+    <button class="month-tab" onclick="switchMonth('august', this)">
+      <p class="month-tab-label">Steady State</p>
+      <p class="month-tab-name">August 2026</p>
+      <p class="month-tab-sub">Parking dropped · same baseline otherwise</p>
     </button>
   </div>
 
@@ -726,63 +726,6 @@ body {
 // ══════════════════════════════════════════════
 
 const BUDGETS = {
-  june: {
-    income: 5654,
-    incomeNote: '4 deposits in June · CHK $2,304 + WF $3,350 (actuals)',
-
-    oneTime: [
-      { label: 'Movers',            amount: 1500,  note: 'estimate — local move' },
-      { label: 'Security Deposit',  amount: 2700,  note: 'new place' },
-      { label: 'Overlap Utilities', amount: 200,   note: 'final PG&E true-up' },
-    ],
-
-    // Fixed shared bills — shown with full/your-share breakdown
-    sharedBills: [
-      { desc: 'Rent',              full: 4350,  yourShare: 2700, yourPct: 62, note: 'BILT — settled via payroll sweep' },
-      { desc: 'PG&E / Utilities',  full: 260,   yourShare: 130,  yourPct: 50, note: 'last month — final true-up' },
-      { desc: 'Lemonade Renters',  full: 84,    yourShare: 42,   yourPct: 50, note: 'pet + renters insurance' },
-      { desc: 'Stak Parking',      full: 250,   yourShare: 125,  yourPct: 50, note: 'shared parking space' },
-    ],
-
-    lines: [
-      // Fixed — your share only
-      { cat: 'Housing',     desc: 'Rent — your share (62%)',            amount: 2700, type: 'fixed',   group: 'Fixed Obligations' },
-      { cat: 'Utilities',   desc: 'PG&E — your share (50%)',            amount: 130,  type: 'fixed',   group: 'Fixed Obligations' },
-      { cat: 'Insurance',   desc: 'Lemonade — your share (50%)',        amount: 42,   type: 'fixed',   group: 'Fixed Obligations' },
-      { cat: 'Parking',     desc: 'Stak — your share (50%)',            amount: 125,  type: 'fixed',   group: 'Fixed Obligations' },
-      // Debt — corrected per plan
-      { cat: 'Debt',        desc: 'Discover — lump-sum payoff target',  amount: 2060, type: 'debt',    group: 'Debt Payments' },
-      { cat: 'Debt',        desc: 'Citi — $140 biweekly (×2 periods)',  amount: 280,  type: 'debt',    group: 'Debt Payments' },
-      // BILT excluded — joint day-to-day, settled externally
-      // Savings
-      { cat: 'Savings',     desc: 'WF Joint — payroll sweep',           amount: 1350, type: 'savings', group: 'Savings & Investing' },
-      { cat: 'Investing',   desc: 'Roth IRA — Vanguard (biweekly)',     amount: 325,  type: 'savings', group: 'Savings & Investing' },
-      // Discretionary
-      { cat: 'Groceries',   desc: 'Groceries & household',              amount: 400,  type: 'flex',    group: 'Discretionary' },
-      { cat: 'Dining Out',  desc: 'Restaurants & delivery',             amount: 300,  type: 'flex',    group: 'Discretionary' },
-      { cat: 'Transport',   desc: 'Clipper, Lyft, rideshare',           amount: 120,  type: 'flex',    group: 'Discretionary' },
-      { cat: 'Shopping',    desc: 'Clothing, Amazon, misc.',            amount: 150,  type: 'flex',    group: 'Discretionary' },
-      { cat: 'Subscriptions',desc:'Adobe, Netflix, subscriptions',      amount: 120,  type: 'flex',    group: 'Discretionary' },
-      { cat: 'Entertainment',desc:'Bars, events, nightlife',            amount: 150,  type: 'flex',    group: 'Discretionary' },
-      { cat: 'Health',      desc: 'Pharmacy, wellness, grooming',       amount: 75,   type: 'flex',    group: 'Discretionary' },
-    ],
-
-    savings: [
-      { label: 'WF Joint — Rent/Travel Fund', amount: 1350, sub: 'auto each payroll' },
-      { label: 'Vanguard Roth IRA',           amount: 325,  sub: '$6,500/yr target · on track' },
-      { label: 'WF Personal Buffer',          amount: 0,    sub: 'depleted — movers + deposit month' },
-    ],
-
-    notes: [
-      { icon: '🚚', title: 'Moving Month — Tight Cashflow',
-        text: '<strong>June is your bridge month.</strong> Three paychecks land this month — use the third as a lump-sum sweep at Discover to close that balance. After one-time costs (~$4,400) you\'ll have roughly <strong>$280 buffer</strong> remaining. Hold discretionary spend lean.' },
-      { icon: '💳', title: 'BILT Card — Not Budgeted',
-        text: 'BILT is your joint day-to-day card with Eston. Charges are settled externally between you two. Starting July 2026, BILT charges are verified monthly. Javaun's individual charges, Eston's charges, and shared splits are confirmed in Statements.html each month. Tag as <strong>J / E / ½</strong> with the percentage — those flow into your actual spend tracking but don\'t count as budget commitments.' },
-      { icon: '🏦', title: 'Citi Fixed Plan — 21 Months',
-        text: '<strong>$280/month ($140 biweekly)</strong> pays off $5,460 by Dec 2027. Payment is fixed — set autopay to $140 on each payroll date. Don\'t adjust unless you get a windfall.' },
-    ],
-  },
-
   july: {
     income: 6700,
     incomeNote: '4 SFMTA pay periods · gap year begins late summer',
@@ -790,31 +733,31 @@ const BUDGETS = {
     oneTime: [],
 
     sharedBills: [
-      { desc: 'PG&E / Utilities',  full: 0,    yourShare: 0,   yourPct: 0,  note: 'no longer at current place' },
-      { desc: 'Lemonade Renters',  full: 84,   yourShare: 42,  yourPct: 50, note: 'new place — confirm split' },
-      { desc: 'Stak Parking',      full: 250,  yourShare: 125, yourPct: 50, note: 'confirm if continuing' },
+      { desc: 'Rent',               full: 2700, yourShare: 1620, yourPct: 60, note: 'BILT — Oakland place' },
+      { desc: 'PG&E / Utilities',  full: 267.81, yourShare: 133.91, yourPct: 50, note: 'confirm ongoing split' },
+      { desc: 'Lemonade Renters',  full: 84,   yourShare: 42,  yourPct: 50, note: 'confirm split' },
     ],
 
     lines: [
-      // No rent
-      { cat: 'Insurance',    desc: 'Lemonade — your share (50%)',        amount: 42,   type: 'fixed',   group: 'Fixed Obligations' },
-      { cat: 'Parking',      desc: 'Stak — your share (50%)',            amount: 125,  type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Housing',      desc: 'Rent — your share (60%)',            amount: 1620, type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Utilities',    desc: 'PG&E — your share (50%)',            amount: 134,  type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Pets',         desc: 'Lemonade pet insurance — your share (50%)', amount: 42,   type: 'fixed',   group: 'Fixed Obligations' },
       // Debt — Discover paid off in June, Citi fixed at $280/mo
       { cat: 'Debt',         desc: 'Citi — $140 biweekly (fixed plan)',  amount: 280,  type: 'debt',    group: 'Debt Payments' },
       // Savings — freed-up rent budget redistributed
       { cat: 'Savings',      desc: 'WF Joint — travel/gap year fund',    amount: 1350, type: 'savings', group: 'Savings & Investing' },
       { cat: 'Savings',      desc: 'WF Personal — buffer rebuild',       amount: 500,  type: 'savings', group: 'Savings & Investing' },
-      { cat: 'Investing',    desc: 'Roth IRA — Vanguard',                amount: 325,  type: 'savings', group: 'Savings & Investing' },
+      { cat: 'Savings',      desc: 'Roth IRA — Vanguard',                amount: 325,  type: 'savings', group: 'Savings & Investing' },
       // Discretionary — gap year spending profile
-      { cat: 'Groceries',    desc: 'Groceries & household',              amount: 450,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Shopping',     desc: 'Groceries & household',              amount: 450,  type: 'flex',    group: 'Discretionary' },
       { cat: 'Dining Out',   desc: 'Restaurants & delivery',             amount: 400,  type: 'flex',    group: 'Discretionary' },
-      { cat: 'Transport',    desc: 'Clipper, Lyft, rideshare',           amount: 120,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Transportation', desc: 'Clipper, Lyft, rideshare',         amount: 120,  type: 'flex',    group: 'Discretionary' },
       { cat: 'Shopping',     desc: 'Clothing, Amazon, misc.',            amount: 250,  type: 'flex',    group: 'Discretionary' },
       { cat: 'Subscriptions',desc: 'Adobe, Netflix, subscriptions',      amount: 120,  type: 'flex',    group: 'Discretionary' },
       { cat: 'Entertainment',desc: 'Bars, events, shows',                amount: 200,  type: 'flex',    group: 'Discretionary' },
-      { cat: 'LSAT Prep',    desc: 'Study materials, practice tests',    amount: 150,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Other',        desc: 'LSAT — study materials, practice tests', amount: 150,  type: 'flex', group: 'Discretionary' },
       { cat: 'Travel',       desc: 'Gap year exploration fund',          amount: 300,  type: 'flex',    group: 'Discretionary' },
-      { cat: 'Health',       desc: 'Pharmacy, wellness, self-care',      amount: 100,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Personal Care',desc: 'Pharmacy, wellness, self-care',      amount: 100,  type: 'flex',    group: 'Discretionary' },
     ],
 
     savings: [
@@ -824,12 +767,62 @@ const BUDGETS = {
     ],
 
     notes: [
-      { icon: '✈', title: 'Gap Year Budget — New Baseline',
-        text: '<strong>No rent obligation.</strong> The $2,700 rent share is redistributed: $500 to WF Personal buffer rebuild, $300 to travel fund, $150 to LSAT prep, and the remainder absorbed into discretionary uplift. Discover should be fully paid off from June\'s third paycheck.' },
+      { icon: '🏠', title: 'Rent Resumes at the New Place',
+        text: 'The July BILT statement shows the first full rent charge at the Oakland apartment: <strong>$2,700, your 60% share is $1,620.</strong> Earlier planning assumed a rent-free gap-year gap this month — that didn\'t happen. PG&E also billed for the first time at $267.81 (your $133.91 share); confirm whether that split holds going forward.' },
       { icon: '💳', title: 'BILT — Stays External',
         text: 'BILT remains a joint day-to-day card settled between you and Eston. Continue tagging in Statements.html: <strong>J</strong> for yours alone, <strong>E</strong> for Eston\'s (excluded from your budget), <strong>½</strong> + percentage for any shared charge. Your budget only reflects your confirmed share of split bills.' },
       { icon: '⚖', title: 'Citi — Stay the Course',
-        text: '<strong>$280/mo is fixed through Dec 2027.</strong> With Discover gone and no rent, your fixed obligation load drops from ~$7,500/mo to ~$750/mo — a dramatic shift. Resist the urge to loosen discretionary spend immediately; build the WF buffer to $2,000 first.' },
+        text: '<strong>$280/mo is fixed through Dec 2027.</strong> Discover is gone, but rent is back in the picture this month, so the fixed obligation load isn\'t as light as originally projected. Hold off on loosening discretionary spend; keep building the WF buffer.' },
+    ],
+  },
+
+  august: {
+    income: 6700,
+    incomeNote: '4 SFMTA pay periods · gap year planning continues',
+
+    oneTime: [],
+
+    sharedBills: [
+      { desc: 'Rent',               full: 2700, yourShare: 1620, yourPct: 60, note: 'BILT — Oakland place' },
+      { desc: 'PG&E / Utilities',  full: 267.81, yourShare: 133.91, yourPct: 50, note: 'holding steady from July' },
+      { desc: 'Lemonade Renters',  full: 84,   yourShare: 42,  yourPct: 50, note: 'confirm split' },
+    ],
+
+    lines: [
+      { cat: 'Housing',      desc: 'Rent — your share (60%)',            amount: 1620, type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Utilities',    desc: 'PG&E — your share (50%)',            amount: 134,  type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Pets',         desc: 'Lemonade pet insurance — your share (50%)', amount: 42,   type: 'fixed',   group: 'Fixed Obligations' },
+      // Debt — Discover paid off, Citi fixed at $280/mo
+      { cat: 'Debt',         desc: 'Citi — $140 biweekly (fixed plan)',  amount: 280,  type: 'debt',    group: 'Debt Payments' },
+      // Savings
+      { cat: 'Savings',      desc: 'WF Joint — travel/gap year fund',    amount: 1350, type: 'savings', group: 'Savings & Investing' },
+      { cat: 'Savings',      desc: 'WF Personal — buffer rebuild',       amount: 500,  type: 'savings', group: 'Savings & Investing' },
+      { cat: 'Savings',      desc: 'Roth IRA — Vanguard',                amount: 325,  type: 'savings', group: 'Savings & Investing' },
+      // Discretionary — same gap year spending profile as July
+      { cat: 'Shopping',     desc: 'Groceries & household',              amount: 450,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Dining Out',   desc: 'Restaurants & delivery',             amount: 400,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Transportation', desc: 'Clipper, Lyft, rideshare',         amount: 120,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Shopping',     desc: 'Clothing, Amazon, misc.',            amount: 250,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Subscriptions',desc: 'Adobe, Netflix, subscriptions',      amount: 120,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Entertainment',desc: 'Bars, events, shows',                amount: 200,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Other',        desc: 'LSAT — study materials, practice tests', amount: 150,  type: 'flex', group: 'Discretionary' },
+      { cat: 'Travel',       desc: 'Gap year exploration fund',          amount: 300,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Personal Care',desc: 'Pharmacy, wellness, self-care',      amount: 100,  type: 'flex',    group: 'Discretionary' },
+    ],
+
+    savings: [
+      { label: 'WF Joint — Travel Fund',  amount: 1350, sub: 'auto each payroll' },
+      { label: 'WF Personal Buffer',      amount: 500,  sub: 'continued rebuild' },
+      { label: 'Vanguard Roth IRA',       amount: 325,  sub: '$6,500/yr target' },
+    ],
+
+    notes: [
+      { icon: '🅿️', title: 'Parking Dropped',
+        text: 'Stak Parking is no longer a monthly obligation — it\'s been removed from both shared bills and the fixed-obligation lines. That frees up <strong>$125/mo</strong> from your July baseline; consider routing it toward the WF Personal buffer, which is still rebuilding.' },
+      { icon: '💳', title: 'BILT — Stays External',
+        text: 'BILT remains a joint day-to-day card settled between you and Eston. Continue tagging in Statements.html: <strong>J</strong> for yours alone, <strong>E</strong> for Eston\'s (excluded from your budget), <strong>½</strong> + percentage for any shared charge. Your budget only reflects your confirmed share of split bills.' },
+      { icon: '⚖', title: 'Citi — Stay the Course',
+        text: '<strong>$280/mo is fixed through Dec 2027.</strong> No changes from July — keep autopay running at $140 per payroll date.' },
     ],
   },
 };
@@ -847,7 +840,7 @@ const GROUP_COLORS = {
 // ══════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════
-let activeMonth = 'june';
+let activeMonth = 'july';
 
 function fmt(n) {
   return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -870,7 +863,7 @@ function renderAll() {
   const net            = d.income - totalBudget;
 
   // Hero
-  document.getElementById('hero-month').textContent  = activeMonth === 'june' ? 'June 2026' : 'July 2026+';
+  document.getElementById('hero-month').textContent  = activeMonth === 'july' ? 'July 2026' : 'August 2026';
   document.getElementById('hero-budget').textContent = fmt(totalBudget);
   const heroNet = document.getElementById('hero-net');
   heroNet.textContent = (net >= 0 ? '+' : '') + fmt(net);

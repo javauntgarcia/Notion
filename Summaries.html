@@ -1096,8 +1096,6 @@ const MONTHS = {
       { name:'Target',            cat:'Shopping',   pill:'pill-shopping',  amt: 121.87  },
     ],
   },
-};
-
 
   'Jun 2026': {
     income: {
@@ -1129,8 +1127,37 @@ const MONTHS = {
     ],
   },
 
+  'Jul 2026': {
+    income: {
+      'SFMTA Payroll':    { amt: 6066.84, note: '2 pay periods across CHK + WF Personal' },
+      'Depop Sales':      { amt:   70.60, note: 'WF personal' },
+      'Other Income':     { amt:  249.25, note: 'Venmo cashouts + remote check + ATM deposit' },
+    },
+    spending: {
+      'Housing':        { amt: 3193.06, txns: 9,  color:'#c9a27e', pill:'pill-other'        },
+      'Shopping':       { amt: 1677.24, txns: 48, color:'#b87e9a', pill:'pill-shopping'     },
+      'Dining Out':     { amt:  891.02, txns: 27, color:'#c9927e', pill:'pill-dining'       },
+      'Other':          { amt:  415.78, txns: 7,  color:'#8c8c8c', pill:'pill-other'        },
+      'Subscriptions':  { amt:  280.92, txns: 12, color:'#7e7eb8', pill:'pill-subscriptions'},
+      'Utilities':      { amt:  267.81, txns: 1,  color:'#b8b87e', pill:'pill-other'        },
+      'Savings':        { amt:  230.75, txns: 2,  color:'#7aaa8c', pill:'pill-other'        },
+      'Transportation': { amt:  234.51, txns: 35, color:'#7e9ab8', pill:'pill-transport'    },
+      'Entertainment':  { amt:  191.95, txns: 5,  color:'#c97eb8', pill:'pill-other'        },
+      'Pets':           { amt:   92.91, txns: 3,  color:'#9ab87e', pill:'pill-other'        },
+      'Personal Care':  { amt:   27.75, txns: 2,  color:'#7eb8a2', pill:'pill-other'        },
+    },
+    merchants: [
+      { name:'Bilt Housing Payment', cat:'Housing',  pill:'pill-other',     amt: 2700.00 },
+      { name:'Amazon',               cat:'Shopping', pill:'pill-shopping',  amt:  693.58 },
+      { name:'The Home Depot',       cat:'Housing',  pill:'pill-other',     amt:  371.16 },
+      { name:'Costco - Instacart',   cat:'Shopping', pill:'pill-shopping',  amt:  320.67 },
+      { name:'Ecourt Efs',           cat:'Other',    pill:'pill-other',     amt:  308.95 },
+    ],
+  },
+};
+
 const MONTH_KEYS = Object.keys(MONTHS);
-let activeMonth = 'Jun 2026';
+let activeMonth = 'Jul 2026';
 
 // ── HELPERS ──
 function fmt(n) {
