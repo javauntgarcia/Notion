@@ -1006,26 +1006,6 @@
 </div><!-- /page-wrap -->
 
 <script>
-// ============================================================
-// EDIT: NAV URLS — replace GitHub Pages URLs with Notion page
-// URLs once each subpage has a /embed Notion page set up.
-// target="_blank" is already set on every link.
-// ============================================================
-var NAV_URLS = {
-  'back-main-hub':        'https://www.notion.so/2026-Hub-371e14bd8682801fbef6fd4f2104237d',
-  'nav-curriculum':       'https://www.notion.so/Personal-Curriculum-371e14bd86828067847bda09962e19e2',
-  'nav-content-calendar': 'https://www.notion.so/Content-Calendar-371e14bd86828075a6b3fa42e5ba1215',
-  'nav-work':             'https://www.notion.so/Work-371e14bd8682802d9602d607d2510a69',
-  'nav-depop':            'https://www.notion.so/Depop-371e14bd86828007a8affeef41e7ae38',
-  'nav-notion-guide':     'https://www.notion.so/Notion-Guide-371e14bd8682804eaf42c87cacdf0538',
-  'nav-vocab':            'https://www.notion.so/Vocabulary-List-371e14bd8682802a86d4c8cf223a891a'
-};
-Object.keys(NAV_URLS).forEach(function(id) {
-  var el = document.getElementById(id);
-  if (el) el.href = NAV_URLS[id];
-});
-
-(function () {
   'use strict';
 
   /* ── SUPABASE CONFIG ── */
