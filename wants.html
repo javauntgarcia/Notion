@@ -157,16 +157,16 @@ html, body {
 }
 .want-card:hover { border-color: rgba(255,255,255,0.26); transform: translateY(-3px); }
 .want-card.acquired { border-color: rgba(255,255,255,0.32); }
-.want-card.acquired::after {
-  content: '✓ acquired';
-  position: absolute; top: 10px; right: 10px;
+.card-acquired-badge {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
   font-family: var(--font-mono);
-  font-size: 7px; letter-spacing: 0.15em; text-transform: uppercase;
+  font-size: 7px; letter-spacing: 0.13em; text-transform: uppercase;
   padding: 4px 10px; border-radius: 100px;
   background: rgba(0,0,0,0.65);
   border: 0.5px solid rgba(255,255,255,0.25);
   color: var(--white-dim);
   backdrop-filter: blur(6px);
+  white-space: nowrap;
 }
 
 /* Image */
@@ -320,6 +320,11 @@ option { background: #111; }
     </div>
 
     <div class="modal-field">
+      <label class="modal-label" for="m-acquired">Date Acquired (optional)</label>
+      <input class="modal-input" id="m-acquired" type="date">
+    </div>
+
+    <div class="modal-field">
       <label class="modal-label" for="m-url">Link (optional)</label>
       <input class="modal-input" id="m-url" type="text" placeholder="https://...">
     </div>
@@ -351,6 +356,10 @@ option { background: #111; }
         <div class="detail-meta-item" id="d-url-wrap">
           <span class="detail-meta-label">Link</span>
           <span class="detail-meta-val" id="d-url-display"></span>
+        </div>
+        <div class="detail-meta-item" id="d-acquired-wrap" style="display:none;">
+          <span class="detail-meta-label">Acquired</span>
+          <span class="detail-meta-val" id="d-acquired-display"></span>
         </div>
       </div>
       <p class="detail-notes" id="d-notes"></p>
@@ -493,6 +502,7 @@ function renderGrid() {
   grid.innerHTML = filtered.map(w => `
     <div class="want-card ${w.acquired?'acquired':''}" onclick="openDetail(${w.id})">
       <div class="card-img-wrap">
+        ${w.acquired ? `<div class="card-acquired-badge">✓ ${w.acquiredDate ? formatDateDisplay(w.acquiredDate) : 'acquired'}</div>` : ''}
         ${w.img
           ? `<img class="card-img" src="${w.img}" />`
           : `<div class="card-img-placeholder">✦</div>`}
@@ -520,10 +530,26 @@ function urlLabel(url) {
 }
 function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+function todayISO() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function formatDateDisplay(iso) {
+  if (!iso) return '';
+  // Parse as local date (avoid UTC shift from bare yyyy-mm-dd)
+  const [y,m,d] = iso.split('-').map(Number);
+  if (!y) return iso;
+  const dt = new Date(y, (m||1)-1, d||1);
+  return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 function quickToggle(id, el) {
   const w = wants.find(x => x.id === id);
   if (!w) return;
   w.acquired = !w.acquired;
+  if (w.acquired && !w.acquiredDate) w.acquiredDate = todayISO();
+  if (!w.acquired) w.acquiredDate = null;
   persist();
   renderGrid();
 }
@@ -537,6 +563,7 @@ function openAddModal() {
   document.getElementById('m-name').value = '';
   document.getElementById('m-cat').value = '';
   document.getElementById('m-cost').value = '';
+  document.getElementById('m-acquired').value = '';
   document.getElementById('m-url').value = '';
   document.getElementById('m-notes').value = '';
   document.getElementById('modal-img-preview').style.display = 'none';
@@ -598,6 +625,8 @@ async function saveWant() {
     // if upload fails, imageUrl stays null; existing image (on edit) is preserved below
   }
 
+  const acquiredDateVal = document.getElementById('m-acquired').value; // yyyy-mm-dd or ''
+
   if (editingId) {
     const w = wants.find(x => x.id === editingId);
     w.name = name;
@@ -606,8 +635,17 @@ async function saveWant() {
     w.url = url;
     w.notes = document.getElementById('m-notes').value.trim();
     if (imageUrl) w.img = imageUrl;
+    // Setting a date always marks it acquired. Clearing the date just removes
+    // the date but leaves the acquired flag alone (use the toggle to un-acquire).
+    w.acquiredDate = acquiredDateVal || null;
+    if (acquiredDateVal) w.acquired = true;
   } else {
-    wants.unshift({ id: Date.now(), name, cat: document.getElementById('m-cat').value, cost: document.getElementById('m-cost').value.trim(), url, notes: document.getElementById('m-notes').value.trim(), img: imageUrl, acquired: false });
+    wants.unshift({
+      id: Date.now(), name, cat: document.getElementById('m-cat').value,
+      cost: document.getElementById('m-cost').value.trim(), url,
+      notes: document.getElementById('m-notes').value.trim(), img: imageUrl,
+      acquired: !!acquiredDateVal, acquiredDate: acquiredDateVal || null
+    });
   }
   await persist();
   if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
@@ -635,6 +673,13 @@ function openDetail(id) {
     linkBtn.href = w.url;
     linkBtn.style.display = '';
   } else { urlWrap.style.display = 'none'; linkBtn.style.display = 'none'; }
+  const acqWrap = document.getElementById('d-acquired-wrap');
+  if (w.acquired && w.acquiredDate) {
+    acqWrap.style.display = '';
+    document.getElementById('d-acquired-display').textContent = formatDateDisplay(w.acquiredDate);
+  } else {
+    acqWrap.style.display = 'none';
+  }
   document.getElementById('d-acquire-btn').textContent = w.acquired ? 'Mark as Wanted' : 'Mark as Acquired';
   document.getElementById('detail-modal').classList.add('open');
 }
@@ -652,6 +697,7 @@ function openEditModal() {
   document.getElementById('m-name').value = w.name;
   document.getElementById('m-cat').value = w.cat || '';
   document.getElementById('m-cost').value = w.cost || '';
+  document.getElementById('m-acquired').value = w.acquiredDate || '';
   document.getElementById('m-url').value = w.url || '';
   document.getElementById('m-notes').value = w.notes || '';
   if (w.img) {
@@ -669,7 +715,16 @@ function toggleAcquired() {
   const w = wants.find(x => x.id === detailId);
   if (!w) return;
   w.acquired = !w.acquired;
+  if (w.acquired && !w.acquiredDate) w.acquiredDate = todayISO();
+  if (!w.acquired) w.acquiredDate = null;
   document.getElementById('d-acquire-btn').textContent = w.acquired ? 'Mark as Wanted' : 'Mark as Acquired';
+  const acqWrap = document.getElementById('d-acquired-wrap');
+  if (w.acquired && w.acquiredDate) {
+    acqWrap.style.display = '';
+    document.getElementById('d-acquired-display').textContent = formatDateDisplay(w.acquiredDate);
+  } else {
+    acqWrap.style.display = 'none';
+  }
   persist();
   renderGrid();
 }
