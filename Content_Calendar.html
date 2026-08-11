@@ -1070,6 +1070,25 @@
 </div>
 
 <!-- ============================================================
+     IDEA MOVE MODAL — move an idea card to another category, without
+     needing both the source and target category panel visible at once
+     (the 7 panels stack too tall to both fit on a phone screen, which
+     made the drag-only version effectively undroppable on mobile).
+     ============================================================ -->
+<div class="modal-overlay" id="idea-move-modal">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-title">Move to Another Category</div>
+    <div class="modal-field" style="gap:0.5rem;">
+      <label>Select category</label>
+      <div id="idea-move-grid" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-sm btn-danger" onclick="closeIdeaMoveModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      IDEA MODAL
      ============================================================ -->
 <div class="modal-overlay" id="idea-modal">
@@ -1131,7 +1150,7 @@ async function sbGet(table, id) {
   } catch(e) { return null; }
 }
 async function sbUpsert(table, row) {
-  const res = await fetch(`${SB_URL}/rest/v1/${table}`, {
+  const res = await fetch(`${SB_URL}/rest/v1/${table}?on_conflict=id`, {
     method: 'POST',
     keepalive: true, // let the write finish even if the tab is closing (e.g. right after a drag)
     headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
@@ -1644,6 +1663,46 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     renderBankIdeas(toBank);
   }
 
+  /* ---- Idea Move Modal (tap-to-move fallback, doesn't require the
+     source and target category to both be visible on screen) ---- */
+  let _ideaMoveSrc = null; // { bankId, idx }
+
+  function openIdeaMoveModal(e, bankId, idx) {
+    if (e) e.stopPropagation();
+    _ideaMoveSrc = { bankId, idx };
+    renderIdeaMoveModal();
+    document.getElementById('idea-move-modal').classList.add('open');
+  }
+
+  function closeIdeaMoveModal() {
+    document.getElementById('idea-move-modal').classList.remove('open');
+    _ideaMoveSrc = null;
+  }
+
+  function renderIdeaMoveModal() {
+    const grid = document.getElementById('idea-move-grid');
+    grid.innerHTML = '';
+    BANK_CONFIG.forEach(cfg => {
+      const isOrigin = _ideaMoveSrc && cfg.id === _ideaMoveSrc.bankId;
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-sm';
+      btn.style.cssText = `justify-content:flex-start;background:${cfg.bg};color:${cfg.ink};border-color:${cfg.glassB};opacity:${isOrigin ? 0.4 : 1};`;
+      btn.textContent = cfg.title + (isOrigin ? ' (current)' : '');
+      btn.disabled = isOrigin;
+      if (!isOrigin) {
+        btn.onclick = () => {
+          moveIdea(_ideaMoveSrc.bankId, _ideaMoveSrc.idx, cfg.id);
+          closeIdeaMoveModal();
+        };
+      }
+      grid.appendChild(btn);
+    });
+  }
+
+  document.getElementById('idea-move-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeIdeaMoveModal();
+  });
+
   function renderBankIdeas(bankId) {
     const ideas = getBankIdeas(bankId);
     const list  = document.getElementById('ideas-list-' + bankId);
@@ -1701,6 +1760,10 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
               <button class="btn btn-sm" onclick="editIdea('${bankId}', ${idx})">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 Edit
+              </button>
+              <button class="btn btn-sm" onclick="openIdeaMoveModal(event, '${bankId}', ${idx})">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><path d="M5 9l-3 3 3 3"/><path d="M9 5l3-3 3 3"/><path d="M15 19l3 3 3-3"/><path d="M19 9l3 3-3 3"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+                Move
               </button>
               <button class="btn btn-sm btn-danger" onclick="deleteIdea('${bankId}', ${idx})">Delete</button>
             </div>
