@@ -919,6 +919,13 @@
           <span style="font-size:0.52rem;opacity:0.5;letter-spacing:0.1em;">LINER #</span>
           <input id="linerNum" type="number" min="1" value="1" style="width:40px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:4px;padding:0.2rem 0.4rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:#1A2530;outline:none;text-align:center;" onchange="updateLinerLabel()"/>
         </div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.4rem;align-items:center;justify-content:center;flex-wrap:wrap;">
+          <span style="font-size:0.52rem;opacity:0.5;letter-spacing:0.1em;">DAY</span>
+          <input id="linerCurrentDay" type="number" min="1" value="1" style="width:40px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:4px;padding:0.2rem 0.4rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:#1A2530;outline:none;text-align:center;" onchange="updateCurrentDay()"/>
+          <span style="font-size:0.52rem;opacity:0.5;letter-spacing:0.1em;">OF</span>
+          <input id="linerCycleDays" type="number" min="1" value="10" style="width:40px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:4px;padding:0.2rem 0.4rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:#1A2530;outline:none;text-align:center;" onchange="updateCycleDays()"/>
+          <span style="font-size:0.52rem;opacity:0.5;letter-spacing:0.1em;">DAYS</span>
+        </div>
       </div>
 
       <!-- TO-DO LIST -->
@@ -1258,7 +1265,7 @@ const local = {
 };
 
 // ── HUB STATE ──
-let hubData = { quote:'', quote_attr:'', word:'', word_def:'', todos:[], inv_liner:1, inv_cycle_start:'', cal_events:[] };
+let hubData = { quote:'', quote_attr:'', word:'', word_def:'', todos:[], inv_liner:1, inv_cycle_start:'', inv_cycle_days:10, cal_events:[] };
 
 async function loadHub() {
   try {
@@ -1277,6 +1284,7 @@ async function loadHub() {
   hubData.todos          = JSON.parse(local.get('hub_todos') || '[]');
   hubData.inv_liner      = parseInt(local.get('inv_liner')) || 1;
   hubData.inv_cycle_start= local.get('inv_cycle_start') || '';
+  hubData.inv_cycle_days = parseInt(local.get('inv_cycle_days')) || 10;
   try { hubData.cal_events = JSON.parse(local.get('hub_cal_events') || '[]'); } catch(e) { hubData.cal_events = []; }
   applyHubToUI();
 }
@@ -1300,12 +1308,14 @@ function applyHubToUI() {
   renderTodos();
   if (hubData.inv_liner) {
     document.getElementById('linerNum').value = hubData.inv_liner;
+    const cycleDaysEl = document.getElementById('linerCycleDays');
+    if (cycleDaysEl) cycleDaysEl.value = hubData.inv_cycle_days || 10;
     // Re-render liner display now that the real value is loaded
     const day = getCurrentDay();
     const big = document.getElementById('linerBig');
     if (big) big.textContent = '#' + hubData.inv_liner;
     const info = document.getElementById('linerInfo');
-    if (info) info.textContent = 'Liner #' + hubData.inv_liner + ' · Day ' + day + ' of ' + CYCLE_DAYS;
+    if (info) info.textContent = 'Liner #' + hubData.inv_liner + ' · Day ' + day + ' of ' + (hubData.inv_cycle_days || 10);
     renderDayPips(day);
   }
   _calEvents = hubData.cal_events || [];
@@ -1402,9 +1412,14 @@ async function syncWordToVocabulary(word, def) {
   }
 }
 async function saveLinerMeta() {
-  await patchHub({ inv_liner: hubData.inv_liner || 1, inv_cycle_start: hubData.inv_cycle_start || '' });
+  await patchHub({
+    inv_liner: hubData.inv_liner || 1,
+    inv_cycle_start: hubData.inv_cycle_start || '',
+    inv_cycle_days: hubData.inv_cycle_days || 10
+  });
   local.set('inv_liner',       hubData.inv_liner);
   local.set('inv_cycle_start', hubData.inv_cycle_start);
+  local.set('inv_cycle_days',  hubData.inv_cycle_days || 10);
 }
 async function saveCalMeta() {
   await patchHub({ cal_events: hubData.cal_events || [] });
@@ -1770,7 +1785,14 @@ buildGoalCarousel();
 
 
 // ── INVISALIGN LINER TRACKER ──
-const CYCLE_DAYS = 10;
+// Cycle length is per-liner (some aligners are prescribed 20 days, most
+// are 10) rather than a fixed constant, so it's stored as inv_cycle_days
+// on the main_hub row and editable per liner.
+const DEFAULT_CYCLE_DAYS = 10;
+
+function getCycleDays() {
+  return hubData.inv_cycle_days || DEFAULT_CYCLE_DAYS;
+}
 
 function getCycleStart() {
   let s = hubData.inv_cycle_start;
@@ -1788,13 +1810,14 @@ function getCurrentDay() {
   const start = getCycleStart();
   const today = new Date();
   const diff = Math.floor((today - start) / 86400000);
-  return Math.min(diff + 1, CYCLE_DAYS);
+  return Math.min(diff + 1, getCycleDays());
 }
 
 function renderDayPips(currentDay) {
   const wrap = document.getElementById('dayPips');
   wrap.innerHTML = '';
-  for (let i = 1; i <= CYCLE_DAYS; i++) {
+  const total = getCycleDays();
+  for (let i = 1; i <= total; i++) {
     const pip = document.createElement('div');
     pip.style.cssText = `width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(245,239,228,0.3);background:${i<currentDay?'#4A6A8A':i===currentDay?'#C8D8E2':'transparent'};box-shadow:${i===currentDay?'0 0 6px rgba(200,216,226,0.5)':'none'};transition:background 0.3s;cursor:default;`;
     pip.title = `Day ${i}`;
@@ -1802,10 +1825,22 @@ function renderDayPips(currentDay) {
   }
 }
 
+// Recomputes and re-renders "Day X of N" from the stored start date and
+// cycle length — a calendar calculation, not a live-ticking timer. Safe
+// to call anytime (e.g. after the tab's been open a while) to make sure
+// the displayed day reflects today's actual date.
+function refreshLinerDisplay() {
+  if (!hubData.inv_liner) return;
+  const day = getCurrentDay();
+  const info = document.getElementById('linerInfo');
+  if (info) info.textContent = 'Liner #' + hubData.inv_liner + ' · Day ' + day + ' of ' + getCycleDays();
+  renderDayPips(day);
+}
+
 function updateLinerLabel() {
   const num = document.getElementById('linerNum').value;
   const day = getCurrentDay();
-  document.getElementById('linerInfo').textContent = `Liner #${num} · Day ${day} of ${CYCLE_DAYS}`;
+  document.getElementById('linerInfo').textContent = `Liner #${num} · Day ${day} of ${getCycleDays()}`;
   const big = document.getElementById('linerBig');
   if (big) big.textContent = '#' + num;
   hubData.inv_liner = parseInt(num);
@@ -1813,14 +1848,44 @@ function updateLinerLabel() {
   renderDayPips(day);
 }
 
+// Lets you set the aligner's total wear length (e.g. 20 days instead of
+// the usual 10) without changing the liner number or start date.
+function updateCycleDays() {
+  const el = document.getElementById('linerCycleDays');
+  const val = parseInt(el.value) || DEFAULT_CYCLE_DAYS;
+  hubData.inv_cycle_days = val;
+  saveLinerMeta();
+  refreshLinerDisplay();
+}
+
+// Lets you directly declare "I'm on day N" (e.g. day 2) instead of
+// hunting for a date picker — backs out the start date from today minus
+// (N - 1) days so getCurrentDay() reports the right number going forward.
+function updateCurrentDay() {
+  const el = document.getElementById('linerCurrentDay');
+  const day = Math.max(1, parseInt(el.value) || 1);
+  const start = new Date();
+  start.setDate(start.getDate() - (day - 1));
+  hubData.inv_cycle_start = start.toDateString();
+  saveLinerMeta();
+  refreshLinerDisplay();
+}
+
 function nextLiner() {
   hubData.inv_cycle_start = new Date().toDateString();
+  hubData.inv_cycle_days = DEFAULT_CYCLE_DAYS; // subsequent liners default to 10 days
   const n = document.getElementById('linerNum');
   n.value = +n.value + 1;
   hubData.inv_liner = parseInt(n.value);
+  const cycleDaysEl = document.getElementById('linerCycleDays');
+  if (cycleDaysEl) cycleDaysEl.value = DEFAULT_CYCLE_DAYS;
+  const currentDayEl = document.getElementById('linerCurrentDay');
+  if (currentDayEl) currentDayEl.value = 1;
   saveLinerMeta();
   updateLinerLabel();
 }
+
+setInterval(refreshLinerDisplay, 60 * 1000);
 
 // Init liner tracker — called inside applyHubToUI() after data loads
 
@@ -2210,7 +2275,7 @@ renderWeekCalendar();
   var info = document.getElementById('linerInfo');
   var linerVal = (num ? parseInt(num.value) : 1) || 1;
   if (big) big.textContent = '#' + linerVal;
-  if (info) info.textContent = 'Liner #' + linerVal + ' · Day ' + day + ' of ' + CYCLE_DAYS;
+  if (info) info.textContent = 'Liner #' + linerVal + ' · Day ' + day + ' of ' + getCycleDays();
   renderDayPips(day);
 })();
 </script>
