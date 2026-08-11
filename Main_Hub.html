@@ -1010,6 +1010,7 @@
             <button id="calSyncBtn" onclick="syncCurrentWeekWithMO()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#4A6A8A;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'" title="Sync this week with Monthly Outline">⟲ SYNC</button>
           </div>
         </div>
+        <div id="calSaveStatus" style="padding:0 1.6rem;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.1em;min-height:1em;"></div>
         <div id="calWeekGrid" style="padding:0 1rem 1rem;"></div>
 
         <div style="display:flex;gap:1.6rem;flex-wrap:wrap;padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(74,106,138,0.14);margin-top:0.2rem;">
@@ -1332,7 +1333,7 @@ function applyHubToUI() {
 //   saveQuoteMeta()  → quote / quote_attr
 //   saveWordMeta()   → word / word_def
 //   saveLinerMeta()  → inv_liner / inv_cycle_start
-//   saveCalMeta()    → cal_events
+//   saveCalEventsAsync() → cal_events (awaited, reports save success/failure)
 //   saveTodosToHub() → todos
 //   Planning.html    → habits / last_seen / todos
 
@@ -1421,10 +1422,9 @@ async function saveLinerMeta() {
   local.set('inv_cycle_start', hubData.inv_cycle_start);
   local.set('inv_cycle_days',  hubData.inv_cycle_days || 10);
 }
-async function saveCalMeta() {
-  await patchHub({ cal_events: hubData.cal_events || [] });
-  local.set('hub_cal_events', JSON.stringify(hubData.cal_events || []));
-}
+// (Calendar saves now go through the awaitable saveCalEventsAsync(), which
+// reports success/failure to the on-page status indicator instead of
+// saving silently — see the ── WEEKLY CALENDAR ── section below.)
 
 async function saveTodosToHub() {
   try {
@@ -1892,12 +1892,15 @@ setInterval(refreshLinerDisplay, 60 * 1000);
 // ── WEEKLY CALENDAR ──
 let _calEvents = [];
 function loadCalEvents() { return _calEvents; }
-function saveCalEvents(evts) {
+// Awaitable version so callers can show real save confirmation/errors
+// instead of firing the save and hoping for the best.
+async function saveCalEventsAsync(evts) {
   _calEvents = evts;
   hubData.cal_events = evts;
-  saveCalMeta();
-  // Cross-sync: write merged events to monthly_outline so it stays current
-  syncEventsToMonthlyOutline(evts);
+  local.set('hub_cal_events', JSON.stringify(evts));
+  const ok = await patchHub({ cal_events: evts || [] });
+  syncEventsToMonthlyOutline(evts); // best-effort cross-sync, doesn't block the status
+  return ok;
 }
 
 async function syncEventsToMonthlyOutline(hubEvts) {
@@ -1917,6 +1920,7 @@ async function syncEventsToMonthlyOutline(hubEvts) {
         end:       e.endH  != null ? (e.endH  < 10 ? '0'+e.endH  : ''+e.endH)  + ':00' : '',
         notes:     e.notes || '',
         allDay:    e.allDay || false,
+        overnight: e.overnight || false,
         hubSource: true
       };
     });
@@ -1925,9 +1929,27 @@ async function syncEventsToMonthlyOutline(hubEvts) {
   } catch(e) { console.warn('[Hub→MO sync]', e.message); }
 }
 
-const HOURS = Array.from({length: 21}, (_, i) => i + 4); // 4am–12am
+const HOURS = Array.from({length: 24}, (_, i) => i); // full day, 12am–11pm
 const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// Correct 12-hour label for any hour 0–23 (0 = 12a, 12 = 12p). The old
+// label logic only ever saw hours 4–24 and mislabeled the midnight row
+// as "12p" instead of "12a" — this is used everywhere an hour needs a
+// human label now, so that bug can't resurface.
+function hourLabel(h) {
+  const hh = ((h % 24) + 24) % 24;
+  if (hh === 0) return '12a';
+  if (hh === 12) return '12p';
+  return hh > 12 ? (hh - 12) + 'p' : hh + 'a';
+}
+
+function addDaysToKey(dk, n) {
+  const parts = dk.split('-').map(Number);
+  const d = new Date(parts[0], parts[1] - 1, parts[2]);
+  d.setDate(d.getDate() + n);
+  return dateKey(d);
+}
 
 let calWeekOffset = 0; // 0 = current week
 
@@ -1968,6 +1990,7 @@ async function mergeMOEventsIntoHub() {
         startH:   startH,
         endH:     endH,
         allDay:   e.allDay || (!e.start && !e.end),
+        overnight: e.overnight || false,
         color:    catColors[e.cat] || '#6B7F8E',
         cat:      e.cat,
         notes:    e.notes || '',
@@ -2034,18 +2057,28 @@ function renderWeekCalendar() {
 
   // Hour rows
   HOURS.forEach(function(h) {
-    const label = h === 12 ? '12p' : h > 12 ? (h-12)+'p' : h+'a';
-    html += '<div style="padding:0.25rem 0.3rem 0 0;text-align:right;color:#4A6A8A;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(74,106,138,0.07);line-height:1;padding-top:0.3rem;">' + label + '</div>';
+    html += '<div style="padding:0.25rem 0.3rem 0 0;text-align:right;color:#4A6A8A;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(74,106,138,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
     days.forEach(function(d) {
       const dk = dateKey(d);
       const isToday = dk === today;
-      const hourEvts = evts.filter(function(e){ return e.date===dk && !e.allDay && parseInt(e.startH)===h; });
+      // Normal same-day events starting this hour
+      const hourEvts = evts.filter(function(e){ return e.date===dk && !e.allDay && !e.overnight && parseInt(e.startH)===h; });
+      // Overnight events: the START segment shows on their own date at startH
+      const overnightStarts = evts.filter(function(e){ return e.date===dk && !e.allDay && e.overnight && parseInt(e.startH)===h; });
+      // Overnight events: the END segment shows on the FOLLOWING date at hour 0
+      const overnightEnds = evts.filter(function(e){ return !e.allDay && e.overnight && h === 0 && addDaysToKey(e.date, 1) === dk; });
+
       html += '<div style="border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.07);min-height:28px;background:' +
         (isToday ? 'rgba(74,106,138,0.04)' : 'transparent') +
         ';position:relative;padding:1px 2px;" ondblclick="quickAddEvent(\'' + dk + '\',' + h + ')">';
       hourEvts.forEach(function(e) {
-        var dur = Math.max(1, (parseInt(e.endH)||h+1) - h);
         html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;position:absolute;left:2px;right:2px;top:1px;z-index:2;" onclick="deleteCalEvent(\'' + e.id + '\')" title="Click to remove: ' + e.title + '">' + e.title + '</div>';
+      });
+      overnightStarts.forEach(function(e) {
+        html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;position:absolute;left:2px;right:2px;top:1px;z-index:2;" onclick="deleteCalEvent(\'' + e.id + '\')" title="Overnight: ' + hourLabel(e.startH) + ' → ' + hourLabel(e.endH) + ' next day. Click to remove: ' + e.title + '">🌙 ' + e.title + '</div>';
+      });
+      overnightEnds.forEach(function(e) {
+        html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;position:absolute;left:2px;right:2px;top:1px;z-index:2;opacity:0.85;" onclick="deleteCalEvent(\'' + e.id + '\')" title="Overnight from ' + hourLabel(e.startH) + ' the night before, ends ' + hourLabel(e.endH) + '. Click to remove: ' + e.title + '">↳ ' + e.title + ' ends ' + hourLabel(e.endH) + '</div>';
       });
       html += '</div>';
     });
@@ -2058,12 +2091,13 @@ function renderWeekCalendar() {
     '<input id="calEvtTitle" placeholder="Event title…" style="flex:2;min-width:110px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" />' +
     '<input id="calEvtDate" type="date" style="flex:1;min-width:120px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;" />' +
     '<select id="calEvtStart" style="background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;">' +
-    HOURS.map(function(h){ var l=h===12?'12:00p':h>12?(h-12)+':00p':h+':00a'; return '<option value="'+h+'">'+l+'</option>'; }).join('') +
+    HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('') +
     '</select>' +
     '<select id="calEvtEnd" style="background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;">' +
-    HOURS.map(function(h){ var l=h===12?'12:00p':h>12?(h-12)+':00p':h+':00a'; return '<option value="'+h+'">'+l+'</option>'; }).join('') +
+    HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('') +
     '</select>' +
-    '<label style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" style="width:10px;height:10px;" /> All-day</label>' +
+    '<label style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" onchange="if(this.checked)document.getElementById(\'calEvtOvernight\').checked=false;" style="width:10px;height:10px;" /> All-day</label>' +
+    '<label style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;" title="Ends the next calendar day, e.g. 8p–6a"><input type="checkbox" id="calEvtOvernight" onchange="if(this.checked)document.getElementById(\'calEvtAllDay\').checked=false;" style="width:10px;height:10px;" /> 🌙 Overnight</label>' +
     '<button onclick="addCalEvent()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
     '</div>';
 
@@ -2097,17 +2131,30 @@ async function syncCurrentWeekWithMO() {
   }
 }
 
-function addCalEvent() {
+async function addCalEvent() {
   const title = document.getElementById('calEvtTitle').value.trim();
-  if (!title) return;
+  const statusEl = document.getElementById('calSaveStatus');
+  if (!title) {
+    document.getElementById('calEvtTitle').focus();
+    return;
+  }
   const evts = loadCalEvents();
   const colors = ['#4A6A8A','#6B8C6E','#7DA0BC','#9AB89C','#6B7F8E'];
+  const allDay = document.getElementById('calEvtAllDay').checked;
+  const overnight = !allDay && document.getElementById('calEvtOvernight').checked;
+  const startH = parseInt(document.getElementById('calEvtStart').value);
+  let endH = parseInt(document.getElementById('calEvtEnd').value) + 1;
+  // If not flagged overnight but the picked end hour is at/before the
+  // start hour, treat it as overnight automatically rather than silently
+  // storing a nonsense same-day range (e.g. 8p start, 6a end).
+  const isOvernight = !allDay && (overnight || endH <= startH);
   const newEvt = {
     id: Date.now() + '' + Math.floor(Math.random()*1000),
     date: document.getElementById('calEvtDate').value,
-    startH: parseInt(document.getElementById('calEvtStart').value),
-    endH: parseInt(document.getElementById('calEvtEnd').value) + 1,
-    allDay: document.getElementById('calEvtAllDay').checked,
+    startH: startH,
+    endH: endH,
+    allDay: allDay,
+    overnight: isOvernight,
     title: title,
     color: colors[evts.length % colors.length],
     cat: 'events',
@@ -2115,20 +2162,38 @@ function addCalEvent() {
     hubNative: true
   };
   evts.push(newEvt);
-  saveCalEvents(evts);
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  const ok = await saveCalEventsAsync(evts);
   document.getElementById('calEvtTitle').value = '';
   renderWeekCalendar();
+  if (statusEl) {
+    if (ok) {
+      statusEl.textContent = 'saved ✓';
+      statusEl.style.color = '#4a8a6e';
+      setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
+    } else {
+      statusEl.textContent = 'cloud save failed — kept locally only, will retry on next sync';
+      statusEl.style.color = '#b05050';
+    }
+  }
 }
 
-function deleteCalEvent(id) {
+async function deleteCalEvent(id) {
   if (!confirm('Remove this event?')) return;
+  const statusEl = document.getElementById('calSaveStatus');
   const evts = loadCalEvents().filter(function(e){ return e.id !== id; });
   // Also remove from in-memory MO-sourced display list
   _calEvents = _calEvents.filter(function(e){ return e.id !== id; });
-  saveCalEvents(evts);
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  const ok = await saveCalEventsAsync(evts);
   // Remove from MO table too
   deleteEventFromMO(id);
   renderWeekCalendar();
+  if (statusEl) {
+    statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only, will retry on next sync';
+    statusEl.style.color = ok ? '#4a8a6e' : '#b05050';
+    if (ok) setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
+  }
 }
 
 async function deleteEventFromMO(id) {
@@ -2140,19 +2205,26 @@ async function deleteEventFromMO(id) {
   } catch(e) { console.warn('[Hub delete→MO]', e.message); }
 }
 
-function quickAddEvent(dateStr, hour) {
-  const title = prompt('Event title for ' + dateStr + ' at ' + (hour > 12 ? (hour-12)+'pm' : hour+'am') + ':');
+async function quickAddEvent(dateStr, hour) {
+  const title = prompt('Event title for ' + dateStr + ' at ' + hourLabel(hour) + ':');
   if (!title || !title.trim()) return;
+  const statusEl = document.getElementById('calSaveStatus');
   const evts = loadCalEvents();
   const colors = ['#4A6A8A','#6B8C6E','#7DA0BC','#9AB89C','#6B7F8E'];
   evts.push({
     id: Date.now() + '' + Math.floor(Math.random()*1000),
-    date: dateStr, startH: hour, endH: hour+1, allDay: false,
+    date: dateStr, startH: hour, endH: hour+1, allDay: false, overnight: false,
     title: title.trim(), color: colors[evts.length % colors.length],
     cat: 'events', notes: '', hubNative: true
   });
-  saveCalEvents(evts);
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  const ok = await saveCalEventsAsync(evts);
   renderWeekCalendar();
+  if (statusEl) {
+    statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only, will retry on next sync';
+    statusEl.style.color = ok ? '#4a8a6e' : '#b05050';
+    if (ok) setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
+  }
 }
 
 // ── HABIT TRACKER (log) + WEEKLY LOOK (chart) ──
