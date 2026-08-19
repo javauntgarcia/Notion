@@ -431,9 +431,9 @@
       font-size: 0.56rem;
       color: var(--warm-white);
       opacity: 0.82;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: normal;
+      word-break: break-word;
+      line-height: 1.35;
       flex: 1;
       min-width: 0;
     }
@@ -1384,6 +1384,18 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     });
   }
 
+  // Standard size for short titles; scales down step-by-step for longer
+  // ones so a full concept title fits on the pill without ellipsis-style
+  // truncation cutting it off.
+  function pillTitleFontSize(title) {
+    const len = (title || '').length;
+    if (len <= 20) return '0.56rem';
+    if (len <= 32) return '0.51rem';
+    if (len <= 46) return '0.47rem';
+    if (len <= 62) return '0.43rem';
+    return '0.39rem';
+  }
+
   function renderVideoPill(container, dk, idx, v) {
     const pill = document.createElement('div');
     pill.className = 'video-pill' + (v.archived ? ' archived' : '');
@@ -1404,7 +1416,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
         <button class="pill-check" onclick="toggleArchive(event,'${dk}',${idx})" title="${checkTitle}" style="color:${checkColor};">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </button>
-        <span class="video-pill-title" title="${v.title}">${v.title}</span>
+        <span class="video-pill-title" title="${v.title}" style="font-size:${pillTitleFontSize(v.title)}">${v.title}</span>
         <button class="pill-move" onclick="openMoveModal(event,'${dk}',${idx})" title="Move to another day" style="background:none;border:none;cursor:pointer;padding:0;color:rgba(91,111,255,0.35);flex-shrink:0;transition:color 0.15s;" onmouseover="this.style.color='rgba(91,111,255,0.9)'" onmouseout="this.style.color='rgba(91,111,255,0.35)'">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
         </button>
