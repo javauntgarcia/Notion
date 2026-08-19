@@ -62,6 +62,41 @@
     }
 
     /* ======================================================
+       PAGE-WIDE BACKGROUND
+       EDIT: background — change image filename in src below.
+       Fixed behind everything (topbar excluded via its own
+       higher z-index), so the same photo now shows through the
+       whole page, not just behind the calendar card.
+       ====================================================== */
+    .page-bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .page-bg-layer img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+    .page-bg-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      /* Darker/more even than the old card-only overlay since this now
+         has to keep text readable across the whole page, not just a
+         bottom-anchored calendar card. */
+      background: linear-gradient(
+        180deg,
+        rgba(5, 8, 32, 0.62) 0%,
+        rgba(7, 10, 36, 0.72) 45%,
+        rgba(6, 8, 26, 0.86) 100%
+      );
+    }
+
+    /* ======================================================
        PAGE WRAP
        ====================================================== */
     .page-wrap { position: relative; min-height: 100vh; }
@@ -69,9 +104,9 @@
     .content { position: relative; z-index: 1; }
 
     /* ======================================================
-       CALENDAR SURFACE + BACKGROUND
-       EDIT: background — change image filename in src below
-       The image now lives behind the calendar card only.
+       CALENDAR SURFACE
+       Now a frosted glass card over the page-wide background
+       image instead of holding its own separate copy of it.
        ====================================================== */
     .calendar-surface {
       --warm-white: var(--warm-white-light);
@@ -84,39 +119,13 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      background: var(--primary-mid);
+      background: rgba(8, 13, 42, 0.42);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     @media (max-width: 700px) {
       .calendar-surface { min-height: 520px; padding: 1.5rem 1rem 2rem; }
-    }
-
-    .bg-layer {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .bg-layer img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      object-position: center center;
-      display: block;
-    }
-
-    /* EDIT: overlay — lightened so the full image (including the heart/teeth detail) reads clearly */
-    .bg-layer::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(5, 8, 32, 0.06) 0%,
-        rgba(8, 13, 42, 0.14) 55%,
-        rgba(6, 8, 26, 0.42) 100%
-      );
     }
 
     .calendar-inner { position: relative; z-index: 1; }
@@ -958,6 +967,11 @@
   </style>
 </head>
 <body>
+<!-- EDIT: background — filename in src (space-encoded first, underscore fallback) -->
+<div class="page-bg-layer" aria-hidden="true">
+  <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Content%20Calendar.jpg" alt=""
+       onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/javauntgarcia/Notion/main/Content_Calendar.jpg'" />
+</div>
 <div class="page-wrap">
 
   <div class="content">
@@ -982,11 +996,6 @@
       <!-- Calendar lives HERE inside the masthead; the background image now sits behind this card only -->
       <div class="masthead-calendar" style="animation: fadeUp 0.8s ease both; animation-delay: 0.15s;">
         <div class="calendar-surface">
-          <!-- EDIT: background — filename in src (space-encoded first, underscore fallback) -->
-          <div class="bg-layer">
-            <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Content%20Calendar.jpg" alt=""
-                 onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/javauntgarcia/Notion/main/Content_Calendar.jpg'" />
-          </div>
           <div class="calendar-inner">
             <div class="week-nav">
               <button class="btn btn-sm" onclick="shiftWeek(-1)">
@@ -1054,7 +1063,7 @@
 
     <div class="modal-actions">
       <button class="btn btn-sm btn-danger" onclick="closeVideoModal()">Cancel</button>
-      <button class="btn btn-sm" onclick="saveVideo()">Add to Day</button>
+      <button class="btn btn-sm" onclick="saveVideo()" id="video-modal-save-btn">Add to Day</button>
     </div>
   </div>
 </div>
@@ -1445,6 +1454,9 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </button>
         <span class="video-pill-title" title="${v.title}" style="font-size:${pillTitleFontSize(v.title)}">${v.title}</span>
+        <button class="pill-edit" onclick="editVideoModal(event,'${dk}',${idx})" title="Edit" style="background:none;border:none;cursor:pointer;padding:0;color:rgba(232,160,48,0.4);flex-shrink:0;transition:color 0.15s;" onmouseover="this.style.color='rgba(232,160,48,0.9)'" onmouseout="this.style.color='rgba(232,160,48,0.4)'">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
         <button class="pill-move" onclick="openMoveModal(event,'${dk}',${idx})" title="Move to another day" style="background:none;border:none;cursor:pointer;padding:0;color:rgba(91,111,255,0.35);flex-shrink:0;transition:color 0.15s;" onmouseover="this.style.color='rgba(91,111,255,0.9)'" onmouseout="this.style.color='rgba(91,111,255,0.35)'">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
         </button>
@@ -1540,48 +1552,75 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
   let _videoTargetDate = null;
   let _selectedIdeaTitle = null; // tracks which idea picker row is selected
 
-  function openVideoModal(key) {
-    _videoTargetDate   = key;
-    _selectedIdeaTitle = null;
-    document.getElementById('vm-title').value = '';
-    ['vm-film','vm-edit','vm-post'].forEach(id => document.getElementById(id).checked = false);
+  let _editVideoIdx = null; // set when the video modal is editing an existing pill instead of adding a new one
 
-    // Populate idea picker from all idea banks
+  function populateIdeaPicker() {
     const ideas = allIdeasFlat();
     const pickerList = document.getElementById('idea-picker-list');
     pickerList.innerHTML = '';
 
     if (!ideas.length) {
       pickerList.innerHTML = '<div class="idea-picker-empty">No ideas yet — add some in the Idea Banks below.</div>';
-    } else {
-      ideas.forEach((idea, idx) => {
-        const item = document.createElement('div');
-        item.className = 'idea-picker-item';
-        item.dataset.title = idea.title;
-        const platforms = (idea.platforms || []).map(p =>
-          `<span>${p}</span>`).join('');
-        item.innerHTML = `
-          <div class="idea-picker-dot"></div>
-          <span class="idea-picker-name">${idea.title}</span>
-          <div class="idea-picker-platforms">${platforms}</div>`;
-        item.addEventListener('click', () => {
-          // deselect all, select this one
-          pickerList.querySelectorAll('.idea-picker-item').forEach(el => el.classList.remove('selected'));
-          item.classList.add('selected');
-          _selectedIdeaTitle = idea.title;
-          // clear custom title field when an idea is selected
-          document.getElementById('vm-title').value = '';
-        });
-        pickerList.appendChild(item);
-      });
+      return;
     }
+    ideas.forEach((idea, idx) => {
+      const item = document.createElement('div');
+      item.className = 'idea-picker-item';
+      item.dataset.title = idea.title;
+      const platforms = (idea.platforms || []).map(p =>
+        `<span>${p}</span>`).join('');
+      item.innerHTML = `
+        <div class="idea-picker-dot"></div>
+        <span class="idea-picker-name">${idea.title}</span>
+        <div class="idea-picker-platforms">${platforms}</div>`;
+      item.addEventListener('click', () => {
+        // deselect all, select this one
+        pickerList.querySelectorAll('.idea-picker-item').forEach(el => el.classList.remove('selected'));
+        item.classList.add('selected');
+        _selectedIdeaTitle = idea.title;
+        // clear custom title field when an idea is selected
+        document.getElementById('vm-title').value = '';
+      });
+      pickerList.appendChild(item);
+    });
+  }
 
+  function openVideoModal(key) {
+    _videoTargetDate   = key;
+    _editVideoIdx      = null;
+    _selectedIdeaTitle = null;
+    document.getElementById('vm-title').value = '';
+    ['vm-film','vm-edit','vm-post'].forEach(id => document.getElementById(id).checked = false);
+    document.getElementById('video-modal-title').textContent = 'Schedule a Video';
+    document.getElementById('video-modal-save-btn').textContent = 'Add to Day';
+    populateIdeaPicker();
+    document.getElementById('video-modal').classList.add('open');
+  }
+
+  // Reopens the scheduling modal pre-filled with an already-scheduled
+  // video's title and stage, so it can be edited in place rather than
+  // deleted and re-added.
+  function editVideoModal(e, dk, idx) {
+    e.stopPropagation();
+    const v = getCalData()[dk] && getCalData()[dk][idx];
+    if (!v) return;
+    _videoTargetDate   = dk;
+    _editVideoIdx      = idx;
+    _selectedIdeaTitle = null;
+    document.getElementById('vm-title').value = v.title || '';
+    document.getElementById('vm-film').checked = !!(v.status && v.status.includes('film'));
+    document.getElementById('vm-edit').checked = !!(v.status && v.status.includes('edit'));
+    document.getElementById('vm-post').checked = !!(v.status && v.status.includes('post'));
+    document.getElementById('video-modal-title').textContent = 'Edit Video';
+    document.getElementById('video-modal-save-btn').textContent = 'Save Changes';
+    populateIdeaPicker();
     document.getElementById('video-modal').classList.add('open');
   }
 
   function closeVideoModal() {
     document.getElementById('video-modal').classList.remove('open');
     _videoTargetDate   = null;
+    _editVideoIdx      = null;
     _selectedIdeaTitle = null;
   }
 
@@ -1601,7 +1640,14 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
 
     const cal = getCalData();
     if (!cal[_videoTargetDate]) cal[_videoTargetDate] = [];
-    cal[_videoTargetDate].push({ title, status });
+    if (_editVideoIdx !== null && cal[_videoTargetDate][_editVideoIdx]) {
+      const existing = cal[_videoTargetDate][_editVideoIdx];
+      existing.title = title;
+      existing.status = status;
+      // archived flag (if any) is left untouched by editing
+    } else {
+      cal[_videoTargetDate].push({ title, status });
+    }
     setCalData(cal);
     closeVideoModal();
     renderCalendar();
