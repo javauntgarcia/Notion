@@ -1254,6 +1254,35 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
      ============================================================ */
   function enableDragReorder(el, { getPayload, zoneSelector, onDrop }) {
     let pointerId = null, startX = 0, startY = 0, dragging = false, ghost = null, activeZone = null;
+    let lastX = 0, lastY = 0, autoScrollRAF = null;
+
+    // While dragging near the top/bottom edge of the viewport, keep the
+    // page scrolling toward that edge so panels further up/down the page
+    // (e.g. a category near the bottom of a long board) become reachable
+    // without needing to end the drag first.
+    const EDGE = 70;      // px from viewport edge that triggers scrolling
+    const MAX_SPEED = 16; // px per animation frame at the very edge
+
+    function updateActiveZone(clientX, clientY) {
+      if (activeZone) activeZone.classList.remove('drag-over');
+      ghost.style.display = 'none';
+      const under = document.elementFromPoint(clientX, clientY);
+      ghost.style.display = '';
+      activeZone = under && under.closest(zoneSelector);
+      if (activeZone) activeZone.classList.add('drag-over');
+    }
+
+    function autoScrollTick() {
+      const vh = window.innerHeight;
+      let dy = 0;
+      if (lastY < EDGE) dy = -MAX_SPEED * (1 - lastY / EDGE);
+      else if (lastY > vh - EDGE) dy = MAX_SPEED * (1 - (vh - lastY) / EDGE);
+      if (dy) {
+        window.scrollBy(0, dy);
+        updateActiveZone(lastX, lastY);
+      }
+      if (dragging) autoScrollRAF = requestAnimationFrame(autoScrollTick);
+    }
 
     el.addEventListener('pointerdown', e => {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -1277,6 +1306,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
       ghost.style.top = rect.top + 'px';
       document.body.appendChild(ghost);
       try { el.setPointerCapture(pointerId); } catch (_) {}
+      autoScrollRAF = requestAnimationFrame(autoScrollTick);
     }
 
     function onMove(e) {
@@ -1287,13 +1317,9 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
         startDrag(e);
       }
       e.preventDefault();
+      lastX = e.clientX; lastY = e.clientY;
       if (ghost) ghost.style.transform = `translate(${dx}px, ${dy}px)`;
-      if (activeZone) activeZone.classList.remove('drag-over');
-      ghost.style.display = 'none';
-      const under = document.elementFromPoint(e.clientX, e.clientY);
-      ghost.style.display = '';
-      activeZone = under && under.closest(zoneSelector);
-      if (activeZone) activeZone.classList.add('drag-over');
+      updateActiveZone(e.clientX, e.clientY);
     }
 
     function onUp(e) {
@@ -1313,6 +1339,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
       el.classList.remove('dragging');
       if (activeZone) { activeZone.classList.remove('drag-over'); activeZone = null; }
       if (ghost) { ghost.remove(); ghost = null; }
+      if (autoScrollRAF) { cancelAnimationFrame(autoScrollRAF); autoScrollRAF = null; }
       dragging = false;
     }
     function cleanupListeners() {
