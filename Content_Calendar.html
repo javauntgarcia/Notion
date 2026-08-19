@@ -781,9 +781,10 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.05rem; font-weight: 400;
       color: var(--warm-white); flex: 1;
+      line-height: 1.3;
     }
 
-    .idea-platforms { display: flex; gap: 0.28rem; flex-wrap: wrap; flex-shrink: 0; }
+    .idea-platforms { display: flex; gap: 0.28rem; flex-wrap: wrap; }
 
     .platform-tag {
       font-family: 'DM Mono', monospace;
@@ -1795,6 +1796,12 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
           </a>
         </div>` : '';
 
+      const platformsSection = (idea.platforms && idea.platforms.length) ? `
+        <div>
+          <span class="body-label">Platforms</span>
+          <div class="idea-platforms">${platforms}</div>
+        </div>` : '';
+
       const shotsSection = idea.shots && idea.shots.length ? `
         <div>
           <span class="body-label">Shot List</span>
@@ -1805,10 +1812,10 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
         <div class="idea-header" onclick="toggleIdea('${bankId}', ${idx})">
           <svg class="idea-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           <span class="idea-title-text">${idea.title || 'Untitled'}</span>
-          <div class="idea-platforms">${platforms}</div>
         </div>
         <div class="idea-body">
           <div class="idea-body-inner">
+            ${platformsSection}
             ${urlHTML}
             ${shotsSection}
             <div class="idea-actions">
