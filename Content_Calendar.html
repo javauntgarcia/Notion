@@ -713,9 +713,23 @@
       line-height: 1.15;
     }
 
-    .idea-bank .ideas-list { padding: 0 1.1rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    /* Capped + scrollable so a category with lots of ideas doesn't grow
+       tall enough to swallow the whole screen — keeps every panel
+       reachable at once, which is what makes cross-category dragging
+       actually usable instead of requiring endless scrolling. */
+    .idea-bank .ideas-list {
+      padding: 0 1.1rem;
+      display: flex; flex-direction: column; gap: 0.55rem;
+      max-height: 420px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
     .idea-bank .ideas-add-bar { padding: 0.9rem 1.1rem 1.1rem; margin-top: 0; display: flex; justify-content: flex-end; }
     .idea-bank .empty-state { padding: 1.2rem 0 1.6rem; font-size: 0.56rem; }
+
+    @media (max-width: 700px) {
+      .idea-bank .ideas-list { max-height: 42vh; }
+    }
 
     .ideas-list { display: flex; flex-direction: column; gap: 0.7rem; }
 
