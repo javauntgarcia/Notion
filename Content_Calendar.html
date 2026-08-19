@@ -1765,6 +1765,24 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     renderBankIdeas(toBank);
   }
 
+  // Dragging an idea card directly onto a calendar day: like moveIdea,
+  // this removes the card from its category bank (it's a real move, not
+  // a copy) and turns it into a scheduled video on that day.
+  function moveIdeaToCalendar(bankId, idx, dayKey) {
+    const ideas = getBankIdeas(bankId);
+    const idea = ideas[idx];
+    if (!idea) return;
+    ideas.splice(idx, 1);
+
+    const cal = getCalData();
+    if (!cal[dayKey]) cal[dayKey] = [];
+    cal[dayKey].push({ title: idea.title, status: [] });
+
+    saveCal();
+    renderBankIdeas(bankId);
+    renderCalendar();
+  }
+
   /* ---- Idea Move Modal (tap-to-move fallback, doesn't require the
      source and target category to both be visible on screen) ---- */
   let _ideaMoveSrc = null; // { bankId, idx }
@@ -1879,10 +1897,15 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
         </div>`;
       enableDragReorder(card, {
         getPayload: () => ({ bankId, idx }),
-        zoneSelector: '.ideas-list',
+        zoneSelector: '.ideas-list, .day-col',
         onDrop: (zone, payload) => {
-          const toBank = zone.dataset.bank;
-          if (toBank && toBank !== payload.bankId) moveIdea(payload.bankId, payload.idx, toBank);
+          if (zone.classList.contains('ideas-list')) {
+            const toBank = zone.dataset.bank;
+            if (toBank && toBank !== payload.bankId) moveIdea(payload.bankId, payload.idx, toBank);
+          } else if (zone.classList.contains('day-col')) {
+            const toDay = zone.dataset.key;
+            if (toDay) moveIdeaToCalendar(payload.bankId, payload.idx, toDay);
+          }
         }
       });
       list.appendChild(card);
