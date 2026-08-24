@@ -162,7 +162,7 @@
 
   /* ── QUOTE / WORD ── */
   .quote-card {
-    grid-column: 1 / 3;
+    grid-column: 1 / 4;
     padding: 1.6rem 2rem;
   }
   .section-label {
@@ -215,70 +215,6 @@
     margin-top: 0.2rem;
     line-height: 1.5;
     max-width: 320px;
-  }
-
-  /* ── INVISALIGN TIMER ── */
-  .timer-card {
-    grid-column: 3 / 4;
-    padding: 1.4rem 1.6rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .timer-ring-wrap {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0.6rem 0;
-  }
-  .timer-svg { position: relative; }
-  .timer-track { fill: none; stroke: rgba(245,239,228,0.12); stroke-width: 6; }
-  .timer-fill {
-    fill: none;
-    stroke: #7DA0BC;
-    stroke-width: 6;
-    stroke-linecap: round;
-    stroke-dasharray: 220;
-    stroke-dashoffset: 55;
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
-    transition: stroke-dashoffset 1s ease;
-  }
-  .timer-center {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-  }
-  .timer-hh {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1A2530;
-    line-height: 1;
-  }
-  .timer-label { font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: #4A6A8A; opacity: 0.8; }
-  .timer-btns { display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap; }
-  .timer-btn {
-    padding: 0.3rem 0.8rem;
-    border-radius: 100px;
-    border: 1px solid rgba(74,106,138,0.3);
-    background: rgba(74,106,138,0.08);
-    color: #1A2530;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.55rem;
-    letter-spacing: 0.15em;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .timer-btn:hover { background: rgba(74,106,138,0.2); border-color: #4A6A8A; }
-  .timer-btn.active { background: #4A6A8A; border-color: #4A6A8A; color: #fff; }
-  .timer-liner {
-    font-size: 0.6rem;
-    color: #4A6A8A;
-    text-align: center;
-    margin-top: 0.3rem;
-    opacity: 0.9;
   }
 
   /* ── TO-DO ── */
@@ -840,7 +776,7 @@
   @media (max-width: 768px) {
     .hero-content { padding: 1.5rem 1.2rem 2rem; }
     .main-grid { grid-template-columns: 1fr; }
-    .quote-card, .timer-card, .todo-card, .goals-card, .nav-strip, .calendar-card, .ideal-day-card {
+    .quote-card, .todo-card, .goals-card, .nav-strip, .calendar-card, .ideal-day-card {
       grid-column: 1 / 2 !important;
     }
     .nav-strip { grid-template-columns: repeat(3, 1fr); }
@@ -901,31 +837,6 @@
           <button onclick="saveWord()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
         </div>
         <div style="margin-top:0.4rem;font-family:'DM Mono',monospace;font-size:0.48rem;letter-spacing:0.08em;min-height:1em;" id="hubSaveStatus"></div>
-      </div>
-
-      <!-- INVISALIGN LINER TRACKER -->
-      <div class="glass timer-card">
-        <div class="section-label">✦ Invisalign Tracker</div>
-        <div style="text-align:center;margin:0.8rem 0 0.4rem;">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:#1A2530;line-height:1;" id="linerBig">—</div>
-          <div style="font-size:0.52rem;letter-spacing:0.2em;text-transform:uppercase;color:#4A6A8A;margin-top:0.2rem;">Current Liner</div>
-        </div>
-        <div class="timer-liner" id="linerInfo">Liner #— · Day — of 10</div>
-        <div id="dayPips" style="display:flex;gap:4px;justify-content:center;margin:0.6rem 0;flex-wrap:wrap;"></div>
-        <div class="timer-btns" style="margin-top:0.6rem;">
-          <button class="timer-btn" onclick="nextLiner()">New Liner →</button>
-        </div>
-        <div style="margin-top:0.8rem;display:flex;gap:0.4rem;align-items:center;justify-content:center;flex-wrap:wrap;">
-          <span style="font-size:0.52rem;opacity:0.5;letter-spacing:0.1em;">LINER #</span>
-          <input id="linerNum" type="number" min="1" value="1" style="width:40px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:4px;padding:0.2rem 0.4rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:#1A2530;outline:none;text-align:center;" onchange="updateLinerLabel()"/>
-        </div>
-        <div style="margin-top:0.5rem;display:flex;gap:0.4rem;align-items:center;justify-content:center;flex-wrap:wrap;">
-          <span style="font-size:0.52rem;opacity:0.5;letter-spacing:0.1em;">DAY</span>
-          <input id="linerCurrentDay" type="number" min="1" value="1" style="width:40px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:4px;padding:0.2rem 0.4rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:#1A2530;outline:none;text-align:center;" onchange="updateCurrentDay()"/>
-          <span style="font-size:0.52rem;opacity:0.5;letter-spacing:0.1em;">OF</span>
-          <input id="linerCycleDays" type="number" min="1" value="10" style="width:40px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:4px;padding:0.2rem 0.4rem;font-family:'DM Mono',monospace;font-size:0.6rem;color:#1A2530;outline:none;text-align:center;" onchange="updateCycleDays()"/>
-          <span style="font-size:0.52rem;opacity:0.5;letter-spacing:0.1em;">DAYS</span>
-        </div>
       </div>
 
       <!-- TO-DO LIST -->
@@ -1266,7 +1177,7 @@ const local = {
 };
 
 // ── HUB STATE ──
-let hubData = { quote:'', quote_attr:'', word:'', word_def:'', todos:[], inv_liner:1, inv_cycle_start:'', inv_cycle_days:10, cal_events:[] };
+let hubData = { quote:'', quote_attr:'', word:'', word_def:'', todos:[], cal_events:[] };
 
 async function loadHub() {
   try {
@@ -1283,9 +1194,6 @@ async function loadHub() {
   hubData.word           = local.get('hub_wotw') || '';
   hubData.word_def       = local.get('hub_wotwdef') || '';
   hubData.todos          = JSON.parse(local.get('hub_todos') || '[]');
-  hubData.inv_liner      = parseInt(local.get('inv_liner')) || 1;
-  hubData.inv_cycle_start= local.get('inv_cycle_start') || '';
-  hubData.inv_cycle_days = parseInt(local.get('inv_cycle_days')) || 10;
   try { hubData.cal_events = JSON.parse(local.get('hub_cal_events') || '[]'); } catch(e) { hubData.cal_events = []; }
   applyHubToUI();
 }
@@ -1307,18 +1215,6 @@ function applyHubToUI() {
   if (hubData.word) syncWordToVocabulary(hubData.word, hubData.word_def);
   todos = hubData.todos || [];
   renderTodos();
-  if (hubData.inv_liner) {
-    document.getElementById('linerNum').value = hubData.inv_liner;
-    const cycleDaysEl = document.getElementById('linerCycleDays');
-    if (cycleDaysEl) cycleDaysEl.value = hubData.inv_cycle_days || 10;
-    // Re-render liner display now that the real value is loaded
-    const day = getCurrentDay();
-    const big = document.getElementById('linerBig');
-    if (big) big.textContent = '#' + hubData.inv_liner;
-    const info = document.getElementById('linerInfo');
-    if (info) info.textContent = 'Liner #' + hubData.inv_liner + ' · Day ' + day + ' of ' + (hubData.inv_cycle_days || 10);
-    renderDayPips(day);
-  }
   _calEvents = hubData.cal_events || [];
   renderWeekCalendar();
   // Also pull Monthly Outline native events and merge for display
@@ -1332,7 +1228,6 @@ function applyHubToUI() {
 // patches ONLY the column(s) it owns, in its own request:
 //   saveQuoteMeta()  → quote / quote_attr
 //   saveWordMeta()   → word / word_def
-//   saveLinerMeta()  → inv_liner / inv_cycle_start
 //   saveCalEventsAsync() → cal_events (awaited, reports save success/failure)
 //   saveTodosToHub() → todos
 //   Planning.html    → habits / last_seen / todos
@@ -1352,10 +1247,10 @@ async function patchHub(fields, statusElId) {
 }
 
 // Each widget saves ONLY the field(s) it owns, in its own request.
-// (Previously all of quote/word/liner/cal_events were bundled into one
+// (Previously all of quote/word/cal_events were bundled into one
 // request — if cal_events ever failed to serialize/save, it silently
-// took the word-of-week and Invisalign updates down with it. Splitting
-// them means a calendar hiccup can no longer block a word or liner save.)
+// took the word-of-week updates down with it. Splitting them means a
+// calendar hiccup can no longer block a word save.)
 async function saveQuoteMeta() {
   await patchHub({ quote: hubData.quote || '', quote_attr: hubData.quote_attr || '' }, 'hubSaveStatus');
   local.set('hub_quote', hubData.quote);
@@ -1411,16 +1306,6 @@ async function syncWordToVocabulary(word, def) {
   } catch(e) {
     console.warn('[Hub→Vocabulary sync]', e.message);
   }
-}
-async function saveLinerMeta() {
-  await patchHub({
-    inv_liner: hubData.inv_liner || 1,
-    inv_cycle_start: hubData.inv_cycle_start || '',
-    inv_cycle_days: hubData.inv_cycle_days || 10
-  });
-  local.set('inv_liner',       hubData.inv_liner);
-  local.set('inv_cycle_start', hubData.inv_cycle_start);
-  local.set('inv_cycle_days',  hubData.inv_cycle_days || 10);
 }
 // (Calendar saves now go through the awaitable saveCalEventsAsync(), which
 // reports success/failure to the on-page status indicator instead of
@@ -1784,111 +1669,6 @@ buildGoalCarousel();
 })();
 
 
-// ── INVISALIGN LINER TRACKER ──
-// Cycle length is per-liner (some aligners are prescribed 20 days, most
-// are 10) rather than a fixed constant, so it's stored as inv_cycle_days
-// on the main_hub row and editable per liner.
-const DEFAULT_CYCLE_DAYS = 10;
-
-function getCycleDays() {
-  return hubData.inv_cycle_days || DEFAULT_CYCLE_DAYS;
-}
-
-function getCycleStart() {
-  let s = hubData.inv_cycle_start;
-  if (!s) {
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-    s = twoDaysAgo.toDateString();
-    hubData.inv_cycle_start = s;
-    saveLinerMeta();
-  }
-  return new Date(s);
-}
-
-function getCurrentDay() {
-  const start = getCycleStart();
-  const today = new Date();
-  const diff = Math.floor((today - start) / 86400000);
-  return Math.min(diff + 1, getCycleDays());
-}
-
-function renderDayPips(currentDay) {
-  const wrap = document.getElementById('dayPips');
-  wrap.innerHTML = '';
-  const total = getCycleDays();
-  for (let i = 1; i <= total; i++) {
-    const pip = document.createElement('div');
-    pip.style.cssText = `width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(245,239,228,0.3);background:${i<currentDay?'#4A6A8A':i===currentDay?'#C8D8E2':'transparent'};box-shadow:${i===currentDay?'0 0 6px rgba(200,216,226,0.5)':'none'};transition:background 0.3s;cursor:default;`;
-    pip.title = `Day ${i}`;
-    wrap.appendChild(pip);
-  }
-}
-
-// Recomputes and re-renders "Day X of N" from the stored start date and
-// cycle length — a calendar calculation, not a live-ticking timer. Safe
-// to call anytime (e.g. after the tab's been open a while) to make sure
-// the displayed day reflects today's actual date.
-function refreshLinerDisplay() {
-  if (!hubData.inv_liner) return;
-  const day = getCurrentDay();
-  const info = document.getElementById('linerInfo');
-  if (info) info.textContent = 'Liner #' + hubData.inv_liner + ' · Day ' + day + ' of ' + getCycleDays();
-  renderDayPips(day);
-}
-
-function updateLinerLabel() {
-  const num = document.getElementById('linerNum').value;
-  const day = getCurrentDay();
-  document.getElementById('linerInfo').textContent = `Liner #${num} · Day ${day} of ${getCycleDays()}`;
-  const big = document.getElementById('linerBig');
-  if (big) big.textContent = '#' + num;
-  hubData.inv_liner = parseInt(num);
-  saveLinerMeta();
-  renderDayPips(day);
-}
-
-// Lets you set the aligner's total wear length (e.g. 20 days instead of
-// the usual 10) without changing the liner number or start date.
-function updateCycleDays() {
-  const el = document.getElementById('linerCycleDays');
-  const val = parseInt(el.value) || DEFAULT_CYCLE_DAYS;
-  hubData.inv_cycle_days = val;
-  saveLinerMeta();
-  refreshLinerDisplay();
-}
-
-// Lets you directly declare "I'm on day N" (e.g. day 2) instead of
-// hunting for a date picker — backs out the start date from today minus
-// (N - 1) days so getCurrentDay() reports the right number going forward.
-function updateCurrentDay() {
-  const el = document.getElementById('linerCurrentDay');
-  const day = Math.max(1, parseInt(el.value) || 1);
-  const start = new Date();
-  start.setDate(start.getDate() - (day - 1));
-  hubData.inv_cycle_start = start.toDateString();
-  saveLinerMeta();
-  refreshLinerDisplay();
-}
-
-function nextLiner() {
-  hubData.inv_cycle_start = new Date().toDateString();
-  hubData.inv_cycle_days = DEFAULT_CYCLE_DAYS; // subsequent liners default to 10 days
-  const n = document.getElementById('linerNum');
-  n.value = +n.value + 1;
-  hubData.inv_liner = parseInt(n.value);
-  const cycleDaysEl = document.getElementById('linerCycleDays');
-  if (cycleDaysEl) cycleDaysEl.value = DEFAULT_CYCLE_DAYS;
-  const currentDayEl = document.getElementById('linerCurrentDay');
-  if (currentDayEl) currentDayEl.value = 1;
-  saveLinerMeta();
-  updateLinerLabel();
-}
-
-setInterval(refreshLinerDisplay, 60 * 1000);
-
-// Init liner tracker — called inside applyHubToUI() after data loads
-
 // ── WEEKLY CALENDAR ──
 let _calEvents = [];
 function loadCalEvents() { return _calEvents; }
@@ -1932,6 +1712,59 @@ async function syncEventsToMonthlyOutline(hubEvts) {
 const HOURS = Array.from({length: 24}, (_, i) => i); // full day, 12am–11pm
 const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── EVENT COLOR CODING ──
+// A named palette (drawn from the page's own accent colors) that the
+// person picks from when adding an event. The last-used swatch is
+// remembered locally so repeated adds of the same kind of event (e.g.
+// several "Work" blocks in a row) don't require reselecting each time.
+const EVENT_COLORS = [
+  { hex: '#4A6A8A', name: 'Denim' },
+  { hex: '#7DA0BC', name: 'Sky' },
+  { hex: '#6B8C6E', name: 'Sage' },
+  { hex: '#9AB89C', name: 'Mint' },
+  { hex: '#6B7F8E', name: 'Slate' },
+  { hex: '#3A5878', name: 'Navy' },
+  { hex: '#C4622D', name: 'Rust' },
+  { hex: '#8B5FA3', name: 'Plum' },
+  { hex: '#B5657A', name: 'Rose' }
+];
+let selectedEvtColor = local.get('cal_last_color') || EVENT_COLORS[0].hex;
+
+// Called from the swatch row in the Add Event form. Updates the picker
+// selection directly via the DOM (rather than a full renderWeekCalendar)
+// so the title/date/hour fields the person has already filled in aren't
+// wiped out by a re-render.
+function setEvtColor(hex, el) {
+  selectedEvtColor = hex;
+  local.set('cal_last_color', hex);
+  const row = el.parentElement;
+  Array.from(row.children).forEach(function(c) { c.style.boxShadow = 'none'; c.style.transform = 'scale(1)'; });
+  el.style.boxShadow = '0 0 0 2px #fff, 0 0 0 3.5px ' + hex;
+  el.style.transform = 'scale(1.15)';
+}
+
+function evtColorSwatchesHtml() {
+  return EVENT_COLORS.map(function(c) {
+    const active = c.hex === selectedEvtColor;
+    return '<div onclick="setEvtColor(\'' + c.hex + '\', this)" title="' + c.name + '" style="width:15px;height:15px;border-radius:50%;background:' + c.hex + ';cursor:pointer;flex-shrink:0;transition:transform 0.15s;' +
+      (active ? 'box-shadow:0 0 0 2px #fff, 0 0 0 3.5px ' + c.hex + ';transform:scale(1.15);' : '') + '"></div>';
+  }).join('');
+}
+
+// Right-click on an event block cycles it to the next palette color —
+// deliberately a separate gesture from the left-click delete so the two
+// never collide.
+async function recolorCalEvent(id) {
+  const evts = loadCalEvents();
+  const ev = evts.find(function(e) { return e.id === id; });
+  if (!ev) return;
+  const idx = EVENT_COLORS.findIndex(function(c) { return c.hex === ev.color; });
+  const next = EVENT_COLORS[(idx + 1) % EVENT_COLORS.length];
+  ev.color = next.hex;
+  await saveCalEventsAsync(evts);
+  renderWeekCalendar();
+}
 
 // Correct 12-hour label for any hour 0–23 (0 = 12a, 12 = 12p). The old
 // label logic only ever saw hours 4–24 and mislabeled the midnight row
@@ -2025,9 +1858,6 @@ function renderWeekCalendar() {
     days.push(d);
   }
 
-  // Color palette for events
-  const colors = ['#4A6A8A','#6B8C6E','#7DA0BC','#9AB89C','#6B7F8E','#5A7A8A','#3A5878'];
-
   let html = '<div style="display:grid;grid-template-columns:38px repeat(7,1fr);gap:0;border:1px solid rgba(74,106,138,0.18);border-radius:8px;overflow:hidden;font-size:0.52rem;">';
 
   // Header row
@@ -2050,37 +1880,86 @@ function renderWeekCalendar() {
     const dayAllDay = allDayEvts.filter(function(e){ return e.date === dk; });
     html += '<div style="border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.12);padding:0.2rem;min-height:22px;background:rgba(74,106,138,0.02);">';
     dayAllDay.forEach(function(e) {
-      html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="deleteCalEvent(\'' + e.id + '\')" title="Click to remove: ' + e.title + '">' + e.title + '</div>';
+      html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="deleteCalEvent(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="Click to remove · right-click to recolor: ' + e.title + '">' + e.title + '</div>';
     });
     html += '</div>';
   });
 
-  // Hour rows
+  // Hour rows — just the background cells here. Events are rendered
+  // afterward as their own grid items (see below) so a single event can
+  // span the grid rows for its full duration instead of only appearing
+  // in the hour it starts.
   HOURS.forEach(function(h) {
     html += '<div style="padding:0.25rem 0.3rem 0 0;text-align:right;color:#4A6A8A;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(74,106,138,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
     days.forEach(function(d) {
       const dk = dateKey(d);
       const isToday = dk === today;
-      // Normal same-day events starting this hour
-      const hourEvts = evts.filter(function(e){ return e.date===dk && !e.allDay && !e.overnight && parseInt(e.startH)===h; });
-      // Overnight events: the START segment shows on their own date at startH
-      const overnightStarts = evts.filter(function(e){ return e.date===dk && !e.allDay && e.overnight && parseInt(e.startH)===h; });
-      // Overnight events: the END segment shows on the FOLLOWING date at hour 0
-      const overnightEnds = evts.filter(function(e){ return !e.allDay && e.overnight && h === 0 && addDaysToKey(e.date, 1) === dk; });
-
       html += '<div style="border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.07);min-height:28px;background:' +
         (isToday ? 'rgba(74,106,138,0.04)' : 'transparent') +
-        ';position:relative;padding:1px 2px;" ondblclick="quickAddEvent(\'' + dk + '\',' + h + ')">';
-      hourEvts.forEach(function(e) {
-        html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;position:absolute;left:2px;right:2px;top:1px;z-index:2;" onclick="deleteCalEvent(\'' + e.id + '\')" title="Click to remove: ' + e.title + '">' + e.title + '</div>';
+        ';" ondblclick="quickAddEvent(\'' + dk + '\',' + h + ')"></div>';
+    });
+  });
+
+  // Event blocks — one grid item per event (or per overnight segment),
+  // explicitly placed by grid-row/grid-column so it visually blocks out
+  // its entire start→end span rather than just its starting hour. When
+  // two or more events overlap in time on the same day, they're laid
+  // out side-by-side (in lanes) instead of stacking on top of each other.
+  days.forEach(function(d, dayIdx) {
+    const dk = dateKey(d);
+    const segs = [];
+    evts.forEach(function(e) {
+      if (e.allDay) return;
+      const startH = parseInt(e.startH), endH = parseInt(e.endH);
+      if (e.overnight) {
+        if (e.date === dk) segs.push({ ev: e, startH: startH, endH: 24, kind: 'start' });
+        if (addDaysToKey(e.date, 1) === dk) segs.push({ ev: e, startH: 0, endH: endH, kind: 'end' });
+      } else if (e.date === dk) {
+        segs.push({ ev: e, startH: startH, endH: endH, kind: 'normal' });
+      }
+    });
+    if (!segs.length) return;
+
+    // Sort by start time, then group into clusters of mutually-overlapping
+    // segments, then greedily assign each segment a lane within its
+    // cluster so overlapping segments sit in separate side-by-side lanes.
+    segs.sort(function(a, b) { return a.startH - b.startH || a.endH - b.endH; });
+    const clusters = [];
+    let current = [], clusterEnd = -Infinity;
+    segs.forEach(function(seg) {
+      if (current.length && seg.startH >= clusterEnd) { clusters.push(current); current = []; clusterEnd = -Infinity; }
+      current.push(seg);
+      clusterEnd = Math.max(clusterEnd, seg.endH);
+    });
+    if (current.length) clusters.push(current);
+
+    clusters.forEach(function(cluster) {
+      const laneEnds = [];
+      cluster.forEach(function(seg) {
+        let lane = laneEnds.findIndex(function(end) { return end <= seg.startH; });
+        if (lane === -1) { lane = laneEnds.length; laneEnds.push(seg.endH); }
+        else { laneEnds[lane] = seg.endH; }
+        seg.lane = lane;
       });
-      overnightStarts.forEach(function(e) {
-        html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;position:absolute;left:2px;right:2px;top:1px;z-index:2;" onclick="deleteCalEvent(\'' + e.id + '\')" title="Overnight: ' + hourLabel(e.startH) + ' → ' + hourLabel(e.endH) + ' next day. Click to remove: ' + e.title + '">🌙 ' + e.title + '</div>';
-      });
-      overnightEnds.forEach(function(e) {
-        html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;position:absolute;left:2px;right:2px;top:1px;z-index:2;opacity:0.85;" onclick="deleteCalEvent(\'' + e.id + '\')" title="Overnight from ' + hourLabel(e.startH) + ' the night before, ends ' + hourLabel(e.endH) + '. Click to remove: ' + e.title + '">↳ ' + e.title + ' ends ' + hourLabel(e.endH) + '</div>';
-      });
-      html += '</div>';
+      cluster.forEach(function(seg) { seg.lanes = laneEnds.length; });
+    });
+
+    const colStart = 2 + dayIdx;
+    segs.forEach(function(seg) {
+      const e = seg.ev;
+      const rowStart = 3 + seg.startH;
+      const rowEnd = 3 + seg.endH;
+      const widthPct = 100 / seg.lanes;
+      const leftPct = seg.lane * widthPct;
+      let prefix = '', suffix = '', title = 'Click to remove · right-click to recolor: ' + e.title;
+      if (seg.kind === 'start') { prefix = '🌙 '; title = 'Overnight: ' + hourLabel(e.startH) + ' → ' + hourLabel(e.endH) + ' next day. Click to remove · right-click to recolor: ' + e.title; }
+      if (seg.kind === 'end') { prefix = '↳ '; suffix = ' ends ' + hourLabel(e.endH); title = 'Overnight from ' + hourLabel(e.startH) + ' the night before, ends ' + hourLabel(e.endH) + '. Click to remove · right-click to recolor: ' + e.title; }
+      const showTimeLabel = (seg.endH - seg.startH) >= 2;
+
+      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';position:relative;left:' + leftPct + '%;width:calc(' + widthPct + '% - 3px);box-sizing:border-box;margin:1px 0 0 1px;background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.15rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;overflow:hidden;z-index:2;" onclick="deleteCalEvent(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="' + title + '">' +
+        '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + prefix + e.title + suffix + '</div>' +
+        (showTimeLabel ? '<div style="opacity:0.8;font-size:0.42rem;margin-top:1px;">' + hourLabel(seg.startH) + '–' + hourLabel(seg.endH) + '</div>' : '') +
+        '</div>';
     });
   });
 
@@ -2098,6 +1977,10 @@ function renderWeekCalendar() {
     '</select>' +
     '<label style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" onchange="if(this.checked)document.getElementById(\'calEvtOvernight\').checked=false;" style="width:10px;height:10px;" /> All-day</label>' +
     '<label style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;" title="Ends the next calendar day, e.g. 8p–6a"><input type="checkbox" id="calEvtOvernight" onchange="if(this.checked)document.getElementById(\'calEvtAllDay\').checked=false;" style="width:10px;height:10px;" /> 🌙 Overnight</label>' +
+    '<div style="display:flex;align-items:center;gap:5px;">' +
+    '<span style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;">COLOR</span>' +
+    '<div style="display:flex;gap:5px;">' + evtColorSwatchesHtml() + '</div>' +
+    '</div>' +
     '<button onclick="addCalEvent()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
     '</div>';
 
@@ -2139,7 +2022,6 @@ async function addCalEvent() {
     return;
   }
   const evts = loadCalEvents();
-  const colors = ['#4A6A8A','#6B8C6E','#7DA0BC','#9AB89C','#6B7F8E'];
   const allDay = document.getElementById('calEvtAllDay').checked;
   const overnight = !allDay && document.getElementById('calEvtOvernight').checked;
   const startH = parseInt(document.getElementById('calEvtStart').value);
@@ -2156,7 +2038,7 @@ async function addCalEvent() {
     allDay: allDay,
     overnight: isOvernight,
     title: title,
-    color: colors[evts.length % colors.length],
+    color: selectedEvtColor,
     cat: 'events',
     notes: '',
     hubNative: true
@@ -2210,11 +2092,10 @@ async function quickAddEvent(dateStr, hour) {
   if (!title || !title.trim()) return;
   const statusEl = document.getElementById('calSaveStatus');
   const evts = loadCalEvents();
-  const colors = ['#4A6A8A','#6B8C6E','#7DA0BC','#9AB89C','#6B7F8E'];
   evts.push({
     id: Date.now() + '' + Math.floor(Math.random()*1000),
     date: dateStr, startH: hour, endH: hour+1, allDay: false, overnight: false,
-    title: title.trim(), color: colors[evts.length % colors.length],
+    title: title.trim(), color: selectedEvtColor,
     cat: 'events', notes: '', hubNative: true
   });
   if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
@@ -2339,17 +2220,6 @@ refreshHabitInsights();
 setInterval(refreshHabitInsights, 30000);
 
 renderWeekCalendar();
-// Cold-start liner render (overwritten by applyHubToUI once Supabase data loads)
-(function() {
-  var day = getCurrentDay();
-  var big = document.getElementById('linerBig');
-  var num = document.getElementById('linerNum');
-  var info = document.getElementById('linerInfo');
-  var linerVal = (num ? parseInt(num.value) : 1) || 1;
-  if (big) big.textContent = '#' + linerVal;
-  if (info) info.textContent = 'Liner #' + linerVal + ' · Day ' + day + ' of ' + getCycleDays();
-  renderDayPips(day);
-})();
 </script>
 </body>
 </html>
