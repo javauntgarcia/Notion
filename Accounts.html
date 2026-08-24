@@ -605,14 +605,14 @@ const ACCOUNTS = [
     institution: 'Wells Fargo / BILT',
     name: 'BILT Mastercard',
     type: 'credit',
-    balance: 3613.19,
+    balance: 3277.81,
     apr: '',
     creditLine: null,
     points: 120400,
     pointsLabel: 'BILT Points',
     notes: 'Rent rewards card',
     meta: [
-      { label: 'Balance Owed', val: '$3,613.19', cls: 'neg' },
+      { label: 'Balance Owed', val: '$3,277.81', cls: 'neg' },
       { label: 'BILT Points', val: '120,400 pts', cls: 'highlight' },
       { label: 'Status', val: 'Active', cls: '' },
     ]
@@ -622,14 +622,14 @@ const ACCOUNTS = [
     institution: 'Chase',
     name: 'Sapphire Preferred',
     type: 'credit',
-    balance: 0,
+    balance: 1489.94,
     apr: '26.49%',
     creditLine: 21900,
     points: 64914,
     pointsLabel: 'Ultimate Rewards',
-    notes: 'Paid in full in July · $263.32 credit carried to Aug',
+    notes: 'Aug charges incl. flight ($1,523.60, Eston covering $350)',
     meta: [
-      { label: 'Balance Owed', val: '$0.00 · $263.32 credit', cls: 'pos' },
+      { label: 'Balance Owed', val: '$1,489.94', cls: 'neg' },
       { label: 'UR Points', val: '64,914 pts', cls: 'highlight' },
       { label: 'Credit Line', val: '$21,900', cls: '' },
     ]
@@ -655,12 +655,12 @@ const ACCOUNTS = [
     institution: 'Chase',
     name: 'Total Checking',
     type: 'checking',
-    balance: 612.05,
+    balance: 240.85,
     apr: '',
     creditLine: null,
     notes: 'Primary spending hub',
     meta: [
-      { label: 'Balance', val: '$612.05', cls: 'pos' },
+      { label: 'Balance', val: '$240.85', cls: 'pos' },
       { label: 'Role', val: 'Primary Hub', cls: 'highlight' },
       { label: 'Account', val: '****1345', cls: '' },
     ]
@@ -670,12 +670,12 @@ const ACCOUNTS = [
     institution: 'Chase',
     name: 'Savings Account',
     type: 'savings',
-    balance: 157.03,
+    balance: 216.82,
     apr: '0.00%',
     creditLine: null,
     notes: 'Buffer / transit account',
     meta: [
-      { label: 'Balance', val: '$157.03', cls: '' },
+      { label: 'Balance', val: '$216.82', cls: '' },
       { label: 'APY', val: '0.01%', cls: '' },
       { label: 'Role', val: 'Transit Buffer', cls: '' },
     ]
@@ -686,12 +686,12 @@ const ACCOUNTS = [
     institution: 'Wealthfront',
     name: 'Joint Rent Savings',
     type: 'joint',
-    balance: 2058.22,
+    balance: 4073.64,
     apr: '~4.5% APY',
     creditLine: null,
     notes: 'Shared with partner · Rent fund',
     meta: [
-      { label: 'Balance', val: '$2,058.22', cls: 'pos' },
+      { label: 'Balance', val: '$4,073.64', cls: 'pos' },
       { label: 'APY', val: '~4.5%', cls: 'pos' },
       { label: 'Type', val: 'Joint', cls: '' },
     ]
@@ -701,12 +701,12 @@ const ACCOUNTS = [
     institution: 'Wealthfront',
     name: 'Personal Cash Account',
     type: 'savings',
-    balance: 301.89,
+    balance: 528.20,
     apr: '~4.5% APY',
     creditLine: null,
     notes: 'Depop earnings included',
     meta: [
-      { label: 'Balance', val: '$301.89', cls: 'pos' },
+      { label: 'Balance', val: '$528.20', cls: 'pos' },
       { label: 'APY', val: '~4.5%', cls: 'pos' },
       { label: 'Type', val: 'Individual', cls: '' },
     ]
@@ -817,10 +817,10 @@ document.getElementById('invest-grid').innerHTML  = investAccts.map(buildCard).j
 // ── ALLOCATION BAR ──
 const allocCategories = [
   { label: 'Vanguard IRA', val: 18193.10, color: '#c9a27e' },
-  { label: 'WF Joint',     val: 2058.22,  color: '#c9b97e' },
-  { label: 'WF Personal',  val: 301.89,   color: '#b8c97e' },
-  { label: 'Chase Checking',val: 612.05, color: '#7e9ab8' },
-  { label: 'Chase Savings', val: 157.03,   color: '#7eb8b8' },
+  { label: 'WF Joint',     val: 4073.64,  color: '#c9b97e' },
+  { label: 'WF Personal',  val: 528.20,   color: '#b8c97e' },
+  { label: 'Chase Checking',val: 240.85, color: '#7e9ab8' },
+  { label: 'Chase Savings', val: 216.82,   color: '#7eb8b8' },
 ];
 const allocTotal = allocCategories.reduce((s, c) => s + c.val, 0);
 const barEl   = document.getElementById('alloc-bar');

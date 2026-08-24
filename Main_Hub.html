@@ -152,6 +152,59 @@
     border-radius: 12px;
   }
 
+  /* ── EVENT EDITOR MODAL ── */
+  .evt-editor-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(26,37,48,0.45);
+    backdrop-filter: blur(3px);
+    align-items: center; justify-content: center;
+    padding: 1rem;
+  }
+  .evt-editor-overlay.open { display: flex; }
+  .evt-editor-card {
+    background: #FBF9F5;
+    border: 1px solid rgba(74,106,138,0.22);
+    border-radius: 12px;
+    padding: 1.4rem 1.5rem;
+    width: 100%; max-width: 360px;
+    box-shadow: 0 12px 40px rgba(26,37,48,0.35);
+    font-family: 'DM Mono', monospace;
+  }
+  .evt-editor-card .section-label { margin-bottom: 1rem; }
+  .evt-editor-field { margin-bottom: 0.6rem; }
+  .evt-editor-field input[type="text"],
+  .evt-editor-field input[type="date"],
+  .evt-editor-field select {
+    width: 100%; box-sizing: border-box;
+    background: rgba(74,106,138,0.07); border: 1px solid rgba(74,106,138,0.2);
+    border-radius: 6px; padding: 0.4rem 0.6rem;
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #1A2530;
+    outline: none; letter-spacing: 0.04em;
+  }
+  .evt-editor-row { display: flex; gap: 0.5rem; }
+  .evt-editor-row > div { flex: 1; }
+  .evt-editor-label {
+    font-size: 0.48rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #4A6A8A; opacity: 0.75; margin-bottom: 0.25rem;
+  }
+  .evt-editor-checks {
+    display: flex; gap: 1rem; margin: 0.7rem 0; font-size: 0.5rem;
+    color: #4A6A8A; letter-spacing: 0.08em;
+  }
+  .evt-editor-checks label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+  .evt-editor-actions {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 1rem; gap: 0.5rem;
+  }
+  .evt-editor-btn {
+    font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em;
+    border-radius: 6px; padding: 0.4rem 0.85rem; cursor: pointer;
+  }
+  .evt-editor-btn.save { background: #4A6A8A; border: 1px solid #4A6A8A; color: #fff; }
+  .evt-editor-btn.cancel { background: transparent; border: 1px solid rgba(74,106,138,0.3); color: #4A6A8A; }
+  .evt-editor-btn.delete { background: transparent; border: 1px solid rgba(176,80,80,0.4); color: #b05050; }
+
   /* ── GRID LAYOUT ── */
   .main-grid {
     display: grid;
@@ -819,6 +872,11 @@
         <p class="quote-text" id="quoteText" style="opacity:0.3;font-style:italic;">No quote set yet — add one below.</p>
         <p class="quote-attr" id="quoteAttr"></p>
 
+        <div style="margin-top:0.9rem;padding-top:0.9rem;border-top:1px solid rgba(74,106,138,0.14);">
+          <p class="quote-text" id="quoteText2" style="opacity:0.3;font-style:italic;">No second quote set yet — add one below.</p>
+          <p class="quote-attr" id="quoteAttr2"></p>
+        </div>
+
         <div style="margin-top:1.2rem;">
           <div class="section-label">✦ Word of the Week</div>
           <div class="word-pill" id="wotwPill" style="opacity:0.3;">Word · Week —</div>
@@ -829,6 +887,11 @@
         <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
           <input id="quoteIn" style="flex:1;min-width:140px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Edit quote…" />
           <input id="attrIn" style="flex:1;min-width:100px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="— Attribution" />
+          <button onclick="saveQuote()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
+        </div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input id="quoteIn2" style="flex:1;min-width:140px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Edit second quote…" />
+          <input id="attrIn2" style="flex:1;min-width:100px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="— Attribution" />
           <button onclick="saveQuote()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
         </div>
         <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
@@ -936,6 +999,46 @@
             <div class="section-label" style="margin-bottom:0.5rem;">✦ Weekly Look</div>
             <div class="week-look-sub" id="weekLookSub">Loading…</div>
             <div class="week-chart" id="weekChart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENT EDITOR MODAL — opened by clicking any Weekly Outline event -->
+      <div class="evt-editor-overlay" id="evtEditorOverlay" onclick="if(event.target===this)closeEventEditor()">
+        <div class="evt-editor-card">
+          <div class="section-label">✦ Edit Event</div>
+          <div class="evt-editor-field">
+            <div class="evt-editor-label">Title</div>
+            <input type="text" id="evtEdTitle" />
+          </div>
+          <div class="evt-editor-field">
+            <div class="evt-editor-label">Date</div>
+            <input type="date" id="evtEdDate" />
+          </div>
+          <div class="evt-editor-row evt-editor-field" id="evtEdTimeRow">
+            <div>
+              <div class="evt-editor-label">Start</div>
+              <select id="evtEdStart"></select>
+            </div>
+            <div>
+              <div class="evt-editor-label">End</div>
+              <select id="evtEdEnd"></select>
+            </div>
+          </div>
+          <div class="evt-editor-checks">
+            <label><input type="checkbox" id="evtEdAllDay" onchange="if(this.checked)document.getElementById('evtEdOvernight').checked=false; document.getElementById('evtEdTimeRow').style.display=this.checked?'none':'flex';" /> All-day</label>
+            <label><input type="checkbox" id="evtEdOvernight" onchange="if(this.checked)document.getElementById('evtEdAllDay').checked=false;" /> 🌙 Overnight</label>
+          </div>
+          <div class="evt-editor-field">
+            <div class="evt-editor-label">Color</div>
+            <div style="display:flex;gap:6px;" id="evtEdColorRow"></div>
+          </div>
+          <div class="evt-editor-actions">
+            <button class="evt-editor-btn delete" onclick="deleteEventFromEditor()">Delete</button>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="evt-editor-btn cancel" onclick="closeEventEditor()">Cancel</button>
+              <button class="evt-editor-btn save" onclick="saveEventEditor()">Save</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1177,7 +1280,12 @@ const local = {
 };
 
 // ── HUB STATE ──
-let hubData = { quote:'', quote_attr:'', word:'', word_def:'', todos:[], cal_events:[] };
+let hubData = { quote:'', quote_attr:'', quote2:'', quote2_attr:'', word:'', word_def:'', todos:[], cal_events:[] };
+
+// This week's second quote — added alongside the existing Quote of the
+// Week (Kaveh Akbar). Seeded once below if no quote2 has been saved yet.
+const DEFAULT_QUOTE2 = "My God, I just remembered that we die, But—but me too?! Don't forget that for now, it's strawberry season.";
+const DEFAULT_QUOTE2_ATTR = 'Clarice Lispector';
 
 async function loadHub() {
   try {
@@ -1185,17 +1293,29 @@ async function loadHub() {
     if (row) {
       hubData = { ...hubData, ...row };
       applyHubToUI();
+      seedQuote2IfMissing();
       return;
     }
   } catch(e) {}
   // Fallback to localStorage
   hubData.quote          = local.get('hub_quote') || '';
   hubData.quote_attr     = local.get('hub_attr') || '';
+  hubData.quote2         = local.get('hub_quote2') || '';
+  hubData.quote2_attr    = local.get('hub_attr2') || '';
   hubData.word           = local.get('hub_wotw') || '';
   hubData.word_def       = local.get('hub_wotwdef') || '';
   hubData.todos          = JSON.parse(local.get('hub_todos') || '[]');
   try { hubData.cal_events = JSON.parse(local.get('hub_cal_events') || '[]'); } catch(e) { hubData.cal_events = []; }
   applyHubToUI();
+  seedQuote2IfMissing();
+}
+
+async function seedQuote2IfMissing() {
+  if (hubData.quote2) return;
+  hubData.quote2 = DEFAULT_QUOTE2;
+  hubData.quote2_attr = DEFAULT_QUOTE2_ATTR;
+  applyHubToUI();
+  await saveQuoteMeta();
 }
 
 function applyHubToUI() {
@@ -1205,6 +1325,13 @@ function applyHubToUI() {
   }
   if (hubData.quote_attr) document.getElementById('quoteAttr').textContent = hubData.quote_attr;
   if (hubData.quote) syncQuoteToVocabulary(hubData.quote, hubData.quote_attr);
+  if (hubData.quote2) {
+    const el2 = document.getElementById('quoteText2');
+    el2.textContent = hubData.quote2; el2.style.opacity = ''; el2.style.fontStyle = '';
+    el2.parentElement.style.display = '';
+  }
+  if (hubData.quote2_attr) document.getElementById('quoteAttr2').textContent = hubData.quote2_attr;
+  if (hubData.quote2) syncQuoteToVocabulary(hubData.quote2, hubData.quote2_attr);
   if (hubData.word) {
     const wEl = document.getElementById('wotw');
     const pEl = document.getElementById('wotwPill');
@@ -1252,9 +1379,14 @@ async function patchHub(fields, statusElId) {
 // took the word-of-week updates down with it. Splitting them means a
 // calendar hiccup can no longer block a word save.)
 async function saveQuoteMeta() {
-  await patchHub({ quote: hubData.quote || '', quote_attr: hubData.quote_attr || '' }, 'hubSaveStatus');
+  await patchHub({
+    quote: hubData.quote || '', quote_attr: hubData.quote_attr || '',
+    quote2: hubData.quote2 || '', quote2_attr: hubData.quote2_attr || ''
+  }, 'hubSaveStatus');
   local.set('hub_quote', hubData.quote);
   local.set('hub_attr',  hubData.quote_attr);
+  local.set('hub_quote2', hubData.quote2);
+  local.set('hub_attr2',  hubData.quote2_attr);
 }
 
 // Keeps the Vocabulary List's "Quotes of the Week" tab in sync with
@@ -1328,8 +1460,22 @@ function saveQuote() {
   if (a) { document.getElementById('quoteAttr').textContent = a; hubData.quote_attr = a; }
   document.getElementById('quoteIn').value = '';
   document.getElementById('attrIn').value = '';
+
+  const q2 = document.getElementById('quoteIn2').value.trim();
+  const a2 = document.getElementById('attrIn2').value.trim();
+  if (q2) {
+    const el2 = document.getElementById('quoteText2');
+    el2.textContent = q2; el2.style.opacity = ''; el2.style.fontStyle = '';
+    el2.parentElement.style.display = '';
+    hubData.quote2 = q2;
+  }
+  if (a2) { document.getElementById('quoteAttr2').textContent = a2; hubData.quote2_attr = a2; }
+  document.getElementById('quoteIn2').value = '';
+  document.getElementById('attrIn2').value = '';
+
   saveQuoteMeta();
   if (hubData.quote) syncQuoteToVocabulary(hubData.quote, hubData.quote_attr);
+  if (hubData.quote2) syncQuoteToVocabulary(hubData.quote2, hubData.quote2_attr);
 }
 function saveWord() {
   const wIn = document.getElementById('wotwIn').value.trim();
@@ -1766,6 +1912,98 @@ async function recolorCalEvent(id) {
   renderWeekCalendar();
 }
 
+// ── EVENT EDITOR MODAL ──
+// Clicking an event now opens this editor (instead of deleting it
+// outright). Delete is still available as an explicit button inside.
+let _editingEvtId = null;
+
+function openEventEditor(id) {
+  const ev = loadCalEvents().find(function(e) { return e.id === id; });
+  if (!ev) return;
+  _editingEvtId = id;
+
+  const startSel = document.getElementById('evtEdStart');
+  const endSel = document.getElementById('evtEdEnd');
+  startSel.innerHTML = HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('');
+  endSel.innerHTML = HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('');
+
+  document.getElementById('evtEdTitle').value = ev.title || '';
+  document.getElementById('evtEdDate').value = ev.date || '';
+  startSel.value = ev.startH != null ? ev.startH : 9;
+  // endH is stored exclusive (e.g. a 9a–10a event has endH 10); the
+  // selector shows inclusive hour labels like the Add Event form does,
+  // so step back by 1 for display and re-add it on save.
+  endSel.value = ev.endH != null ? Math.max(0, ev.endH - 1) : 10;
+  document.getElementById('evtEdAllDay').checked = !!ev.allDay;
+  document.getElementById('evtEdOvernight').checked = !!ev.overnight;
+  document.getElementById('evtEdTimeRow').style.display = ev.allDay ? 'none' : 'flex';
+
+  const colorRow = document.getElementById('evtEdColorRow');
+  colorRow.innerHTML = EVENT_COLORS.map(function(c) {
+    const active = c.hex === (ev.color || EVENT_COLORS[0].hex);
+    return '<div onclick="setEvtEdColor(\'' + c.hex + '\', this)" title="' + c.name + '" style="width:15px;height:15px;border-radius:50%;background:' + c.hex + ';cursor:pointer;flex-shrink:0;transition:transform 0.15s;' +
+      (active ? 'box-shadow:0 0 0 2px #fff, 0 0 0 3.5px ' + c.hex + ';transform:scale(1.15);' : '') + '"></div>';
+  }).join('');
+  colorRow.dataset.selected = ev.color || EVENT_COLORS[0].hex;
+
+  document.getElementById('evtEditorOverlay').classList.add('open');
+}
+
+function setEvtEdColor(hex, el) {
+  const row = el.parentElement;
+  row.dataset.selected = hex;
+  Array.from(row.children).forEach(function(c) { c.style.boxShadow = 'none'; c.style.transform = 'scale(1)'; });
+  el.style.boxShadow = '0 0 0 2px #fff, 0 0 0 3.5px ' + hex;
+  el.style.transform = 'scale(1.15)';
+}
+
+function closeEventEditor() {
+  _editingEvtId = null;
+  document.getElementById('evtEditorOverlay').classList.remove('open');
+}
+
+async function saveEventEditor() {
+  if (!_editingEvtId) return;
+  const evts = loadCalEvents();
+  const ev = evts.find(function(e) { return e.id === _editingEvtId; });
+  if (!ev) { closeEventEditor(); return; }
+
+  const title = document.getElementById('evtEdTitle').value.trim();
+  if (!title) { document.getElementById('evtEdTitle').focus(); return; }
+
+  const allDay = document.getElementById('evtEdAllDay').checked;
+  const overnight = !allDay && document.getElementById('evtEdOvernight').checked;
+  const startH = parseInt(document.getElementById('evtEdStart').value);
+  let endH = parseInt(document.getElementById('evtEdEnd').value) + 1;
+  const isOvernight = !allDay && (overnight || endH <= startH);
+
+  ev.title = title;
+  ev.date = document.getElementById('evtEdDate').value;
+  ev.allDay = allDay;
+  ev.overnight = isOvernight;
+  ev.startH = startH;
+  ev.endH = endH;
+  ev.color = document.getElementById('evtEdColorRow').dataset.selected || ev.color;
+
+  const statusEl = document.getElementById('calSaveStatus');
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  const ok = await saveCalEventsAsync(evts);
+  closeEventEditor();
+  renderWeekCalendar();
+  if (statusEl) {
+    statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only, will retry on next sync';
+    statusEl.style.color = ok ? '#4a8a6e' : '#b05050';
+    if (ok) setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
+  }
+}
+
+async function deleteEventFromEditor() {
+  if (!_editingEvtId) return;
+  const id = _editingEvtId;
+  closeEventEditor();
+  await deleteCalEvent(id);
+}
+
 // Correct 12-hour label for any hour 0–23 (0 = 12a, 12 = 12p). The old
 // label logic only ever saw hours 4–24 and mislabeled the midnight row
 // as "12p" instead of "12a" — this is used everywhere an hour needs a
@@ -1880,7 +2118,7 @@ function renderWeekCalendar() {
     const dayAllDay = allDayEvts.filter(function(e){ return e.date === dk; });
     html += '<div style="border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.12);padding:0.2rem;min-height:22px;background:rgba(74,106,138,0.02);">';
     dayAllDay.forEach(function(e) {
-      html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="deleteCalEvent(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="Click to remove · right-click to recolor: ' + e.title + '">' + e.title + '</div>';
+      html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="Click to edit · right-click to recolor: ' + e.title + '">' + e.title + '</div>';
     });
     html += '</div>';
   });
@@ -1951,12 +2189,12 @@ function renderWeekCalendar() {
       const rowEnd = 3 + seg.endH;
       const widthPct = 100 / seg.lanes;
       const leftPct = seg.lane * widthPct;
-      let prefix = '', suffix = '', title = 'Click to remove · right-click to recolor: ' + e.title;
-      if (seg.kind === 'start') { prefix = '🌙 '; title = 'Overnight: ' + hourLabel(e.startH) + ' → ' + hourLabel(e.endH) + ' next day. Click to remove · right-click to recolor: ' + e.title; }
-      if (seg.kind === 'end') { prefix = '↳ '; suffix = ' ends ' + hourLabel(e.endH); title = 'Overnight from ' + hourLabel(e.startH) + ' the night before, ends ' + hourLabel(e.endH) + '. Click to remove · right-click to recolor: ' + e.title; }
+      let prefix = '', suffix = '', title = 'Click to edit · right-click to recolor: ' + e.title;
+      if (seg.kind === 'start') { prefix = '🌙 '; title = 'Overnight: ' + hourLabel(e.startH) + ' → ' + hourLabel(e.endH) + ' next day. Click to edit · right-click to recolor: ' + e.title; }
+      if (seg.kind === 'end') { prefix = '↳ '; suffix = ' ends ' + hourLabel(e.endH); title = 'Overnight from ' + hourLabel(e.startH) + ' the night before, ends ' + hourLabel(e.endH) + '. Click to edit · right-click to recolor: ' + e.title; }
       const showTimeLabel = (seg.endH - seg.startH) >= 2;
 
-      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';position:relative;left:' + leftPct + '%;width:calc(' + widthPct + '% - 3px);box-sizing:border-box;margin:1px 0 0 1px;background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.15rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;overflow:hidden;z-index:2;" onclick="deleteCalEvent(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="' + title + '">' +
+      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';position:relative;left:' + leftPct + '%;width:calc(' + widthPct + '% - 3px);box-sizing:border-box;margin:1px 0 0 1px;background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.15rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;overflow:hidden;z-index:2;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="' + title + '">' +
         '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + prefix + e.title + suffix + '</div>' +
         (showTimeLabel ? '<div style="opacity:0.8;font-size:0.42rem;margin-top:1px;">' + hourLabel(seg.startH) + '–' + hourLabel(seg.endH) + '</div>' : '') +
         '</div>';

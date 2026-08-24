@@ -594,15 +594,15 @@ function fmtDate(iso) {
 
 // ── REAL ACCOUNT DATA (as of May 31, 2026) ──
 const ACCOUNTS = [
-  { name: 'BILT Mastercard',        type: 'Credit Card', class: 'debt',     balance: -3613.19 },
+  { name: 'BILT Mastercard',        type: 'Credit Card', class: 'debt',     balance: -3277.81 },
   { name: 'Discover It',            type: 'Credit Card', class: 'debt',     balance:  0.0     },
   { name: 'Citi Diamond Preferred', type: 'Credit Card', class: 'debt',     balance: -4973.27 },
-  { name: 'Chase Sapphire Reserve', type: 'Credit Card', class: 'debt',     balance:  0.0     },
+  { name: 'Chase Sapphire Reserve', type: 'Credit Card', class: 'debt',     balance: -1489.94 },
   { name: 'Wells Fargo Active Cash',type: 'Credit Card', class: 'debt',     balance:  0.0     },
-  { name: 'Chase Checking',         type: 'Checking',    class: 'checking', balance:  612.05  },
-  { name: 'Chase Savings',          type: 'Savings',     class: 'asset',    balance:  157.03  },
-  { name: 'Wealthfront Joint',      type: 'HYSA',        class: 'asset',    balance:  2058.22 },
-  { name: 'Wealthfront Personal',   type: 'HYSA',        class: 'asset',    balance:  301.89  },
+  { name: 'Chase Checking',         type: 'Checking',    class: 'checking', balance:  240.85  },
+  { name: 'Chase Savings',          type: 'Savings',     class: 'asset',    balance:  216.82  },
+  { name: 'Wealthfront Joint',      type: 'HYSA',        class: 'asset',    balance:  4073.64 },
+  { name: 'Wealthfront Personal',   type: 'HYSA',        class: 'asset',    balance:  528.20  },
   { name: 'Vanguard Roth IRA',      type: 'Investment',  class: 'asset',    balance:  18193.10 },
 ];
 
@@ -621,7 +621,7 @@ function loadAccounts() {
         <p class="account-name">${a.name}</p>
         <span class="account-type-tag">${a.type}</span>
         <p class="account-balance ${balClass}">${display}</p>
-        <p class="account-updated">As of Jul 31, 2026</p>
+        <p class="account-updated">As of Aug 23, 2026</p>
       </div>`;
   }).join('');
 
@@ -631,17 +631,17 @@ function loadAccounts() {
   nwEl.className = 'nw-value ' + (nw >= 0 ? 'positive' : 'negative');
   document.getElementById('total-assets').textContent = fmt(totalAssets);
   document.getElementById('total-debt').textContent   = '-' + fmt(totalDebt);
-  document.getElementById('last-updated').textContent = 'Jul 31, 2026';
+  document.getElementById('last-updated').textContent = 'Aug 23, 2026';
 }
 
-// ── BUDGET SUMMARY (July 2026 — Actuals) ──
+// ── BUDGET SUMMARY (August 2026 — Actuals through Aug 23) ──
 const BUDGET_CATS = [
-  { name: 'Housing',       spent: 1620, limit: 1620 },
-  { name: 'Debt',          spent:  280, limit:  280 },
-  { name: 'Savings',       spent: 2074, limit: 2175 },
-  { name: 'Shopping',      spent: 1677, limit:  700 },
-  { name: 'Dining Out',    spent:  891, limit:  400 },
-  { name: 'Transportation',spent:  235, limit:  120 },
+  { name: 'Housing',       spent: 1732, limit: 1620 },
+  { name: 'Debt',          spent:  140, limit:  280 },
+  { name: 'Savings',       spent:  243, limit: 2175 },
+  { name: 'Shopping',      spent:  941, limit:  700 },
+  { name: 'Dining Out',    spent:  442, limit:  400 },
+  { name: 'Transportation',spent:  216, limit:  120 },
 ];
 
 function loadBudget() {
@@ -665,9 +665,9 @@ function loadBudget() {
 // ── GOALS ──
 const GOALS = [
   { name: 'Discover — Paid Off ✓',    current: 2418.59, target: 2418.59, note: 'Paid in full in July · $32.37 credit carried to Aug' },
-  { name: 'Pay Off Citi (21 mo.)',     current:  280.00, target: 5459.99, note: '$280/mo · payments started July · $5,180 remaining' },
-  { name: 'Roth IRA — 2026',          current: 1625.00, target: 6500.00, note: 'no contribution logged Jun/Jul — resume $325 biweekly' },
-  { name: 'WF Personal Buffer',        current:  301.89, target: 2000.00, note: 'still low — heavy July transfers out' },
+  { name: 'Pay Off Citi (21 mo.)',     current:  420.00, target: 5459.99, note: '$280/mo · $140 posted so far in Aug · $5,040 remaining' },
+  { name: 'Roth IRA — 2026',          current: 1625.00, target: 6500.00, note: 'no contribution logged Jun–Aug — resume $325 biweekly' },
+  { name: 'WF Personal Buffer',        current:  528.20, target: 2000.00, note: 'rebuilding — Aug payroll + Depop sales, still below target' },
 ];
 
 function loadGoals() {

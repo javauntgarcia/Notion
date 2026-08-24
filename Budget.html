@@ -780,7 +780,9 @@ const BUDGETS = {
     income: 6700,
     incomeNote: '4 SFMTA pay periods · gap year planning continues',
 
-    oneTime: [],
+    oneTime: [
+      { desc: 'Flight (Chase Sapphire) — your share after Eston\'s $350', amount: 1173.60, note: 'Total fare $1,523.60 · split so Eston covers $350' },
+    ],
 
     sharedBills: [
       { desc: 'Rent',               full: 2700, yourShare: 1620, yourPct: 60, note: 'BILT — Oakland place' },
@@ -817,6 +819,10 @@ const BUDGETS = {
     ],
 
     notes: [
+      { icon: '✈️', title: 'Flight Booked — Outside the Travel Line',
+        text: 'A <strong>$1,523.60</strong> flight hit the Chase Sapphire card on 8/17. Eston is covering $350 of it, leaving your share at <strong>$1,173.60</strong> — well past the $300 discretionary Travel line, so it\'s logged as a one-time expense this month instead.' },
+      { icon: '🛒', title: 'Best Buy — Split 50/50',
+        text: 'The $1,105.19 Best Buy charge on 8/9 is tagged as a shared BILT expense at 50/50, adding roughly <strong>$552.60</strong> to your effective Shopping spend for August.' },
       { icon: '🅿️', title: 'Parking Dropped',
         text: 'Stak Parking is no longer a monthly obligation — it\'s been removed from both shared bills and the fixed-obligation lines. That frees up <strong>$125/mo</strong> from your July baseline; consider routing it toward the WF Personal buffer, which is still rebuilding.' },
       { icon: '💳', title: 'BILT — Stays External',
