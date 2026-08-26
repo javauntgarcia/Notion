@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics · Hub</title>
+
+  <!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  ANALYTICS DASHBOARD — EDIT GUIDE                            ║
+  ║                                                              ║
+  ║  SUPABASE: run supabase_setup.sql once in your Supabase      ║
+  ║  project's SQL editor before using this page — it creates    ║
+  ║  the analytics_videos table this page reads/writes.          ║
+  ║                                                              ║
+  ║  QUICK EDIT LANDMARKS — search for these to jump to each     ║
+  ║  section you want to change:                                 ║
+  ║                                                              ║
+  ║  PALETTE      → ":root {" near the top of <style>           ║
+  ║  BACKGROUND   → "EDIT: background image URL"                 ║
+  ║  FIELD MAP    → "EDIT: recognized import field names"        ║
+  ║  STOPWORDS    → "EDIT: SEO stopword list"                    ║
+  ╚══════════════════════════════════════════════════════════════╝
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ══════════════════════════════════════════
+       PALETTE — matches Productivity.html so this
+       page reads as the same site
+    ══════════════════════════════════════════ */
+    :root {
+      --black:       #080808;
+      --charcoal:    #161212;
+      --crimson:     #7a1a1a;
+      --crimson-mid: #b02a2a;
+      --amber:       #c8852a;
+      --gold:        #e8b84b;
+      --warm-white:  #f5ede0;
+      --ivory:       #ede0cc;
+      --glass:       rgba(200,133,42,0.12);
+      --glass-hover: rgba(200,133,42,0.20);
+      --glass-b:     rgba(232,184,75,0.28);
+      --good:        #6fae6a;
+      --bad:         #c85a3a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      color: var(--warm-white);
+      background: var(--black);
+      overflow-x: hidden;
+    }
+
+    .page-wrap { position: relative; min-height: 100vh; }
+
+    /* ── BACKGROUND ── */
+    .bg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+    .bg-layer img {
+      display: block; width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      filter: saturate(0.8) brightness(0.75);
+    }
+    .bg-layer::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(8,4,4,0.60) 0%, rgba(20,8,4,0.42) 45%, rgba(8,4,4,0.70) 100%);
+    }
+
+    .page { position: relative; z-index: 10; max-width: 980px; margin: 0 auto; padding: 0 1.5rem 8rem; }
+
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-b);
+      border-radius: 14px;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 2rem;
+      background: rgba(8,4,4,0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(232,184,75,0.10);
+    }
+    .back-link {
+      font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ivory); text-decoration: none; opacity: 0.8;
+      display: flex; align-items: center; gap: 0.4rem; transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 1; }
+    .back-link svg { width: 14px; height: 14px; }
+    .topbar-date {
+      font-family: 'DM Mono', monospace; font-size: 0.75rem; font-weight: 500;
+      letter-spacing: 0.12em; color: var(--amber); opacity: 0.9;
+    }
+
+    /* ── MASTHEAD ── */
+    .masthead {
+      min-height: 70vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 7rem 1rem 3rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .masthead h1 {
+      font-family: 'Cormorant Garamond', serif; font-weight: 700;
+      font-size: clamp(3.2rem, 9vw, 6rem); line-height: 0.95;
+      color: var(--warm-white); letter-spacing: -0.01em;
+    }
+    .masthead h1 em { font-style: italic; color: var(--gold); font-weight: 400; }
+    .masthead .sub {
+      margin-top: 1rem;
+      font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--ivory); opacity: 0.5; max-width: 34rem;
+    }
+
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber);
+      opacity: 0.9; margin-bottom: 1rem;
+    }
+    .section-sub {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.05em;
+      color: var(--ivory); opacity: 0.45; margin-top: -0.6rem; margin-bottom: 1.2rem;
+    }
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(232,184,75,0.18), transparent); margin: 3.5rem 0; }
+
+    .btn-pill {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gold);
+      background: rgba(232,184,75,0.10); border: 1px solid rgba(232,184,75,0.3);
+      border-radius: 99px; padding: 0.5rem 1.2rem; cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-pill:hover { background: rgba(232,184,75,0.20); color: var(--warm-white); }
+    .btn-pill:disabled { opacity: 0.3; cursor: default; }
+    .btn-pill.danger { color: var(--bad); border-color: rgba(200,90,58,0.35); }
+    .btn-pill.danger:hover { background: rgba(200,90,58,0.15); }
+    .save-confirm {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em;
+      color: var(--gold); opacity: 0; transition: opacity 0.4s;
+    }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    section { padding: 3.5rem 0; animation: fadeUp 0.8s 0.1s ease both; }
+
+    /* ════════════════════════════════════════
+       IMPORT / ADD VIDEO
+    ════════════════════════════════════════ */
+    .import-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; }
+    .import-tab {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--ivory); opacity: 0.5;
+      background: rgba(232,184,75,0.06); border: 1px solid rgba(232,184,75,0.15);
+      border-radius: 99px; padding: 0.45rem 1rem; cursor: pointer; transition: all 0.2s;
+    }
+    .import-tab.active { color: var(--gold); opacity: 1; background: rgba(232,184,75,0.14); border-color: rgba(232,184,75,0.35); }
+    .import-panel { display: none; }
+    .import-panel.active { display: block; }
+
+    .dropzone {
+      border: 1px dashed rgba(232,184,75,0.35); border-radius: 14px;
+      padding: 2rem 1.5rem; text-align: center; cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .dropzone:hover, .dropzone.drag { background: rgba(232,184,75,0.08); border-color: rgba(232,184,75,0.6); }
+    .dropzone-label {
+      font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em;
+      color: var(--ivory); opacity: 0.55;
+    }
+    .dropzone-sub { font-size: 0.58rem; opacity: 0.4; margin-top: 0.4rem; }
+    .dz-file-hidden { display: none; }
+
+    .import-paste {
+      width: 100%; min-height: 8rem; font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      color: var(--warm-white); background: rgba(0,0,0,0.2); border: 1px solid rgba(232,184,75,0.2);
+      border-radius: 10px; padding: 0.9rem; resize: vertical; outline: none;
+    }
+    .import-paste:focus { border-color: rgba(232,184,75,0.6); }
+
+    .import-status { font-size: 0.65rem; color: var(--ivory); opacity: 0.55; margin-top: 0.8rem; line-height: 1.6; }
+    .import-status b { color: var(--gold); }
+    .raw-toggle { color: var(--amber); cursor: pointer; text-decoration: underline; opacity: 0.8; }
+    .raw-preview {
+      display: none; margin-top: 0.6rem; max-height: 220px; overflow: auto;
+      background: rgba(0,0,0,0.35); border-radius: 8px; padding: 0.8rem;
+      font-size: 0.6rem; color: var(--ivory); opacity: 0.7; white-space: pre-wrap; word-break: break-word;
+    }
+    .raw-preview.open { display: block; }
+
+    /* Manual add form */
+    .manual-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+    @media (max-width: 640px) { .manual-grid { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .field label {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--amber); opacity: 0.75;
+    }
+    .field input[type=text], .field input[type=number], .field input[type=date],
+    .field select, .field textarea {
+      font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--warm-white);
+      background: rgba(0,0,0,0.2); border: 1px solid rgba(232,184,75,0.2);
+      border-radius: 8px; padding: 0.55rem 0.7rem; outline: none; width: 100%;
+    }
+    .field textarea { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.95rem; min-height: 4rem; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(232,184,75,0.6); }
+    .field-span-2 { grid-column: span 2; }
+    @media (max-width: 640px) { .field-span-2 { grid-column: span 1; } }
+    .field-hint { font-size: 0.56rem; color: var(--ivory); opacity: 0.35; }
+
+    .thumb-picker { display: flex; align-items: center; gap: 0.9rem; }
+    .thumb-preview {
+      width: 60px; height: 60px; border-radius: 8px; background-size: cover; background-position: center;
+      background-color: rgba(255,255,255,0.05); border: 1px solid rgba(232,184,75,0.25); flex-shrink: 0;
+    }
+
+    .form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-top: 1.4rem; }
+
+    /* ════════════════════════════════════════
+       STAT ROW
+    ════════════════════════════════════════ */
+    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem; }
+    @media (max-width: 680px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card { padding: 1.1rem 1.2rem; }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 1.9rem; font-weight: 600; color: var(--warm-white); line-height: 1; }
+    .stat-label { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); opacity: 0.75; margin-top: 0.4rem; }
+
+    /* ════════════════════════════════════════
+       LIBRARY TABLE
+    ════════════════════════════════════════ */
+    .lib-controls { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; align-items: center; }
+    .lib-controls select {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--ivory);
+      background: rgba(0,0,0,0.25); border: 1px solid rgba(232,184,75,0.22); border-radius: 8px;
+      padding: 0.4rem 0.6rem; outline: none;
+    }
+    .video-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .video-row {
+      display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.1rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .video-row:hover { background: var(--glass-hover); }
+    .video-thumb {
+      width: 46px; height: 46px; border-radius: 8px; background-size: cover; background-position: center;
+      background-color: rgba(255,255,255,0.05); flex-shrink: 0; border: 1px solid rgba(232,184,75,0.2);
+    }
+    .video-main { flex: 1; min-width: 0; }
+    .video-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--warm-white);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .video-meta { font-size: 0.6rem; color: var(--ivory); opacity: 0.5; margin-top: 0.15rem; display: flex; gap: 0.7rem; flex-wrap: wrap; }
+    .platform-tag {
+      font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15rem 0.5rem;
+      border-radius: 99px; background: rgba(232,184,75,0.14); color: var(--gold); flex-shrink: 0;
+    }
+    .video-nums { display: flex; gap: 1.2rem; flex-shrink: 0; }
+    .video-nums .n { text-align: right; }
+    .video-nums .n-val { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--warm-white); }
+    .video-nums .n-lbl { font-size: 0.52rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ivory); opacity: 0.4; }
+    .video-del { color: var(--bad); opacity: 0.5; font-size: 0.8rem; cursor: pointer; padding: 0.2rem 0.4rem; flex-shrink: 0; }
+    .video-del:hover { opacity: 1; }
+    .empty-note { font-size: 0.7rem; color: var(--ivory); opacity: 0.38; text-align: center; padding: 2rem 0; }
+
+    /* Expanded detail */
+    .video-detail { display: none; padding: 1.2rem 1.3rem 1.4rem; margin-top: -0.4rem; }
+    .video-detail.open { display: block; }
+    .detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-bottom: 1rem; }
+    @media (max-width: 680px) { .detail-grid { grid-template-columns: repeat(2, 1fr); } }
+    .detail-stat { text-align: center; }
+    .detail-stat .n-val { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--warm-white); }
+    .detail-stat .n-lbl { font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ivory); opacity: 0.45; margin-top: 0.2rem; }
+    .retention-chart { width: 100%; height: 90px; margin-top: 0.5rem; }
+    .hashtag-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }
+    .hashtag-pill { font-size: 0.58rem; color: var(--gold); background: rgba(232,184,75,0.1); border: 1px solid rgba(232,184,75,0.2); border-radius: 99px; padding: 0.2rem 0.6rem; }
+    .drop-callout { font-size: 0.62rem; color: var(--ivory); opacity: 0.6; margin-top: 0.7rem; font-style: italic; }
+
+    /* ════════════════════════════════════════
+       BREAKDOWN BARS (platform, day-of-week, hashtags)
+    ════════════════════════════════════════ */
+    .bd-row { display: flex; align-items: center; gap: 0.9rem; padding: 0.5rem 0; }
+    .bd-label { width: 8rem; flex-shrink: 0; font-size: 0.65rem; color: var(--ivory); opacity: 0.7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bd-track { flex: 1; height: 7px; background: rgba(232,184,75,0.08); border-radius: 99px; overflow: hidden; }
+    .bd-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--crimson-mid), var(--gold)); width: 0%; transition: width 1s cubic-bezier(0.22,1,0.36,1); }
+    .bd-val { width: 4.5rem; flex-shrink: 0; text-align: right; font-size: 0.62rem; color: var(--gold); }
+
+    .seo-table { width: 100%; border-collapse: collapse; }
+    .seo-table th {
+      font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--amber); opacity: 0.75; text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid rgba(232,184,75,0.18);
+    }
+    .seo-table td {
+      font-size: 0.72rem; color: var(--warm-white); padding: 0.55rem 0.6rem; border-bottom: 1px solid rgba(232,184,75,0.08);
+    }
+    .seo-table tr:last-child td { border-bottom: none; }
+    .seo-tag { color: var(--gold); }
+
+    .audience-empty, .lib-empty { font-size: 0.68rem; color: var(--ivory); opacity: 0.4; padding: 1.5rem; text-align: center; }
+
+    .footer { text-align: center; padding: 2rem 0 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.8rem; color: var(--amber); opacity: 0.35; }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <div class="bg-layer">
+    <!-- EDIT: background image URL -->
+    <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Analytics.jpg" alt="" />
+  </div>
+
+  <div class="topbar">
+    <a href="https://javauntgarcia.github.io/Notion/Productivity.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Productivity
+    </a>
+    <div class="topbar-date" id="today-date"></div>
+  </div>
+
+  <div class="page">
+
+    <div class="masthead">
+      <h1>Analy<em>tics</em></h1>
+      <p class="sub">performance, retention &amp; SEO across every post</p>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         OVERVIEW STATS
+    ══════════════════════════════════════════ -->
+    <section id="overview-section">
+      <p class="section-label">Overview</p>
+      <div class="stat-row">
+        <div class="glass stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Videos tracked</div>
+        </div>
+        <div class="glass stat-card">
+          <div class="stat-num" id="stat-views">0</div>
+          <div class="stat-label">Total views</div>
+        </div>
+        <div class="glass stat-card">
+          <div class="stat-num" id="stat-engagement">—</div>
+          <div class="stat-label">Avg engagement rate</div>
+        </div>
+        <div class="glass stat-card">
+          <div class="stat-num" id="stat-completion">—</div>
+          <div class="stat-label">Avg completion rate</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         IMPORT / ADD
+    ══════════════════════════════════════════ -->
+    <section id="import-section">
+      <p class="section-label">Add Data</p>
+      <p class="section-sub">import an export file, paste raw text, or enter a video by hand</p>
+
+      <div class="glass" style="padding:1.4rem 1.5rem;">
+        <div class="import-tabs">
+          <div class="import-tab active" data-tab="file">Upload File</div>
+          <div class="import-tab" data-tab="paste">Paste Text / JSON</div>
+          <div class="import-tab" data-tab="manual">Add Manually</div>
+        </div>
+
+        <!-- FILE UPLOAD -->
+        <div class="import-panel active" data-panel="file">
+          <div class="dropzone" id="dropzone">
+            <div class="dropzone-label">Drop a .json or .csv export here, or click to browse</div>
+            <div class="dropzone-sub">TikTok data export, Instagram insights export, YouTube Studio CSV, or any similar file</div>
+          </div>
+          <input type="file" id="dz-input" class="dz-file-hidden" accept=".json,.csv,.txt" />
+          <div class="import-status" id="file-status"></div>
+        </div>
+
+        <!-- PASTE -->
+        <div class="import-panel" data-panel="paste">
+          <textarea class="import-paste" id="paste-input" placeholder="Paste raw JSON (an array of videos, or a single video object), CSV rows, or even just captions/hashtags — one per line."></textarea>
+          <div class="form-actions" style="margin-top:0.8rem;">
+            <span class="save-confirm" id="paste-confirm">Imported</span>
+            <button class="btn-pill" onclick="importPastedText()">Parse &amp; Import</button>
+          </div>
+          <div class="import-status" id="paste-status"></div>
+        </div>
+
+        <!-- MANUAL -->
+        <div class="import-panel" data-panel="manual">
+          <div class="manual-grid">
+            <div class="field">
+              <label>Platform</label>
+              <select id="m-platform">
+                <option>TikTok</option>
+                <option>Instagram</option>
+                <option>YouTube</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Posted Date</label>
+              <input type="date" id="m-date" />
+            </div>
+            <div class="field field-span-2">
+              <label>Caption / Text</label>
+              <textarea id="m-caption" placeholder="Full caption or on-screen text — used for the SEO breakdown below"></textarea>
+            </div>
+            <div class="field field-span-2">
+              <label>Thumbnail</label>
+              <div class="thumb-picker">
+                <div class="thumb-preview" id="m-thumb-preview"></div>
+                <input type="file" id="m-thumb-input" accept="image/*" />
+              </div>
+              <div class="field-hint">Compressed automatically before saving to keep storage small</div>
+            </div>
+            <div class="field"><label>Views</label><input type="number" id="m-views" min="0" /></div>
+            <div class="field"><label>Likes</label><input type="number" id="m-likes" min="0" /></div>
+            <div class="field"><label>Comments</label><input type="number" id="m-comments" min="0" /></div>
+            <div class="field"><label>Shares</label><input type="number" id="m-shares" min="0" /></div>
+            <div class="field"><label>Saves / Bookmarks</label><input type="number" id="m-saves" min="0" /></div>
+            <div class="field"><label>Avg Watch Time (sec)</label><input type="number" id="m-watch" min="0" step="0.1" /></div>
+            <div class="field field-span-2">
+              <label>Retention — % of viewers still watching at each checkpoint</label>
+              <div class="manual-grid" style="grid-template-columns:repeat(4,1fr);">
+                <input type="number" id="m-r25" placeholder="25%" min="0" max="100" />
+                <input type="number" id="m-r50" placeholder="50%" min="0" max="100" />
+                <input type="number" id="m-r75" placeholder="75%" min="0" max="100" />
+                <input type="number" id="m-r100" placeholder="100%" min="0" max="100" />
+              </div>
+              <div class="field-hint">Leave blank whatever your platform doesn't report — used to spot where viewers drop off</div>
+            </div>
+            <div class="field field-span-2">
+              <label>Top Countries / Audience (optional, freeform — e.g. "US 40%, UK 12%")</label>
+              <input type="text" id="m-audience" placeholder="US 40%, UK 12%, Canada 9%" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <span class="save-confirm" id="manual-confirm">Saved</span>
+            <button class="btn-pill" onclick="saveManualVideo()">Add Video</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         VIDEO LIBRARY
+    ══════════════════════════════════════════ -->
+    <section id="library-section">
+      <p class="section-label">Video Library</p>
+      <div class="lib-controls">
+        <select id="lib-platform-filter" onchange="renderLibrary()">
+          <option value="">All platforms</option>
+          <option>TikTok</option>
+          <option>Instagram</option>
+          <option>YouTube</option>
+          <option>Other</option>
+        </select>
+        <select id="lib-sort" onchange="renderLibrary()">
+          <option value="posted_desc">Newest first</option>
+          <option value="views_desc">Most views</option>
+          <option value="engagement_desc">Highest engagement</option>
+          <option value="completion_desc">Highest completion</option>
+        </select>
+      </div>
+      <div class="glass video-list" id="video-list"></div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         TOP PERFORMERS
+    ══════════════════════════════════════════ -->
+    <section id="top-section">
+      <p class="section-label">What's Performing Best</p>
+      <p class="section-sub">ranked by views — click any row above for the full breakdown</p>
+      <div class="glass" style="padding:1.2rem 1.4rem;" id="top-performers"></div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         PLATFORM & TIMING BREAKDOWN
+    ══════════════════════════════════════════ -->
+    <section id="breakdown-section">
+      <p class="section-label">Where &amp; When It Performs Best</p>
+      <div class="manual-grid">
+        <div class="glass" style="padding:1.2rem 1.4rem;">
+          <div class="section-sub" style="margin-top:0;">By platform</div>
+          <div id="platform-breakdown"></div>
+        </div>
+        <div class="glass" style="padding:1.2rem 1.4rem;">
+          <div class="section-sub" style="margin-top:0;">By day posted</div>
+          <div id="day-breakdown"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         SEO / CAPTION INSIGHTS
+    ══════════════════════════════════════════ -->
+    <section id="seo-section">
+      <p class="section-label">Text &amp; Hashtag Performance</p>
+      <p class="section-sub">keywords and hashtags ranked by the average engagement rate of videos that used them — a proxy for on-platform SEO, not a live search-ranking signal</p>
+      <div class="glass" style="padding:0.6rem 0.8rem;overflow-x:auto;">
+        <table class="seo-table" id="seo-table"></table>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         AUDIENCE
+    ══════════════════════════════════════════ -->
+    <section id="audience-section">
+      <p class="section-label">Most Common Viewers</p>
+      <p class="section-sub">aggregated from whatever audience/country data your imports or manual entries included</p>
+      <div class="glass" style="padding:1.2rem 1.4rem;" id="audience-breakdown"></div>
+    </section>
+
+    <div class="footer">the numbers behind the noise</div>
+
+  </div><!-- /page -->
+
+</div><!-- /page-wrap -->
+
+<script>
+'use strict';
+
+/* ── SUPABASE CONFIG — same project as the rest of the site ── */
+var SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
+var SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
+var TABLE  = 'analytics_videos';
+
+function sbHeaders(extra) {
+  var h = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY };
+  if (extra) for (var k in extra) h[k] = extra[k];
+  return h;
+}
+function sbList(cb) {
+  fetch(SB_URL + '/rest/v1/' + TABLE + '?select=*&order=posted_at.desc.nullslast', { headers: sbHeaders() })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { cb(Array.isArray(d) ? d : []); })
+    .catch(function () { cb(null); });
+}
+function sbUpsert(row, cb) {
+  fetch(SB_URL + '/rest/v1/' + TABLE + '?on_conflict=id', {
+    method: 'POST',
+    headers: sbHeaders({ 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' }),
+    body: JSON.stringify(Object.assign({}, row, { updated_at: new Date().toISOString() }))
+  }).then(function (r) {
+    if (!r.ok) return r.text().then(function (t) { console.warn('[sbUpsert]', r.status, t); });
+    if (cb) cb(true);
+  }).catch(function (e) { console.warn('[sbUpsert]', e.message); if (cb) cb(false); });
+}
+function sbDelete(id, cb) {
+  fetch(SB_URL + '/rest/v1/' + TABLE + '?id=eq.' + encodeURIComponent(id), {
+    method: 'DELETE', headers: sbHeaders()
+  }).then(function (r) { if (cb) cb(r.ok); }).catch(function () { if (cb) cb(false); });
+}
+
+/* ── LOCAL FALLBACK (mirrors Productivity.html's pattern) ── */
+function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function saveLocalCache() { lsSet('an_videos_cache', JSON.stringify(VIDEOS)); }
+
+var VIDEOS = [];
+
+var now = new Date();
+document.getElementById('today-date').textContent =
+  now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+/* ════════════════════════════════════════
+   BOOTSTRAP
+════════════════════════════════════════ */
+sbList(function (rows) {
+  if (rows) {
+    VIDEOS = rows;
+    saveLocalCache();
+  } else {
+    try { VIDEOS = JSON.parse(ls('an_videos_cache') || '[]'); } catch (e) { VIDEOS = []; }
+  }
+  renderAll();
+});
+
+function renderAll() {
+  renderOverview();
+  renderLibrary();
+  renderTopPerformers();
+  renderBreakdowns();
+  renderSEO();
+  renderAudience();
+}
+
+/* ════════════════════════════════════════
+   HELPERS — metrics shared across sections
+════════════════════════════════════════ */
+function num(v) { var n = parseFloat(v); return isFinite(n) ? n : 0; }
+function engagementRate(v) {
+  var views = num(v.views);
+  if (!views) return null;
+  return (num(v.likes) + num(v.comments) + num(v.shares) + num(v.saves)) / views;
+}
+function fmtInt(n) {
+  n = Math.round(num(n));
+  if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(n);
+}
+function fmtPct(n) { return n === null || n === undefined || isNaN(n) ? '—' : (Math.round(n * 1000) / 10) + '%'; }
+function fmtPct100(n) { return n === null || n === undefined || isNaN(n) ? '—' : Math.round(n) + '%'; }
+function completionOf(v) {
+  if (v.completion_rate !== null && v.completion_rate !== undefined && v.completion_rate !== '') return num(v.completion_rate);
+  if (v.retention_curve && v.retention_curve.length) {
+    var last = v.retention_curve[v.retention_curve.length - 1];
+    if (last && last.pct !== undefined) return num(last.pct);
+  }
+  return null;
+}
+
+/* ════════════════════════════════════════
+   OVERVIEW
+════════════════════════════════════════ */
+function renderOverview() {
+  document.getElementById('stat-total').textContent = VIDEOS.length;
+  var totalViews = VIDEOS.reduce(function (s, v) { return s + num(v.views); }, 0);
+  document.getElementById('stat-views').textContent = fmtInt(totalViews);
+
+  var rates = VIDEOS.map(engagementRate).filter(function (r) { return r !== null; });
+  var avgRate = rates.length ? rates.reduce(function (a, b) { return a + b; }, 0) / rates.length : null;
+  document.getElementById('stat-engagement').textContent = fmtPct(avgRate);
+
+  var comps = VIDEOS.map(completionOf).filter(function (c) { return c !== null; });
+  var avgComp = comps.length ? comps.reduce(function (a, b) { return a + b; }, 0) / comps.length : null;
+  document.getElementById('stat-completion').textContent = avgComp === null ? '—' : fmtPct100(avgComp);
+}
+
+/* ════════════════════════════════════════
+   LIBRARY
+════════════════════════════════════════ */
+var openDetailId = null;
+
+function renderLibrary() {
+  var list = document.getElementById('video-list');
+  var platformFilter = document.getElementById('lib-platform-filter').value;
+  var sortMode = document.getElementById('lib-sort').value;
+
+  var items = VIDEOS.slice();
+  if (platformFilter) items = items.filter(function (v) { return v.platform === platformFilter; });
+
+  items.sort(function (a, b) {
+    if (sortMode === 'views_desc') return num(b.views) - num(a.views);
+    if (sortMode === 'engagement_desc') return (engagementRate(b) || 0) - (engagementRate(a) || 0);
+    if (sortMode === 'completion_desc') return (completionOf(b) || 0) - (completionOf(a) || 0);
+    var ad = a.posted_at ? new Date(a.posted_at).getTime() : 0;
+    var bd = b.posted_at ? new Date(b.posted_at).getTime() : 0;
+    return bd - ad;
+  });
+
+  list.innerHTML = '';
+  if (!items.length) {
+    list.innerHTML = '<div class="lib-empty">No videos yet — add one above.</div>';
+    return;
+  }
+
+  items.forEach(function (v) {
+    var row = document.createElement('div');
+    row.className = 'video-row';
+    var thumbStyle = v.thumbnail ? 'background-image:url(\'' + v.thumbnail + '\')' : '';
+    var er = engagementRate(v);
+    row.innerHTML =
+      '<div class="video-thumb" style="' + thumbStyle + '"></div>' +
+      '<div class="video-main">' +
+        '<div class="video-title">' + escapeHtml(v.title || '(untitled)') + '</div>' +
+        '<div class="video-meta"><span class="platform-tag">' + escapeHtml(v.platform || 'Other') + '</span>' +
+        (v.posted_at ? '<span>' + new Date(v.posted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="video-nums">' +
+        '<div class="n"><div class="n-val">' + fmtInt(v.views) + '</div><div class="n-lbl">Views</div></div>' +
+        '<div class="n"><div class="n-val">' + fmtPct(er) + '</div><div class="n-lbl">Engage</div></div>' +
+      '</div>' +
+      '<div class="video-del" data-id="' + v.id + '" title="Delete">✕</div>';
+
+    row.addEventListener('click', function (e) {
+      if (e.target.classList.contains('video-del')) return;
+      toggleDetail(v.id);
+    });
+    row.querySelector('.video-del').addEventListener('click', function (e) {
+      e.stopPropagation();
+      deleteVideo(v.id);
+    });
+    list.appendChild(row);
+
+    if (openDetailId === v.id) {
+      list.appendChild(buildDetail(v));
+    }
+  });
+}
+
+function toggleDetail(id) {
+  openDetailId = openDetailId === id ? null : id;
+  renderLibrary();
+}
+
+function buildDetail(v) {
+  var wrap = document.createElement('div');
+  wrap.className = 'glass video-detail open';
+  var er = engagementRate(v);
+  var comp = completionOf(v);
+
+  var statsHtml =
+    '<div class="detail-grid">' +
+      statBlock(fmtInt(v.likes), 'Likes') +
+      statBlock(fmtInt(v.comments), 'Comments') +
+      statBlock(fmtInt(v.shares), 'Shares') +
+      statBlock(fmtInt(v.saves), 'Saves') +
+      statBlock(v.avg_watch_time ? num(v.avg_watch_time).toFixed(1) + 's' : '—', 'Avg Watch Time') +
+      statBlock(fmtPct(er), 'Engagement Rate') +
+      statBlock(comp === null ? '—' : fmtPct100(comp), 'Completion') +
+      statBlock((v.hashtags && v.hashtags.length) || 0, 'Hashtags') +
+    '</div>';
+
+  var retentionHtml = '';
+  if (v.retention_curve && v.retention_curve.length > 1) {
+    retentionHtml = '<div class="section-sub" style="margin-top:0;">Retention curve</div>' + buildRetentionSVG(v.retention_curve) + buildDropCallout(v.retention_curve);
+  }
+
+  var hashHtml = '';
+  if (v.hashtags && v.hashtags.length) {
+    hashHtml = '<div class="hashtag-pills">' + v.hashtags.map(function (h) { return '<span class="hashtag-pill">#' + escapeHtml(h) + '</span>'; }).join('') + '</div>';
+  }
+
+  var rawHtml = '';
+  if (v.raw_data) {
+    rawHtml = '<div style="margin-top:1rem;"><span class="raw-toggle" onclick="this.nextElementSibling.classList.toggle(\'open\')">view raw imported data</span>' +
+      '<div class="raw-preview">' + escapeHtml(JSON.stringify(v.raw_data, null, 2)) + '</div></div>';
+  }
+
+  wrap.innerHTML = statsHtml + retentionHtml + hashHtml + rawHtml;
+  return wrap;
+}
+
+function statBlock(val, lbl) {
+  return '<div class="detail-stat"><div class="n-val">' + val + '</div><div class="n-lbl">' + lbl + '</div></div>';
+}
+
+function buildRetentionSVG(curve) {
+  var w = 600, h = 90, pad = 6;
+  var pts = curve.map(function (p) {
+    var x = pad + (num(p.t) / 100) * (w - pad * 2);
+    var y = pad + (1 - num(p.pct) / 100) * (h - pad * 2);
+    return x + ',' + y;
+  }).join(' ');
+  return '<svg class="retention-chart" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+    '<polyline points="' + pts + '" fill="none" stroke="#e8b84b" stroke-width="2" vector-effect="non-scaling-stroke" />' +
+    '</svg>';
+}
+
+function buildDropCallout(curve) {
+  var biggest = null;
+  for (var i = 1; i < curve.length; i++) {
+    var delta = num(curve[i - 1].pct) - num(curve[i].pct);
+    if (!biggest || delta > biggest.delta) biggest = { delta: delta, at: curve[i].t };
+  }
+  if (!biggest || biggest.delta <= 0) return '';
+  return '<div class="drop-callout">Biggest drop-off: ' + Math.round(biggest.delta) + '% of viewers leave by the ' + Math.round(num(biggest.at)) + '% mark</div>';
+}
+
+function deleteVideo(id) {
+  VIDEOS = VIDEOS.filter(function (v) { return v.id !== id; });
+  saveLocalCache();
+  sbDelete(id);
+  renderAll();
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+/* ════════════════════════════════════════
+   TOP PERFORMERS
+════════════════════════════════════════ */
+function renderTopPerformers() {
+  var el = document.getElementById('top-performers');
+  if (!VIDEOS.length) { el.innerHTML = '<div class="empty-note">Nothing to rank yet.</div>'; return; }
+  var top = VIDEOS.slice().sort(function (a, b) { return num(b.views) - num(a.views); }).slice(0, 8);
+  var max = num(top[0].views) || 1;
+  el.innerHTML = top.map(function (v) {
+    var pct = Math.max(4, Math.round((num(v.views) / max) * 100));
+    return '<div class="bd-row">' +
+      '<div class="bd-label" title="' + escapeHtml(v.title || '') + '">' + escapeHtml((v.title || '(untitled)').slice(0, 28)) + '</div>' +
+      '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="bd-val">' + fmtInt(v.views) + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+/* ════════════════════════════════════════
+   PLATFORM + DAY BREAKDOWNS
+════════════════════════════════════════ */
+function renderBreakdowns() {
+  var byPlatform = {};
+  VIDEOS.forEach(function (v) {
+    var p = v.platform || 'Other';
+    if (!byPlatform[p]) byPlatform[p] = { views: 0, count: 0 };
+    byPlatform[p].views += num(v.views);
+    byPlatform[p].count += 1;
+  });
+  renderBarGroup('platform-breakdown', byPlatform, function (k) { return k; }, function (d) { return fmtInt(d.views); });
+
+  var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var byDay = {};
+  days.forEach(function (d) { byDay[d] = { views: 0, count: 0 }; });
+  VIDEOS.forEach(function (v) {
+    if (!v.posted_at) return;
+    var d = days[new Date(v.posted_at).getDay()];
+    byDay[d].views += num(v.views);
+    byDay[d].count += 1;
+  });
+  var anyDay = Object.keys(byDay).some(function (k) { return byDay[k].count > 0; });
+  if (!anyDay) {
+    document.getElementById('day-breakdown').innerHTML = '<div class="empty-note">No posted dates yet.</div>';
+  } else {
+    renderBarGroup('day-breakdown', byDay, function (k) { return k; }, function (d) { return fmtInt(d.views); });
+  }
+}
+
+function renderBarGroup(elId, dataObj, labelFn, valFn) {
+  var el = document.getElementById(elId);
+  var keys = Object.keys(dataObj).filter(function (k) { return dataObj[k].count > 0; });
+  if (!keys.length) { el.innerHTML = '<div class="empty-note">No data yet.</div>'; return; }
+  var max = Math.max.apply(null, keys.map(function (k) { return dataObj[k].views; })) || 1;
+  keys.sort(function (a, b) { return dataObj[b].views - dataObj[a].views; });
+  el.innerHTML = keys.map(function (k) {
+    var pct = Math.max(4, Math.round((dataObj[k].views / max) * 100));
+    return '<div class="bd-row">' +
+      '<div class="bd-label">' + escapeHtml(labelFn(k)) + '</div>' +
+      '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="bd-val">' + valFn(dataObj[k]) + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+/* ════════════════════════════════════════
+   SEO / CAPTION + HASHTAG PERFORMANCE
+   EDIT: SEO stopword list — words below are
+   ignored when scoring caption keywords
+════════════════════════════════════════ */
+var STOPWORDS = ['the','a','an','and','or','but','is','are','was','were','to','of','in','on','for','with','at','by','from','this','that','it','my','your','our','i','you','we','they','he','she','be','as','if','so','not','just','out','up','all','new'];
+
+function extractHashtags(v) {
+  if (v.hashtags && v.hashtags.length) return v.hashtags;
+  var text = v.title || '';
+  var m = text.match(/#(\w+)/g) || [];
+  return m.map(function (t) { return t.slice(1); });
+}
+function extractKeywords(v) {
+  var text = (v.title || '').replace(/#\w+/g, '').toLowerCase();
+  var words = text.match(/[a-z']{3,}/g) || [];
+  var seen = {};
+  return words.filter(function (w) {
+    if (STOPWORDS.indexOf(w) !== -1) return false;
+    if (seen[w]) return false;
+    seen[w] = true;
+    return true;
+  });
+}
+
+function renderSEO() {
+  var table = document.getElementById('seo-table');
+  var stats = {}; // term -> { count, views, engSum }
+
+  VIDEOS.forEach(function (v) {
+    var er = engagementRate(v) || 0;
+    var terms = extractHashtags(v).map(function (h) { return { term: h, tag: true }; })
+      .concat(extractKeywords(v).map(function (k) { return { term: k, tag: false }; }));
+    terms.forEach(function (t) {
+      var key = (t.tag ? '#' : '') + t.term;
+      if (!stats[key]) stats[key] = { count: 0, views: 0, engSum: 0, tag: t.tag };
+      stats[key].count += 1;
+      stats[key].views += num(v.views);
+      stats[key].engSum += er;
+    });
+  });
+
+  var rows = Object.keys(stats).map(function (k) {
+    var s = stats[k];
+    return { term: k, count: s.count, avgViews: s.views / s.count, avgEng: s.engSum / s.count, tag: s.tag };
+  }).filter(function (r) { return r.count >= 1; });
+
+  rows.sort(function (a, b) { return b.avgEng - a.avgEng; });
+  rows = rows.slice(0, 15);
+
+  if (!rows.length) {
+    table.innerHTML = '<tr><td class="empty-note" colspan="4">Add captions or hashtags to videos to see this breakdown.</td></tr>';
+    return;
+  }
+
+  var head = '<tr><th>Term</th><th>Used In</th><th>Avg Views</th><th>Avg Engagement</th></tr>';
+  var body = rows.map(function (r) {
+    return '<tr><td class="seo-tag">' + escapeHtml(r.term) + '</td><td>' + r.count + ' video' + (r.count === 1 ? '' : 's') + '</td>' +
+      '<td>' + fmtInt(r.avgViews) + '</td><td>' + fmtPct(r.avgEng) + '</td></tr>';
+  }).join('');
+  table.innerHTML = head + body;
+}
+
+/* ════════════════════════════════════════
+   AUDIENCE ("most common viewers")
+════════════════════════════════════════ */
+function renderAudience() {
+  var el = document.getElementById('audience-breakdown');
+  var combined = {};
+  var any = false;
+  VIDEOS.forEach(function (v) {
+    if (!v.audience || !v.audience.length) return;
+    any = true;
+    v.audience.forEach(function (a) {
+      if (!combined[a.label]) combined[a.label] = 0;
+      combined[a.label] += num(a.pct);
+    });
+  });
+  if (!any) {
+    el.innerHTML = '<div class="audience-empty">No audience data yet — add "Top Countries / Audience" when importing or adding a video by hand, or import a platform export that includes it.</div>';
+    return;
+  }
+  var keys = Object.keys(combined);
+  var max = Math.max.apply(null, keys.map(function (k) { return combined[k]; })) || 1;
+  keys.sort(function (a, b) { return combined[b] - combined[a]; });
+  el.innerHTML = keys.slice(0, 10).map(function (k) {
+    var pct = Math.max(4, Math.round((combined[k] / max) * 100));
+    return '<div class="bd-row">' +
+      '<div class="bd-label">' + escapeHtml(k) + '</div>' +
+      '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="bd-val">' + (Math.round(combined[k] * 10) / 10) + '%</div>' +
+      '</div>';
+  }).join('');
+}
+
+/* ════════════════════════════════════════
+   IMAGE COMPRESSION
+   Resizes to a max dimension and re-encodes
+   as JPEG so thumbnails stay small in Supabase.
+════════════════════════════════════════ */
+function compressImage(file, maxDim, quality, cb) {
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    var img = new Image();
+    img.onload = function () {
+      var w = img.width, h = img.height;
+      var scale = Math.min(1, maxDim / Math.max(w, h));
+      var cw = Math.max(1, Math.round(w * scale));
+      var ch = Math.max(1, Math.round(h * scale));
+      var canvas = document.createElement('canvas');
+      canvas.width = cw; canvas.height = ch;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, cw, ch);
+      cb(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = function () { cb(null); };
+    img.src = e.target.result;
+  };
+  reader.onerror = function () { cb(null); };
+  reader.readAsDataURL(file);
+}
+
+/* ════════════════════════════════════════
+   TAB SWITCHING
+════════════════════════════════════════ */
+document.querySelectorAll('.import-tab').forEach(function (tab) {
+  tab.addEventListener('click', function () {
+    document.querySelectorAll('.import-tab').forEach(function (t) { t.classList.remove('active'); });
+    document.querySelectorAll('.import-panel').forEach(function (p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    document.querySelector('.import-panel[data-panel="' + tab.dataset.tab + '"]').classList.add('active');
+  });
+});
+
+/* ════════════════════════════════════════
+   MANUAL ADD
+════════════════════════════════════════ */
+var manualThumb = null;
+document.getElementById('m-thumb-input').addEventListener('change', function (e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  compressImage(file, 480, 0.62, function (dataUrl) {
+    manualThumb = dataUrl;
+    if (dataUrl) document.getElementById('m-thumb-preview').style.backgroundImage = "url('" + dataUrl + "')";
+  });
+});
+
+function parseAudienceText(str) {
+  if (!str) return [];
+  return str.split(',').map(function (part) {
+    var m = part.trim().match(/^(.+?)\s+(\d+(\.\d+)?)\s*%?$/);
+    if (!m) return null;
+    return { label: m[1].trim(), pct: parseFloat(m[2]) };
+  }).filter(Boolean);
+}
+
+window.saveManualVideo = function () {
+  var retention = [];
+  [['m-r25', 25], ['m-r50', 50], ['m-r75', 75], ['m-r100', 100]].forEach(function (pair) {
+    var val = document.getElementById(pair[0]).value;
+    if (val !== '') retention.push({ t: pair[1], pct: parseFloat(val) });
+  });
+
+  var caption = document.getElementById('m-caption').value || '';
+  var hashtags = (caption.match(/#(\w+)/g) || []).map(function (h) { return h.slice(1); });
+
+  var row = {
+    id: (crypto.randomUUID ? crypto.randomUUID() : 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2)),
+    platform: document.getElementById('m-platform').value,
+    title: caption,
+    thumbnail: manualThumb,
+    posted_at: document.getElementById('m-date').value ? new Date(document.getElementById('m-date').value).toISOString() : null,
+    views: num(document.getElementById('m-views').value),
+    likes: num(document.getElementById('m-likes').value),
+    comments: num(document.getElementById('m-comments').value),
+    shares: num(document.getElementById('m-shares').value),
+    saves: num(document.getElementById('m-saves').value),
+    avg_watch_time: document.getElementById('m-watch').value ? num(document.getElementById('m-watch').value) : null,
+    completion_rate: retention.length ? retention[retention.length - 1].pct : null,
+    retention_curve: retention.length ? retention : null,
+    audience: parseAudienceText(document.getElementById('m-audience').value),
+    hashtags: hashtags,
+    raw_data: null
+  };
+
+  VIDEOS.unshift(row);
+  saveLocalCache();
+  sbUpsert(row);
+  renderAll();
+
+  var c = document.getElementById('manual-confirm');
+  c.style.opacity = 1;
+  setTimeout(function () { c.style.opacity = 0; }, 1800);
+
+  // reset form
+  ['m-caption','m-views','m-likes','m-comments','m-shares','m-saves','m-watch','m-r25','m-r50','m-r75','m-r100','m-audience','m-date'].forEach(function (id) {
+    document.getElementById(id).value = '';
+  });
+  manualThumb = null;
+  document.getElementById('m-thumb-preview').style.backgroundImage = '';
+  document.getElementById('m-thumb-input').value = '';
+};
+
+/* ════════════════════════════════════════
+   FILE / PASTE IMPORT
+   Lenient parser: recognizes common export
+   field names, keeps everything else as
+   raw_data so nothing is silently dropped.
+   EDIT: recognized import field names
+════════════════════════════════════════ */
+var FIELD_MAP = {
+  title: ['caption', 'desc', 'description', 'text', 'title', 'video_description'],
+  views: ['playcount', 'play_count', 'views', 'videoviews', 'impressions', 'plays', 'view_count'],
+  likes: ['diggcount', 'digg_count', 'likecount', 'like_count', 'likes'],
+  comments: ['commentcount', 'comment_count', 'comments'],
+  shares: ['sharecount', 'share_count', 'shares'],
+  saves: ['collectcount', 'collect_count', 'saves', 'bookmarks', 'bookmark_count'],
+  avg_watch_time: ['avgwatchtime', 'avg_watch_time', 'averagewatchtimeseconds', 'average_watch_time', 'avg_time_watched'],
+  completion_rate: ['completionrate', 'completion_rate', 'videocompletionrate', 'fullvideowatchedrate', 'full_video_watched_rate'],
+  posted_at: ['createtimeiso', 'create_time_iso', 'timestamp', 'date', 'posted_at', 'created_at', 'createtime', 'create_time']
+};
+
+function findField(obj, names) {
+  var keys = Object.keys(obj);
+  for (var i = 0; i < names.length; i++) {
+    for (var j = 0; j < keys.length; j++) {
+      if (keys[j].toLowerCase() === names[i]) return obj[keys[j]];
+    }
+  }
+  return undefined;
+}
+
+function normalizeRecord(obj, platformGuess) {
+  var row = {
+    id: (crypto.randomUUID ? crypto.randomUUID() : 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2)),
+    platform: platformGuess || 'Other',
+    raw_data: obj
+  };
+  row.title = findField(obj, FIELD_MAP.title) || '';
+  row.views = num(findField(obj, FIELD_MAP.views));
+  row.likes = num(findField(obj, FIELD_MAP.likes));
+  row.comments = num(findField(obj, FIELD_MAP.comments));
+  row.shares = num(findField(obj, FIELD_MAP.shares));
+  row.saves = num(findField(obj, FIELD_MAP.saves));
+  var awt = findField(obj, FIELD_MAP.avg_watch_time);
+  row.avg_watch_time = awt !== undefined ? num(awt) : null;
+  var cr = findField(obj, FIELD_MAP.completion_rate);
+  row.completion_rate = cr !== undefined ? num(cr) * (num(cr) <= 1 ? 100 : 1) : null;
+  var posted = findField(obj, FIELD_MAP.posted_at);
+  row.posted_at = null;
+  if (posted !== undefined) {
+    if (typeof posted === 'number') {
+      // unix seconds vs ms heuristic
+      row.posted_at = new Date(posted > 2000000000 ? posted : posted * 1000).toISOString();
+    } else {
+      var d = new Date(posted);
+      if (!isNaN(d.getTime())) row.posted_at = d.toISOString();
+    }
+  }
+  row.hashtags = (row.title.match(/#(\w+)/g) || []).map(function (h) { return h.slice(1); });
+  row.thumbnail = null;
+  row.retention_curve = null;
+  row.audience = null;
+  return row;
+}
+
+function findRecordArray(parsed) {
+  if (Array.isArray(parsed)) return parsed;
+  if (parsed && typeof parsed === 'object') {
+    var candidates = ['videos', 'itemList', 'aweme_list', 'items', 'data', 'posts', 'media'];
+    for (var i = 0; i < candidates.length; i++) {
+      if (Array.isArray(parsed[candidates[i]])) return parsed[candidates[i]];
+    }
+    return [parsed];
+  }
+  return [];
+}
+
+function guessPlatform(text) {
+  var t = text.toLowerCase();
+  if (t.indexOf('tiktok') !== -1 || t.indexOf('aweme') !== -1 || t.indexOf('diggcount') !== -1) return 'TikTok';
+  if (t.indexOf('instagram') !== -1 || t.indexOf('media_id') !== -1) return 'Instagram';
+  if (t.indexOf('youtube') !== -1 || t.indexOf('yt_') !== -1) return 'YouTube';
+  return 'Other';
+}
+
+function parseCSV(text) {
+  var lines = text.split(/\r?\n/).filter(function (l) { return l.trim().length; });
+  if (!lines.length) return [];
+  var headers = lines[0].split(',').map(function (h) { return h.trim().replace(/^"|"$/g, ''); });
+  return lines.slice(1).map(function (line) {
+    var cells = line.split(',');
+    var obj = {};
+    headers.forEach(function (h, i) { obj[h] = cells[i] !== undefined ? cells[i].trim().replace(/^"|"$/g, '') : ''; });
+    return obj;
+  });
+}
+
+function importRecords(records, platformGuess, statusElId) {
+  var rows = records.map(function (r) { return normalizeRecord(r, platformGuess); });
+  rows.forEach(function (row) { VIDEOS.unshift(row); sbUpsert(row); });
+  saveLocalCache();
+  renderAll();
+  var status = document.getElementById(statusElId);
+  status.innerHTML = 'Imported <b>' + rows.length + '</b> record' + (rows.length === 1 ? '' : 's') + '. ' +
+    'Every field I didn\'t recognize is kept — open a video in the Library below and click "view raw imported data" to see it, or fill in anything missing by editing it manually.';
+}
+
+function handleImportFile(file) {
+  var status = document.getElementById('file-status');
+  status.textContent = 'Reading ' + file.name + '…';
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    var text = e.target.result;
+    var platformGuess = guessPlatform(file.name + ' ' + text.slice(0, 2000));
+    try {
+      if (file.name.toLowerCase().endsWith('.csv')) {
+        importRecords(parseCSV(text), platformGuess, 'file-status');
+      } else {
+        var parsed = JSON.parse(text);
+        importRecords(findRecordArray(parsed), platformGuess, 'file-status');
+      }
+    } catch (err) {
+      status.textContent = 'Could not parse that file as JSON or CSV (' + err.message + '). Try the "Paste Text / JSON" tab, or add the video manually.';
+    }
+  };
+  reader.onerror = function () { status.textContent = 'Could not read that file.'; };
+  reader.readAsText(file);
+}
+
+var dropzone = document.getElementById('dropzone');
+var dzInput = document.getElementById('dz-input');
+dropzone.addEventListener('click', function () { dzInput.click(); });
+dzInput.addEventListener('change', function () { if (dzInput.files[0]) handleImportFile(dzInput.files[0]); });
+['dragover', 'dragleave', 'drop'].forEach(function (evt) {
+  dropzone.addEventListener(evt, function (e) {
+    e.preventDefault();
+    if (evt === 'dragover') dropzone.classList.add('drag');
+    else dropzone.classList.remove('drag');
+    if (evt === 'drop' && e.dataTransfer.files[0]) handleImportFile(e.dataTransfer.files[0]);
+  });
+});
+
+window.importPastedText = function () {
+  var text = document.getElementById('paste-input').value.trim();
+  var status = document.getElementById('paste-status');
+  if (!text) { status.textContent = 'Paste something first.'; return; }
+  var platformGuess = guessPlatform(text.slice(0, 2000));
+
+  try {
+    var parsed = JSON.parse(text);
+    importRecords(findRecordArray(parsed), platformGuess, 'paste-status');
+  } catch (err) {
+    // Not JSON — treat as CSV if it looks comma-delimited with a header, else as line-per-caption
+    if (text.indexOf(',') !== -1 && text.split('\n')[0].split(',').length > 1) {
+      importRecords(parseCSV(text), platformGuess, 'paste-status');
+    } else {
+      var lines = text.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+      var records = lines.map(function (l) { return { caption: l }; });
+      importRecords(records, platformGuess, 'paste-status');
+    }
+  }
+  var c = document.getElementById('paste-confirm');
+  c.style.opacity = 1;
+  setTimeout(function () { c.style.opacity = 0; }, 1800);
+  document.getElementById('paste-input').value = '';
+};
+
+/* Sync across tabs */
+window.addEventListener('storage', function () { location.reload(); });
+
+</script>
+
+</body>
+</html>
