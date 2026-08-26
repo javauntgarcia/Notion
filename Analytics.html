@@ -349,7 +349,7 @@
         </div>
         <div class="glass stat-card">
           <div class="stat-num" id="stat-views">0</div>
-          <div class="stat-label">Total views</div>
+          <div class="stat-label" id="stat-views-label">Total views</div>
         </div>
         <div class="glass stat-card">
           <div class="stat-num" id="stat-engagement">—</div>
@@ -637,10 +637,21 @@ function completionOf(v) {
 /* ════════════════════════════════════════
    OVERVIEW
 ════════════════════════════════════════ */
+/* Some exports (e.g. TikTok's basic "download your data" file) only
+   include like counts, not view counts. When nothing in the library
+   has views, fall back to likes as the headline metric everywhere
+   below instead of showing a wall of zeros. */
+function primaryMetric() {
+  return VIDEOS.some(function (v) { return num(v.views) > 0; }) ? 'views' : 'likes';
+}
+function primaryMetricLabel(metric) { return metric === 'likes' ? 'Likes' : 'Views'; }
+
 function renderOverview() {
   document.getElementById('stat-total').textContent = VIDEOS.length;
-  var totalViews = VIDEOS.reduce(function (s, v) { return s + num(v.views); }, 0);
-  document.getElementById('stat-views').textContent = fmtInt(totalViews);
+  var metric = primaryMetric();
+  var totalPrimary = VIDEOS.reduce(function (s, v) { return s + num(v[metric]); }, 0);
+  document.getElementById('stat-views').textContent = fmtInt(totalPrimary);
+  document.getElementById('stat-views-label').textContent = metric === 'likes' ? 'Total likes' : 'Total views';
 
   var rates = VIDEOS.map(engagementRate).filter(function (r) { return r !== null; });
   var avgRate = rates.length ? rates.reduce(function (a, b) { return a + b; }, 0) / rates.length : null;
@@ -665,7 +676,7 @@ function renderLibrary() {
   if (platformFilter) items = items.filter(function (v) { return v.platform === platformFilter; });
 
   items.sort(function (a, b) {
-    if (sortMode === 'views_desc') return num(b.views) - num(a.views);
+    if (sortMode === 'views_desc') return num(b[primaryMetric()]) - num(a[primaryMetric()]);
     if (sortMode === 'engagement_desc') return (engagementRate(b) || 0) - (engagementRate(a) || 0);
     if (sortMode === 'completion_desc') return (completionOf(b) || 0) - (completionOf(a) || 0);
     var ad = a.posted_at ? new Date(a.posted_at).getTime() : 0;
@@ -679,6 +690,7 @@ function renderLibrary() {
     return;
   }
 
+  var metric = primaryMetric();
   items.forEach(function (v) {
     var row = document.createElement('div');
     row.className = 'video-row';
@@ -693,7 +705,7 @@ function renderLibrary() {
         '</div>' +
       '</div>' +
       '<div class="video-nums">' +
-        '<div class="n"><div class="n-val">' + fmtInt(v.views) + '</div><div class="n-lbl">Views</div></div>' +
+        '<div class="n"><div class="n-val">' + fmtInt(v[metric]) + '</div><div class="n-lbl">' + primaryMetricLabel(metric) + '</div></div>' +
         '<div class="n"><div class="n-val">' + fmtPct(er) + '</div><div class="n-lbl">Engage</div></div>' +
       '</div>' +
       '<div class="video-del" data-id="' + v.id + '" title="Delete">✕</div>';
@@ -747,13 +759,19 @@ function buildDetail(v) {
     hashHtml = '<div class="hashtag-pills">' + v.hashtags.map(function (h) { return '<span class="hashtag-pill">#' + escapeHtml(h) + '</span>'; }).join('') + '</div>';
   }
 
+  var linkHtml = '';
+  var sourceUrl = findSourceUrl(v);
+  if (sourceUrl) {
+    linkHtml = '<div class="drop-callout"><a href="' + escapeHtml(sourceUrl) + '" target="_blank" rel="noopener" style="color:var(--gold);">view original ↗</a></div>';
+  }
+
   var rawHtml = '';
   if (v.raw_data) {
     rawHtml = '<div style="margin-top:1rem;"><span class="raw-toggle" onclick="this.nextElementSibling.classList.toggle(\'open\')">view raw imported data</span>' +
       '<div class="raw-preview">' + escapeHtml(JSON.stringify(v.raw_data, null, 2)) + '</div></div>';
   }
 
-  wrap.innerHTML = statsHtml + retentionHtml + hashHtml + rawHtml;
+  wrap.innerHTML = statsHtml + retentionHtml + hashHtml + linkHtml + rawHtml;
   return wrap;
 }
 
@@ -802,14 +820,15 @@ function escapeHtml(s) {
 function renderTopPerformers() {
   var el = document.getElementById('top-performers');
   if (!VIDEOS.length) { el.innerHTML = '<div class="empty-note">Nothing to rank yet.</div>'; return; }
-  var top = VIDEOS.slice().sort(function (a, b) { return num(b.views) - num(a.views); }).slice(0, 8);
-  var max = num(top[0].views) || 1;
+  var metric = primaryMetric();
+  var top = VIDEOS.slice().sort(function (a, b) { return num(b[metric]) - num(a[metric]); }).slice(0, 8);
+  var max = num(top[0][metric]) || 1;
   el.innerHTML = top.map(function (v) {
-    var pct = Math.max(4, Math.round((num(v.views) / max) * 100));
+    var pct = Math.max(4, Math.round((num(v[metric]) / max) * 100));
     return '<div class="bd-row">' +
       '<div class="bd-label" title="' + escapeHtml(v.title || '') + '">' + escapeHtml((v.title || '(untitled)').slice(0, 28)) + '</div>' +
       '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
-      '<div class="bd-val">' + fmtInt(v.views) + '</div>' +
+      '<div class="bd-val">' + fmtInt(v[metric]) + '</div>' +
       '</div>';
   }).join('');
 }
@@ -818,11 +837,12 @@ function renderTopPerformers() {
    PLATFORM + DAY BREAKDOWNS
 ════════════════════════════════════════ */
 function renderBreakdowns() {
+  var metric = primaryMetric();
   var byPlatform = {};
   VIDEOS.forEach(function (v) {
     var p = v.platform || 'Other';
     if (!byPlatform[p]) byPlatform[p] = { views: 0, count: 0 };
-    byPlatform[p].views += num(v.views);
+    byPlatform[p].views += num(v[metric]);
     byPlatform[p].count += 1;
   });
   renderBarGroup('platform-breakdown', byPlatform, function (k) { return k; }, function (d) { return fmtInt(d.views); });
@@ -833,7 +853,7 @@ function renderBreakdowns() {
   VIDEOS.forEach(function (v) {
     if (!v.posted_at) return;
     var d = days[new Date(v.posted_at).getDay()];
-    byDay[d].views += num(v.views);
+    byDay[d].views += num(v[metric]);
     byDay[d].count += 1;
   });
   var anyDay = Object.keys(byDay).some(function (k) { return byDay[k].count > 0; });
@@ -1079,8 +1099,18 @@ var FIELD_MAP = {
   saves: ['collectcount', 'collect_count', 'saves', 'bookmarks', 'bookmark_count'],
   avg_watch_time: ['avgwatchtime', 'avg_watch_time', 'averagewatchtimeseconds', 'average_watch_time', 'avg_time_watched'],
   completion_rate: ['completionrate', 'completion_rate', 'videocompletionrate', 'fullvideowatchedrate', 'full_video_watched_rate'],
-  posted_at: ['createtimeiso', 'create_time_iso', 'timestamp', 'date', 'posted_at', 'created_at', 'createtime', 'create_time']
+  posted_at: ['createtimeiso', 'create_time_iso', 'timestamp', 'date', 'posted_at', 'created_at', 'createtime', 'create_time'],
+  thumbnail: ['coverimage', 'cover_image', 'thumbnail', 'thumbnailurl', 'thumbnail_url', 'cover', 'dynamiccover', 'origincover']
 };
+/* Source-link field names — read from raw_data at render time only
+   (not stored as its own column, since the analytics_videos table
+   schema is fixed and we don't want an unrecognized column silently
+   breaking every save). */
+var SOURCE_URL_FIELDS = ['link', 'video_url', 'sharelink', 'share_url', 'url', 'webvideourl', 'web_video_url'];
+
+/* Placeholder values some exports use in place of a real caption —
+   treated as "no title" rather than shown literally. */
+var BLANK_TITLE_VALUES = ['n/a', 'none', 'null', '-'];
 
 function findField(obj, names) {
   var keys = Object.keys(obj);
@@ -1092,13 +1122,20 @@ function findField(obj, names) {
   return undefined;
 }
 
+function findSourceUrl(v) {
+  if (!v.raw_data || typeof v.raw_data !== 'object') return null;
+  var url = findField(v.raw_data, SOURCE_URL_FIELDS);
+  return typeof url === 'string' && url ? url : null;
+}
+
 function normalizeRecord(obj, platformGuess) {
   var row = {
     id: (crypto.randomUUID ? crypto.randomUUID() : 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2)),
     platform: platformGuess || 'Other',
     raw_data: obj
   };
-  row.title = findField(obj, FIELD_MAP.title) || '';
+  var rawTitle = findField(obj, FIELD_MAP.title) || '';
+  row.title = BLANK_TITLE_VALUES.indexOf(String(rawTitle).trim().toLowerCase()) !== -1 ? '' : rawTitle;
   row.views = num(findField(obj, FIELD_MAP.views));
   row.likes = num(findField(obj, FIELD_MAP.likes));
   row.comments = num(findField(obj, FIELD_MAP.comments));
@@ -1120,22 +1157,44 @@ function normalizeRecord(obj, platformGuess) {
     }
   }
   row.hashtags = (row.title.match(/#(\w+)/g) || []).map(function (h) { return h.slice(1); });
-  row.thumbnail = null;
+  var thumb = findField(obj, FIELD_MAP.thumbnail);
+  row.thumbnail = typeof thumb === 'string' && thumb ? thumb : null;
   row.retention_curve = null;
   row.audience = null;
   return row;
 }
 
 function findRecordArray(parsed) {
+  return findRecordArrayDeep(parsed) || [parsed];
+}
+
+function findRecordArrayDeep(parsed) {
   if (Array.isArray(parsed)) return parsed;
-  if (parsed && typeof parsed === 'object') {
-    var candidates = ['videos', 'itemList', 'aweme_list', 'items', 'data', 'posts', 'media'];
-    for (var i = 0; i < candidates.length; i++) {
-      if (Array.isArray(parsed[candidates[i]])) return parsed[candidates[i]];
-    }
-    return [parsed];
+  if (!parsed || typeof parsed !== 'object') return null;
+
+  // TikTok's official "Download your data" export (user_data_tiktok.json)
+  // nests posts several levels deep: Post.Posts.VideoList.
+  if (parsed.Post && parsed.Post.Posts && Array.isArray(parsed.Post.Posts.VideoList)) {
+    return parsed.Post.Posts.VideoList;
   }
-  return [];
+
+  var candidates = ['videos', 'itemList', 'aweme_list', 'items', 'data', 'posts', 'media'];
+  for (var i = 0; i < candidates.length; i++) {
+    if (Array.isArray(parsed[candidates[i]])) return parsed[candidates[i]];
+  }
+
+  // Generic fallback: descend into nested objects looking for the
+  // first array of record-like objects, so other deeply-nested export
+  // shapes still work without a hardcoded path for each one.
+  var keys = Object.keys(parsed);
+  for (var j = 0; j < keys.length; j++) {
+    var val = parsed[keys[j]];
+    if (val && typeof val === 'object' && !Array.isArray(val)) {
+      var nested = findRecordArrayDeep(val);
+      if (nested) return nested;
+    }
+  }
+  return null;
 }
 
 function guessPlatform(text) {
