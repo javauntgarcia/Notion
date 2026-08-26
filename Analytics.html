@@ -11,7 +11,12 @@
   ║                                                              ║
   ║  SUPABASE: run supabase_setup.sql once in your Supabase      ║
   ║  project's SQL editor before using this page — it creates    ║
-  ║  the analytics_videos table this page reads/writes.          ║
+  ║  the analytics_videos table this page reads/writes. Also     ║
+  ║  run the analytics_daily table snippet (see GROWTH SETUP.md  ║
+  ║  / the message this was delivered with) for the Growth Over  ║
+  ║  Time section below — it stores daily account totals from    ║
+  ║  TikTok's "Overview" analytics export, separate from the     ║
+  ║  per-video library.                                          ║
   ║                                                              ║
   ║  QUICK EDIT LANDMARKS — search for these to jump to each     ║
   ║  section you want to change:                                 ║
@@ -20,12 +25,15 @@
   ║  BACKGROUND   → "EDIT: background image URL"                 ║
   ║  FIELD MAP    → "EDIT: recognized import field names"        ║
   ║  STOPWORDS    → "EDIT: SEO stopword list"                    ║
+  ║  DAILY MAP    → "EDIT: recognized daily-overview field names" ║
   ╚══════════════════════════════════════════════════════════════╝
   -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <!-- SheetJS — parses .xlsx exports (TikTok's Growth/Overview analytics file) client-side -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
     /* ══════════════════════════════════════════
@@ -287,6 +295,55 @@
     .drop-callout { font-size: 0.62rem; color: var(--ivory); opacity: 0.6; margin-top: 0.7rem; font-style: italic; }
 
     /* ════════════════════════════════════════
+       GROWTH OVER TIME (daily account totals)
+    ════════════════════════════════════════ */
+    .toggle-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .toggle-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .toggle-pill {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ivory); opacity: 0.55;
+      background: rgba(232,184,75,0.06); border: 1px solid rgba(232,184,75,0.15);
+      border-radius: 99px; padding: 0.35rem 0.85rem; cursor: pointer; transition: all 0.2s;
+    }
+    .toggle-pill.active { color: var(--gold); opacity: 1; background: rgba(232,184,75,0.14); border-color: rgba(232,184,75,0.35); }
+
+    .growth-chart-card { padding: 1.2rem 1.4rem 0.6rem; position: relative; }
+    .growth-chart-wrap { position: relative; width: 100%; }
+    .growth-chart-wrap svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .growth-axis-text { font-family: 'DM Mono', monospace; font-size: 9px; fill: var(--ivory); opacity: 0.45; }
+    .growth-gridline { stroke: rgba(245,237,224,0.08); stroke-width: 1; }
+    .growth-line { fill: none; stroke: var(--gold); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+    .growth-area { fill: url(#growthAreaFill); }
+    .growth-crosshair { stroke: var(--gold); stroke-width: 1; opacity: 0; pointer-events: none; }
+    .growth-hover-dot { fill: var(--gold); stroke: var(--black); stroke-width: 2; opacity: 0; pointer-events: none; }
+    .growth-end-dot { fill: var(--gold); stroke: var(--black); stroke-width: 2; }
+    .growth-hit-layer { fill: transparent; cursor: crosshair; }
+    .growth-tooltip {
+      position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.12s;
+      background: rgba(8,4,4,0.92); border: 1px solid rgba(232,184,75,0.3); border-radius: 8px;
+      padding: 0.5rem 0.7rem; font-family: 'DM Mono', monospace; white-space: nowrap; transform: translate(-50%, -115%);
+      z-index: 20;
+    }
+    .growth-tooltip .gt-date { font-size: 0.56rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ivory); opacity: 0.65; }
+    .growth-tooltip .gt-val { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--warm-white); margin-top: 0.1rem; }
+    .growth-empty { font-size: 0.68rem; color: var(--ivory); opacity: 0.4; padding: 2.5rem 1.5rem; text-align: center; }
+    .growth-peak-note { font-size: 0.62rem; color: var(--ivory); opacity: 0.5; margin-top: 0.6rem; }
+    .growth-peak-note b { color: var(--gold); }
+
+    /* Growth import tabs — visually identical to .import-tab/.import-panel
+       but a separate class so they don't get swept into the video-import
+       tab switcher's global querySelectorAll('.import-tab'). */
+    .g-tab {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--ivory); opacity: 0.5;
+      background: rgba(232,184,75,0.06); border: 1px solid rgba(232,184,75,0.15);
+      border-radius: 99px; padding: 0.45rem 1rem; cursor: pointer; transition: all 0.2s;
+    }
+    .g-tab.active { color: var(--gold); opacity: 1; background: rgba(232,184,75,0.14); border-color: rgba(232,184,75,0.35); }
+    .g-panel { display: none; }
+    .g-panel.active { display: block; }
+
+    /* ════════════════════════════════════════
        BREAKDOWN BARS (platform, day-of-week, hashtags)
     ════════════════════════════════════════ */
     .bd-row { display: flex; align-items: center; gap: 0.9rem; padding: 0.5rem 0; }
@@ -365,11 +422,88 @@
     <div class="divider"></div>
 
     <!-- ══════════════════════════════════════════
+         GROWTH OVER TIME (daily account totals —
+         separate from the per-video library above;
+         comes from TikTok's Analytics "Overview" export)
+    ══════════════════════════════════════════ -->
+    <section id="growth-section">
+      <p class="section-label">Growth Over Time</p>
+      <p class="section-sub">daily account totals — views, profile visits, likes, comments &amp; shares</p>
+
+      <div class="stat-row" style="margin-bottom:1.4rem;">
+        <div class="glass stat-card">
+          <div class="stat-num" id="g-stat-views">—</div>
+          <div class="stat-label">Views (range)</div>
+        </div>
+        <div class="glass stat-card">
+          <div class="stat-num" id="g-stat-profile">—</div>
+          <div class="stat-label">Profile views</div>
+        </div>
+        <div class="glass stat-card">
+          <div class="stat-num" id="g-stat-likes">—</div>
+          <div class="stat-label">Likes</div>
+        </div>
+        <div class="glass stat-card">
+          <div class="stat-num" id="g-stat-days">—</div>
+          <div class="stat-label">Days tracked</div>
+        </div>
+      </div>
+
+      <div class="glass growth-chart-card">
+        <div class="toggle-row">
+          <div class="toggle-group" id="g-metric-toggle">
+            <div class="toggle-pill active" data-metric="video_views">Views</div>
+            <div class="toggle-pill" data-metric="profile_views">Profile Views</div>
+            <div class="toggle-pill" data-metric="likes">Likes</div>
+            <div class="toggle-pill" data-metric="comments">Comments</div>
+            <div class="toggle-pill" data-metric="shares">Shares</div>
+          </div>
+          <div class="toggle-group" id="g-range-toggle">
+            <div class="toggle-pill" data-range="30">30D</div>
+            <div class="toggle-pill" data-range="90">90D</div>
+            <div class="toggle-pill active" data-range="all">All</div>
+          </div>
+        </div>
+        <div class="growth-chart-wrap" id="growth-chart-wrap">
+          <div class="growth-empty" id="growth-empty">No growth data yet — import TikTok's Analytics "Overview" export below (Creator Tools → Analytics → Overview → Export data).</div>
+        </div>
+        <div class="growth-peak-note" id="growth-peak-note"></div>
+      </div>
+
+      <div class="glass" style="padding:1.4rem 1.5rem;margin-top:1rem;">
+        <div class="import-tabs">
+          <div class="g-tab active" data-gtab="file">Upload File</div>
+          <div class="g-tab" data-gtab="paste">Paste Text / JSON</div>
+        </div>
+
+        <div class="g-panel active" data-gpanel="file">
+          <div class="dropzone" id="g-dropzone">
+            <div class="dropzone-label">Drop a .xlsx, .csv or .json Overview export here, or click to browse</div>
+            <div class="dropzone-sub">TikTok Analytics → Overview → Export data — daily totals, not per-video</div>
+          </div>
+          <input type="file" id="g-dz-input" class="dz-file-hidden" accept=".xlsx,.csv,.json,.txt" />
+          <div class="import-status" id="g-file-status"></div>
+        </div>
+
+        <div class="g-panel" data-gpanel="paste">
+          <textarea class="import-paste" id="g-paste-input" placeholder="Paste CSV rows or a JSON array with Date / Video Views / Profile Views / Likes / Comments / Shares columns."></textarea>
+          <div class="form-actions" style="margin-top:0.8rem;">
+            <span class="save-confirm" id="g-paste-confirm">Imported</span>
+            <button class="btn-pill" onclick="importGrowthPastedText()">Parse &amp; Import</button>
+          </div>
+          <div class="import-status" id="g-paste-status"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
          IMPORT / ADD
     ══════════════════════════════════════════ -->
     <section id="import-section">
       <p class="section-label">Add Data</p>
-      <p class="section-sub">import an export file, paste raw text, or enter a video by hand</p>
+      <p class="section-sub">per-video data — import an export file, paste raw text, or enter a video by hand (for daily account totals, use Growth Over Time above)</p>
 
       <div class="glass" style="padding:1.4rem 1.5rem;">
         <div class="import-tabs">
@@ -575,12 +709,51 @@ function sbDelete(id, cb) {
   }).then(function (r) { if (cb) cb(r.ok); }).catch(function () { if (cb) cb(false); });
 }
 
+/* ── DAILY GROWTH TABLE — same Supabase project, separate table.
+   Run this once in the Supabase SQL editor before importing growth data:
+
+   create table if not exists analytics_daily (
+     date date primary key,
+     video_views integer default 0,
+     profile_views integer default 0,
+     likes integer default 0,
+     comments integer default 0,
+     shares integer default 0,
+     updated_at timestamptz default now()
+   );
+   alter table analytics_daily enable row level security;
+   create policy "public read" on analytics_daily for select using (true);
+   create policy "public write" on analytics_daily for insert with check (true);
+   create policy "public update" on analytics_daily for update using (true);
+   -- match this to whatever policy analytics_videos already uses if it differs
+── */
+var DAILY_TABLE = 'analytics_daily';
+function dailySbList(cb) {
+  fetch(SB_URL + '/rest/v1/' + DAILY_TABLE + '?select=*&order=date.asc', { headers: sbHeaders() })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { cb(Array.isArray(d) ? d : []); })
+    .catch(function () { cb(null); });
+}
+function dailySbUpsert(rows, cb) {
+  if (!rows.length) { if (cb) cb(true); return; }
+  fetch(SB_URL + '/rest/v1/' + DAILY_TABLE + '?on_conflict=date', {
+    method: 'POST',
+    headers: sbHeaders({ 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' }),
+    body: JSON.stringify(rows.map(function (r) { return Object.assign({}, r, { updated_at: new Date().toISOString() }); }))
+  }).then(function (r) {
+    if (!r.ok) return r.text().then(function (t) { console.warn('[dailySbUpsert]', r.status, t); });
+    if (cb) cb(true);
+  }).catch(function (e) { console.warn('[dailySbUpsert]', e.message); if (cb) cb(false); });
+}
+
 /* ── LOCAL FALLBACK (mirrors Productivity.html's pattern) ── */
 function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 function saveLocalCache() { lsSet('an_videos_cache', JSON.stringify(VIDEOS)); }
+function saveDailyLocalCache() { lsSet('an_daily_cache', JSON.stringify(DAILY)); }
 
 var VIDEOS = [];
+var DAILY = [];
 
 var now = new Date();
 document.getElementById('today-date').textContent =
@@ -597,6 +770,16 @@ sbList(function (rows) {
     try { VIDEOS = JSON.parse(ls('an_videos_cache') || '[]'); } catch (e) { VIDEOS = []; }
   }
   renderAll();
+});
+
+dailySbList(function (rows) {
+  if (rows) {
+    DAILY = rows;
+    saveDailyLocalCache();
+  } else {
+    try { DAILY = JSON.parse(ls('an_daily_cache') || '[]'); } catch (e) { DAILY = []; }
+  }
+  renderGrowth();
 });
 
 function renderAll() {
@@ -974,6 +1157,358 @@ function renderAudience() {
       '</div>';
   }).join('');
 }
+
+/* ════════════════════════════════════════
+   GROWTH OVER TIME — daily account totals
+   (TikTok Analytics "Overview" export)
+════════════════════════════════════════ */
+var GROWTH_METRIC = 'video_views';
+var GROWTH_RANGE = 'all';
+var GROWTH_METRIC_LABELS = {
+  video_views: 'Views', profile_views: 'Profile Views', likes: 'Likes', comments: 'Comments', shares: 'Shares'
+};
+
+function growthFilteredDays() {
+  if (GROWTH_RANGE === 'all') return DAILY;
+  var n = parseInt(GROWTH_RANGE, 10);
+  return DAILY.slice(Math.max(0, DAILY.length - n));
+}
+
+function renderGrowth() {
+  var wrap = document.getElementById('growth-chart-wrap');
+  var peakNote = document.getElementById('growth-peak-note');
+  var days = growthFilteredDays();
+
+  document.getElementById('g-stat-days').textContent = DAILY.length;
+
+  if (!DAILY.length) {
+    document.getElementById('g-stat-views').textContent = '—';
+    document.getElementById('g-stat-profile').textContent = '—';
+    document.getElementById('g-stat-likes').textContent = '—';
+    wrap.innerHTML = '<div class="growth-empty" id="growth-empty">No growth data yet — import TikTok\'s Analytics "Overview" export below (Creator Tools → Analytics → Overview → Export data).</div>';
+    peakNote.textContent = '';
+    return;
+  }
+
+  var sumViews = days.reduce(function (s, d) { return s + num(d.video_views); }, 0);
+  var sumProfile = days.reduce(function (s, d) { return s + num(d.profile_views); }, 0);
+  var sumLikes = days.reduce(function (s, d) { return s + num(d.likes); }, 0);
+  document.getElementById('g-stat-views').textContent = fmtInt(sumViews);
+  document.getElementById('g-stat-profile').textContent = fmtInt(sumProfile);
+  document.getElementById('g-stat-likes').textContent = fmtInt(sumLikes);
+
+  buildGrowthChart(wrap, days);
+
+  var peak = days.reduce(function (best, d) { return num(d[GROWTH_METRIC]) > num(best[GROWTH_METRIC]) ? d : best; }, days[0]);
+  peakNote.innerHTML = 'Best day for ' + escapeHtml(GROWTH_METRIC_LABELS[GROWTH_METRIC]) + ': <b>' +
+    fmtInt(peak[GROWTH_METRIC]) + '</b> on ' + formatDailyDate(peak.date);
+}
+
+function formatDailyDate(iso) {
+  var d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function buildGrowthChart(wrap, days) {
+  if (!days.length) { wrap.innerHTML = '<div class="growth-empty">Nothing in this range.</div>'; return; }
+
+  var W = 900, H = 220, padL = 42, padR = 10, padT = 14, padB = 26;
+  var plotW = W - padL - padR, plotH = H - padT - padB;
+
+  var vals = days.map(function (d) { return num(d[GROWTH_METRIC]); });
+  var maxVal = Math.max.apply(null, vals);
+  var niceMax = maxVal <= 0 ? 1 : niceCeiling(maxVal);
+
+  function xAt(i) { return padL + (days.length === 1 ? 0 : (i / (days.length - 1)) * plotW); }
+  function yAt(v) { return padT + plotH - (v / niceMax) * plotH; }
+
+  var pts = vals.map(function (v, i) { return xAt(i) + ',' + yAt(v); }).join(' ');
+  var areaPts = 'M' + xAt(0) + ',' + yAt(0) + ' ' + vals.map(function (v, i) { return 'L' + xAt(i) + ',' + yAt(v); }).join(' ') + ' L' + xAt(days.length - 1) + ',' + yAt(0) + ' Z';
+
+  // gridlines + y-axis ticks at 0 / half / max
+  var ticks = [0, niceMax / 2, niceMax];
+  var gridSvg = ticks.map(function (t) {
+    var y = yAt(t);
+    return '<line class="growth-gridline" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y + '" y2="' + y + '" />' +
+      '<text class="growth-axis-text" x="' + (padL - 8) + '" y="' + (y + 3) + '" text-anchor="end">' + fmtInt(t) + '</text>';
+  }).join('');
+
+  // sparse x-axis date labels: first, ~middle, last
+  var xLabelIdxs = days.length > 1 ? [0, Math.floor((days.length - 1) / 2), days.length - 1] : [0];
+  var xLabelsSvg = xLabelIdxs.map(function (i) {
+    return '<text class="growth-axis-text" x="' + xAt(i) + '" y="' + (H - 6) + '" text-anchor="' + (i === 0 ? 'start' : i === days.length - 1 ? 'end' : 'middle') + '">' + formatDailyDate(days[i].date) + '</text>';
+  }).join('');
+
+  var lastIdx = days.length - 1;
+
+  var svg =
+    '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' +
+      '<defs><linearGradient id="growthAreaFill" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0%" stop-color="#e8b84b" stop-opacity="0.22" />' +
+        '<stop offset="100%" stop-color="#e8b84b" stop-opacity="0" />' +
+      '</linearGradient></defs>' +
+      gridSvg +
+      '<path class="growth-area" d="' + areaPts + '" />' +
+      '<polyline class="growth-line" points="' + pts + '" />' +
+      '<circle class="growth-end-dot" cx="' + xAt(lastIdx) + '" cy="' + yAt(vals[lastIdx]) + '" r="4" />' +
+      xLabelsSvg +
+      '<line class="growth-crosshair" id="growth-crosshair" x1="0" x2="0" y1="' + padT + '" y2="' + (H - padB) + '" />' +
+      '<circle class="growth-hover-dot" id="growth-hover-dot" r="5" />' +
+      '<rect class="growth-hit-layer" x="' + padL + '" y="0" width="' + plotW + '" height="' + H + '" />' +
+    '</svg>' +
+    '<div class="growth-tooltip" id="growth-tooltip"><div class="gt-date"></div><div class="gt-val"></div></div>';
+
+  wrap.innerHTML = svg;
+
+  var svgEl = wrap.querySelector('svg');
+  var hitLayer = wrap.querySelector('.growth-hit-layer');
+  var crosshair = document.getElementById('growth-crosshair');
+  var hoverDot = document.getElementById('growth-hover-dot');
+  var tooltip = document.getElementById('growth-tooltip');
+  var tipDate = tooltip.querySelector('.gt-date');
+  var tipVal = tooltip.querySelector('.gt-val');
+
+  function showAt(i) {
+    var x = xAt(i), y = yAt(vals[i]);
+    crosshair.setAttribute('x1', x); crosshair.setAttribute('x2', x);
+    crosshair.style.opacity = 1;
+    hoverDot.setAttribute('cx', x); hoverDot.setAttribute('cy', y);
+    hoverDot.style.opacity = 1;
+    tipDate.textContent = formatDailyDate(days[i].date);
+    tipVal.textContent = fmtInt(vals[i]) + ' ' + GROWTH_METRIC_LABELS[GROWTH_METRIC];
+    var pct = (x / W) * 100;
+    tooltip.style.left = pct + '%';
+    tooltip.style.top = ((y / H) * 100) + '%';
+    tooltip.style.opacity = 1;
+  }
+  function hide() {
+    crosshair.style.opacity = 0;
+    hoverDot.style.opacity = 0;
+    tooltip.style.opacity = 0;
+  }
+
+  hitLayer.addEventListener('pointermove', function (e) {
+    var rect = svgEl.getBoundingClientRect();
+    var relX = ((e.clientX - rect.left) / rect.width) * W;
+    var frac = (relX - padL) / plotW;
+    var i = Math.round(frac * (days.length - 1));
+    i = Math.max(0, Math.min(days.length - 1, i));
+    showAt(i);
+  });
+  hitLayer.addEventListener('pointerleave', hide);
+}
+
+/* Rounds up to a clean axis-tick ceiling (1/2/5 × 10^n) */
+function niceCeiling(v) {
+  var exp = Math.floor(Math.log(v) / Math.LN10);
+  var base = Math.pow(10, exp);
+  var steps = [1, 2, 2.5, 5, 10];
+  for (var i = 0; i < steps.length; i++) {
+    if (v <= steps[i] * base) return steps[i] * base;
+  }
+  return 10 * base;
+}
+
+/* ── Parsing TikTok's daily Overview export ──
+   EDIT: recognized daily-overview field names */
+var DAILY_FIELD_MAP = {
+  date: ['date', 'day'],
+  video_views: ['video views', 'videoviews', 'views', 'plays'],
+  profile_views: ['profile views', 'profileviews'],
+  likes: ['likes'],
+  comments: ['comments'],
+  shares: ['shares']
+};
+var MONTH_NAMES = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+
+function isoDate(d) {
+  var y = d.getFullYear(), m = ('0' + (d.getMonth() + 1)).slice(-2), dd = ('0' + d.getDate()).slice(-2);
+  return y + '-' + m + '-' + dd;
+}
+function parseMonthDay(str) {
+  var m = String(str).trim().match(/^([A-Za-z]+)\s+(\d{1,2})$/);
+  if (!m) return null;
+  var mi = MONTH_NAMES.indexOf(m[1].toLowerCase());
+  if (mi === -1) return null;
+  return { month: mi, day: parseInt(m[2], 10) };
+}
+/* TikTok's Overview export gives dates as "Month Day" with no year, and
+   wraps across a year boundary partway through the file. Infer years by
+   walking backward from the most recent day (assumed close to today) and
+   decrementing the year whenever the month increases going backward. */
+function inferYearsForSeries(mdList) {
+  var n = mdList.length;
+  var years = new Array(n);
+  var today = new Date();
+  var lastMD = mdList[n - 1];
+  var candidateYear = today.getFullYear();
+  var candidate = new Date(candidateYear, lastMD.month, lastMD.day);
+  if (candidate.getTime() > today.getTime() + 2 * 24 * 3600 * 1000) candidateYear -= 1;
+  years[n - 1] = candidateYear;
+  for (var i = n - 2; i >= 0; i--) {
+    years[i] = (mdList[i].month > mdList[i + 1].month) ? years[i + 1] - 1 : years[i + 1];
+  }
+  return years;
+}
+
+function resolveDailyDates(rawRows) {
+  var resolved = new Array(rawRows.length).fill(null);
+  var mdIndices = [];
+  rawRows.forEach(function (r, i) {
+    var raw = r.dateRaw;
+    if (raw === undefined || raw === null || raw === '') return;
+    if (raw instanceof Date && !isNaN(raw.getTime())) { resolved[i] = isoDate(raw); return; }
+    var str = String(raw).trim();
+    if (/\d{4}/.test(str)) {
+      var d = new Date(str);
+      if (!isNaN(d.getTime())) { resolved[i] = isoDate(d); return; }
+    }
+    var md = parseMonthDay(str);
+    if (md) { r._md = md; mdIndices.push(i); return; }
+    var d2 = new Date(str);
+    if (!isNaN(d2.getTime())) resolved[i] = isoDate(d2);
+  });
+  if (mdIndices.length) {
+    var mdList = mdIndices.map(function (i) { return rawRows[i]._md; });
+    var years = inferYearsForSeries(mdList);
+    mdIndices.forEach(function (idx, k) {
+      resolved[idx] = isoDate(new Date(years[k], mdList[k].month, mdList[k].day));
+    });
+  }
+  return resolved;
+}
+
+function normalizeDailyRaw(obj) {
+  return {
+    dateRaw: findField(obj, DAILY_FIELD_MAP.date),
+    video_views: num(findField(obj, DAILY_FIELD_MAP.video_views)),
+    profile_views: num(findField(obj, DAILY_FIELD_MAP.profile_views)),
+    likes: num(findField(obj, DAILY_FIELD_MAP.likes)),
+    comments: num(findField(obj, DAILY_FIELD_MAP.comments)),
+    shares: num(findField(obj, DAILY_FIELD_MAP.shares))
+  };
+}
+
+function importGrowthRecords(records, statusElId) {
+  var status = document.getElementById(statusElId);
+  var rawRows = records.map(normalizeDailyRaw);
+  var dates = resolveDailyDates(rawRows);
+  var rows = [], skipped = 0;
+  rawRows.forEach(function (r, i) {
+    if (!dates[i]) { skipped++; return; }
+    rows.push({ date: dates[i], video_views: r.video_views, profile_views: r.profile_views, likes: r.likes, comments: r.comments, shares: r.shares });
+  });
+  if (!rows.length) {
+    status.textContent = 'Could not find any recognizable Date + metric columns in that file.';
+    return;
+  }
+  var byDate = {};
+  DAILY.forEach(function (d) { byDate[d.date] = d; });
+  rows.forEach(function (r) { byDate[r.date] = r; });
+  DAILY = Object.keys(byDate).map(function (k) { return byDate[k]; }).sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+  saveDailyLocalCache();
+  dailySbUpsert(rows);
+  renderGrowth();
+  status.innerHTML = 'Imported <b>' + rows.length + '</b> day' + (rows.length === 1 ? '' : 's') +
+    (skipped ? ' (' + skipped + ' row' + (skipped === 1 ? '' : 's') + ' skipped — no recognizable date)' : '') + '.';
+}
+
+function handleGrowthImportFile(file) {
+  var status = document.getElementById('g-file-status');
+  status.textContent = 'Reading ' + file.name + '…';
+  var name = file.name.toLowerCase();
+
+  if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+    var xReader = new FileReader();
+    xReader.onload = function (e) {
+      try {
+        var wb = XLSX.read(e.target.result, { type: 'array' });
+        var json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+        importGrowthRecords(json, 'g-file-status');
+      } catch (err) {
+        status.textContent = 'Could not parse that spreadsheet (' + err.message + '). Try the "Paste Text / JSON" tab instead.';
+      }
+    };
+    xReader.onerror = function () { status.textContent = 'Could not read that file.'; };
+    xReader.readAsArrayBuffer(file);
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    var text = e.target.result;
+    try {
+      if (name.endsWith('.csv')) {
+        importGrowthRecords(parseCSV(text), 'g-file-status');
+      } else {
+        importGrowthRecords(findRecordArray(JSON.parse(text)), 'g-file-status');
+      }
+    } catch (err) {
+      status.textContent = 'Could not parse that file as JSON or CSV (' + err.message + '). Try the "Paste Text / JSON" tab.';
+    }
+  };
+  reader.onerror = function () { status.textContent = 'Could not read that file.'; };
+  reader.readAsText(file);
+}
+
+window.importGrowthPastedText = function () {
+  var text = document.getElementById('g-paste-input').value.trim();
+  var status = document.getElementById('g-paste-status');
+  if (!text) { status.textContent = 'Paste something first.'; return; }
+  try {
+    importGrowthRecords(findRecordArray(JSON.parse(text)), 'g-paste-status');
+  } catch (err) {
+    if (text.indexOf(',') !== -1 && text.split('\n')[0].split(',').length > 1) {
+      importGrowthRecords(parseCSV(text), 'g-paste-status');
+    } else {
+      status.textContent = 'Could not parse that as JSON or CSV.';
+      return;
+    }
+  }
+  var c = document.getElementById('g-paste-confirm');
+  c.style.opacity = 1;
+  setTimeout(function () { c.style.opacity = 0; }, 1800);
+  document.getElementById('g-paste-input').value = '';
+};
+
+document.getElementById('g-metric-toggle').addEventListener('click', function (e) {
+  var pill = e.target.closest('.toggle-pill');
+  if (!pill) return;
+  GROWTH_METRIC = pill.dataset.metric;
+  this.querySelectorAll('.toggle-pill').forEach(function (p) { p.classList.remove('active'); });
+  pill.classList.add('active');
+  renderGrowth();
+});
+document.getElementById('g-range-toggle').addEventListener('click', function (e) {
+  var pill = e.target.closest('.toggle-pill');
+  if (!pill) return;
+  GROWTH_RANGE = pill.dataset.range;
+  this.querySelectorAll('.toggle-pill').forEach(function (p) { p.classList.remove('active'); });
+  pill.classList.add('active');
+  renderGrowth();
+});
+
+document.querySelectorAll('.g-tab').forEach(function (tab) {
+  tab.addEventListener('click', function () {
+    document.querySelectorAll('.g-tab').forEach(function (t) { t.classList.remove('active'); });
+    document.querySelectorAll('.g-panel').forEach(function (p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    document.querySelector('.g-panel[data-gpanel="' + tab.dataset.gtab + '"]').classList.add('active');
+  });
+});
+
+var gDropzone = document.getElementById('g-dropzone');
+var gDzInput = document.getElementById('g-dz-input');
+gDropzone.addEventListener('click', function () { gDzInput.click(); });
+gDzInput.addEventListener('change', function () { if (gDzInput.files[0]) handleGrowthImportFile(gDzInput.files[0]); });
+['dragover', 'dragleave', 'drop'].forEach(function (evt) {
+  gDropzone.addEventListener(evt, function (e) {
+    e.preventDefault();
+    if (evt === 'dragover') gDropzone.classList.add('drag');
+    else gDropzone.classList.remove('drag');
+    if (evt === 'drop' && e.dataTransfer.files[0]) handleGrowthImportFile(e.dataTransfer.files[0]);
+  });
+});
 
 /* ════════════════════════════════════════
    IMAGE COMPRESSION
