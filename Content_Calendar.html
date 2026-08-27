@@ -539,6 +539,7 @@
 
     .modal-field input[type="text"],
     .modal-field input[type="url"],
+    .modal-field input[type="date"],
     .modal-field textarea,
     .modal-field select {
       width: 100%;
@@ -554,10 +555,12 @@
     }
     .modal-field input[type="text"]:focus,
     .modal-field input[type="url"]:focus,
+    .modal-field input[type="date"]:focus,
     .modal-field textarea:focus,
     .modal-field select:focus { border-color: rgba(91,111,255,0.55); }
     .modal-field textarea { resize: vertical; min-height: 68px; }
     .modal-field select option { background: #0a0e32; }
+    .modal-field input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) opacity(0.6); cursor: pointer; }
 
     .modal-field.url-field input {
       border-color: rgba(232,160,48,0.20);
@@ -1029,6 +1032,12 @@
   <div class="modal-box">
     <div class="modal-title" id="video-modal-title">Schedule a Video</div>
 
+    <!-- DATE — pick or re-assign the exact date this activity lands on -->
+    <div class="modal-field">
+      <label>Date</label>
+      <input type="date" id="vm-date" />
+    </div>
+
     <!-- IDEA PICKER -->
     <div class="modal-field">
       <label>Choose from your ideas</label>
@@ -1149,6 +1158,11 @@
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Add Shot
       </button>
+    </div>
+
+    <div class="modal-field">
+      <label>Notes</label>
+      <textarea id="im-notes" placeholder="Anything else worth remembering about this one…"></textarea>
     </div>
 
     <div class="modal-actions">
@@ -1497,6 +1511,25 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     if (!cal[toDk]) cal[toDk] = [];
     cal[toDk].push(video);
     setCalData(cal);
+    jumpToWeekContaining(toDk);
+  }
+
+  // Shift the visible week so a given date (YYYY-MM-DD) is on screen —
+  // used after reassigning/moving an activity so it doesn't just vanish
+  // from the currently displayed week.
+  function mondayOf(date) {
+    const d = new Date(date); d.setHours(0,0,0,0);
+    const dow = d.getDay();
+    d.setDate(d.getDate() - (dow===0 ? 6 : dow-1));
+    return d;
+  }
+  function jumpToWeekContaining(dateStr) {
+    if (!dateStr) { renderCalendar(); return; }
+    const [y,m,d] = dateStr.split('-').map(Number);
+    const targetMonday = mondayOf(new Date(y, m-1, d));
+    const todayMonday  = mondayOf(new Date());
+    const diffDays = Math.round((targetMonday - todayMonday) / (1000*60*60*24));
+    weekOffset = Math.round(diffDays / 7);
     renderCalendar();
   }
 
@@ -1590,6 +1623,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     _editVideoIdx      = null;
     _selectedIdeaTitle = null;
     document.getElementById('vm-title').value = '';
+    document.getElementById('vm-date').value = key;
     ['vm-film','vm-edit','vm-post'].forEach(id => document.getElementById(id).checked = false);
     document.getElementById('video-modal-title').textContent = 'Schedule a Video';
     document.getElementById('video-modal-save-btn').textContent = 'Add to Day';
@@ -1608,6 +1642,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     _editVideoIdx      = idx;
     _selectedIdeaTitle = null;
     document.getElementById('vm-title').value = v.title || '';
+    document.getElementById('vm-date').value = dk;
     document.getElementById('vm-film').checked = !!(v.status && v.status.includes('film'));
     document.getElementById('vm-edit').checked = !!(v.status && v.status.includes('edit'));
     document.getElementById('vm-post').checked = !!(v.status && v.status.includes('post'));
@@ -1638,19 +1673,30 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     if (document.getElementById('vm-edit').checked) status.push('edit');
     if (document.getElementById('vm-post').checked) status.push('post');
 
+    // The date field lets an activity be re-assigned to any specific date,
+    // not just the day it was originally scheduled on or dragged onto.
+    const chosenDate = document.getElementById('vm-date').value || _videoTargetDate;
+
     const cal = getCalData();
-    if (!cal[_videoTargetDate]) cal[_videoTargetDate] = [];
-    if (_editVideoIdx !== null && cal[_videoTargetDate][_editVideoIdx]) {
+
+    if (_editVideoIdx !== null && cal[_videoTargetDate] && cal[_videoTargetDate][_editVideoIdx]) {
       const existing = cal[_videoTargetDate][_editVideoIdx];
       existing.title = title;
       existing.status = status;
       // archived flag (if any) is left untouched by editing
+      if (chosenDate && chosenDate !== _videoTargetDate) {
+        cal[_videoTargetDate].splice(_editVideoIdx, 1);
+        if (!cal[_videoTargetDate].length) delete cal[_videoTargetDate];
+        if (!cal[chosenDate]) cal[chosenDate] = [];
+        cal[chosenDate].push(existing);
+      }
     } else {
-      cal[_videoTargetDate].push({ title, status });
+      if (!cal[chosenDate]) cal[chosenDate] = [];
+      cal[chosenDate].push({ title, status });
     }
     setCalData(cal);
     closeVideoModal();
-    renderCalendar();
+    jumpToWeekContaining(chosenDate);
   }
 
   function toggleStatus(e, dk, idx, s) {
@@ -1872,6 +1918,12 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
           <div class="shots-list">${shotsHTML}</div>
         </div>` : '';
 
+      const notesSection = idea.notes ? `
+        <div>
+          <span class="body-label">Notes</span>
+          <div class="shot-text" style="white-space:pre-wrap;">${idea.notes}</div>
+        </div>` : '';
+
       card.innerHTML = `
         <div class="idea-header" onclick="toggleIdea('${bankId}', ${idx})">
           <svg class="idea-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -1882,6 +1934,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
             ${platformsSection}
             ${urlHTML}
             ${shotsSection}
+            ${notesSection}
             <div class="idea-actions">
               <button class="btn btn-sm" onclick="editIdea('${bankId}', ${idx})">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:3px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -1934,6 +1987,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     document.getElementById('idea-modal-title').textContent = _editIdeaIdx !== null ? 'Edit Idea' : 'New Idea';
     document.getElementById('im-title').value = '';
     document.getElementById('im-url').value   = '';
+    document.getElementById('im-notes').value = '';
     ['tiktok','instagram','facebook','linkedin'].forEach(p =>
       document.getElementById('im-'+p).checked = false);
     document.getElementById('shots-builder').innerHTML = '';
@@ -1942,6 +1996,7 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
       const idea = getBankIdeas(_editIdeaBank)[_editIdeaIdx];
       document.getElementById('im-title').value = idea.title || '';
       document.getElementById('im-url').value   = idea.url   || '';
+      document.getElementById('im-notes').value = idea.notes || '';
       (idea.platforms || []).forEach(p => {
         const el = document.getElementById('im-'+p.toLowerCase());
         if (el) el.checked = true;
@@ -1984,8 +2039,9 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     if (document.getElementById('im-linkedin').checked)  platforms.push('LinkedIn');
     const shots = Array.from(document.querySelectorAll('.shot-input'))
       .map(i => i.value.trim()).filter(Boolean);
+    const notes = document.getElementById('im-notes').value.trim();
 
-    const idea  = { title, url, platforms, shots };
+    const idea  = { title, url, platforms, shots, notes };
     const bankId = _editIdeaBank || 'misc';
     const ideas  = getBankIdeas(bankId);
     if (_editIdeaIdx !== null) ideas[_editIdeaIdx] = idea;
