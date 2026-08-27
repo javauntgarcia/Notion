@@ -1038,16 +1038,16 @@
       <input type="date" id="vm-date" />
     </div>
 
-    <!-- IDEA PICKER -->
-    <div class="modal-field">
+    <!-- IDEA PICKER — only shown when scheduling a brand-new topic, not when editing one already on the calendar -->
+    <div class="modal-field" id="idea-picker-field">
       <label>Choose from your ideas</label>
       <div class="idea-picker-list" id="idea-picker-list"></div>
     </div>
 
-    <div class="or-divider"><span>or type a custom title</span></div>
+    <div class="or-divider" id="idea-picker-divider"><span>or type a custom title</span></div>
 
     <div class="modal-field">
-      <label>Custom Title</label>
+      <label id="vm-title-label">Custom Title</label>
       <input type="text" id="vm-title" placeholder="e.g. Word of the Day — Solipsism" />
     </div>
 
@@ -1496,6 +1496,9 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
         <button class="pill-move" onclick="openMoveModal(event,'${dk}',${idx})" title="Move to another day" style="background:none;border:none;cursor:pointer;padding:0;color:rgba(91,111,255,0.35);flex-shrink:0;transition:color 0.15s;" onmouseover="this.style.color='rgba(91,111,255,0.9)'" onmouseout="this.style.color='rgba(91,111,255,0.35)'">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
         </button>
+        <button class="pill-dup" onclick="duplicateVideo(event,'${dk}',${idx})" title="Duplicate — then reassign the date and phase" style="background:none;border:none;cursor:pointer;padding:0;color:rgba(160,174,255,0.4);flex-shrink:0;transition:color 0.15s;" onmouseover="this.style.color='rgba(160,174,255,0.9)'" onmouseout="this.style.color='rgba(160,174,255,0.4)'">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
         <button class="pill-del" onclick="deleteVideo(event,'${dk}',${idx})" title="Remove">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -1673,6 +1676,10 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     ['vm-film','vm-edit','vm-post'].forEach(id => document.getElementById(id).checked = false);
     document.getElementById('video-modal-title').textContent = 'Schedule a Video';
     document.getElementById('video-modal-save-btn').textContent = 'Add to Day';
+    // Adding a new topic — offer the idea picker as a shortcut
+    document.getElementById('idea-picker-field').style.display = '';
+    document.getElementById('idea-picker-divider').style.display = '';
+    document.getElementById('vm-title-label').textContent = 'Custom Title';
     populateIdeaPicker();
     document.getElementById('video-modal').classList.add('open');
   }
@@ -1699,7 +1706,10 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     else addVmShotInput();
     document.getElementById('video-modal-title').textContent = 'Edit Video';
     document.getElementById('video-modal-save-btn').textContent = 'Save Changes';
-    populateIdeaPicker();
+    // Editing an existing topic — the idea picker is only for adding new ones
+    document.getElementById('idea-picker-field').style.display = 'none';
+    document.getElementById('idea-picker-divider').style.display = 'none';
+    document.getElementById('vm-title-label').textContent = 'Title';
     document.getElementById('video-modal').classList.add('open');
   }
 
@@ -1774,6 +1784,24 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
     if (!cal[dk].length) delete cal[dk];
     setCalData(cal);
     renderCalendar();
+  }
+
+  // Clones a scheduled topic onto the same day (fresh copy, not marked as
+  // posted), then opens the editor on the new copy so it can immediately
+  // be reassigned to a different date and/or phase without touching the
+  // original.
+  function duplicateVideo(e, dk, idx) {
+    e.stopPropagation();
+    const cal = getCalData();
+    const src = cal[dk] && cal[dk][idx];
+    if (!src) return;
+    const copy = JSON.parse(JSON.stringify(src));
+    copy.archived = false;
+    cal[dk].push(copy);
+    const newIdx = cal[dk].length - 1;
+    setCalData(cal);
+    renderCalendar();
+    editVideoModal(e, dk, newIdx);
   }
 
   document.getElementById('video-modal').addEventListener('click', function(e) {
