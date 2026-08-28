@@ -18,6 +18,12 @@
   ║  TikTok's "Overview" analytics export, separate from the     ║
   ║  per-video library.                                          ║
   ║                                                              ║
+  ║  ALSO run video_fields_migration.sql (delivered alongside    ║
+  ║  this file, 2026-08-28) once — it adds the category/length/  ║
+  ║  camera-angle/editing-style/audio/hook columns and creates   ║
+  ║  the "analytics-videos" Storage bucket the video uploader    ║
+  ║  below writes to.                                            ║
+  ║                                                              ║
   ║  QUICK EDIT LANDMARKS — search for these to jump to each     ║
   ║  section you want to change:                                 ║
   ║                                                              ║
@@ -26,6 +32,11 @@
   ║  FIELD MAP    → "EDIT: recognized import field names"        ║
   ║  STOPWORDS    → "EDIT: SEO stopword list"                    ║
   ║  DAILY MAP    → "EDIT: recognized daily-overview field names" ║
+  ║  PILLARS      → "<select id=\"m-category\">" in the Add      ║
+  ║                 Data form — edit the <option> list to match  ║
+  ║                 your actual content pillars                  ║
+  ║  VIDEO COMPRESS → "EDIT: longest-side cap for compressed     ║
+  ║                 video" — lower maxDim = smaller files         ║
   ╚══════════════════════════════════════════════════════════════╝
   -->
 
@@ -232,6 +243,19 @@
       width: 60px; height: 60px; border-radius: 8px; background-size: cover; background-position: center;
       background-color: rgba(255,255,255,0.05); border: 1px solid rgba(232,184,75,0.25); flex-shrink: 0;
     }
+
+    /* "Other" free-text reveal next to a select — used by Category, Camera Angle, Editing Style */
+    .other-input { display: none; margin-top: 0.5rem; }
+    .other-input.show { display: block; }
+
+    /* Video file picker (separate from the thumbnail image picker above) */
+    .video-preview {
+      width: 100%; max-width: 220px; border-radius: 8px; margin-top: 0.6rem;
+      border: 1px solid rgba(232,184,75,0.25); display: none; background: rgba(0,0,0,0.3);
+    }
+    .video-preview.show { display: block; }
+    .upload-progress { font-size: 0.6rem; color: var(--ivory); opacity: 0.6; margin-top: 0.4rem; line-height: 1.5; }
+    .upload-progress b { color: var(--gold); }
 
     .form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-top: 1.4rem; }
 
@@ -560,6 +584,88 @@
               </div>
               <div class="field-hint">Compressed automatically before saving to keep storage small</div>
             </div>
+
+            <div class="field field-span-2">
+              <label>Video File</label>
+              <input type="file" id="m-video-input" accept="video/*" />
+              <video class="video-preview" id="m-video-preview" controls muted></video>
+              <div class="upload-progress" id="m-video-status"></div>
+              <div class="field-hint">Re-encoded and downscaled in your browser before upload so it doesn't eat Supabase storage — length below auto-fills from the file</div>
+            </div>
+
+            <div class="field">
+              <label>Content Pillar / Category</label>
+              <select id="m-category">
+                <option value="">— select —</option>
+                <option>Curiosity/Learning</option>
+                <option>Fashion Forward</option>
+                <option>Political Reflections</option>
+                <option>Transportation/Work</option>
+                <option>Couple in Love</option>
+                <option>Too Local</option>
+                <option>Upkeep</option>
+                <option value="__other__">Other…</option>
+              </select>
+              <input type="text" id="m-category-other" class="other-input" placeholder="Name this category" />
+              <div class="field-hint">Auto-fills from Posted Date's day of week (Mon=Curiosity/Learning … Sun=Upkeep) — override anytime</div>
+            </div>
+            <div class="field"><label>Length (seconds)</label><input type="number" id="m-length" min="0" step="0.1" /></div>
+
+            <div class="field">
+              <label>Camera Angle</label>
+              <select id="m-angle">
+                <option value="">— select —</option>
+                <option>Selfie / Front-facing</option>
+                <option>Handheld</option>
+                <option>Tripod / Static</option>
+                <option>POV</option>
+                <option>Over-the-shoulder</option>
+                <option>Wide / Establishing</option>
+                <option>Multi-angle</option>
+                <option value="__other__">Other…</option>
+              </select>
+              <input type="text" id="m-angle-other" class="other-input" placeholder="Describe the angle" />
+            </div>
+            <div class="field">
+              <label>Editing Style</label>
+              <select id="m-editstyle">
+                <option value="">— select —</option>
+                <option>Minimal / talking head</option>
+                <option>Jump cuts</option>
+                <option>Voiceover + B-roll</option>
+                <option>Text-overlay heavy</option>
+                <option>Trending template</option>
+                <option>Montage / fast-cut</option>
+                <option>Skit / multiple takes</option>
+                <option value="__other__">Other…</option>
+              </select>
+              <input type="text" id="m-editstyle-other" class="other-input" placeholder="Describe the edit" />
+            </div>
+
+            <div class="field">
+              <label>Audio (optional)</label>
+              <select id="m-audio">
+                <option value="">— select —</option>
+                <option>Original audio</option>
+                <option>Trending sound</option>
+                <option>Voiceover</option>
+                <option>Music only</option>
+                <option>No sound / silent</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Hook Type (optional)</label>
+              <select id="m-hook">
+                <option value="">— select —</option>
+                <option>Question</option>
+                <option>Bold claim / stat</option>
+                <option>Visual hook</option>
+                <option>Text-on-screen hook</option>
+                <option>Story/anecdote lead-in</option>
+                <option>Direct to camera</option>
+              </select>
+            </div>
+
             <div class="field"><label>Views</label><input type="number" id="m-views" min="0" /></div>
             <div class="field"><label>Likes</label><input type="number" id="m-likes" min="0" /></div>
             <div class="field"><label>Comments</label><input type="number" id="m-comments" min="0" /></div>
@@ -583,7 +689,7 @@
           </div>
           <div class="form-actions">
             <span class="save-confirm" id="manual-confirm">Saved</span>
-            <button class="btn-pill" onclick="saveManualVideo()">Add Video</button>
+            <button class="btn-pill" id="m-save-btn" onclick="saveManualVideo()">Add Video</button>
           </div>
         </div>
       </div>
@@ -603,6 +709,9 @@
           <option>Instagram</option>
           <option>YouTube</option>
           <option>Other</option>
+        </select>
+        <select id="lib-category-filter" onchange="renderLibrary()">
+          <option value="">All categories</option>
         </select>
         <select id="lib-sort" onchange="renderLibrary()">
           <option value="posted_desc">Newest first</option>
@@ -647,6 +756,34 @@
     <div class="divider"></div>
 
     <!-- ══════════════════════════════════════════
+         VIDEO TYPE / FORMAT BREAKDOWN
+    ══════════════════════════════════════════ -->
+    <section id="format-section">
+      <p class="section-label">What Format Performs Best</p>
+      <p class="section-sub">only counts videos where that field was filled in — leave a field blank on a video and it's simply excluded from that box</p>
+      <div class="manual-grid">
+        <div class="glass" style="padding:1.2rem 1.4rem;">
+          <div class="section-sub" style="margin-top:0;">By content pillar / category</div>
+          <div id="category-breakdown"></div>
+        </div>
+        <div class="glass" style="padding:1.2rem 1.4rem;">
+          <div class="section-sub" style="margin-top:0;">By length</div>
+          <div id="length-breakdown"></div>
+        </div>
+        <div class="glass" style="padding:1.2rem 1.4rem;">
+          <div class="section-sub" style="margin-top:0;">By camera angle</div>
+          <div id="angle-breakdown"></div>
+        </div>
+        <div class="glass" style="padding:1.2rem 1.4rem;">
+          <div class="section-sub" style="margin-top:0;">By editing style</div>
+          <div id="editstyle-breakdown"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
          SEO / CAPTION INSIGHTS
     ══════════════════════════════════════════ -->
     <section id="seo-section">
@@ -681,6 +818,27 @@
 var SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
 var SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
 var TABLE  = 'analytics_videos';
+var VIDEO_BUCKET = 'analytics-videos'; // EDIT: must exist as a PUBLIC bucket in Supabase Storage — see migration notes at the end of this file
+
+function fetchWithTimeout(url, options, ms) {
+  var controller = new AbortController();
+  var timer = setTimeout(function () { controller.abort(); }, ms || 8000);
+  var opts = Object.assign({}, options, { signal: controller.signal });
+  return fetch(url, opts).finally(function () { clearTimeout(timer); });
+}
+
+/* Uploads a compressed video Blob (or the raw File, if compression wasn't
+   possible in this browser) to Supabase Storage and returns its public URL. */
+function sbUploadVideo(blobOrFile, filename, contentType, cb) {
+  fetchWithTimeout(SB_URL + '/storage/v1/object/' + VIDEO_BUCKET + '/' + filename, {
+    method: 'POST',
+    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': contentType || 'video/webm' },
+    body: blobOrFile
+  }, 60000).then(function (r) {
+    if (!r.ok) return r.text().then(function (t) { console.warn('[sbUploadVideo]', r.status, t); cb(null); });
+    cb({ url: SB_URL + '/storage/v1/object/public/' + VIDEO_BUCKET + '/' + filename, path: filename });
+  }).catch(function (e) { console.warn('[sbUploadVideo]', e.message); cb(null); });
+}
 
 function sbHeaders(extra) {
   var h = { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY };
@@ -784,11 +942,26 @@ dailySbList(function (rows) {
 
 function renderAll() {
   renderOverview();
+  renderCategoryFilterOptions();
   renderLibrary();
   renderTopPerformers();
   renderBreakdowns();
+  renderFormatBreakdowns();
   renderSEO();
   renderAudience();
+}
+
+/* Rebuilds the category filter's <option> list from whatever categories
+   actually appear in the data, so custom ("Other…") pillars show up too,
+   without hand-maintaining a second static list. */
+function renderCategoryFilterOptions() {
+  var sel = document.getElementById('lib-category-filter');
+  var current = sel.value;
+  var cats = {};
+  VIDEOS.forEach(function (v) { if (v.category) cats[v.category] = true; });
+  var keys = Object.keys(cats).sort();
+  sel.innerHTML = '<option value="">All categories</option>' +
+    keys.map(function (k) { return '<option' + (k === current ? ' selected' : '') + '>' + escapeHtml(k) + '</option>'; }).join('');
 }
 
 /* ════════════════════════════════════════
@@ -808,6 +981,22 @@ function fmtInt(n) {
 }
 function fmtPct(n) { return n === null || n === undefined || isNaN(n) ? '—' : (Math.round(n * 1000) / 10) + '%'; }
 function fmtPct100(n) { return n === null || n === undefined || isNaN(n) ? '—' : Math.round(n) + '%'; }
+function fmtDuration(sec) {
+  sec = Math.round(num(sec));
+  if (sec < 60) return sec + 's';
+  return Math.floor(sec / 60) + 'm ' + (sec % 60) + 's';
+}
+/* Buckets a video's length into a fixed set of short-form ranges so
+   "By length" can compare like with like instead of one bar per second value. */
+function lengthBucket(sec) {
+  sec = num(sec);
+  if (sec <= 0) return null;
+  if (sec < 15) return '<15s';
+  if (sec < 30) return '15–30s';
+  if (sec < 60) return '30–60s';
+  if (sec < 90) return '60–90s';
+  return '90s+';
+}
 function completionOf(v) {
   if (v.completion_rate !== null && v.completion_rate !== undefined && v.completion_rate !== '') return num(v.completion_rate);
   if (v.retention_curve && v.retention_curve.length) {
@@ -853,10 +1042,12 @@ var openDetailId = null;
 function renderLibrary() {
   var list = document.getElementById('video-list');
   var platformFilter = document.getElementById('lib-platform-filter').value;
+  var categoryFilter = document.getElementById('lib-category-filter').value;
   var sortMode = document.getElementById('lib-sort').value;
 
   var items = VIDEOS.slice();
   if (platformFilter) items = items.filter(function (v) { return v.platform === platformFilter; });
+  if (categoryFilter) items = items.filter(function (v) { return v.category === categoryFilter; });
 
   items.sort(function (a, b) {
     if (sortMode === 'views_desc') return num(b[primaryMetric()]) - num(a[primaryMetric()]);
@@ -884,7 +1075,9 @@ function renderLibrary() {
       '<div class="video-main">' +
         '<div class="video-title">' + escapeHtml(v.title || '(untitled)') + '</div>' +
         '<div class="video-meta"><span class="platform-tag">' + escapeHtml(v.platform || 'Other') + '</span>' +
+        (v.category ? '<span class="platform-tag">' + escapeHtml(v.category) + '</span>' : '') +
         (v.posted_at ? '<span>' + new Date(v.posted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + '</span>' : '') +
+        (v.duration_sec ? '<span>' + fmtDuration(v.duration_sec) + '</span>' : '') +
         '</div>' +
       '</div>' +
       '<div class="video-nums">' +
@@ -948,13 +1141,32 @@ function buildDetail(v) {
     linkHtml = '<div class="drop-callout"><a href="' + escapeHtml(sourceUrl) + '" target="_blank" rel="noopener" style="color:var(--gold);">view original ↗</a></div>';
   }
 
+  var formatBits = [];
+  if (v.category) formatBits.push(['Pillar', v.category]);
+  if (v.duration_sec) formatBits.push(['Length', fmtDuration(v.duration_sec)]);
+  if (v.camera_angle) formatBits.push(['Camera Angle', v.camera_angle]);
+  if (v.editing_style) formatBits.push(['Editing Style', v.editing_style]);
+  if (v.audio_type) formatBits.push(['Audio', v.audio_type]);
+  if (v.hook_type) formatBits.push(['Hook', v.hook_type]);
+  var formatHtml = '';
+  if (formatBits.length) {
+    formatHtml = '<div class="hashtag-pills" style="margin-top:0.9rem;">' +
+      formatBits.map(function (b) { return '<span class="hashtag-pill">' + escapeHtml(b[0]) + ': ' + escapeHtml(b[1]) + '</span>'; }).join('') +
+      '</div>';
+  }
+
+  var videoHtml = '';
+  if (v.video_url) {
+    videoHtml = '<video class="video-preview show" style="max-width:280px;margin-top:1rem;" controls src="' + escapeHtml(v.video_url) + '"></video>';
+  }
+
   var rawHtml = '';
   if (v.raw_data) {
     rawHtml = '<div style="margin-top:1rem;"><span class="raw-toggle" onclick="this.nextElementSibling.classList.toggle(\'open\')">view raw imported data</span>' +
       '<div class="raw-preview">' + escapeHtml(JSON.stringify(v.raw_data, null, 2)) + '</div></div>';
   }
 
-  wrap.innerHTML = statsHtml + retentionHtml + hashHtml + linkHtml + rawHtml;
+  wrap.innerHTML = statsHtml + formatHtml + retentionHtml + hashHtml + videoHtml + linkHtml + rawHtml;
   return wrap;
 }
 
@@ -1059,6 +1271,53 @@ function renderBarGroup(elId, dataObj, labelFn, valFn) {
       '<div class="bd-label">' + escapeHtml(labelFn(k)) + '</div>' +
       '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
       '<div class="bd-val">' + valFn(dataObj[k]) + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+/* ════════════════════════════════════════
+   VIDEO TYPE / FORMAT BREAKDOWN
+   Ranked by AVERAGE performance (not total) so a
+   category with 2 videos can still outrank one with
+   20 — that's the whole point of a "what format wins"
+   view, as opposed to the "Where & When" totals above.
+════════════════════════════════════════ */
+var LENGTH_ORDER = ['<15s', '15–30s', '30–60s', '60–90s', '90s+'];
+
+function renderFormatBreakdowns() {
+  var useRate = VIDEOS.some(function (v) { return num(v.views) > 0; });
+  renderAvgBarGroup('category-breakdown', function (v) { return v.category; }, null, useRate);
+  renderAvgBarGroup('angle-breakdown', function (v) { return v.camera_angle; }, null, useRate);
+  renderAvgBarGroup('editstyle-breakdown', function (v) { return v.editing_style; }, null, useRate);
+  renderAvgBarGroup('length-breakdown', function (v) { return lengthBucket(v.duration_sec); }, LENGTH_ORDER, useRate);
+}
+
+function renderAvgBarGroup(elId, keyFn, sortOrder, useRate) {
+  var el = document.getElementById(elId);
+  var groups = {};
+  VIDEOS.forEach(function (v) {
+    var k = keyFn(v);
+    if (!k) return;
+    var val = useRate ? engagementRate(v) : num(v[primaryMetric()]);
+    if (val === null || val === undefined) return;
+    if (!groups[k]) groups[k] = { sum: 0, count: 0 };
+    groups[k].sum += val;
+    groups[k].count += 1;
+  });
+  var keys = Object.keys(groups);
+  if (!keys.length) { el.innerHTML = '<div class="empty-note">No data yet — fill this field in on a few videos to see it here.</div>'; return; }
+  keys.forEach(function (k) { groups[k].avg = groups[k].sum / groups[k].count; });
+  if (sortOrder) keys.sort(function (a, b) { return sortOrder.indexOf(a) - sortOrder.indexOf(b); });
+  else keys.sort(function (a, b) { return groups[b].avg - groups[a].avg; });
+  var max = Math.max.apply(null, keys.map(function (k) { return groups[k].avg; })) || 0.0001;
+  el.innerHTML = keys.map(function (k) {
+    var pct = Math.max(4, Math.round((groups[k].avg / max) * 100));
+    var valLabel = useRate ? fmtPct(groups[k].avg) : fmtInt(groups[k].avg);
+    var n = groups[k].count;
+    return '<div class="bd-row">' +
+      '<div class="bd-label" title="' + escapeHtml(k) + ' — ' + n + ' video' + (n === 1 ? '' : 's') + '">' + escapeHtml(k) + '</div>' +
+      '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="bd-val">' + valLabel + '</div>' +
       '</div>';
   }).join('');
 }
@@ -1562,6 +1821,162 @@ document.getElementById('m-thumb-input').addEventListener('change', function (e)
   });
 });
 
+/* "Other…" reveal — shared by Category, Camera Angle, Editing Style */
+function wireOtherToggle(selectId, otherId) {
+  var sel = document.getElementById(selectId);
+  var other = document.getElementById(otherId);
+  sel.addEventListener('change', function () {
+    if (sel.value === '__other__') { other.classList.add('show'); other.focus(); }
+    else { other.classList.remove('show'); other.value = ''; }
+  });
+}
+wireOtherToggle('m-category', 'm-category-other');
+wireOtherToggle('m-angle', 'm-angle-other');
+wireOtherToggle('m-editstyle', 'm-editstyle-other');
+
+/* Content pillar is tied to day of week — auto-fill Category from
+   Posted Date's weekday, but never clobber a category you already
+   picked yourself. EDIT: PILLAR SCHEDULE — keep this in sync with
+   the <option> list in "<select id="m-category">" above. */
+var PILLAR_BY_DAY = ['Upkeep', 'Curiosity/Learning', 'Fashion Forward', 'Political Reflections', 'Transportation/Work', 'Couple in Love', 'Too Local'];
+document.getElementById('m-date').addEventListener('change', function () {
+  var catSel = document.getElementById('m-category');
+  if (catSel.value || !this.value) return;
+  var day = new Date(this.value + 'T00:00:00').getDay();
+  var pillar = PILLAR_BY_DAY[day];
+  var match = Array.prototype.find.call(catSel.options, function (o) { return o.value === pillar; });
+  if (match) catSel.value = pillar;
+});
+
+function resolvedSelectValue(selectId, otherId) {
+  var val = document.getElementById(selectId).value;
+  if (val === '__other__') return document.getElementById(otherId).value.trim();
+  return val;
+}
+
+function fmtKB(bytes) {
+  if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + 'MB';
+  return Math.round(bytes / 1024) + 'KB';
+}
+
+/* ── VIDEO FILE: read metadata, re-encode smaller, hold in memory until Save ──
+   Auto-fills Length from the file's own duration. Compression plays the
+   clip through an offscreen canvas + MediaRecorder (silently — volume is
+   zeroed but the audio track still feeds the recording), which is the one
+   compression trick available with no server and no extra libraries. If
+   the browser can't do that (e.g. Safari), the original file is uploaded
+   as-is instead of blocking the whole workflow. */
+var manualVideoBlob = null;
+var manualVideoContentType = null;
+var manualVideoDuration = null;
+
+document.getElementById('m-video-input').addEventListener('change', function (e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var status = document.getElementById('m-video-status');
+  var preview = document.getElementById('m-video-preview');
+  manualVideoBlob = null;
+  status.textContent = 'Reading video…';
+  preview.classList.remove('show');
+
+  var url = URL.createObjectURL(file);
+  var probe = document.createElement('video');
+  probe.preload = 'metadata';
+  probe.style.cssText = 'position:fixed;left:-9999px;width:2px;height:2px;';
+  probe.src = url;
+  probe.muted = false;
+  document.body.appendChild(probe);
+
+  probe.onloadedmetadata = function () {
+    manualVideoDuration = probe.duration;
+    if (isFinite(manualVideoDuration) && manualVideoDuration > 0 && !document.getElementById('m-length').value) {
+      document.getElementById('m-length').value = Math.round(manualVideoDuration);
+    }
+    status.textContent = 'Compressing…';
+    compressVideoFile(probe, function (blob) {
+      URL.revokeObjectURL(url);
+      document.body.removeChild(probe);
+      if (blob) {
+        manualVideoBlob = blob;
+        manualVideoContentType = 'video/webm';
+        status.innerHTML = 'Compressed <b>' + fmtKB(file.size) + '</b> → <b>' + fmtKB(blob.size) + '</b>';
+        preview.src = URL.createObjectURL(blob);
+      } else {
+        manualVideoBlob = file;
+        manualVideoContentType = file.type || 'video/mp4';
+        status.innerHTML = 'Couldn\'t compress in this browser — will upload the original file (<b>' + fmtKB(file.size) + '</b>). Consider compressing it first if that\'s large.';
+        preview.src = URL.createObjectURL(file);
+      }
+      preview.classList.add('show');
+    });
+  };
+  probe.onerror = function () {
+    status.textContent = 'Could not read that video file.';
+    document.body.removeChild(probe);
+  };
+});
+
+function compressVideoFile(videoEl, cb) {
+  try {
+    var captureFn = videoEl.captureStream || videoEl.mozCaptureStream;
+    if (!captureFn || !window.MediaRecorder) { cb(null); return; }
+    var mimeCandidates = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+    var mime = null;
+    for (var i = 0; i < mimeCandidates.length; i++) {
+      if (MediaRecorder.isTypeSupported(mimeCandidates[i])) { mime = mimeCandidates[i]; break; }
+    }
+    if (!mime) { cb(null); return; }
+
+    var maxDim = 720; // EDIT: longest-side cap for compressed video — lower = smaller files
+    var vw = videoEl.videoWidth || 640, vh = videoEl.videoHeight || 360;
+    var scale = Math.min(1, maxDim / Math.max(vw, vh));
+    var cw = Math.max(2, Math.round(vw * scale));
+    var ch = Math.max(2, Math.round(vh * scale));
+    var canvas = document.createElement('canvas');
+    canvas.width = cw; canvas.height = ch;
+    var ctx = canvas.getContext('2d');
+
+    var canvasStream = canvas.captureStream(30);
+    var sourceStream = captureFn.call(videoEl);
+    var audioTracks = sourceStream.getAudioTracks();
+    if (audioTracks.length) canvasStream.addTrack(audioTracks[0]);
+
+    var recorder = new MediaRecorder(canvasStream, { mimeType: mime, videoBitsPerSecond: 1500000 });
+    var chunks = [];
+    recorder.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+
+    var drawing = true;
+    function drawFrame() {
+      if (!drawing) return;
+      try { ctx.drawImage(videoEl, 0, 0, cw, ch); } catch (e) {}
+      requestAnimationFrame(drawFrame);
+    }
+
+    var finished = false;
+    function finish() {
+      if (finished) return;
+      finished = true;
+      drawing = false;
+      try { recorder.stop(); } catch (e) {}
+    }
+
+    recorder.onstop = function () { cb(new Blob(chunks, { type: 'video/webm' })); };
+
+    videoEl.volume = 0; // silent to the ear, audio track still reaches the recorder
+    videoEl.currentTime = 0;
+    videoEl.onended = finish;
+    setTimeout(finish, (isFinite(videoEl.duration) ? videoEl.duration * 1000 : 30000) + 4000); // safety net
+
+    videoEl.play().then(function () {
+      recorder.start();
+      drawFrame();
+    }).catch(function () { cb(null); });
+  } catch (e) {
+    console.warn('[compressVideoFile]', e.message);
+    cb(null);
+  }
+}
+
 function parseAudienceText(str) {
   if (!str) return [];
   return str.split(',').map(function (part) {
@@ -1569,6 +1984,34 @@ function parseAudienceText(str) {
     if (!m) return null;
     return { label: m[1].trim(), pct: parseFloat(m[2]) };
   }).filter(Boolean);
+}
+
+function resetManualForm() {
+  ['m-caption', 'm-views', 'm-likes', 'm-comments', 'm-shares', 'm-saves', 'm-watch',
+   'm-r25', 'm-r50', 'm-r75', 'm-r100', 'm-audience', 'm-date', 'm-length',
+   'm-category-other', 'm-angle-other', 'm-editstyle-other'].forEach(function (id) {
+    document.getElementById(id).value = '';
+  });
+  ['m-category', 'm-angle', 'm-editstyle', 'm-audio', 'm-hook'].forEach(function (id) {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('m-category-other').classList.remove('show');
+  document.getElementById('m-angle-other').classList.remove('show');
+  document.getElementById('m-editstyle-other').classList.remove('show');
+
+  manualThumb = null;
+  document.getElementById('m-thumb-preview').style.backgroundImage = '';
+  document.getElementById('m-thumb-input').value = '';
+
+  manualVideoBlob = null;
+  manualVideoContentType = null;
+  manualVideoDuration = null;
+  document.getElementById('m-video-input').value = '';
+  document.getElementById('m-video-status').textContent = '';
+  var preview = document.getElementById('m-video-preview');
+  preview.classList.remove('show');
+  preview.removeAttribute('src');
+  preview.load();
 }
 
 window.saveManualVideo = function () {
@@ -1581,12 +2024,18 @@ window.saveManualVideo = function () {
   var caption = document.getElementById('m-caption').value || '';
   var hashtags = (caption.match(/#(\w+)/g) || []).map(function (h) { return h.slice(1); });
 
-  var row = {
+  var baseRow = {
     id: (crypto.randomUUID ? crypto.randomUUID() : 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2)),
     platform: document.getElementById('m-platform').value,
     title: caption,
     thumbnail: manualThumb,
     posted_at: document.getElementById('m-date').value ? new Date(document.getElementById('m-date').value).toISOString() : null,
+    category: resolvedSelectValue('m-category', 'm-category-other') || null,
+    duration_sec: document.getElementById('m-length').value ? num(document.getElementById('m-length').value) : (manualVideoDuration ? Math.round(manualVideoDuration) : null),
+    camera_angle: resolvedSelectValue('m-angle', 'm-angle-other') || null,
+    editing_style: resolvedSelectValue('m-editstyle', 'm-editstyle-other') || null,
+    audio_type: document.getElementById('m-audio').value || null,
+    hook_type: document.getElementById('m-hook').value || null,
     views: num(document.getElementById('m-views').value),
     likes: num(document.getElementById('m-likes').value),
     comments: num(document.getElementById('m-comments').value),
@@ -1597,25 +2046,43 @@ window.saveManualVideo = function () {
     retention_curve: retention.length ? retention : null,
     audience: parseAudienceText(document.getElementById('m-audience').value),
     hashtags: hashtags,
+    video_url: null,
+    video_path: null,
     raw_data: null
   };
 
-  VIDEOS.unshift(row);
-  saveLocalCache();
-  sbUpsert(row);
-  renderAll();
+  var saveBtn = document.getElementById('m-save-btn');
 
-  var c = document.getElementById('manual-confirm');
-  c.style.opacity = 1;
-  setTimeout(function () { c.style.opacity = 0; }, 1800);
+  function finalizeSave(videoInfo) {
+    var row = Object.assign({}, baseRow);
+    if (videoInfo) { row.video_url = videoInfo.url; row.video_path = videoInfo.path; }
 
-  // reset form
-  ['m-caption','m-views','m-likes','m-comments','m-shares','m-saves','m-watch','m-r25','m-r50','m-r75','m-r100','m-audience','m-date'].forEach(function (id) {
-    document.getElementById(id).value = '';
-  });
-  manualThumb = null;
-  document.getElementById('m-thumb-preview').style.backgroundImage = '';
-  document.getElementById('m-thumb-input').value = '';
+    VIDEOS.unshift(row);
+    saveLocalCache();
+    sbUpsert(row);
+    renderAll();
+
+    var c = document.getElementById('manual-confirm');
+    c.style.opacity = 1;
+    setTimeout(function () { c.style.opacity = 0; }, 1800);
+
+    resetManualForm();
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Add Video';
+  }
+
+  if (manualVideoBlob) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Uploading video…';
+    var ext = (manualVideoContentType || '').indexOf('mp4') !== -1 ? 'mp4' : 'webm';
+    var filename = baseRow.id + '.' + ext;
+    sbUploadVideo(manualVideoBlob, filename, manualVideoContentType, function (result) {
+      if (!result) document.getElementById('m-video-status').textContent = 'Video upload failed — everything else was saved. Re-open this video later and re-add just the file if you want it.';
+      finalizeSave(result);
+    });
+  } else {
+    finalizeSave(null);
+  }
 };
 
 /* ════════════════════════════════════════
