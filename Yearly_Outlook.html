@@ -601,6 +601,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   await seedMilestones();
+  await seedQuarterNotes();
   YEARS.forEach(yr => buildPanel(yr));
   const def = YEARS.includes(String(todayY)) ? String(todayY) : '2026';
   switchYear(def);
@@ -799,44 +800,51 @@ async function seedMilestones() {
     { date:'2026-12-01', title:'Roth IRA 2026 maxed ($7,000)',         notes:'Finance' },
     { date:'2027-01-01', title:'Roth IRA 2027 contributions begin',    notes:'Finance' },
     { date:'2027-01-01', title:'Wedding fund savings begin',           notes:'Finance' },
-    { date:'2027-06-01', title:'Buenos Aires living fund target hit',  notes:'Finance' },
-    { date:'2026-07-01', end_date:'2028-04-01', title:'Citi card payoff phase', notes:'Finance · $280/mo for 20 months' },
-    { date:'2028-04-01', title:'Citi card fully paid off 🎉',          notes:'Finance · cash flow freed' },
+    { date:'2028-07-01', title:'Buenos Aires living fund target hit',  notes:'Finance' },
+    { date:'2026-07-01', end_date:'2028-03-01', title:'Citi card payoff phase', notes:'Finance · $280/mo for ~20 months' },
+    { date:'2028-03-01', title:'Citi card fully paid off 🎉',          notes:'Finance · cash flow freed' },
 
     // ── CONTENT CREATION ──
-    { date:'2026-06-01', title:'10K TikTok milestone 🎯',              notes:'Content · 1 full year serious' },
     { date:'2026-09-01', title:'Brand partnership conversations begin', notes:'Content' },
     { date:'2026-12-01', title:'First paid brand partnership',         notes:'Content' },
-    { date:'2027-03-01', title:'Pitch Streetsblog SF / Next City',     notes:'Content · longform policy writing' },
+    { date:'2027-02-01', title:'Pitch Streetsblog SF / Next City',     notes:'Content · longform policy writing' },
     { date:'2027-06-01', title:'2–3 published longform pieces',        notes:'Content' },
-    { date:'2027-07-01', end_date:'2028-12-31', title:'Buenos Aires content era', notes:'Content · travel series' },
+    { date:'2028-08-01', end_date:'2029-07-31', title:'Buenos Aires content era', notes:'Content · travel series' },
+
+    // ── SOCIAL GROWTH + CLOTHING/CRAFT INCOME ──
+    { date:'2026-10-01', title:'Learn embroidery, crochet & sewing basics', notes:'Craft skills' },
+    { date:'2026-11-01', title:'Experiment: solar/sun-fade dye + first sublimation print test', notes:'Craft skills' },
+    { date:'2026-10-01', end_date:'2027-05-05', title:'Social growth push toward 10,000 followers', notes:'Goal: by birthday (May 5)' },
+    { date:'2027-01-01', title:'First handmade/customized clothing piece listed for sale', notes:'Secondary income launch' },
+    { date:'2027-05-05', title:'🎂 10,000 followers + secondary clothing income established', notes:'Birthday goal — social + craft income' },
 
     // ── ENGAGEMENT & WEDDING ──
     { date:'2027-03-15', title:'Engagement 💍',                        notes:'Spring 2027 · March–April window' },
     { date:'2027-05-01', title:'Wedding venue booked — Sayulita',      notes:'Wedding' },
-    { date:'2027-07-01', title:'Vendors locked (photo, planner, catering)', notes:'Wedding' },
+    { date:'2027-06-15', title:'Photographer & planner locked',        notes:'Wedding' },
+    { date:'2027-07-01', title:'Catering & florals booked',            notes:'Wedding' },
     { date:'2027-09-01', title:'Invitations designed & sent',          notes:'Wedding' },
     { date:'2027-10-01', title:'Guest travel logistics finalized',     notes:'Wedding' },
-    { date:'2028-03-01', end_date:'2028-05-31', title:'Wedding window 🎉', notes:'March–May 2028' },
-    { date:'2028-05-15', end_date:'2028-06-30', title:'Honeymoon — Brazil & Argentina 🌎', notes:'South America' },
+    { date:'2028-03-01', end_date:'2028-03-31', title:'Wedding — Sayulita 🎉', notes:'March 2028' },
+    { date:'2028-04-01', end_date:'2028-04-30', title:'Honeymoon — Brazil & Argentina 🌎', notes:'South America' },
 
     // ── GAP YEAR / MOVE ABROAD ──
     { date:'2026-09-01', end_date:'2026-12-31', title:'Buenos Aires research & visa prep', notes:'Gap Year Prep' },
-    { date:'2026-12-01', title:'Passport renewed',                     notes:'Gap Year Prep' },
-    { date:'2027-01-01', title:'Final SFMTA date set, notice given',   notes:'Gap Year' },
-    { date:'2027-03-01', title:'Last day at SFMTA',                    notes:'Gap Year begins' },
-    { date:'2027-04-01', title:'Arrive Buenos Aires 🌎',               notes:'Gap Year · base city' },
-    { date:'2027-04-01', end_date:'2028-06-30', title:'Gap year abroad', notes:'Buenos Aires base' },
-    { date:'2027-06-01', end_date:'2028-05-31', title:'Regional South America travel', notes:'Colombia, Peru, Chile, Brazil' },
+    { date:'2026-11-01', title:'Passport renewed',                     notes:'Gap Year Prep' },
+    { date:'2028-05-01', title:'SFMTA formal notice given — last day set for August', notes:'Gap Year · SFERS vesting confirmed' },
+    { date:'2028-08-01', title:'Last day at SFMTA',                    notes:'Gap Year begins · 5 years, pension vested' },
+    { date:'2028-08-15', title:'Arrive Buenos Aires 🌎',               notes:'Gap Year · base city' },
+    { date:'2028-08-01', end_date:'2029-07-31', title:'Gap year abroad', notes:'Buenos Aires base' },
+    { date:'2028-10-01', end_date:'2029-06-30', title:'Regional South America travel', notes:'Colombia, Peru, Chile, Brazil' },
 
     // ── LAW SCHOOL ──
-    { date:'2027-01-01', end_date:'2027-06-01', title:'LSAT prep phase', notes:'Law School · target 170+' },
+    { date:'2026-10-01', end_date:'2027-06-01', title:'LSAT prep phase', notes:'Law School · target 170+' },
     { date:'2027-06-15', title:'LSAT sitting',                         notes:'Law School · June/Aug 2027' },
-    { date:'2027-09-01', title:'LSAT retake if needed',                notes:'Law School' },
-    { date:'2028-09-01', end_date:'2028-12-31', title:'Law school applications', notes:'Columbia, NYU, Stanford, Berkeley, Penn' },
-    { date:'2029-03-01', title:'Law school decisions arrive',          notes:'Law School · negotiate LRAP' },
-    { date:'2029-05-01', title:'Commit to law school',                 notes:'Law School' },
-    { date:'2029-08-01', title:'Law school begins 🎓',                 notes:'Law School' },
+    { date:'2027-08-01', title:'LSAT retake if needed',                notes:'Law School' },
+    { date:'2027-09-01', end_date:'2027-10-31', title:'Law school applications submitted — all T-14', notes:'Columbia, NYU, Stanford, Berkeley, Penn' },
+    { date:'2028-01-01', title:'Law school decisions arrive',          notes:'Law School · negotiate LRAP' },
+    { date:'2028-04-01', title:'Commit to law school — deposit paid',  notes:'Law School' },
+    { date:'2029-08-01', title:'Law school begins 🎓',                 notes:'Law School · Fall 2029' },
   ];
 
   const existing = getEvents();
@@ -851,6 +859,52 @@ async function seedMilestones() {
   }));
 
   setEvents([...existing, ...seeded]);
+}
+
+/* ══════════════════════════════════
+   SEED QUARTERLY SUMMARIES (runs once)
+   Pulled from the detailed month-by-month roadmap
+   (Monthly_Outline.html). Only fills a quarter box
+   that is still empty — never overwrites anything
+   you've already typed.
+══════════════════════════════════ */
+async function seedQuarterNotes() {
+  if (_yrData.quarterSeeded) return;
+
+  const seeds = {
+    '2026': {
+      q3: `Consistency era — gym, meals, posting 7x/week.\nSupplements dialed in; protein target hit.\nDraft first CalMatters op-ed; land first news pitch.\nEmergency fund building (month 1 of 3).\nPay off debt; map goals for the final 90 days of 2026.`,
+      q4: `LSAT prep begins — Logical Reasoning → Reading Comp → full timed practice tests weekly.\nRing research → budget confirmed → ring purchased 💍.\nRoth IRA 2026 maxed ($7K); emergency fund fully funded.\nFulbright application requirements reviewed.\nBrand pitch deck drafted; first brand partnership conversation.\nSocial growth push begins — building toward 10,000 followers by birthday (May 5).\nStart learning hand embroidery, crochet & sewing basics; experiment with solar/sun-fade dye and a first sublimation print test.\nPassport renewed; year-end SFMTA review documented.`,
+    },
+    '2027': {
+      q1: `LSAT registered for June/Aug 2027; practice score climbs 165+ → 170+.\nFulbright statement of grant purpose drafted (v1 → v2); affiliates identified.\nPROPOSE TO ESTON 💍 (March) — Sayulita wedding planning begins.\nRoth IRA Year 2 + wedding fund savings begin.\nFirst paid brand partnership; longform pitch to Next City/CityLab.\nFirst handmade/customized clothing piece listed for sale — secondary income stream launches.\nFollower growth accelerating toward the 10K/May 5 birthday goal.`,
+      q2: `LSAT final prep sprint → peak practice → LSAT SITTING in June.\nT-14 school list finalized.\nFulbright: letter of affiliation received; personal statement final draft.\nSayulita venue shortlisted, then booked — deposit paid, date locked.\n🎂 May 5 — 10,000 followers hit + secondary clothing income established (embroidery/crochet/sewing/dye/sublimation pieces selling).\nWedding fund 30%+; 3rd byline published.`,
+      q3: `LSAT score arrives — retake assessment if needed (retake in August).\nFulbright application SUBMITTED.\nLaw school apps open: CAS/transcripts in, rec letters requested — this is the window to lock the application-cycle decision, and applications go out by October.\nStep 4 SFMTA raise redirected fully to savings.\nWedding: catering & florals booked, save-the-dates + invitations out; fund 60%+.\nGrowth continues past 10K toward 15K–25K; clothing/craft income scaling up.\nBayview Shuttle white paper published.`,
+      q4: `LAW SCHOOL APPLICATIONS SUBMITTED — all T-14.\nLRAP research complete; Fulbright interview if selected.\nDecisions start arriving late Dec/Jan.\nGuest travel logistics confirmed; wedding fund 90%+; pre-wedding fitness peak.\nRoth IRA 2027 maxed; 2028 contributions begin.`,
+    },
+    '2028': {
+      q1: `Law school decisions compiled — compare offers, negotiate aid/LRAP.\nFulbright finalist/alternate notification.\nWEDDING — Sayulita, Mexico 🎉 (March) + honeymoon Brazil → Argentina (April).\nCiti card FINAL PAYMENT — debt free.\nLaw school commitment deposit paid; Buenos Aires housing research begins.`,
+      q2: `Return from honeymoon; post-wedding financial reset; "new chapter" content era begins.\nSFMTA formal notice given — last day set for August; SFERS vesting confirmed.\nExpat CPA identified; Buenos Aires lease signed.\nLaw school housing research; rest and protect the baseline before departure.`,
+      q3: `Last day at SFMTA (SFERS vested) — five years complete.\nDepart for the gap year abroad; land and settle into Buenos Aires.\nSet up banking/logistics as an expat.\n(Beyond June 2028 the month-by-month plan hasn't been mapped in detail yet — good next planning horizon.)`,
+      q4: `Gap year abroad continues from the Buenos Aires base — regional South America travel begins.\nContent creation continues from the road.\nStart squaring away housing, finances, and LRAP details for the Fall 2029 law school start.`,
+    },
+  };
+
+  if (!_yrData.notes) _yrData.notes = {};
+  Object.keys(seeds).forEach(yr => {
+    const existing = _yrData.notes[yr] || {};
+    const fill = seeds[yr];
+    _yrData.notes[yr] = {
+      theme: existing.theme || '',
+      q1: existing.q1 || fill.q1 || '',
+      q2: existing.q2 || fill.q2 || '',
+      q3: existing.q3 || fill.q3 || '',
+      q4: existing.q4 || fill.q4 || '',
+    };
+  });
+
+  _yrData.quarterSeeded = true;
+  await saveYearly();
 }
 
 function openNewModal(ds) {

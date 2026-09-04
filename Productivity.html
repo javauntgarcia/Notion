@@ -1081,6 +1081,7 @@
   function initPage() {
     renderAffirmations();
     renderGoals();
+    buildVocabFlashcards();
   }
 
   sbGet('productivity', 'singleton', function(row) {
@@ -1095,15 +1096,81 @@
       _prod.prod_jour_done    = ls('prod_jour_done') === '1' ? 1 : 0;
       _prod.prod_social_weeks = parseInt(ls('prod_social_weeks')) || 0;
     }
+
+    // One-time verification against the real Depop_Sales CSV exports
+    // (Jan 1 – Sep 3, 2026): 46 valid orders / 50 items sold (bundles
+    // counted by item, 2 fully-cancelled rows excluded) / $887.83 net
+    // revenue after partial refunds. Only raises prod_dep_sold if the
+    // stored count is behind what the sales data proves — never walks
+    // it back down, so manual entries above this floor are untouched.
+    var DEPOP_CSV_VERIFIED_SOLD = 50;
+    if ((parseInt(_prod.prod_dep_sold) || 0) < DEPOP_CSV_VERIFIED_SOLD) {
+      _prod.prod_dep_sold = DEPOP_CSV_VERIFIED_SOLD;
+      patchProd(['prod_dep_sold']);
+    }
+
     sbGet('vocabulary', 'singleton', function(vrow) {
       if (vrow && vrow.words) {
         _vocab = vrow;
       } else {
         try { _vocab.words = JSON.parse(ls('vl_words') || '[]'); } catch(e) {}
       }
-      initPage();
+      reconcileSocialGoal(initPage);
     });
   });
+
+  /* ════════════════════════════════════════
+     SOCIAL GOAL RECONCILIATION
+     Planning.html's daily "Post on social media"
+     checkbox is the primary source for the
+     weeks-with-a-post count (it syncs prod_social_weeks
+     live as you check things off). As a fallback/
+     verification step, this also scans Analytics.html's
+     video log (analytics_videos) for TikTok/Instagram
+     posts and folds in any week that has a logged post
+     but never got checked off in Planning. It only ever
+     raises the count to match what's provable — it never
+     walks it backward, so it can't undo manual progress.
+  ════════════════════════════════════════ */
+  var SOCIAL_TASK_TEXTS = ['Post on social media', 'Post on TikTok'];
+  function weekKeyOf(dateKeyStr) {
+    var d = new Date(dateKeyStr + 'T00:00:00');
+    var dow = d.getDay(); // 0=Sun … 6=Sat
+    d.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow)); // back up to Monday
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function reconcileSocialGoal(cb) {
+    fetch(SB_URL + '/rest/v1/planning_archive?select=id,habits', {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY }
+    }).then(function(r){ return r.json(); }).catch(function(){ return []; }).then(function(archive) {
+      archive = Array.isArray(archive) ? archive : [];
+      var weeks = {};
+      archive.forEach(function(day) {
+        if (!day || !day.id || !Array.isArray(day.habits)) return;
+        var hit = day.habits.some(function(h){ return h && SOCIAL_TASK_TEXTS.indexOf(h.text) !== -1 && h.done; });
+        if (hit) weeks[weekKeyOf(day.id)] = true;
+      });
+
+      fetch(SB_URL + '/rest/v1/analytics_videos?select=posted_at,platform', {
+        headers: { apikey: SB_KEY, Authorization: 'Bearer '+SB_KEY }
+      }).then(function(r){ return r.json(); }).catch(function(){ return []; }).then(function(videos) {
+        videos = Array.isArray(videos) ? videos : [];
+        videos.forEach(function(v) {
+          if (!v || !v.posted_at) return;
+          if (v.platform !== 'TikTok' && v.platform !== 'Instagram') return;
+          weeks[weekKeyOf(v.posted_at.slice(0,10))] = true;
+        });
+
+        var count2026 = Object.keys(weeks).filter(function(wk){ return wk.slice(0,4) === '2026'; }).length;
+        var verified = Math.min(52, count2026);
+        if (verified > (parseInt(_prod.prod_social_weeks) || 0)) {
+          _prod.prod_social_weeks = verified;
+          patchProd(['prod_social_weeks']);
+        }
+        cb();
+      });
+    });
+  }
 
   /* ════════════════════════════════════════
      SECTION 1 — AFFIRMATIONS
@@ -1274,7 +1341,7 @@
      takes the 25 most recently added non-archived
      words and shuffles them each session.
   ════════════════════════════════════════ */
-  (function() {
+  function buildVocabFlashcards() {
     var wrapper = document.getElementById('fc-wrapper');
 
     /* ── Base dataset (mirrors Vocabulary List.html) ── */
@@ -1431,7 +1498,7 @@
     }
 
     deck.length ? buildDeck() : renderEmpty();
-  })();
+  }
 
   /* Sync across tabs */
   window.addEventListener('storage', function(){ location.reload(); });
