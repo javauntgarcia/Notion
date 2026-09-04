@@ -1047,8 +1047,19 @@
   var _prod = { id:'singleton', affirmations:null, prod_curr_done:0, prod_dep_sold:0, prod_jour_done:0, prod_social_weeks:0, vision_notes:{} };
   var _vocab = { id:'singleton', words:[] };
 
-  function saveProd() {
-    sbUpsert('productivity', _prod);
+  // Patches only the fields listed in `fields` — NOT the whole cached
+  // _prod object. Planning.html now also writes to prod_social_weeks
+  // (via the daily "Post on social media" checkbox), so if this page has
+  // been open a while, _prod can be stale in ways that don't matter for
+  // whatever the person just clicked here. Sending the entire object on
+  // every save would silently overwrite that other field with whatever
+  // was cached at page load, undoing progress logged from Planning.html
+  // in the meantime. The local mirror still saves everything, since
+  // that's just this browser's own offline fallback.
+  function patchProd(fields) {
+    var payload = { id: 'singleton' };
+    fields.forEach(function(k) { payload[k] = _prod[k]; });
+    sbUpsert('productivity', payload);
     lsSet('prod_affirmations', JSON.stringify(_prod.affirmations));
     lsSet('prod_curr_done',    _prod.prod_curr_done);
     lsSet('prod_dep_sold',     _prod.prod_dep_sold);
@@ -1135,7 +1146,7 @@
     var vals = [];
     inputs.forEach(function(inp) { vals.push(inp.value || ''); });
     _prod.affirmations = vals;
-    saveProd();
+    patchProd(['affirmations']);
     var c = document.getElementById('aff-confirm');
     c.style.opacity = 1;
     setTimeout(function(){ c.style.opacity = 0; }, 1800);
@@ -1152,16 +1163,29 @@
   ════════════════════════════════════════ */
 
   window.stepGoal = function(key, delta, max, id) {
+    if (key === 'prod_social_weeks') {
+      // Planning.html's daily checkbox can bump this between page loads,
+      // so read the live value before applying the manual +/- instead of
+      // trusting whatever was cached when this page opened.
+      sbGet('productivity', 'singleton', function(row) {
+        var cur  = (row && parseInt(row.prod_social_weeks)) || 0;
+        var next = Math.min(max, Math.max(0, cur + delta));
+        _prod.prod_social_weeks = next;
+        patchProd(['prod_social_weeks']);
+        renderGoals();
+      });
+      return;
+    }
     var cur  = parseInt(_prod[key]) || 0;
     var next = Math.min(max, Math.max(0, cur + delta));
     _prod[key] = next;
-    saveProd();
+    patchProd([key]);
     renderGoals();
   };
 
   window.toggleGoal = function(key, id) {
     _prod[key] = _prod[key] ? 0 : 1;
-    saveProd();
+    patchProd([key]);
     renderGoals();
   };
 
@@ -1233,7 +1257,7 @@
     if (!_prod.vision_notes) _prod.vision_notes = {};
     _prod.vision_notes[key]       = val;
     _prod.vision_notes[key+'_ts'] = t;
-    saveProd();
+    patchProd(['vision_notes']);
     document.getElementById('vis-saved-at').textContent = 'Saved ' + t;
     var btn = document.querySelector('.vis-footer .btn-pill');
     var orig = btn.textContent;
@@ -1411,8 +1435,6 @@
 
   /* Sync across tabs */
   window.addEventListener('storage', function(){ location.reload(); });
-
-})();
 </script>
 
 </body>
