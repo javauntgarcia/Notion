@@ -414,6 +414,43 @@ body {
 .add-book-form input::placeholder { color: var(--text-muted); }
 .add-book-form input:focus { border-color: var(--accent); }
 
+/* Libby status — manual tracker (no public Libby/OverDrive API exists
+   for personal-account holds/loans, so this is a self-reported status
+   you set after checking the app yourself). */
+.modal-libby-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+.libby-select {
+  background: rgba(46, 42, 38, 0.45);
+  border: 1px solid rgba(140, 115, 85, 0.25);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--warm-white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.libby-select:focus { border-color: var(--accent); }
+.book-libby-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 5px;
+  margin-left: 0.5rem;
+  white-space: nowrap;
+  border: 1px solid rgba(140, 115, 85, 0.3);
+  color: var(--text-muted);
+}
+.book-libby-badge.available { color: #9ab89c; border-color: rgba(154,184,156,0.4); }
+.book-libby-badge.hold      { color: #d8b06a; border-color: rgba(216,176,106,0.4); }
+.book-libby-badge.wishlist  { color: #b89ac0; border-color: rgba(184,154,192,0.4); }
+
 .btn-pill {
   border-radius: 99px;
   font-family: 'DM Mono', monospace;
@@ -754,6 +791,20 @@ body {
       <span class="read-toggle-label">Mark as read</span>
     </div>
 
+    <!-- Libby status — self-reported (no public API for personal Libby
+         holds/loans exists), so this just tracks what you saw when you
+         last checked the app, to help sequence what to read next. -->
+    <div class="modal-libby-row">
+      <span class="read-toggle-label">Libby</span>
+      <select class="libby-select" id="modal-libby-status">
+        <option value="">Not checked</option>
+        <option value="available">Available now</option>
+        <option value="hold">On hold list</option>
+        <option value="wishlist">On wishlist</option>
+        <option value="own">Own a copy</option>
+      </select>
+    </div>
+
     <div class="modal-divider"></div>
 
     <p class="modal-section-label">Notes</p>
@@ -816,6 +867,16 @@ const CURRICULUM = [
           { id: "scurati-m",         title: "M: Son of the Century",                    author: "Antonio Scurati" },
           { id: "oldenburg-great",   title: "The Great Good Place",                     author: "Ray Oldenburg" },
           { id: "paxton-anatomy",    title: "The Anatomy of Fascism",                   author: "Robert O. Paxton" },
+          { id: "turchin-endtimes",  title: "End Times: Elites, Counter-Elites, and the Path of Political Disintegration", author: "Peter Turchin" },
+        ]
+      },
+      {
+        id: "2026-fall-spirituality",
+        label: "Fall",
+        track: "Spirituality & Identity",
+        books: [
+          { id: "baldwin-fire",      title: "The Fire Next Time",                       author: "James Baldwin" },
+          { id: "ehrman-heaven",     title: "Heaven and Hell: A History of the Afterlife", author: "Bart D. Ehrman" },
         ]
       },
       {
@@ -861,7 +922,7 @@ const CURRICULUM = [
    ============================================================ */
 
 // ── SUPABASE STATE ──
-let _cur = { id: 'singleton', read_items: {}, notes: {}, quotes: {}, added: {} };
+let _cur = { id: 'singleton', read_items: {}, notes: {}, quotes: {}, added: {}, libby: {} };
 
 async function saveCur() {
   await sbUpsert('personal_curriculum', _cur);
@@ -870,6 +931,20 @@ async function saveCur() {
   Object.keys(_cur.notes).forEach(k => lsSet('cur_notes_' + k, _cur.notes[k]));
   Object.keys(_cur.quotes).forEach(k => lsSet('cur_quotes_' + k, _cur.quotes[k]));
   Object.keys(_cur.added).forEach(k => lsSet('cur_added_' + k, JSON.stringify(_cur.added[k])));
+  Object.keys(_cur.libby || {}).forEach(k => lsSet('cur_libby_' + k, _cur.libby[k]));
+}
+
+// One-time seed: mark books Javaun has already confirmed reading as read,
+// if not already marked (never overrides a manual "unread" toggle back —
+// only sets it the first time, same pattern as Productivity.html's Depop
+// verification). Spring 2026: M: Son of the Century, End Times.
+const ALREADY_READ_SEED = ['scurati-m', 'turchin-endtimes'];
+function seedAlreadyRead() {
+  let changed = false;
+  ALREADY_READ_SEED.forEach(id => {
+    if (!bookIsRead(id)) { _cur.read_items[id] = 'true'; changed = true; }
+  });
+  if (changed) saveCur();
 }
 
 function lsGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
@@ -981,6 +1056,9 @@ function renderBookList(sem, books) {
   list.innerHTML = '';
   books.forEach(book => {
     const read = bookIsRead(book.id);
+    const libbyStatus = (_cur.libby && _cur.libby[book.id]) || lsGet('cur_libby_' + book.id) || '';
+    const libbyLabels = { available: 'Available', hold: 'On Hold', wishlist: 'Wishlist', own: 'Own It' };
+    const libbyBadge = libbyStatus ? `<span class="book-libby-badge ${libbyStatus}">${libbyLabels[libbyStatus] || libbyStatus}</span>` : '';
     const li = document.createElement('li');
     li.innerHTML = `
       <div class="book-item${read ? ' read' : ''}" tabindex="0" role="button"
@@ -993,7 +1071,7 @@ function renderBookList(sem, books) {
           </svg>
         </div>
         <div class="book-info">
-          <div class="book-title">${book.title}</div>
+          <div class="book-title">${book.title}${libbyBadge}</div>
           <div class="book-author">${book.author}</div>
         </div>
         <svg class="book-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -1080,6 +1158,7 @@ function openModal(book, semLabel) {
   const quotes = _cur.quotes[book.id] || lsGet('cur_quotes_' + book.id) || '';
   document.getElementById('modal-notes').value = notes;
   document.getElementById('modal-quotes').value = quotes;
+  document.getElementById('modal-libby-status').value = (_cur.libby && _cur.libby[book.id]) || lsGet('cur_libby_' + book.id) || '';
 
   const readToggle = document.getElementById('modal-read-toggle');
   const isRead = bookIsRead(book.id);
@@ -1120,6 +1199,14 @@ readToggleBtn.addEventListener('click', () => {
 });
 readToggleBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); readToggleBtn.click(); }});
 
+// Libby status — saves immediately on change
+document.getElementById('modal-libby-status').addEventListener('change', e => {
+  if (!currentBookId) return;
+  if (!_cur.libby) _cur.libby = {};
+  _cur.libby[currentBookId] = e.target.value;
+  saveCur();
+});
+
 // Save button
 document.getElementById('modal-save').addEventListener('click', () => {
   if (!currentBookId) return;
@@ -1149,6 +1236,7 @@ async function initCurriculum() {
   const row = await sbGet('personal_curriculum', 'singleton');
   if (row) {
     _cur = { ..._cur, ...row };
+    if (!_cur.libby) _cur.libby = {};
   } else {
     // Fallback: migrate from localStorage
     const allKeys = Object.keys(localStorage);
@@ -1158,9 +1246,11 @@ async function initCurriculum() {
         if (k.startsWith('cur_notes_'))  _cur.notes[k.replace('cur_notes_', '')]     = localStorage.getItem(k);
         if (k.startsWith('cur_quotes_')) _cur.quotes[k.replace('cur_quotes_', '')]   = localStorage.getItem(k);
         if (k.startsWith('cur_added_'))  _cur.added[k.replace('cur_added_', '')]     = JSON.parse(localStorage.getItem(k));
+        if (k.startsWith('cur_libby_'))  _cur.libby[k.replace('cur_libby_', '')]     = localStorage.getItem(k);
       } catch(e) {}
     });
   }
+  seedAlreadyRead();
   renderCurriculum();
 }
 initCurriculum();

@@ -46,17 +46,30 @@
     overflow-x: hidden;
   }
 
-  /* ── BG LAYER — absolute img, scrolls with page (matches subpages) ── */
+  /* ── BG LAYER — capped-height hero band, scrolls with page ──
+     Previously this was width:100%/height:auto with no cap, so the tall
+     portrait photo (1232×1600) rendered at ~1.3x the viewport width —
+     over 1800px tall on a 1440px-wide screen — and bled straight through
+     the Weekly Outline calendar, cutting a hard seam across the hour
+     grid. Capping the band height and using object-fit:cover keeps the
+     photo itself undistorted (cover never stretches — it crops) while
+     guaranteeing the band ends well above the calendar, so the calendar
+     can still visually sit against its lower edge, but the Habit
+     Tracker / Weekly Look / Add Event area below it always renders
+     clear, on the plain page background. */
   .bg-layer {
     position: absolute;
     top: 0; left: 0;
     width: 100%;
+    height: clamp(480px, 78vw, 1180px);
+    overflow: hidden;
     z-index: 0;
   }
   .bg-layer img {
     display: block;
-    width: 100%; height: auto;
-    object-position: center top;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 12%;
   }
   .bg-layer::after {
     content: '';
@@ -636,15 +649,12 @@
      Ideal Day) use a dusty lavender accent instead of the rose used
      above — a color the background photo doesn't carry — so the lower
      half of the page reads as its own zone.
-     The background photo's rendered height scales with viewport width
-     (it's full-width, auto-height), so on wide screens it can run
-     taller than everything above this card combined. This margin grows
-     to match — clearing the photo with room to spare — and does
-     nothing once the content above is already taller than the photo
-     (narrow/tablet widths, or mobile's single-column stack). */
+     The background photo band is now height-capped (see .bg-layer), so
+     it never grows past its own hero zone — a small fixed gap is all
+     that's needed here instead of a viewport-width-scaled guess. */
   .calendar-card {
     grid-column: 1 / 4;
-    margin-top: max(0px, calc(83vw - 950px));
+    margin-top: 1.5rem;
     padding: 0;
     overflow: hidden;
     background: rgba(232,222,240,0.62);

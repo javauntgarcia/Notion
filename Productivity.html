@@ -849,9 +849,13 @@
             <div class="progress-track"><div class="progress-fill" id="dep-bar"></div></div>
           </div>
           <div class="goal-stepper">
-            <button class="stepper-btn" onclick="stepGoal('prod_dep_sold',-1,25,'dep')">−</button>
+            <!-- ceiling raised to 9999 (was 25) — capping it at the 25-item
+                 target made the + button knock the count back down to 25
+                 once sales passed it, silently erasing real sales above
+                 target. The 25 target itself still lives in renderGoals(). -->
+            <button class="stepper-btn" onclick="stepGoal('prod_dep_sold',-1,9999,'dep')">−</button>
             <span class="stepper-count" id="dep-count">0</span>
-            <button class="stepper-btn" onclick="stepGoal('prod_dep_sold',1,25,'dep')">+</button>
+            <button class="stepper-btn" onclick="stepGoal('prod_dep_sold',1,9999,'dep')">+</button>
           </div>
         </div>
 
@@ -1291,12 +1295,13 @@
       bar('jour-bar', done ? 100 : 0);
     })();
 
-    /* Depop — target: 25 */
+    /* Depop — target: 25. Shows the real sold count even past target
+       (e.g. 50 of 25) — only the bar fill clamps at 100%. */
     (function() {
-      var n = Math.min(25, Math.max(0, parseInt(_prod.prod_dep_sold) || 0));
+      var n = Math.max(0, parseInt(_prod.prod_dep_sold) || 0);
       document.getElementById('dep-count').textContent = n;
       document.getElementById('dep-meta').textContent  = n + ' of 25 sold';
-      bar('dep-bar', pct(n, 25));
+      bar('dep-bar', pct(Math.min(n, 25), 25));
     })();
 
     /* Social — target: 52 weeks */

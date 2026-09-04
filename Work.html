@@ -2163,73 +2163,59 @@ function renderDeliverables() {
   });
 }
 
-// ── TASKS: default seed, derived from the 7/27 to-do list (most recent week) ──
-// Each week in the to-do doc supersedes the weeks below it, so this reflects
-// only the still-open items as of 7/27, plus that week's completions.
+// ── TASKS: default seed, derived from the to-do list through 8/31 (most
+// recent week) plus the running "Long-term / Need to Start / In Progress /
+// Recently Completed" summary at the top of that doc. Each week in the
+// to-do doc supersedes the weeks below it, so this reflects only the
+// still-open items as of 8/31, plus that week's completions.
+// NOTE: a few items had an ambiguous project or an incomplete/unclear
+// description in the source doc — see the "(unclear — " notes below.
+// This is a fallback SEED only: if the live page already has saved data
+// (Supabase or localStorage), that data wins and this array is never
+// shown — it only appears on a first-ever load with nothing saved yet.
 const DEFAULT_TASKS = [
-  // Bayview Shuttle — CARB
-  { id: 'dt1',  title: 'Follow-up with Lillian re: timeline', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  { id: 'dt2',  title: 'Prepare quarterly report for CARB', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  // Bayview Shuttle — Transit emergency planning
-  { id: 'dt3',  title: 'Follow-up on 56 Rutland memo', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  // Bayview Shuttle — FIMPS Device Issues
-  { id: 'dt4',  title: 'Follow-up on fare readers PO', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  // Bayview Shuttle — Project Updates
-  { id: 'dt5',  title: 'Storymap finalization', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  { id: 'dt6',  title: 'DPH Shuttle adoption analysis/evaluation', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  // Bayview Shuttle — Community partners
-  { id: 'dt7',  title: 'Update the Bayview Shuttle pamphlets', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  // Access for All
-  { id: 'dt8',  title: 'CPUC quarterly reports — DUE August 15th', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  { id: 'dt9',  title: 'CPUC Annual report — DUE September 15th', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  { id: 'dt10', title: 'Create agenda for SF Taxi and Green Cab', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  // Admin
-  { id: 'dt11', title: 'Ask former Pecha Kucha presenters if they can judge', project: 'Admin', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  { id: 'dt12', title: 'Look at swag items we can give out', project: 'Admin', status: 'not-started', createdAt: Date.parse('2026-07-27') },
-  // Completed this week (7/27)
-  { id: 'dt13', title: 'Follow-up re: the SFGH ridership', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-07-20'), completedAt: Date.parse('2026-07-27') },
-  { id: 'dt14', title: 'Cycle 6 Notice Letter', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-07-13'), completedAt: Date.parse('2026-07-27') },
-  { id: 'dt15', title: 'Deliver Docusign to CPUC (Julie)', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-07-13'), completedAt: Date.parse('2026-07-27') },
-  { id: 'dt16', title: "Check on Green Cab's invoicing", project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-07-20'), completedAt: Date.parse('2026-07-27') },
-  { id: 'dt17', title: 'Send out the Intern Committee Pecha Kucha details', project: 'Admin', status: 'completed', createdAt: Date.parse('2026-07-20'), completedAt: Date.parse('2026-07-27') },
+  // ── Not started ──
+  { id: 'dt1',  title: 'Bayview Shuttle federal procurement RFP — ~7-month ideal timeline; overlaps with the Paratransit vehicle lease timeline', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  { id: 'dt2',  title: 'Via amendment — prepare MTAB calendar item', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  { id: 'dt3',  title: '1-pager for Mr. Bryant', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  { id: 'dt4',  title: 'DPH: lease a Paratransit vehicle — is a 6-month timeline right, or does a different lease make more sense?', project: 'Paratransit', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  { id: 'dt5',  title: 'Call Mark (Green Cab) — revise the budget for the new vehicle; trip requirements', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  { id: 'dt6',  title: 'Update materials (unclear — which materials? flag for Javaun)', project: 'Admin', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  { id: 'dt7',  title: 'Ask about new chair (unclear — a person or furniture? flag for Javaun)', project: 'Admin', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  // Long-term / backlog (from the running summary, not tied to one week)
+  { id: 'dt8',  title: 'Event booking agreement for the Bayview Shuttle (similar to SECC\'s)', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  { id: 'dt9',  title: 'SFAAACD curriculum — long-term program sustainability (grant funding runs through 2027; stay at SF ACD vs. hand off to partners after)', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  { id: 'dt10', title: 'Diversified funding portfolio — event-based system/service', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-08-31') },
+  { id: 'dt11', title: 'Access for All / Ramp Taxi — long-term program direction', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-08-31') },
 
-  // ── Gaps found in earlier weeks (back through 6/29) not yet reflected on the board ──
-  // Still-open items from 7/20/7/13 that never got crossed out and don't appear in 7/27
-  { id: 'dt18', title: 'Create a sole source justification outline', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
-  { id: 'dt19', title: 'Develop a follow-up memo to upper management (transit emergency planning)', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-13') },
-  { id: 'dt20', title: 'Review the SFAAACD curriculum', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-06-15') },
-  { id: 'dt21', title: 'Schedule meeting with SFAAACD about Community Congress', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
-  { id: 'dt22', title: 'Send TRC flyer to Maritza and connect with TRC folks', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
-  { id: 'dt23', title: 'Community Congress agenda — reach out to James Bryant', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
-  { id: 'dt24', title: 'Community Congress agenda — reach out to the other three delegates', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
-  { id: 'dt25', title: 'Community Congress — create a draft questionnaire to send', project: 'Bayview Shuttle', status: 'not-started', createdAt: Date.parse('2026-07-20') },
-  { id: 'dt26', title: 'Send out reminder for the ramp taxi document', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-20') },
-  { id: 'dt27', title: 'Review ramp taxi document content', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-20') },
-  { id: 'dt28', title: 'Send FAQ page out to Mona/Meher', project: 'Access for All', status: 'not-started', createdAt: Date.parse('2026-07-13') },
+  // ── In progress ──
+  { id: 'dt12', title: '56 Rutland memo update', project: 'Bayview Shuttle', status: 'in-progress', createdAt: Date.parse('2026-08-24') },
+  { id: 'dt13', title: 'DPH MOU', project: 'Bayview Shuttle', status: 'in-progress', createdAt: Date.parse('2026-08-24') },
+  { id: 'dt14', title: 'Green Cab grant agreement', project: 'Access for All', status: 'in-progress', createdAt: Date.parse('2026-08-24') },
+  { id: 'dt15', title: 'Via grant agreement', project: 'Bayview Shuttle', status: 'in-progress', createdAt: Date.parse('2026-08-24') },
+  { id: 'dt16', title: 'SF Taxi grant agreement', project: 'Access for All', status: 'in-progress', createdAt: Date.parse('2026-08-24') },
 
-  // Completed deliverables from 6/29–7/3 that never made it onto the board
-  { id: 'dt29', title: '56 Rutland Via ridership analysis — synopsis for Transit team', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-06-29'), completedAt: Date.parse('2026-07-03') },
-  { id: 'dt30', title: 'Via Second Amendment — updated rate & flexibility language draft', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-07-03') },
-  { id: 'dt31', title: 'DPH Shuttle adoption memo — revised per Jonathan\'s comments', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-07-03') },
-  { id: 'dt32', title: 'Via Second Amendment PowerPoint — MTAB timeline & growth-since-Nov.-2024 update', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-06-29') },
-  { id: 'dt33', title: 'A4A RFP proposal review — 1-pager and presentation', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-06-29'), completedAt: Date.parse('2026-07-03') },
-  { id: 'dt34', title: 'A4A RFP budget proposal scoring', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-06-29') },
-  { id: 'dt35', title: 'APTA Conference write-up for Maddy', project: 'Accessibility', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-07-03') },
-  { id: 'dt36', title: 'NAD Conference reels + webpage coordination', project: 'Accessibility', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-06-29') },
-  { id: 'dt37', title: 'Travel training videos SOW review', project: 'Accessibility', status: 'completed', createdAt: Date.parse('2026-06-22'), completedAt: Date.parse('2026-06-29') },
+  // ── Recently completed (per the doc's own "Recently Completed" list + 8/31 check-offs) ──
+  { id: 'dt17', title: 'PSC submission for the Via amendment', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-08-24'), completedAt: Date.parse('2026-08-31') },
+  { id: 'dt18', title: 'Via amendment sent for review', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-08-24'), completedAt: Date.parse('2026-08-31') },
+  { id: 'dt19', title: 'FY 25-26 PPAR', project: 'Admin', status: 'completed', createdAt: Date.parse('2026-08-24'), completedAt: Date.parse('2026-08-31') },
+  { id: 'dt20', title: 'FY 26-27 PPAR', project: 'Admin', status: 'completed', createdAt: Date.parse('2026-08-24'), completedAt: Date.parse('2026-08-31') },
+  { id: 'dt21', title: 'Review SFAAACD curriculum', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-08-24'), completedAt: Date.parse('2026-08-31') },
+  { id: 'dt22', title: 'CARB quarterly report', project: 'Bayview Shuttle', status: 'completed', createdAt: Date.parse('2026-08-24'), completedAt: Date.parse('2026-08-31') },
+  { id: 'dt23', title: 'Budget Revision (BR) for Access for All', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-08-24'), completedAt: Date.parse('2026-08-31') },
+  { id: 'dt24', title: 'Follow-up with Chris re: insurance and unmet demand', project: 'Access for All', status: 'completed', createdAt: Date.parse('2026-08-24'), completedAt: Date.parse('2026-08-31') },
 ];
 
 // ── SKILLS logged against the completed deliverables above ────
 const DEFAULT_TASK_SKILLS = [
-  { id: 'dts1', skillName: 'Policy Analysis',       taskId: 'dt29', taskTitle: '56 Rutland Via ridership analysis — synopsis for Transit team', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-07-03') },
-  { id: 'dts2', skillName: 'Policy Analysis',       taskId: 'dt30', taskTitle: 'Via Second Amendment — updated rate & flexibility language draft', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-07-03') },
-  { id: 'dts3', skillName: 'Policy Analysis',       taskId: 'dt31', taskTitle: 'DPH Shuttle adoption memo — revised per Jonathan\'s comments', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-07-03') },
-  { id: 'dts4', skillName: 'Policy Analysis',       taskId: 'dt32', taskTitle: 'Via Second Amendment PowerPoint — MTAB timeline & growth-since-Nov.-2024 update', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-06-29') },
-  { id: 'dts5', skillName: 'Grant Writing',         taskId: 'dt33', taskTitle: 'A4A RFP proposal review — 1-pager and presentation', taskProject: 'Access for All', completedAt: Date.parse('2026-07-03') },
-  { id: 'dts6', skillName: 'Grant Writing',         taskId: 'dt34', taskTitle: 'A4A RFP budget proposal scoring', taskProject: 'Access for All', completedAt: Date.parse('2026-06-29') },
-  { id: 'dts7', skillName: 'Community Engagement',  taskId: 'dt35', taskTitle: 'APTA Conference write-up for Maddy', taskProject: 'Accessibility', completedAt: Date.parse('2026-07-03') },
-  { id: 'dts8', skillName: 'Community Engagement',  taskId: 'dt36', taskTitle: 'NAD Conference reels + webpage coordination', taskProject: 'Accessibility', completedAt: Date.parse('2026-06-29') },
-  { id: 'dts9', skillName: 'Policy Analysis',       taskId: 'dt37', taskTitle: 'Travel training videos SOW review', taskProject: 'Accessibility', completedAt: Date.parse('2026-06-29') },
+  { id: 'dts1', skillName: 'Policy Analysis',       taskId: 'dt17', taskTitle: 'PSC submission for the Via amendment', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-08-31') },
+  { id: 'dts2', skillName: 'Policy Analysis',       taskId: 'dt18', taskTitle: 'Via amendment sent for review', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-08-31') },
+  { id: 'dts3', skillName: 'Grant Writing',         taskId: 'dt19', taskTitle: 'FY 25-26 PPAR', taskProject: 'Admin', completedAt: Date.parse('2026-08-31') },
+  { id: 'dts4', skillName: 'Grant Writing',         taskId: 'dt20', taskTitle: 'FY 26-27 PPAR', taskProject: 'Admin', completedAt: Date.parse('2026-08-31') },
+  { id: 'dts5', skillName: 'Community Engagement',  taskId: 'dt21', taskTitle: 'Review SFAAACD curriculum', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-08-31') },
+  { id: 'dts6', skillName: 'Policy Analysis',       taskId: 'dt22', taskTitle: 'CARB quarterly report', taskProject: 'Bayview Shuttle', completedAt: Date.parse('2026-08-31') },
+  { id: 'dts7', skillName: 'Grant Writing',         taskId: 'dt23', taskTitle: 'Budget Revision (BR) for Access for All', taskProject: 'Access for All', completedAt: Date.parse('2026-08-31') },
+  { id: 'dts8', skillName: 'Community Engagement',  taskId: 'dt24', taskTitle: 'Follow-up with Chris re: insurance and unmet demand', taskProject: 'Access for All', completedAt: Date.parse('2026-08-31') },
 ];
 
 // ── SKILLS ────────────────────────────────────────────────────
