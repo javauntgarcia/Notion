@@ -495,15 +495,17 @@
     .archive-inner { padding: 20px 24px; }
 
     .archive-day-block {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       padding-left: 16px;
       border-left: 2px solid rgba(201,176,138,0.15);
     }
     .archive-day-header {
       display: flex;
       align-items: baseline;
+      justify-content: space-between;
       gap: 12px;
-      margin-bottom: 8px;
+      padding: 4px 0;
+      cursor: pointer;
     }
     .archive-day-name {
       font-family: 'Cormorant Garamond', serif;
@@ -511,11 +513,30 @@
       font-style: italic;
       color: var(--sand-lt);
     }
+    .archive-day-right {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-shrink: 0;
+    }
     .archive-day-pct {
       font-size: 0.58rem;
       letter-spacing: 0.1em;
       color: rgba(201,176,138,0.45);
     }
+    .archive-day-chevron {
+      font-size: 0.6rem;
+      color: rgba(201,176,138,0.4);
+      transition: transform 0.25s;
+      display: inline-block;
+    }
+    .archive-day-block.expanded .archive-day-chevron { transform: rotate(180deg); }
+    .archive-day-items {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .archive-day-block.expanded .archive-day-items { max-height: 600px; }
     .archive-task-row {
       display: flex;
       align-items: center;
@@ -525,9 +546,20 @@
       color: rgba(242,234,216,0.45);
     }
     .archive-task-row.done { text-decoration: line-through; opacity: 0.5; }
-    .a-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-    .a-done { background: var(--olive-lt); }
-    .a-open { background: rgba(201,176,138,0.25); }
+    .archive-check {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(201,176,138,0.4);
+      background: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: all 0.2s;
+    }
+    .archive-check:checked { background: var(--olive-lt); border-color: var(--olive-lt); }
+    .archive-check:hover { border-color: rgba(201,176,138,0.7); }
 
     /* ── SUBPAGE CARDS ── */
     .subpage-row {
@@ -822,12 +854,23 @@ const DEFAULT_TASKS = [
   'Lunch (home)',
   'Read for 30 minutes',
   'Make dinner',
-  'Post on TikTok',
+  'Post on social media',
   'Do to-do list',
   'Hairline treatment',
   'Compliment Eston',
   'Nightcare routine'
 ];
+
+// One-time text migrations for renamed default tasks — old label -> new
+// label, so an existing saved habit gets renamed in place instead of the
+// old entry sticking around alongside a brand-new duplicate.
+const TASK_RENAMES = { 'Post on TikTok': 'Post on social media' };
+
+// Any of these labels (old or new) count as "the social media task" for
+// the Productivity page's Social Media goal sync — so history logged
+// under the old name still counts.
+const SOCIAL_TASK_TEXTS = ['Post on social media', 'Post on TikTok'];
+function isSocialTask(text) { return SOCIAL_TASK_TEXTS.includes(text); }
 
 // Tasks that only appear on specific days of the week (0=Sun … 6=Sat)
 const CONDITIONAL_TASKS = [
@@ -849,6 +892,7 @@ function conditionalTextsForDate(d) {
 // tags legacy/untagged entries, makes sure every default task exists,
 // and swaps in whichever conditional task belongs to today.
 function syncTasksForToday() {
+  _habits = _habits.map(h => TASK_RENAMES[h.text] ? { ...h, text: TASK_RENAMES[h.text] } : h);
   _habits = _habits.map(h => {
     if (h.type) return h;
     if (DEFAULT_TASKS.includes(h.text)) return { ...h, type: 'default' };
@@ -905,13 +949,20 @@ async function maybeRolloverDay() {
   const key = todayKey();
   if (_lastSeen === key) return;
   if (_lastSeen && _habits.length) {
+    const d = new Date(_lastSeen + 'T00:00:00');
     const entry = {
       id: _lastSeen,
+      tasks: _tasks,
       habits: _habits.map(h => ({ text: h.text, done: !!h.done })),
-      archived_at: new Date().toISOString()
+      archived_at: new Date().toISOString(),
+      label: isNaN(d) ? null : d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})
     };
     try { await sbUpsert('planning_archive', entry); } catch(e) {}
     await loadArchive();
+    // The ad-hoc checklist belonged to the day that just ended — it's now
+    // captured in the archive entry above, so start the new day fresh.
+    _tasks = [];
+    await saveTasks();
   }
   _habits = _habits.map(h => ({ ...h, done: false }));
   syncTasksForToday();
@@ -1023,7 +1074,60 @@ function addHabit() {
 
 function toggleHabit(id) {
   const h = _habits.find(x => x.id === id);
-  if (h) { h.done = !h.done; saveHabits(); renderHabits(); }
+  if (h) {
+    h.done = !h.done;
+    saveHabits();
+    renderHabits();
+    if (isSocialTask(h.text)) syncSocialGoal(todayKey(), h.done);
+  }
+}
+
+// ── SOCIAL MEDIA GOAL SYNC (Productivity.html "Social Media" tracker) ──
+// The Productivity page's Social Media goal counts weeks-with-a-post,
+// target 52. Rather than keep a separate running log, we derive "was this
+// week already credited?" straight from the actual completion data we
+// already have (archive + today), so there's nothing extra to store and
+// nothing that can drift out of sync.
+function weekKeyOf(dateKeyStr) {
+  const d = new Date(dateKeyStr + 'T00:00:00');
+  const dow = d.getDay(); // 0=Sun … 6=Sat
+  d.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow)); // back up to Monday
+  return todayKey(d);
+}
+
+// True if some day OTHER than excludeDateKey, in the same week, already
+// has the social task marked done (checked across the loaded archive and
+// today's list).
+function socialDoneElsewhereInWeek(excludeDateKey) {
+  const wk = weekKeyOf(excludeDateKey);
+  const hit = _archive.some(day =>
+    day.id !== excludeDateKey &&
+    weekKeyOf(day.id) === wk &&
+    (day.habits || []).some(h => isSocialTask(h.text) && h.done)
+  );
+  if (hit) return true;
+  const todayK = todayKey();
+  if (todayK !== excludeDateKey && weekKeyOf(todayK) === wk) {
+    const h = _habits.find(x => isSocialTask(x.text));
+    if (h && h.done) return true;
+  }
+  return false;
+}
+
+// Called whenever a "Post on social media" checkbox (today's or an
+// archived day's) is toggled. Bumps Productivity.html's prod_social_weeks
+// by 1 the first time a given week gets a completion, and backs it off by
+// 1 if that was the week's only completion and it just got unchecked.
+// Never touches any week that isn't directly caused by this toggle.
+async function syncSocialGoal(dateKey, done) {
+  const coveredElsewhere = socialDoneElsewhereInWeek(dateKey);
+  if (coveredElsewhere) return; // this week's credit already stands (or still stands) via another day
+  try {
+    const row = await sbGet('productivity', 'singleton');
+    const cur = (row && parseInt(row.prod_social_weeks)) || 0;
+    const next = done ? Math.min(52, cur + 1) : Math.max(0, cur - 1);
+    if (next !== cur) await sbUpsert('productivity', { id: 'singleton', prod_social_weeks: next });
+  } catch(e) { console.warn('[syncSocialGoal]', e.message); }
 }
 
 function deleteHabit(id) {
@@ -1119,25 +1223,66 @@ function renderArchive() {
   }
   inner.innerHTML = '';
   _archive.forEach(day => {
-    const done  = day.tasks.filter(t=>t.done).length;
-    const total = day.tasks.length;
-    const pct   = total ? Math.round((done/total)*100) : 0;
+    // Older/auto-rollover entries may be missing one field or the other —
+    // show whatever the day actually has (habits, tasks, or both). Each
+    // item is tagged with which array + index it came from so its
+    // checkbox can be edited and written back to the right place.
+    const tasks  = Array.isArray(day.tasks)  ? day.tasks  : [];
+    const habits = Array.isArray(day.habits) ? day.habits : [];
+    const all    = tasks.map((t,i) => ({ ...t, _src:'tasks',  _idx:i }))
+      .concat(habits.map((h,i) => ({ ...h, _src:'habits', _idx:i })));
+    const done   = all.filter(t=>t.done).length;
+    const total  = all.length;
+    const pct    = total ? Math.round((done/total)*100) : 0;
+    const isOpen = _archiveExpanded.has(day.id);
     const block = document.createElement('div');
-    block.className = 'archive-day-block';
+    block.className = 'archive-day-block' + (isOpen ? ' expanded' : '');
     block.innerHTML = `
-      <div class="archive-day-header">
+      <div class="archive-day-header" onclick="toggleArchiveDay('${day.id}')">
         <span class="archive-day-name">${day.label || day.id}</span>
-        <span class="archive-day-pct">${pct}% done</span>
+        <span class="archive-day-right">
+          <span class="archive-day-pct">${pct}% done</span>
+          <span class="archive-day-chevron">▾</span>
+        </span>
       </div>
-      ${day.tasks.map(t=>`
-        <div class="archive-task-row ${t.done?'done':''}">
-          <div class="a-dot ${t.done?'a-done':'a-open'}"></div>
-          <span>${escHtml(t.text)}</span>
-        </div>
-      `).join('')}
+      <div class="archive-day-items">
+        ${all.length ? all.map(t=>`
+          <div class="archive-task-row ${t.done?'done':''}">
+            <input type="checkbox" class="archive-check" ${t.done?'checked':''}
+              onchange="toggleArchiveItem('${day.id}','${t._src}',${t._idx},this.checked)" />
+            <span>${escHtml(t.text)}</span>
+          </div>
+        `).join('') : '<div class="archive-task-row" style="opacity:0.4">No items recorded</div>'}
+      </div>
     `;
     inner.appendChild(block);
   });
+}
+
+// Which archived days are currently expanded to show their item list —
+// collapsed by default, showing just the date and % done. Persists across
+// re-renders (e.g. after checking a box) so the day you're editing
+// doesn't snap shut on you.
+let _archiveExpanded = new Set();
+function toggleArchiveDay(dayId) {
+  if (_archiveExpanded.has(dayId)) _archiveExpanded.delete(dayId);
+  else _archiveExpanded.add(dayId);
+  renderArchive();
+}
+
+// Lets a past day's checkbox be corrected after the fact — patches just
+// that one item in the archived row (tasks or habits, whichever it came
+// from) and re-renders. If the item is the social media task, re-syncs
+// the Productivity page's Social Media goal to match.
+async function toggleArchiveItem(dayId, src, idx, checked) {
+  const day = _archive.find(d => d.id === dayId);
+  if (!day || !Array.isArray(day[src]) || !day[src][idx]) return;
+  day[src][idx].done = checked;
+  try { await sbUpsert('planning_archive', { id: dayId, [src]: day[src] }); } catch(e) {}
+  renderArchive();
+  if (src === 'habits' && isSocialTask(day[src][idx].text)) {
+    await syncSocialGoal(dayId, checked);
+  }
 }
 </script>
 </body>
