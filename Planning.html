@@ -935,9 +935,24 @@ async function loadAndRenderTasks() {
   // Load archive so the habit log / weekly view render with history
   await loadArchive();
   await maybeRolloverDay();
+  ensureMonthlyTodos();
   renderTasks();
   renderHabits();
   scheduleRolloverWatch();
+}
+
+// Auto-adds recurring monthly to-dos to today's ad-hoc checklist. Keyed
+// by exact text so re-running this on every load/rollover never creates
+// duplicates — it only adds the item if it isn't already sitting there
+// (whether the person added it themselves or a previous run already did).
+function ensureMonthlyTodos() {
+  const key = todayKey();
+  if (!key.endsWith('-15')) return;
+  const label = 'Mid-month evaluation';
+  if (!_tasks.some(t => t.text === label)) {
+    _tasks.push({ id: Date.now() + 9000, text: label, done: false });
+    saveTasks();
+  }
 }
 
 // If it's a new day since last visit, snapshot yesterday's completed
@@ -977,6 +992,8 @@ function scheduleRolloverWatch() {
   setInterval(async () => {
     if (_lastSeen !== todayKey()) {
       await maybeRolloverDay();
+      ensureMonthlyTodos();
+      renderTasks();
       renderHabits();
       updateDateHeaders();
     }

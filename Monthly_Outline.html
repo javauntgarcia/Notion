@@ -663,16 +663,28 @@
     </div>
 
     <div class="field-group">
-      <div class="field-label">Date</div>
-      <input type="date" id="evDate" />
+      <div class="field-label">Start</div>
+      <div class="time-row">
+        <input type="date" id="evDate" />
+        <input type="time" id="evStart" />
+      </div>
     </div>
 
     <div class="field-group">
-      <div class="field-label">Time (optional)</div>
+      <div class="field-label">End (optional — leave blank for a single day)</div>
       <div class="time-row">
-        <input type="time" id="evStart" />
+        <input type="date" id="evEndDate" />
         <input type="time" id="evEnd" />
       </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Repeats</div>
+      <select id="evRecur">
+        <option value="">Doesn't repeat</option>
+        <option value="annual">Annually (same month + day)</option>
+        <option value="monthly">Monthly (same day of month)</option>
+      </select>
     </div>
 
     <div class="field-group">
@@ -758,13 +770,75 @@ window.addEventListener('DOMContentLoaded', async () => {
     try { _moData.cal_events = JSON.parse(lsGet('plan_cal_events') || '[]'); } catch(e) {}
   }
 
+  ensureSeedEvents();
+
   buildLegend();
   buildSwatches();
   renderCalendar();
   loadMonthly();
   // Pull hub-native events and merge into calendar display
   mergeHubEventsIntoMO();
+  // Pull scheduled content-calendar items and merge into calendar display
+  mergeContentCalendarIntoMO();
 });
+
+/* ══════════════════════════════════════
+   SEED EVENTS
+   One-time, idempotent: each has a fixed id, so this only ever adds a
+   given event once, the first time this updated page loads, no matter
+   how many times init runs afterward. Safe to add more here later the
+   same way — just give each a stable, unique id.
+══════════════════════════════════════ */
+const SEED_EVENTS = [
+  { id: 'seed_labor_day_2026', title: 'Labor Day', date: '2026-09-07', cat: 'events', start: '', end: '', notes: '' },
+  { id: 'seed_ainur_visit_2026', title: 'Ainur visiting', date: '2026-09-12', endDate: '2026-09-24', cat: 'events', start: '', end: '', notes: '' },
+  { id: 'seed_nora_birthday', title: 'Nora\'s birthday', date: '2026-09-15', cat: 'birthdays', start: '', end: '', notes: '', recur: 'annual' },
+  { id: 'seed_portola_2026', title: 'Portola Music Festival', date: '2026-09-26', endDate: '2026-09-27', cat: 'activity', start: '', end: '', notes: '' },
+  { id: 'seed_anniversary_deadline_2026', title: 'Finalize anniversary plans (deadline)', date: '2026-09-12', cat: 'appointments', start: '', end: '', notes: 'Final day to lock in anniversary plans.' },
+  { id: 'seed_midmonth_eval', title: 'Mid-month evaluation', date: '2026-09-15', cat: 'appointments', start: '', end: '', notes: 'Check in on goals, budget, and routine.', recur: 'monthly' },
+];
+function ensureSeedEvents() {
+  const existing = getAllEvents();
+  const existingIds = new Set(existing.map(e => e.id));
+  const toAdd = SEED_EVENTS.filter(e => !existingIds.has(e.id));
+  if (toAdd.length) setAllEvents(existing.concat(toAdd));
+}
+
+/* ══════════════════════════════════════
+   CONTENT CALENDAR → MONTHLY OUTLINE
+   Content_Calendar.html schedules pieces of content per day in
+   content_calendar.calendar[dateKey] (an array of {title,status,...},
+   no stable id of its own). Rather than add events incrementally like
+   the Hub merge below, this fully replaces the ccSource-tagged subset
+   of cal_events every cycle — so edits, new adds, and deletions on the
+   Content Calendar side all show up correctly here, not just additions.
+══════════════════════════════════════ */
+async function mergeContentCalendarIntoMO() {
+  try {
+    const ccRow = await sbGet('content_calendar', 'singleton');
+    if (!ccRow || !ccRow.calendar) return;
+    const ccEvents = [];
+    Object.keys(ccRow.calendar).forEach(dateKey => {
+      (ccRow.calendar[dateKey] || []).forEach((v, idx) => {
+        const statusNote = (v.status && v.status.length) ? `Status: ${v.status.join(', ')}` : '';
+        ccEvents.push({
+          id:    `cc_${dateKey}_${idx}`,
+          title: v.title + (v.archived ? ' (posted)' : ''),
+          date:  dateKey,
+          cat:   'creative',
+          start: '', end: '',
+          notes: [statusNote, v.notes].filter(Boolean).join(' — '),
+          ccSource: true
+        });
+      });
+    });
+    const existing = getAllEvents().filter(e => !e.ccSource);
+    const merged = existing.concat(ccEvents);
+    setAllEvents(merged);
+    renderCalendar();
+  } catch(e) { console.warn('[CC→MO merge]', e.message); }
+}
+setInterval(mergeContentCalendarIntoMO, 30000);
 
 async function mergeHubEventsIntoMO() {
   try {
@@ -868,6 +942,51 @@ function goToToday() {
 }
 
 /* ══════════════════════════════════════
+   MULTI-DAY / RECURRING EVENT HELPERS
+   An event's primary `date` field is always its start date (and its only
+   date, for the common single-day case) — this keeps every existing
+   event, and all the Hub/Content-Calendar sync code that only knows
+   about `date`, working unchanged. `endDate` is optional and only
+   present when an event spans more than one day. `recur` is optional:
+   'annual' matches any year with the same month+day as `date`, 'monthly'
+   matches any day-of-month equal to `date`'s day, in any month/year.
+══════════════════════════════════════ */
+function eventSpanEnd(ev) { return ev.endDate || ev.date; }
+function eventIsMultiDay(ev) { return !ev.recur && eventSpanEnd(ev) !== ev.date; }
+function eventCoversDate(ev, ds) {
+  if (!ev.date) return false;
+  if (ev.recur === 'annual') {
+    return ev.date.slice(5) === ds.slice(5); // compare "MM-DD"
+  }
+  if (ev.recur === 'monthly') {
+    return ev.date.slice(8) === ds.slice(8); // compare "DD"
+  }
+  return ds >= ev.date && ds <= eventSpanEnd(ev);
+}
+function fmtTime(t) {
+  if (!t) return '';
+  const [hStr, mStr] = t.split(':');
+  const h = parseInt(hStr, 10);
+  const m = parseInt(mStr, 10);
+  const ampm = h >= 12 ? 'p' : 'a';
+  const h12  = h % 12 || 12;
+  const mPad = m > 0 ? ':' + String(m).padStart(2,'0') : '';
+  return h12 + mPad + ampm;
+}
+// What a chip shows for a given day within an event's span: the start
+// time on day one, the end time on the last day (if different from the
+// first), and a plain continuation mark on any day in between.
+function chipTimeLabel(ev, ds) {
+  const spanEnd = eventSpanEnd(ev);
+  const isFirst = ds === ev.date;
+  const isLast  = ds === spanEnd;
+  if (eventIsMultiDay(ev) && !isFirst && !isLast) return { text: '⋯', cls: 'chip-time no-time' };
+  if (eventIsMultiDay(ev) && isLast && !isFirst)  return ev.end ? { text: fmtTime(ev.end), cls: 'chip-time' } : { text: '⋯', cls: 'chip-time no-time' };
+  if (ev.start) return { text: fmtTime(ev.start), cls: 'chip-time' };
+  return { text: '·', cls: 'chip-time no-time' };
+}
+
+/* ══════════════════════════════════════
    CALENDAR RENDER
 ══════════════════════════════════════ */
 function renderCalendar() {
@@ -892,9 +1011,10 @@ function renderCalendar() {
                       viewMonth === today.getMonth() &&
                       d === today.getDate());
 
-    // events for this day, filtered by hidden cats
+    // events for this day (including multi-day spans and recurring
+    // events), filtered by hidden cats
     const dayEvents = allEvents
-      .filter(ev => ev.date === ds && !hiddenCats.has(ev.cat))
+      .filter(ev => eventCoversDate(ev, ds) && !hiddenCats.has(ev.cat))
       .sort((a,b) => (a.start||'').localeCompare(b.start||''));
 
     const cell = document.createElement('div');
@@ -921,22 +1041,11 @@ function renderCalendar() {
       bar.className = 'chip-bar';
       bar.style.background = color;
 
-      // time label — always visible
+      // time label — always visible (accounts for multi-day span position)
       const timeEl = document.createElement('div');
-      if (ev.start) {
-        // format "14:30" → "2:30p" or "9:00a"
-        const [hStr, mStr] = ev.start.split(':');
-        const h = parseInt(hStr, 10);
-        const m = parseInt(mStr, 10);
-        const ampm = h >= 12 ? 'p' : 'a';
-        const h12  = h % 12 || 12;
-        const mPad = m > 0 ? ':' + String(m).padStart(2,'0') : '';
-        timeEl.textContent = h12 + mPad + ampm;
-        timeEl.className = 'chip-time';
-      } else {
-        timeEl.textContent = '·';
-        timeEl.className = 'chip-time no-time';
-      }
+      const label = chipTimeLabel(ev, ds);
+      timeEl.textContent = label.text;
+      timeEl.className = label.cls;
 
       chip.appendChild(bar);
       chip.appendChild(timeEl);
@@ -973,7 +1082,9 @@ function openNewModal(ds) {
   document.getElementById('evTitle').value  = '';
   document.getElementById('evDate').value   = ds;
   document.getElementById('evStart').value  = '';
+  document.getElementById('evEndDate').value = '';
   document.getElementById('evEnd').value    = '';
+  document.getElementById('evRecur').value  = '';
   document.getElementById('evNotes').value  = '';
   document.getElementById('deleteBtn').style.display = 'none';
   selectSwatch(CATEGORIES[0].id);
@@ -990,7 +1101,9 @@ function openEditModal(ev) {
   document.getElementById('evTitle').value  = ev.title;
   document.getElementById('evDate').value   = ev.date;
   document.getElementById('evStart').value  = ev.start || '';
+  document.getElementById('evEndDate').value = ev.endDate || '';
   document.getElementById('evEnd').value    = ev.end   || '';
+  document.getElementById('evRecur').value  = ev.recur || '';
   document.getElementById('evNotes').value  = ev.notes || '';
   document.getElementById('deleteBtn').style.display = 'inline-block';
   selectSwatch(ev.cat);
@@ -1034,15 +1147,23 @@ function saveEvent() {
   const title = document.getElementById('evTitle').value.trim();
   if (!title) { document.getElementById('evTitle').focus(); return; }
 
+  const startDate = document.getElementById('evDate').value;
+  const endDateVal = document.getElementById('evEndDate').value;
+  const recurVal   = document.getElementById('evRecur').value;
+
   const ev = {
     id:    editingId || String(Date.now()),
     title,
-    date:  document.getElementById('evDate').value,
+    date:  startDate,
     cat:   selectedCat(),
     start: document.getElementById('evStart').value,
     end:   document.getElementById('evEnd').value,
     notes: document.getElementById('evNotes').value,
   };
+  // Only stored when actually different from the common case, so
+  // ordinary single-day events keep the same minimal shape as before.
+  if (endDateVal && endDateVal !== startDate) ev.endDate = endDateVal;
+  if (recurVal) ev.recur = recurVal;
 
   let events = getAllEvents();
   if (editingId) {
@@ -1150,16 +1271,16 @@ const ROADMAP = {
     ciAdulting: 'Make my first big purchase (a TV)!',
   },
   '2026_8': { // September 2026
-    goals: '1. 6+ hrs/week LSAT study — Logic Games first\n2. 5,000 TikTok followers\n3. Discover card fully paid off\n4. First byline published\n5. Fulbright program shortlist (2–3 options)\n6. LSAT diagnostic taken — baseline established\n7. LSAT study platform chosen\n8. Step 3 salary increase — adjust savings\n9. CalMatters pitch sent\n10. Fulbright research begun',
-    focus: 'Discover card gone. LSAT real. First byline. Halfway to 10K.',
-    ciWork: 'First byline published (CalMatters or Streetsblog). Bayview Through Our Eyes Phase 1.',
-    ciCreative: '5,000 TikTok milestone. Consistency review — is the posting schedule working?',
-    ciHealth: 'Wind-down locked: screens off 9:45, lights out 10 PM. Gym streak.',
-    ciEston: 'Celebrate Discover card payoff together.',
-    ciGrowth: 'LSAT: Logic Games mastery. 6+ hrs/week committed.',
-    ciFriends: 'Fall social plans. Don\'t let LSAT study isolate.',
+    goals: '1. Write first news-related article and develop a pitch\n2. Create goals for the last 90 days of 2026\n3. Pay off debt\n4. Get in a consistently good and healthy gym/eating routine\n5. Play a match through the tennis club or attend an event',
+    focus: 'First article and pitch out the door. Debt cleared. Routine that holds — then map the final 90 days.',
+    ciWork: 'Write the first news-related article start to finish. Develop and send the pitch.',
+    ciCreative: 'Portola Music Festival content (9/26–27). Keep the posting rhythm steady.',
+    ciHealth: 'Consistent gym + eating routine — not a streak, a baseline that holds through the month.',
+    ciEston: 'Anniversary plans finalized by the 12th. Portola together.',
+    ciGrowth: 'Map goals for the last 90 days of 2026 — what actually needs to be true by December 31.',
+    ciFriends: 'Ainur in town 9/12–9/24. Nora\'s birthday on the 15th. Get on the court — tennis club match or event.',
     ciFamily: 'Check in.',
-    ciAdulting: 'Discover card PAID OFF. Emergency fund: Month 3 — complete.',
+    ciAdulting: 'Debt paid off. Mid-month evaluation on the 15th — money, routine, goals.',
   },
   '2026_9': { // October 2026
     goals: '1. LSAT: Logical Reasoning mastery phase\n2. Roth IRA 2026 contributions toward $7K\n3. Brand pitch deck drafted\n4. Ring research — budget confirmed\n5. Fulbright application requirements reviewed',
@@ -1521,11 +1642,19 @@ function showEventPopover(ev, color, chip) {
   titleEl.textContent = ev.title;
   pop.appendChild(titleEl);
 
-  // date
+  // date (shows a range for multi-day events, and notes recurrence)
   const dateEl = document.createElement('div');
   dateEl.className = 'popover-meta';
   const d = new Date(ev.date + 'T12:00:00');
-  dateEl.textContent = d.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' });
+  let dateText = d.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' });
+  const spanEnd = eventSpanEnd(ev);
+  if (eventIsMultiDay(ev)) {
+    const dEnd = new Date(spanEnd + 'T12:00:00');
+    dateText += ' – ' + dEnd.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric', year: d.getFullYear()!==dEnd.getFullYear() ? 'numeric' : undefined });
+  }
+  if (ev.recur === 'annual')  dateText += ' · repeats annually';
+  if (ev.recur === 'monthly') dateText += ' · repeats monthly';
+  dateEl.textContent = dateText;
   pop.appendChild(dateEl);
 
   // time
