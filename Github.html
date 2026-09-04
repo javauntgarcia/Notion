@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  ============================================================
+  GITHUB GUIDE — Edit Templates
+  ============================================================
+  GitHub Pages URL:
+    https://javauntgarcia.github.io/Notion/Github.html
+
+  This page replaced Notion_Guide.html (2026-09-04) — Javaun no
+  longer edits these dashboards through Notion, only directly on
+  GitHub, so every tab below is a copy-paste template for asking
+  Claude to change a file's code and get it back onto GitHub.
+
+  EDIT GUIDE — search these strings to find each section:
+    Palette / colors   →  :root {
+    Background image   →  EDIT: background image URL
+    Overlay tint       →  EDIT: overlay gradient
+    Tab labels         →  EDIT: tab names
+    Template content   →  EDIT: template text
+    localStorage keys  →  gh_prompt_
+  ============================================================
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GitHub Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   EDIT: Color palette — derived from Notion_Design.jpg
+   Actual image tones: deep black, warm amber/gold ochre,
+   rich dark brown, cream/milk white, crimson-red bead accents.
+   ============================================================ */
+:root {
+  --primary:        #1a1108;        /* deep amber-black */
+  --primary-mid:    #2c1e0a;        /* dark warm brown */
+  --accent:         #c8882a;        /* amber gold */
+  --highlight:      #e8b96a;        /* warm ochre/gold */
+  --warm-white:     #f5ead8;        /* cream */
+  --ivory:          #faf3e8;        /* near ivory */
+  --crimson:        #9e2b2b;        /* bead red accent */
+  --glass:          rgba(200, 136, 42, 0.10);
+  --glass-hover:    rgba(200, 136, 42, 0.18);
+  --glass-b:        rgba(232, 185, 106, 0.26);
+  --tab-active-bg:  rgba(200, 136, 42, 0.20);
+  --tab-active-b:   rgba(232, 185, 106, 0.55);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Mono', monospace;
+  background: var(--primary);
+  color: var(--warm-white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ---- PAGE WRAP ---- */
+.page-wrap {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* ---- BACKGROUND ---- */
+/* EDIT: background image URL — change filename after /main/ */
+.bg-layer {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.bg-layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+/* EDIT: overlay gradient — tinted to image dominant colors */
+.bg-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    175deg,
+    rgba(14, 9, 2, 0.80) 0%,
+    rgba(28, 16, 4, 0.65) 45%,
+    rgba(22, 12, 3, 0.75) 100%
+  );
+  z-index: 1;
+}
+
+/* ---- TOPBAR ---- */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 48px;
+  background: rgba(14, 9, 2, 0.42);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(232, 185, 106, 0.10);
+}
+.topbar-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.topbar-back:hover { opacity: 1; }
+.topbar-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--highlight);
+  opacity: 0.50;
+  letter-spacing: 0.08em;
+}
+
+/* ---- CONTENT LAYER ---- */
+.content { position: relative; z-index: 1; }
+
+/* ---- MASTHEAD ---- */
+.masthead {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 1rem 4rem;
+}
+.eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.2rem;
+  opacity: 0.9;
+}
+.masthead h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 10vw, 6.5rem);
+  font-weight: 700;
+  line-height: 1.0;
+  color: var(--warm-white);
+  letter-spacing: -0.01em;
+}
+.masthead h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--highlight);
+}
+.tagline { display: none; }
+
+/* scroll cue */
+.scroll-cue {
+  margin-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: bob 1.8s ease-in-out infinite;
+  color: var(--accent);
+  opacity: 0.6;
+}
+.scroll-cue span {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+/* ---- DIVIDER ---- */
+.divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(200, 136, 42, 0.18),
+    transparent
+  );
+}
+
+/* ---- SECTIONS ---- */
+.section {
+  padding: 5rem 1.5rem 5rem;
+  max-width: 880px;
+  margin: 0 auto;
+  animation: fadeUp 0.8s ease both;
+}
+.section:nth-of-type(1) { animation-delay: 0.1s; }
+.section:nth-of-type(2) { animation-delay: 0.2s; }
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.75;
+  margin-bottom: 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label svg { opacity: 0.8; flex-shrink: 0; }
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(200,136,42,0.20), transparent);
+}
+
+/* ---- GLASS CARD ---- */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-b);
+  border-radius: 14px;
+  padding: 1.8rem 2rem;
+}
+
+/* ---- TABS ---- */
+.tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 1.6rem;
+}
+/* EDIT: tab names are on the button elements below */
+.tab-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(200,136,42,0.07);
+  border: 1px solid rgba(200,136,42,0.22);
+  border-radius: 99px;
+  padding: 0.46em 1.15em;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  outline: none;
+  white-space: nowrap;
+}
+.tab-btn:hover {
+  background: rgba(200,136,42,0.15);
+  border-color: rgba(232,185,106,0.40);
+}
+.tab-btn.active {
+  background: var(--tab-active-bg);
+  border-color: var(--tab-active-b);
+  color: var(--highlight);
+}
+
+/* ---- PROMPT PANE ---- */
+.prompt-pane { display: none; }
+.prompt-pane.active { display: block; }
+
+.prompt-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.prompt-pane-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--warm-white);
+  letter-spacing: 0.01em;
+}
+.btn-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Pill button */
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(200,136,42,0.10);
+  border: 1px solid rgba(200,136,42,0.30);
+  border-radius: 99px;
+  padding: 0.44em 1.05em;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  outline: none;
+}
+.pill-btn:hover {
+  background: rgba(200,136,42,0.20);
+  border-color: rgba(232,185,106,0.45);
+}
+.pill-btn.flash {
+  color: var(--highlight);
+  border-color: var(--highlight);
+}
+
+/* Textarea */
+.prompt-textarea {
+  width: 100%;
+  min-height: 360px;
+  background: rgba(14, 9, 2, 0.50);
+  border: 1px solid rgba(200,136,42,0.18);
+  border-radius: 10px;
+  color: var(--warm-white);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  line-height: 1.78;
+  padding: 1.1rem 1.2rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  letter-spacing: 0.01em;
+}
+.prompt-textarea:focus {
+  border-color: rgba(232,185,106,0.42);
+}
+.prompt-textarea::placeholder {
+  color: rgba(200,136,42,0.30);
+}
+
+/* save status */
+.save-status {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.57rem;
+  letter-spacing: 0.18em;
+  color: var(--highlight);
+  opacity: 0;
+  text-transform: uppercase;
+  transition: opacity 0.3s;
+  margin-top: 0.55rem;
+  text-align: right;
+}
+.save-status.visible { opacity: 0.65; }
+
+/* copy toast */
+.copy-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(26, 16, 4, 0.93);
+  border: 1px solid var(--glass-b);
+  border-radius: 99px;
+  padding: 0.52em 1.5em;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--highlight);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 200;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.copy-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---- FOOTER ---- */
+footer {
+  text-align: center;
+  padding: 2.5rem 1rem 3rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--accent);
+  opacity: 0.35;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- ANIMATIONS ---- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(6px); }
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 600px) {
+  .topbar { padding: 0 1rem; }
+  .glass-card { padding: 1.4rem 1.2rem; }
+  .tab-btn { font-size: 0.55rem; padding: 0.42em 0.9em; }
+  .prompt-textarea { min-height: 280px; font-size: 0.68rem; }
+}
+</style>
+</head>
+
+<body>
+<div class="page-wrap">
+
+  <!-- BACKGROUND -->
+  <div class="bg-layer">
+    <!-- EDIT: background image URL — filename is "Notion Design.jpg" (with space) -->
+    <img
+      src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Notion%20Design.jpg"
+      alt=""
+      aria-hidden="true"
+    />
+  </div>
+
+  <!-- TOPBAR -->
+  <nav class="topbar">
+    <a href="Productivity.html" class="topbar-back" aria-label="Back to Productivity">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Productivity
+    </a>
+    <span class="topbar-date" id="topbar-date"></span>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- MASTHEAD -->
+    <section class="masthead" aria-label="Page header">
+      <p class="eyebrow">System · Reference</p>
+      <h1>GitHub <em>Guide</em></h1>
+      <div class="scroll-cue" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+        <span>scroll</span>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ============================================================
+         SECTION: Edit Templates
+         EDIT: Add/rename tabs by editing tab-btn list + matching pane divs.
+         Each pane id must be "pane-{tabId}", textarea id "textarea-{tabId}",
+         status id "status-{tabId}". localStorage key: gh_prompt_{tabId}
+         ============================================================ -->
+    <section class="section" id="prompt-library">
+      <p class="section-label">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Edit Templates
+      </p>
+
+      <div class="glass-card">
+
+        <!-- EDIT: tab names — data-tab must match the pane id suffix -->
+        <div class="tab-bar" role="tablist" aria-label="Page prompts">
+          <button class="tab-btn active" data-tab="main-hub"     role="tab" aria-selected="true"  aria-controls="pane-main-hub">Main Hub</button>
+          <button class="tab-btn"        data-tab="productivity" role="tab" aria-selected="false" aria-controls="pane-productivity">Productivity</button>
+          <button class="tab-btn"        data-tab="finances"     role="tab" aria-selected="false" aria-controls="pane-finances">Finances</button>
+          <button class="tab-btn"        data-tab="growth"       role="tab" aria-selected="false" aria-controls="pane-growth">Growth</button>
+          <button class="tab-btn"        data-tab="wellness"     role="tab" aria-selected="false" aria-controls="pane-wellness">Wellness</button>
+          <button class="tab-btn"        data-tab="planning"     role="tab" aria-selected="false" aria-controls="pane-planning">Planning</button>
+        </div>
+
+        <!-- ── TAB: Main Hub ── -->
+        <div class="prompt-pane active" id="pane-main-hub" role="tabpanel">
+          <div class="prompt-pane-header">
+            <span class="prompt-pane-title">Main Hub</span>
+            <div class="btn-row">
+              <button class="pill-btn" onclick="copyPrompt('main-hub')" aria-label="Copy Main Hub prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+              <button class="pill-btn" onclick="savePrompt('main-hub')" aria-label="Save Main Hub prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save
+              </button>
+            </div>
+          </div>
+          <textarea class="prompt-textarea" id="textarea-main-hub" placeholder="Paste your Main Hub Claude prompt here — saves on blur or via Save button." spellcheck="false"></textarea>
+          <p class="save-status" id="status-main-hub">Saved</p>
+        </div>
+
+        <!-- ── TAB: Productivity ── -->
+        <div class="prompt-pane" id="pane-productivity" role="tabpanel">
+          <div class="prompt-pane-header">
+            <span class="prompt-pane-title">Productivity</span>
+            <div class="btn-row">
+              <button class="pill-btn" onclick="copyPrompt('productivity')" aria-label="Copy Productivity prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+              <button class="pill-btn" onclick="savePrompt('productivity')" aria-label="Save Productivity prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save
+              </button>
+            </div>
+          </div>
+          <textarea class="prompt-textarea" id="textarea-productivity" spellcheck="false"></textarea>
+          <p class="save-status" id="status-productivity">Saved</p>
+        </div>
+
+        <!-- ── TAB: Finances ── -->
+        <div class="prompt-pane" id="pane-finances" role="tabpanel">
+          <div class="prompt-pane-header">
+            <span class="prompt-pane-title">Finances</span>
+            <div class="btn-row">
+              <button class="pill-btn" onclick="copyPrompt('finances')" aria-label="Copy Finances prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+              <button class="pill-btn" onclick="savePrompt('finances')" aria-label="Save Finances prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save
+              </button>
+            </div>
+          </div>
+          <textarea class="prompt-textarea" id="textarea-finances" placeholder="Paste your Finances page Claude prompt here." spellcheck="false"></textarea>
+          <p class="save-status" id="status-finances">Saved</p>
+        </div>
+
+        <!-- ── TAB: Growth ── -->
+        <div class="prompt-pane" id="pane-growth" role="tabpanel">
+          <div class="prompt-pane-header">
+            <span class="prompt-pane-title">Growth</span>
+            <div class="btn-row">
+              <button class="pill-btn" onclick="copyPrompt('growth')" aria-label="Copy Growth prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+              <button class="pill-btn" onclick="savePrompt('growth')" aria-label="Save Growth prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save
+              </button>
+            </div>
+          </div>
+          <textarea class="prompt-textarea" id="textarea-growth" placeholder="Paste your Growth page Claude prompt here." spellcheck="false"></textarea>
+          <p class="save-status" id="status-growth">Saved</p>
+        </div>
+
+        <!-- ── TAB: Wellness ── -->
+        <div class="prompt-pane" id="pane-wellness" role="tabpanel">
+          <div class="prompt-pane-header">
+            <span class="prompt-pane-title">Wellness</span>
+            <div class="btn-row">
+              <button class="pill-btn" onclick="copyPrompt('wellness')" aria-label="Copy Wellness prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+              <button class="pill-btn" onclick="savePrompt('wellness')" aria-label="Save Wellness prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save
+              </button>
+            </div>
+          </div>
+          <textarea class="prompt-textarea" id="textarea-wellness" placeholder="Paste your Wellness page Claude prompt here." spellcheck="false"></textarea>
+          <p class="save-status" id="status-wellness">Saved</p>
+        </div>
+
+        <!-- ── TAB: Planning ── -->
+        <div class="prompt-pane" id="pane-planning" role="tabpanel">
+          <div class="prompt-pane-header">
+            <span class="prompt-pane-title">Planning</span>
+            <div class="btn-row">
+              <button class="pill-btn" onclick="copyPrompt('planning')" aria-label="Copy Planning prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+              <button class="pill-btn" onclick="savePrompt('planning')" aria-label="Save Planning prompt">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save
+              </button>
+            </div>
+          </div>
+          <textarea class="prompt-textarea" id="textarea-planning" placeholder="Paste your Planning page Claude prompt here." spellcheck="false"></textarea>
+          <p class="save-status" id="status-planning">Saved</p>
+        </div>
+
+      </div><!-- .glass-card -->
+    </section>
+
+    <div class="divider"></div>
+
+    <footer>edit deliberately · commit often</footer>
+
+  </div><!-- .content -->
+</div><!-- .page-wrap -->
+
+<!-- COPY TOAST -->
+<div class="copy-toast" id="copy-toast" aria-live="polite">Copied to clipboard</div>
+
+<script>
+// ============================================================
+// EDIT: Tab IDs — keep in sync with the tab-btn data-tab values above
+// ============================================================
+var TABS = ['main-hub', 'productivity', 'finances', 'growth', 'wellness', 'planning'];
+
+// EDIT: localStorage key prefix — gh_ for GitHub Guide
+var PREFIX = 'gh_prompt_';
+
+// ---- MAIN HUB DEFAULT PROMPT ----
+// EDIT: prompt text — pre-loaded workflow prompt for Main Hub.html
+// Seeds on first load only; edit via the textarea and Save button thereafter.
+var MAIN_HUB_DEFAULT = `
+# Main_Hub.html — Edit Template (GitHub-only workflow)
+
+Use this whenever you want a change made to Main_Hub.html. No Notion step — this repo is the only source of truth now.
+
+---
+
+## Step 1 — Get the current file
+
+Grab the latest version straight from GitHub so nothing gets edited from a stale copy:
+https://github.com/javauntgarcia/Notion/blob/main/Main_Hub.html
+
+Live page: https://javauntgarcia.github.io/Notion/Main_Hub.html
+
+This page stores its data in Supabase (see the SB_URL / SB_KEY constants near the top of the script), mirrored to localStorage as an offline fallback — nothing needs to be exported before you start.
+
+## Step 2 — Ask Claude
+
+Paste this into a Claude conversation along with the current Main_Hub.html file, filling in the bracketed part.
+
+---
+
+Here is Main_Hub.html from my GitHub Pages dashboard (javauntgarcia.github.io/Notion). Please make the following change:
+
+[DESCRIBE YOUR CHANGE — which section, what it should do, what the new text/behavior should be]
+
+Preserve:
+- Fonts: Cormorant Garamond (headings/display) + DM Mono (labels/mono/body) from Google Fonts — never substitute system fonts.
+- Dark glass-card aesthetic: background ~0.10–0.18 alpha, backdrop-filter: blur(14px), border 1px solid ~0.26–0.30 alpha, border-radius 14px.
+- All colors as :root CSS variables — never hardcode a hex value inline.
+- The existing Supabase table(s) and column names exactly as they are — don't rename or restructure them, and keep writes mirrored to localStorage as the offline fallback.
+- Single self-contained .html file — everything inline, no frameworks, no build step.
+- No emojis — inline SVG line icons only (stroke, not fill; stroke-width 1.5; Feather/Lucide style).
+- The "EDIT: ..." landmark comments — keep the existing ones and add new ones for anything you introduce, so the next edit is easy to find.
+
+Return the complete updated file — not a diff, not a snippet.
+
+---
+
+## Step 3 — Get it back onto GitHub
+
+Claude can't push to this repo directly, so:
+1. Save the file Claude returns.
+2. Either use GitHub's web editor (open Main_Hub.html on github.com, click the pencil icon, paste in the new content, commit) or, from a local clone:
+   git add "Main_Hub.html"
+   git commit -m "feat: [what changed]"
+   git push origin main
+3. Confirm the live page updated: https://javauntgarcia.github.io/Notion/Main_Hub.html
+`;
+
+// ---- GROWTH DEFAULT PROMPT ----
+// EDIT: prompt text — pre-loaded workflow prompt for Growth.html
+// Seeds on first load only.
+var GROWTH_DEFAULT = `
+# Growth.html — Edit Template (GitHub-only workflow)
+
+Use this whenever you want a change made to Growth.html. No Notion step — GitHub is the only source of truth.
+
+---
+
+## Step 1 — Get the current file
+
+https://github.com/javauntgarcia/Notion/blob/main/Growth.html
+Live page: https://javauntgarcia.github.io/Notion/Growth.html
+
+This page reads/writes Supabase (SB_URL / SB_KEY near the top of the script) with a localStorage mirror as fallback — nothing to export first.
+
+## Step 2 — Ask Claude
+
+Paste this into a Claude conversation along with the current Growth.html file, filling in the bracketed part.
+
+---
+
+Here is Growth.html from my GitHub Pages dashboard (javauntgarcia.github.io/Notion). Please make the following change:
+
+[DESCRIBE YOUR CHANGE — which section, what it should do, what the new text/behavior should be]
+
+Preserve:
+- Fonts: Cormorant Garamond (headings/display) + DM Mono (labels/mono/body) from Google Fonts.
+- Dark glass-card aesthetic: background ~0.10–0.18 alpha, backdrop-filter: blur(14px), border ~0.26–0.30 alpha, border-radius 14px.
+- Colors defined as :root CSS variables — preserve the variable names, never hardcode hex inline.
+- The existing Supabase table/columns exactly as they are, with the localStorage mirror kept as the offline fallback.
+- Single self-contained .html file, no frameworks, no build step.
+- No emojis — inline SVG line icons only (stroke-width 1.5).
+- The "EDIT: ..." landmark comments — keep and extend them.
+
+Return the complete updated file, not a diff.
+
+---
+
+## Step 3 — Get it back onto GitHub
+
+1. Save the file Claude returns.
+2. Upload it via GitHub's web editor (pencil icon on Growth.html → paste → commit) or from a local clone:
+   git add "Growth.html"
+   git commit -m "feat: [what changed]"
+   git push origin main
+3. Confirm at https://javauntgarcia.github.io/Notion/Growth.html
+`;
+
+// ---- PLANNING DEFAULT PROMPT ----
+// EDIT: prompt text — pre-loaded workflow prompt for Planning.html
+// Seeds on first load only.
+var PLANNING_DEFAULT = `
+# Planning.html — Edit Template (GitHub-only workflow)
+
+Use this whenever you want a change made to Planning.html. No Notion step — GitHub is the only source of truth.
+
+---
+
+## Step 1 — Get the current file
+
+https://github.com/javauntgarcia/Notion/blob/main/Planning.html
+Live page: https://javauntgarcia.github.io/Notion/Planning.html
+
+Planning.html and its subpages (Yearly_Outlook.html, Monthly_Outline.html, Weekly_Check-in.html) read/write Supabase with a localStorage mirror as fallback — nothing to export first.
+
+## Step 2 — Ask Claude
+
+Paste this into a Claude conversation along with the current file, filling in the bracketed part.
+
+---
+
+Here is Planning.html from my GitHub Pages dashboard (javauntgarcia.github.io/Notion). Please make the following change:
+
+[DESCRIBE YOUR CHANGE — which section, what it should do, what the new text/behavior should be]
+
+Preserve:
+- Fonts: Cormorant Garamond (headings/display) + DM Mono (labels/mono/body) from Google Fonts.
+- Dark glass-card aesthetic: background ~0.10–0.18 alpha, backdrop-filter: blur(14px), border ~0.26–0.30 alpha, border-radius 14px.
+- Colors as :root CSS variables — preserve the variable names and values, never hardcode hex inline.
+- The existing Supabase table/columns exactly as they are, with the localStorage mirror kept as the offline fallback.
+- Single self-contained .html file, no frameworks, no build step.
+- No emojis — inline SVG line icons only (stroke-width 1.5).
+- The "EDIT: ..." landmark comments — keep and extend them.
+
+Return the complete updated file, not a diff.
+
+---
+
+## Step 3 — Get it back onto GitHub
+
+1. Save the file Claude returns.
+2. Upload it via GitHub's web editor (pencil icon → paste → commit) or from a local clone:
+   git add "Planning.html"
+   git commit -m "feat: [what changed]"
+   git push origin main
+3. Confirm at https://javauntgarcia.github.io/Notion/Planning.html
+`;
+
+// ---- PRODUCTIVITY DEFAULT PROMPT ----
+// EDIT: prompt text — this is the pre-loaded Subpage Build Prompt for Productivity.
+// It will only seed if the user has never saved anything to ng_prompt_productivity.
+var PRODUCTIVITY_DEFAULT = `
+# Productivity.html — Edit Template (GitHub-only workflow)
+
+Use this whenever you want a change made to Productivity.html itself, or when building a brand-new subpage for it. No Notion step — GitHub is the only source of truth now.
+
+---
+
+## Step 1 — Get the current file
+
+https://github.com/javauntgarcia/Notion/blob/main/Productivity.html
+Live page: https://javauntgarcia.github.io/Notion/Productivity.html
+
+## Step 2 — Ask Claude
+
+For edits to Productivity.html itself: upload the file to a Claude conversation, describe the change, and remind Claude to preserve — Cormorant Garamond + DM Mono fonts, the dark glass-card aesthetic, the :root CSS variables, the prod_ localStorage prefix (mirroring whatever it already writes to Supabase), the single-file constraint, no frameworks, no emojis, inline SVG icons only, and the "EDIT: ..." landmark comments. Ask for the complete file back, not a diff.
+
+For a brand-new subpage, use the Subpage Build Prompt below.
+
+---
+
+# Subpage Build Prompt
+## Paste this to Claude when building each new subpage. Fill in the bracketed fields before sending.
+
+---
+
+Build an HTML dashboard page called [PAGE TITLE].html as a subpage of my GitHub Pages system (github.com/javauntgarcia/Notion → javauntgarcia.github.io/Notion). Match every rule below exactly.
+
+---
+
+### Page-specific details (fill these in each time)
+
+| Field | Value |
+|---|---|
+| Page title | [e.g. Personal Curriculum] |
+| HTML filename | [e.g. Personal_Curriculum.html] |
+| GitHub image filename | [e.g. Personal_Curriculum.jpg] |
+| Eyebrow label | [e.g. Reading · Study] |
+| H1 display (italic split) | [e.g. Curric<em>ulum</em>] |
+| Parent page back link | Productivity.html (or Main_Hub.html) |
+| Needs Supabase? | [yes, if data should sync across devices — no, if localStorage-only is fine] |
+| Sections to include | [list the sections — see Section Menu below] |
+
+---
+
+### Rules — follow all of these exactly
+
+Fonts
+- Display / headings: Cormorant Garamond (weights 300, 400, 600; italic variants)
+- Body / labels / mono: DM Mono (weights 300, 400, 500)
+- Load both from Google Fonts. Never use system fonts.
+
+Background image
+- Pull from GitHub raw: https://raw.githubusercontent.com/javauntgarcia/Notion/main/[FILENAME].jpg
+- The image must cover the full page height and scroll with the content (not fixed).
+- Implementation: wrap everything in a page-wrap div with position: relative. Inside it, a bg-layer div as position: absolute, top:0, left:0, width:100%, height:100%, z-index:0. The image inside bg-layer uses width:100%, height:100%, object-fit:cover, object-position: center top.
+- Add a dark overlay via bg-layer::after using a linear-gradient tinted to match the image's dominant colors at roughly 0.5 opacity. Adjust so text stays legible.
+
+Color palette
+- Derive the palette from the image's dominant tones. Build 6–8 CSS variables in :root named --primary, --primary-mid, --accent, --highlight, --warm-white, --ivory, --glass, --glass-hover, --glass-b.
+- --glass = primary color at ~0.12 alpha for frosted card backgrounds.
+- --glass-b = highlight color at ~0.28 alpha for card borders.
+- Do not reuse Productivity.html's amber/crimson palette unless the image genuinely shares those tones.
+
+Data layer
+- If the page needs data to sync across devices (anything you'd want to see update on your phone after editing on your laptop), back it with Supabase: reuse the same project (SB_URL / SB_KEY constants — copy them from Main_Hub.html) and a new table named for the page, with sbGet/sbUpsert helper functions matching the pattern already used across the site. Always mirror writes to localStorage as an offline fallback.
+- If the page is fine staying local to one browser, localStorage alone is okay — use a unique key prefix per page (see table below) and never reuse another page's prefix.
+
+Topbar
+- Fixed to top, full width, z-index 100.
+- Left: back arrow SVG (inline, 14x14) + link text, to Productivity.html or Main_Hub.html as specified.
+- Right: today's date, set via JS, DM Mono 0.65rem.
+- Background: page's dark base color at ~0.42 alpha plus backdrop-filter: blur(12px).
+- Bottom border: 1px solid, primary highlight color at 0.10 alpha.
+
+Masthead
+- min-height: 100vh, centered column, padding: 6rem 1rem 4rem.
+- Eyebrow: DM Mono, 0.65rem, letter-spacing 0.3em, uppercase, primary accent color.
+- H1: Cormorant Garamond, clamp(3.5rem, 10vw, 6.5rem), weight 700. The em inside is italic, lighter weight, highlight color.
+- No tagline or subtext beneath the H1.
+- Scroll cue: animated bounce arrow below, DM Mono "scroll" label.
+
+Glass cards
+- background: var(--glass), backdrop-filter: blur(14px), border: 1px solid var(--glass-b), border-radius: 14px.
+- On hover: background shifts to var(--glass-hover), transform: translateY(-4px).
+
+Section structure
+- Each section: padding: 5rem 0 5rem, animation: fadeUp 0.8s ease both with staggered animation-delay.
+- Section label above each block: DM Mono, 0.6rem, letter-spacing 0.3em, uppercase, accent color at 0.75 opacity.
+- Sections separated by a 1px divider with a horizontal gradient fade (transparent to accent at 0.18 to transparent).
+
+No emojis — use inline SVG line icons (stroke, not fill) for all iconography. Feather/Lucide icon style: stroke-width 1.5, stroke-linecap round, stroke-linejoin round. Size 18x18.
+
+No subtext / descriptions — cards show label + title + arrow only, no paragraph descriptions under titles.
+
+Buttons
+- Pill shape: border-radius 99px, DM Mono 0.6rem, uppercase, letter-spacing 0.2em.
+- Colors: accent color text, accent at 0.10 background, accent at 0.30 border.
+- Hover: accent at 0.20 background.
+
+Edit guide
+- Include a prominent HTML comment block at the top (inside head, before style) listing the GitHub Pages URL for this page, and a landmark search guide: what string to search to find each editable section (palette, background URL, section content, localStorage keys, Supabase table name).
+- Inside the CSS and JS, add EDIT: ... comments at every point a future editor would want to change something.
+
+Animations
+- keyframes fadeUp: opacity 0 to 1, translateY 20px to 0.
+- keyframes bob: translateY 0 to 6px to 0, for the scroll cue.
+- No other animations unless the section content specifically calls for one (e.g. flashcard flip).
+
+Footer
+- Centered, Cormorant Garamond italic, 0.8rem, accent color at 0.35 opacity.
+- Text: a short phrase appropriate to the page (e.g. "read deeply, think slowly" for Curriculum).
+
+File must be self-contained — one .html file, no external JS files, no frameworks. CSS in style, JS in script at the bottom of body.
+
+---
+
+### Section menu — pick the ones relevant to each page
+
+| Section type | Use for |
+|---|---|
+| Editable list | Ordered list of items the user types in and saves. |
+| Progress tracker | Goal card with a progress bar. |
+| Daily text prompt | A textarea that saves per-day (keyed by date). |
+| Kanban / status columns | Two or three columns with draggable cards. |
+| Flashcard deck | Flip-card UI. Reads a stored array. |
+| Rich text note | A full-width textarea, stable key. |
+| Table / log | A rendered table of entries. Add-row form at the bottom. |
+| Link grid | Navigation cards to other subpages or external URLs. |
+
+---
+
+### Subpage image filenames
+
+| Subpage | GitHub image filename |
+|---|---|
+| Personal Curriculum | Personal_Curriculum.jpg |
+| Content Calendar | Content_Calendar.jpg |
+| GitHub Guide | Notion Design.jpg |
+| Vocabulary List | vocabulary list.WEBP |
+| Depop | Depop.jpg |
+| Work | Work.jpg |
+
+---
+
+### Quick-start prompts
+
+Personal Curriculum
+Build Personal_Curriculum.html. Image: Personal_Curriculum.jpg. Eyebrow: Reading · Study. H1: Curric<em>ulum</em>. Back link: Productivity.html. Supabase table: personal_curriculum.
+
+Content Calendar
+Build Content_Calendar.html. Image: Content_Calendar.jpg. Eyebrow: Brand · Schedule. H1: Content <em>Calendar</em>. Back link: Productivity.html.
+
+Vocabulary List
+Build Vocabulary_List.html. Image: vocabulary list.WEBP. Eyebrow: Language · Brand. H1: Vocab<em>ulary</em>. Back link: Productivity.html.
+
+Depop
+Build Depop.html. Image: Depop.jpg. Eyebrow: Side Hustle · Sales. H1: De<em>pop</em>. Back link: Productivity.html.
+
+Work
+Build Work.html. Image: Work.jpg. Eyebrow: SFMTA · Planning. H1: <em>Work</em>. Back link: Productivity.html.
+
+---
+
+## Step 3 — Get it back onto GitHub
+
+1. Save the file Claude returns.
+2. Upload it via GitHub's web editor (pencil icon → paste → commit for an existing file; "Add file" → "Create new file" for a new subpage) or from a local clone:
+   git add "[filename]"
+   git commit -m "feat: [what changed]"
+   git push origin main
+3. If it's a new subpage, add a link card to it from Productivity.html (or wherever it belongs) in the same pass.
+4. Confirm the live page: https://javauntgarcia.github.io/Notion/[filename]
+`;
+
+// ---- WELLNESS DEFAULT PROMPT ----
+// EDIT: pre-loaded wellness build prompt. Seeds on first load only.
+var WELLNESS_DEFAULT = `
+# Wellness.html — Edit Template (GitHub-only workflow)
+
+Use this whenever you want a change made to Wellness.html or one of its subpages (Weekly_Check-in.html, Workout_Plan.html, Workout_Tracker.html). No Notion step — GitHub is the only source of truth now.
+
+---
+
+## Step 1 — Get the current file
+
+https://github.com/javauntgarcia/Notion/blob/main/Wellness.html
+Live page: https://javauntgarcia.github.io/Notion/Wellness.html
+
+Weekly_Check-in.html and Workout_Tracker.html read/write Supabase (SB_URL / SB_KEY near the top of the script), mirrored to localStorage as an offline fallback. Workout_Plan.html is static reference content with no saved data. Nothing needs to be exported before you start.
+
+## Step 2 — Ask Claude
+
+For edits to Wellness.html itself: upload the file, describe the change, and remind Claude to preserve — Cormorant Garamond + DM Mono fonts, the dark glass-card aesthetic, the :root CSS variables, the wl_ localStorage prefix, and (for the two data-backed subpages) the existing Supabase table/columns. Ask for the complete file back, not a diff.
+
+For a brand-new Wellness subpage, use the Subpage Build Prompt below.
+
+---
+
+# Wellness Subpage Build Prompt
+## Universal rules and page specs. Paste to Claude and append the CURRENT PAGE block for the page you're building.
+
+---
+
+Build a single HTML file for a personal wellness page hosted on GitHub Pages (github.com/javauntgarcia/Notion). The specific page to build is indicated in the CURRENT PAGE section at the bottom.
+
+---
+
+UNIVERSAL RULES (apply to every page)
+
+File constraints:
+- Single .html file, all CSS and JS inlined
+- No frameworks, no external JS libraries
+- No base64, no embedded image data anywhere in the file
+
+Background:
+- Full-width img tag using the GitHub raw URL specified in CURRENT PAGE
+- CSS: width: 100%, height: auto — portrait image, never cropped, scrolls naturally with the page
+- Never use background-size: cover or the background-image CSS property for the main image
+- Below the image the page background is white (#ffffff)
+
+Design system:
+- Fonts: Playfair Display (titles, display numbers, headings) + DM Mono (labels, inputs, metadata, body) via Google Fonts
+- Glass cards: background: rgba(255,255,255,0.25), backdrop-filter: blur(14px), border: 1px solid rgba(255,255,255,0.45), border-radius: 14px
+- Color palette: sample the key tones from the page's background image — cobalt, powder blue, ice, and cream ranges. No black anywhere in text, overlays, or UI
+- All section titles in Playfair Display italic, all inputs/labels/metadata in DM Mono
+
+Fixed topbar:
+- Position: fixed, frosted glass blur, does not scroll with page
+- Left: back arrow + "Wellness" — href="Wellness.html"
+- Right: back arrow + "Main Hub" — href="Main_Hub.html"
+- Center or right-aligned: today's date in DM Mono
+- Add enough padding-top to the page wrapper so content is never hidden behind the topbar
+
+Data layer:
+- If the page should sync across devices (you'd want to see today's entry on your phone after logging it on your laptop), back it with Supabase the same way Weekly_Check-in.html and Workout_Tracker.html already do — reuse the SB_URL / SB_KEY constants and mirror every write to localStorage as the offline fallback.
+- If it's static reference content with nothing to save (like Workout_Plan.html), skip a data layer entirely.
+- On every write, dispatch a native storage event so other open tabs update in real time.
+
+---
+
+CURRENT PAGE — copy one of the three blocks below and append it here when building each page
+
+---
+PAGE: Weekly_Check-in.html
+---
+
+Background image URL:
+https://raw.githubusercontent.com/javauntgarcia/Notion/main/Weekly_Check_ins.jpg
+
+Data this page must read/write (Supabase, mirrored to localStorage):
+- Check-in entries: date, weight, chest, waist, shoulders, arms, thighs, calves, glutes, notes
+- First-ever logged weight, written once on first save, never overwritten
+- Most recent logged weight, updated on every save
+
+Features:
+
+1. Journey summary banner (glass card) — only shown if 2+ entries exist
+   - Date range: first entry to latest entry
+   - Total weeks tracked
+   - Net change for weight and each measurement (e.g. -4.2 lbs, +0.5 in)
+   - Display as a horizontal scrolling stat strip
+
+2. Input form (glass card)
+   - Date picker defaulting to today
+   - Fields: Weight (lbs), Chest (in), Waist (in), Shoulders (in), Arms (in), Thighs (in), Calves (in), Glutes (in), Notes (textarea)
+   - Save button writes the new entry, sets the first-logged weight on first save only, always updates the most-recent weight
+
+3. Latest stats strip
+   - Most recent value per metric with delta vs prior entry
+
+4. History section
+   - All entries newest first, each showing date + all metrics + notes + delete button
+   - Group by week if more than 4 entries exist
+
+---
+PAGE: Workout_Plan.html
+---
+
+Background image URL:
+https://raw.githubusercontent.com/javauntgarcia/Notion/main/Workout_Plan.jpg
+
+No data layer — this page is static reference only.
+
+Weekly split (hardcoded):
+- Monday: Push — Chest, Triceps, Front Delts
+- Tuesday: Pull — Back, Biceps, Rear Delts
+- Wednesday: Legs — Quads, Hamstrings, Glutes, Calves
+- Thursday: Shoulders and Core
+- Friday: HIIT / Cardio
+- Saturday: Upper Body — Chest and Back emphasis
+- Sunday: Rest and Mobility
+
+Features:
+
+1. 7-day anchor grid
+   - Horizontal row of day chips (Mon-Sun), each labeled with day + workout type
+   - Each chip is a smooth-scroll anchor to its section below
+   - Today's chip is visually highlighted
+
+2. Day cards (one glass card per day)
+   - Header: day name + workout type in Playfair Display italic
+   - Exercise table inside: 3 columns — Exercise + coaching cue | Sets x Reps | Rest
+   - 4-6 realistic exercises per day appropriate to the split
+
+3. Sunday card
+   - No exercise table — show a mobility/recovery tip instead
+
+---
+PAGE: Workout_Tracker.html
+---
+
+Background image URL:
+https://raw.githubusercontent.com/javauntgarcia/Notion/main/Workout_Tracker.jpg
+
+Data this page must read/write (Supabase, mirrored to localStorage):
+- Sessions: date, type, duration, pushups, notes
+- Total session count, incremented on every save
+- Max push-up rep count, updated only if the new value is higher than the stored one
+
+Features:
+
+1. Log a session (glass card)
+   - Fields: Date picker (defaults to today), Workout type/name, Duration (minutes), Max push-ups, Notes
+
+2. Stats bar (glass card)
+   - Total sessions logged
+   - Current streak: consecutive weeks with at least one session
+   - Personal best push-ups
+   - Average session duration
+
+3. Weekly activity chart
+   - Past 8 weeks, sessions per week
+   - Pure CSS bars or vanilla JS canvas — no charting libraries
+
+4. Session history
+   - All sessions newest first, grouped by week
+   - Each entry: date, type, duration, push-ups, notes, delete button
+
+---
+
+## Step 3 — Get it back onto GitHub
+
+1. Save the file Claude returns.
+2. Upload it via GitHub's web editor (pencil icon → paste → commit) or from a local clone:
+   git add "[filename]"
+   git commit -m "feat: [what changed]"
+   git push origin main
+3. Confirm at https://javauntgarcia.github.io/Notion/[filename]
+`;
+
+// ---- Date in topbar ----
+(function() {
+  var el = document.getElementById('topbar-date');
+  if (!el) return;
+  var d = new Date();
+  el.textContent = d.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+  });
+})();
+
+// ---- Load saved prompts; seed defaults ----
+TABS.forEach(function(id) {
+  var ta = document.getElementById('textarea-' + id);
+  if (!ta) return;
+
+  try {
+    var saved = localStorage.getItem(PREFIX + id);
+    if (saved !== null) {
+      // User has saved content — use it
+      ta.value = saved;
+    } else if (id === 'main-hub') {
+      // EDIT: seed Main Hub tab with the workflow prompt on first load
+      ta.value = MAIN_HUB_DEFAULT;
+      try { localStorage.setItem(PREFIX + 'main-hub', MAIN_HUB_DEFAULT); } catch(e) {}
+    } else if (id === 'productivity') {
+      // EDIT: seed Productivity tab with the workflow + subpage build prompt on first load
+      ta.value = PRODUCTIVITY_DEFAULT;
+      try { localStorage.setItem(PREFIX + 'productivity', PRODUCTIVITY_DEFAULT); } catch(e) {}
+    } else if (id === 'growth') {
+      // EDIT: seed Growth tab with the workflow prompt on first load
+      ta.value = GROWTH_DEFAULT;
+      try { localStorage.setItem(PREFIX + 'growth', GROWTH_DEFAULT); } catch(e) {}
+    } else if (id === 'wellness') {
+      // EDIT: seed Wellness tab with the workflow + subpage build prompt on first load
+      ta.value = WELLNESS_DEFAULT;
+      try { localStorage.setItem(PREFIX + 'wellness', WELLNESS_DEFAULT); } catch(e) {}
+    } else if (id === 'planning') {
+      // EDIT: seed Planning tab with the workflow prompt on first load
+      ta.value = PLANNING_DEFAULT;
+      try { localStorage.setItem(PREFIX + 'planning', PLANNING_DEFAULT); } catch(e) {}
+    }
+  } catch(e) {
+    // localStorage unavailable; textarea stays empty
+  }
+
+  // Auto-save on blur
+  ta.addEventListener('blur', function() { savePrompt(id); });
+});
+
+// ---- Tab switching ----
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var tabId = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.prompt-pane').forEach(function(p) {
+      p.classList.remove('active');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    var pane = document.getElementById('pane-' + tabId);
+    if (pane) pane.classList.add('active');
+  });
+});
+
+// ---- Save prompt ----
+function savePrompt(id) {
+  var ta = document.getElementById('textarea-' + id);
+  var st = document.getElementById('status-' + id);
+  if (!ta) return;
+  try { localStorage.setItem(PREFIX + id, ta.value); } catch(e) {}
+  if (st) {
+    st.classList.add('visible');
+    setTimeout(function() { st.classList.remove('visible'); }, 1800);
+  }
+}
+
+// ---- Copy prompt to clipboard ----
+function copyPrompt(id) {
+  var ta = document.getElementById('textarea-' + id);
+  if (!ta || !ta.value.trim()) return;
+  var text = ta.value;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showToast).catch(function() {
+      fallbackCopy(ta);
+    });
+  } else {
+    fallbackCopy(ta);
+  }
+}
+
+function fallbackCopy(ta) {
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  showToast();
+}
+
+function showToast() {
+  var t = document.getElementById('copy-toast');
+  if (!t) return;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2100);
+}
+
+// Expose for inline onclick
+window.savePrompt = savePrompt;
+window.copyPrompt = copyPrompt;
+</script>
+</body>
+</html>

@@ -342,6 +342,25 @@
       padding: 1px 4px;
     }
 
+    /* Multi-day event line — one segment per day, edge-to-edge so
+       adjacent days' segments visually connect into a single bar
+       running across the span (wraps at week boundaries). Mirrors
+       the phase-bar treatment on Yearly_Outlook.html. */
+    .day-phase-bar {
+      position: absolute;
+      left: 0; right: 0;
+      height: 4px;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.15s;
+    }
+    .day-phase-bar:hover,
+    .day-phase-bar.popover-open { opacity: 1; }
+    .day-phase-bar.phase-start { border-radius: 4px 0 0 4px; left: 14%; }
+    .day-phase-bar.phase-mid   { border-radius: 0; }
+    .day-phase-bar.phase-end   { border-radius: 0 4px 4px 0; right: 14%; }
+    .day-phase-bar.phase-solo  { border-radius: 4px; left: 14%; right: 14%; }
+
     /* ── ADD EVENT MODAL ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
@@ -888,6 +907,11 @@ function setAllEvents(arr) { _moData.cal_events = arr; saveMo(); }
 ══════════════════════════════════════ */
 function monthKey(yr, mo) { return `${yr}_${mo}`; }
 function dateStr(yr, mo, d){ return `${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function addDays(ds, n) {
+  const [y, m, d] = ds.split('-').map(Number);
+  const dt = new Date(y, m - 1, d + n);
+  return dateStr(dt.getFullYear(), dt.getMonth(), dt.getDate());
+}
 function flashSave() {
   const dot = document.getElementById('saveDot');
   dot.classList.add('show');
@@ -1026,10 +1050,41 @@ function renderCalendar() {
     numEl.textContent = d;
     cell.appendChild(numEl);
 
-    // event chips (max 3, then "+N more")
+    // Multi-day events get a continuous line running across every date
+    // they cover (a segment per day, edge-to-edge so adjacent days'
+    // segments read as one bar) instead of a chip repeated on every
+    // day — the chip below still appears on the span's start/end days
+    // for the title and time.
+    const phaseEvents = dayEvents.filter(eventIsMultiDay);
+    phaseEvents.forEach((ev, idx) => {
+      const cat   = catById(ev.cat);
+      const color = cat?.color || '#444';
+      const prevActive = eventCoversDate(ev, addDays(ds, -1));
+      const nextActive = eventCoversDate(ev, addDays(ds, 1));
+      let posCls = 'phase-mid';
+      if (!prevActive && !nextActive) posCls = 'phase-solo';
+      else if (!prevActive) posCls = 'phase-start';
+      else if (!nextActive) posCls = 'phase-end';
+
+      const phaseBar = document.createElement('div');
+      phaseBar.className = 'day-phase-bar ' + posCls;
+      phaseBar.style.background = color;
+      phaseBar.style.bottom = (3 + idx * 6) + 'px';
+      phaseBar.title = ev.title;
+      phaseBar.onclick = (e) => {
+        e.stopPropagation();
+        showEventPopover(ev, color, phaseBar);
+      };
+      cell.appendChild(phaseBar);
+    });
+
+    // event chips (max 3, then "+N more") — multi-day events only show
+    // a chip on their start/end day; the phase-bar above covers the
+    // days in between, so a chip there would just repeat the same line.
+    const chipEvents = dayEvents.filter(ev => !eventIsMultiDay(ev) || ds === ev.date || ds === eventSpanEnd(ev));
     const evWrap = document.createElement('div');
     evWrap.className = 'day-events';
-    const visible = dayEvents.slice(0, 3);
+    const visible = chipEvents.slice(0, 3);
     visible.forEach(ev => {
       const cat   = catById(ev.cat);
       const color = cat?.color || '#444';
@@ -1057,10 +1112,10 @@ function renderCalendar() {
       };
       evWrap.appendChild(chip);
     });
-    if (dayEvents.length > 3) {
+    if (chipEvents.length > 3) {
       const more = document.createElement('div');
       more.className = 'more-events';
-      more.textContent = `+${dayEvents.length - 3} more`;
+      more.textContent = `+${chipEvents.length - 3} more`;
       evWrap.appendChild(more);
     }
     cell.appendChild(evWrap);

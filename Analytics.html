@@ -277,37 +277,8 @@
       background: rgba(0,0,0,0.25); border: 1px solid rgba(232,184,75,0.22); border-radius: 8px;
       padding: 0.4rem 0.6rem; outline: none;
     }
-    .video-list { display: flex; flex-direction: column; gap: 0.6rem; }
-    .video-row {
-      display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.1rem; cursor: pointer;
-      transition: background 0.2s;
-    }
-    .video-row:hover { background: var(--glass-hover); }
-    .video-thumb {
-      width: 46px; height: 46px; border-radius: 8px; background-size: cover; background-position: center;
-      background-color: rgba(255,255,255,0.05); flex-shrink: 0; border: 1px solid rgba(232,184,75,0.2);
-    }
-    .video-main { flex: 1; min-width: 0; }
-    .video-title {
-      font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--warm-white);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .video-meta { font-size: 0.6rem; color: var(--ivory); opacity: 0.5; margin-top: 0.15rem; display: flex; gap: 0.7rem; flex-wrap: wrap; }
-    .platform-tag {
-      font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15rem 0.5rem;
-      border-radius: 99px; background: rgba(232,184,75,0.14); color: var(--gold); flex-shrink: 0;
-    }
-    .video-nums { display: flex; gap: 1.2rem; flex-shrink: 0; }
-    .video-nums .n { text-align: right; }
-    .video-nums .n-val { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: var(--warm-white); }
-    .video-nums .n-lbl { font-size: 0.52rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ivory); opacity: 0.4; }
-    .video-del { color: var(--bad); opacity: 0.5; font-size: 0.8rem; cursor: pointer; padding: 0.2rem 0.4rem; flex-shrink: 0; }
-    .video-del:hover { opacity: 1; }
     .empty-note { font-size: 0.7rem; color: var(--ivory); opacity: 0.38; text-align: center; padding: 2rem 0; }
 
-    /* Expanded detail */
-    .video-detail { display: none; padding: 1.2rem 1.3rem 1.4rem; margin-top: -0.4rem; }
-    .video-detail.open { display: block; }
     .detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-bottom: 1rem; }
     @media (max-width: 680px) { .detail-grid { grid-template-columns: repeat(2, 1fr); } }
     .detail-stat { text-align: center; }
@@ -367,27 +338,115 @@
     .g-panel { display: none; }
     .g-panel.active { display: block; }
 
-    /* ════════════════════════════════════════
-       BREAKDOWN BARS (platform, day-of-week, hashtags)
-    ════════════════════════════════════════ */
-    .bd-row { display: flex; align-items: center; gap: 0.9rem; padding: 0.5rem 0; }
-    .bd-label { width: 8rem; flex-shrink: 0; font-size: 0.65rem; color: var(--ivory); opacity: 0.7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .bd-track { flex: 1; height: 7px; background: rgba(232,184,75,0.08); border-radius: 99px; overflow: hidden; }
-    .bd-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--crimson-mid), var(--gold)); width: 0%; transition: width 1s cubic-bezier(0.22,1,0.36,1); }
-    .bd-val { width: 4.5rem; flex-shrink: 0; text-align: right; font-size: 0.62rem; color: var(--gold); }
-
-    .seo-table { width: 100%; border-collapse: collapse; }
-    .seo-table th {
-      font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--amber); opacity: 0.75; text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid rgba(232,184,75,0.18);
-    }
-    .seo-table td {
-      font-size: 0.72rem; color: var(--warm-white); padding: 0.55rem 0.6rem; border-bottom: 1px solid rgba(232,184,75,0.08);
-    }
-    .seo-table tr:last-child td { border-bottom: none; }
-    .seo-tag { color: var(--gold); }
-
     .audience-empty, .lib-empty { font-size: 0.68rem; color: var(--ivory); opacity: 0.4; padding: 1.5rem; text-align: center; }
+
+    /* ════════════════════════════════════════
+       CHART PRIMITIVES — hbar (horizontal bar
+       chart w/ axis), donut, and vertical bar
+       (day-of-week). Reused across every
+       breakdown section so the page reads as
+       one visual system instead of a form.
+    ════════════════════════════════════════ */
+    .hbar-chart { display: flex; flex-direction: column; gap: 0.55rem; }
+    .hbar-row { display: flex; align-items: center; gap: 0.9rem; }
+    .hbar-label { width: 8rem; flex-shrink: 0; font-size: 0.65rem; color: var(--ivory); opacity: 0.72; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hbar-track { flex: 1; position: relative; height: 14px; }
+    .hbar-track svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .hbar-bar-bg { fill: rgba(232,184,75,0.08); }
+    .hbar-bar-fill { fill: url(#hbarGradient); }
+    .hbar-tick { stroke: rgba(245,237,224,0.10); stroke-width: 1; }
+    .hbar-val { width: 4.5rem; flex-shrink: 0; text-align: right; font-size: 0.62rem; color: var(--gold); }
+    .hbar-axis-labels { display: flex; justify-content: space-between; margin: 0.1rem 0 0 8.9rem; font-size: 0.5rem; color: var(--ivory); opacity: 0.32; letter-spacing: 0.05em; }
+
+    /* Vertical bar chart — day of week */
+    .vbar-chart { width: 100%; }
+    .vbar-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .vbar-bar { fill: url(#vbarGradient); transition: opacity 0.15s; }
+    .vbar-bar:hover { opacity: 0.75; }
+    .vbar-axis-text { font-family: 'DM Mono', monospace; font-size: 9px; fill: var(--ivory); opacity: 0.5; }
+    .vbar-val-text { font-family: 'DM Mono', monospace; font-size: 9px; fill: var(--gold); }
+    .vbar-gridline { stroke: rgba(245,237,224,0.08); stroke-width: 1; }
+
+    /* Donut chart — platform mix */
+    .donut-wrap { display: flex; align-items: center; gap: 1.6rem; flex-wrap: wrap; }
+    .donut-svg { flex-shrink: 0; width: 128px; height: 128px; }
+    .donut-center-val { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; fill: var(--warm-white); }
+    .donut-center-lbl { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.1em; fill: var(--ivory); opacity: 0.5; text-transform: uppercase; }
+    .donut-legend { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; min-width: 140px; }
+    .donut-legend-row { display: flex; align-items: center; gap: 0.55rem; font-size: 0.65rem; color: var(--ivory); }
+    .donut-swatch { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+    .donut-legend-label { flex: 1; opacity: 0.85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .donut-legend-val { color: var(--gold); font-size: 0.6rem; flex-shrink: 0; }
+
+    /* ════════════════════════════════════════
+       VIDEO LIBRARY — thumbnail grid + modal
+    ════════════════════════════════════════ */
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.8rem; }
+    .video-card {
+      cursor: pointer; overflow: hidden; transition: transform 0.2s, background 0.2s;
+      display: flex; flex-direction: column;
+    }
+    .video-card:hover { transform: translateY(-3px); background: var(--glass-hover); }
+    .video-card-thumb {
+      width: 100%; aspect-ratio: 9 / 12; background-size: cover; background-position: center;
+      background-color: rgba(255,255,255,0.05); position: relative; flex-shrink: 0;
+    }
+    .video-card-thumb::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,4,4,0.85) 0%, rgba(8,4,4,0.15) 45%, transparent 70%);
+    }
+    .video-card-platform {
+      position: absolute; top: 0.5rem; left: 0.5rem; z-index: 1;
+      font-size: 0.5rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.15rem 0.5rem;
+      border-radius: 99px; background: rgba(8,4,4,0.55); color: var(--gold); backdrop-filter: blur(6px);
+    }
+    .video-card-metric {
+      position: absolute; bottom: 0.5rem; left: 0.6rem; right: 0.6rem; z-index: 1;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--warm-white); line-height: 1;
+    }
+    .video-card-metric span { font-family: 'DM Mono', monospace; font-size: 0.5rem; color: var(--ivory); opacity: 0.6; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-top: 0.2rem; }
+    .video-card-body { padding: 0.6rem 0.7rem 0.75rem; }
+    .video-card-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 0.82rem; color: var(--warm-white);
+      overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.25; min-height: 2em;
+    }
+    .video-card-meta { font-size: 0.55rem; color: var(--ivory); opacity: 0.45; margin-top: 0.3rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    .video-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(8,4,4,0.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      align-items: flex-start; justify-content: center; padding: 5rem 1rem 3rem; overflow-y: auto;
+    }
+    .video-modal-overlay.open { display: flex; }
+    .video-modal-card {
+      background: linear-gradient(160deg, rgba(22,18,18,0.97), rgba(12,8,8,0.98));
+      border: 1px solid var(--glass-b); border-radius: 18px; width: 100%; max-width: 640px;
+      padding: 2rem; position: relative; animation: fadeUp 0.3s ease both;
+    }
+    .video-modal-close {
+      position: absolute; top: 1.1rem; right: 1.1rem; background: none; border: none; color: var(--ivory);
+      opacity: 0.6; cursor: pointer; padding: 0.3rem; display: flex; transition: opacity 0.2s;
+    }
+    .video-modal-close:hover { opacity: 1; }
+    .video-modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--warm-white); margin-bottom: 0.2rem; padding-right: 2rem; }
+    .video-modal-meta { font-size: 0.62rem; color: var(--ivory); opacity: 0.5; margin-bottom: 1.2rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .video-modal-del { color: var(--bad); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; opacity: 0.7; }
+    .video-modal-del:hover { opacity: 1; }
+
+    /* ════════════════════════════════════════
+       COLLAPSIBLE — native <details>, styled to
+       match the glass-card look elsewhere
+    ════════════════════════════════════════ */
+    .collapsible-card { padding: 0; overflow: hidden; }
+    .collapsible-card > summary {
+      list-style: none; cursor: pointer; padding: 1.1rem 1.4rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .collapsible-card > summary::-webkit-details-marker { display: none; }
+    .collapsible-summary-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
+    .collapsible-summary-hint { font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--ivory); opacity: 0.4; }
+    .collapsible-chevron { color: var(--amber); transition: transform 0.2s; flex-shrink: 0; }
+    .collapsible-card[open] .collapsible-chevron { transform: rotate(180deg); }
+    .collapsible-card-body { padding: 0 1.4rem 1.4rem; }
 
     .footer { text-align: center; padding: 2rem 0 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.8rem; color: var(--amber); opacity: 0.35; }
   </style>
@@ -529,7 +588,13 @@
       <p class="section-label">Add Data</p>
       <p class="section-sub">per-video data — import an export file, paste raw text, or enter a video by hand (for daily account totals, use Growth Over Time above)</p>
 
-      <div class="glass" style="padding:1.4rem 1.5rem;">
+      <details class="glass collapsible-card" id="add-data-card">
+        <summary>
+          <span class="collapsible-summary-label">Add / Import a Video</span>
+          <span class="collapsible-summary-hint" style="margin-right:auto;margin-left:0.8rem;">click to expand</span>
+          <svg class="collapsible-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </summary>
+        <div class="collapsible-card-body">
         <div class="import-tabs">
           <div class="import-tab active" data-tab="file">Upload File</div>
           <div class="import-tab" data-tab="paste">Paste Text / JSON</div>
@@ -692,7 +757,8 @@
             <button class="btn-pill" id="m-save-btn" onclick="saveManualVideo()">Add Video</button>
           </div>
         </div>
-      </div>
+        </div><!-- /collapsible-card-body -->
+      </details>
     </section>
 
     <div class="divider"></div>
@@ -720,7 +786,7 @@
           <option value="completion_desc">Highest completion</option>
         </select>
       </div>
-      <div class="glass video-list" id="video-list"></div>
+      <div class="video-grid" id="video-list"></div>
     </section>
 
     <div class="divider"></div>
@@ -789,9 +855,7 @@
     <section id="seo-section">
       <p class="section-label">Text &amp; Hashtag Performance</p>
       <p class="section-sub">keywords and hashtags ranked by the average engagement rate of videos that used them — a proxy for on-platform SEO, not a live search-ranking signal</p>
-      <div class="glass" style="padding:0.6rem 0.8rem;overflow-x:auto;">
-        <table class="seo-table" id="seo-table"></table>
-      </div>
+      <div class="glass" style="padding:1.2rem 1.4rem;" id="seo-chart"></div>
     </section>
 
     <div class="divider"></div>
@@ -810,6 +874,20 @@
   </div><!-- /page -->
 
 </div><!-- /page-wrap -->
+
+<!-- ══════════════════════════════════════════
+     VIDEO DETAIL MODAL
+══════════════════════════════════════════ -->
+<div class="video-modal-overlay" id="video-modal-overlay" role="dialog" aria-modal="true">
+  <div class="video-modal-card">
+    <button class="video-modal-close" id="video-modal-close" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="video-modal-title" id="video-modal-title"></div>
+    <div class="video-modal-meta" id="video-modal-meta"></div>
+    <div id="video-modal-body"></div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -1035,10 +1113,9 @@ function renderOverview() {
 }
 
 /* ════════════════════════════════════════
-   LIBRARY
+   LIBRARY — thumbnail grid; click a card to
+   open the full breakdown in a modal
 ════════════════════════════════════════ */
-var openDetailId = null;
-
 function renderLibrary() {
   var list = document.getElementById('video-list');
   var platformFilter = document.getElementById('lib-platform-filter').value;
@@ -1066,64 +1143,76 @@ function renderLibrary() {
 
   var metric = primaryMetric();
   items.forEach(function (v) {
-    var row = document.createElement('div');
-    row.className = 'video-row';
+    var card = document.createElement('div');
+    card.className = 'glass video-card';
     var thumbStyle = v.thumbnail ? 'background-image:url(\'' + v.thumbnail + '\')' : '';
-    var er = engagementRate(v);
-    row.innerHTML =
-      '<div class="video-thumb" style="' + thumbStyle + '"></div>' +
-      '<div class="video-main">' +
-        '<div class="video-title">' + escapeHtml(v.title || '(untitled)') + '</div>' +
-        '<div class="video-meta"><span class="platform-tag">' + escapeHtml(v.platform || 'Other') + '</span>' +
-        (v.category ? '<span class="platform-tag">' + escapeHtml(v.category) + '</span>' : '') +
-        (v.posted_at ? '<span>' + new Date(v.posted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + '</span>' : '') +
-        (v.duration_sec ? '<span>' + fmtDuration(v.duration_sec) + '</span>' : '') +
-        '</div>' +
-      '</div>' +
-      '<div class="video-nums">' +
-        '<div class="n"><div class="n-val">' + fmtInt(v[metric]) + '</div><div class="n-lbl">' + primaryMetricLabel(metric) + '</div></div>' +
-        '<div class="n"><div class="n-val">' + fmtPct(er) + '</div><div class="n-lbl">Engage</div></div>' +
-      '</div>' +
-      '<div class="video-del" data-id="' + v.id + '" title="Delete">✕</div>';
+    var metaBits = [];
+    if (v.category) metaBits.push(escapeHtml(v.category));
+    if (v.posted_at) metaBits.push(new Date(v.posted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    if (v.duration_sec) metaBits.push(fmtDuration(v.duration_sec));
 
-    row.addEventListener('click', function (e) {
-      if (e.target.classList.contains('video-del')) return;
-      toggleDetail(v.id);
-    });
-    row.querySelector('.video-del').addEventListener('click', function (e) {
-      e.stopPropagation();
-      deleteVideo(v.id);
-    });
-    list.appendChild(row);
+    card.innerHTML =
+      '<div class="video-card-thumb" style="' + thumbStyle + '">' +
+        '<span class="video-card-platform">' + escapeHtml(v.platform || 'Other') + '</span>' +
+        '<div class="video-card-metric">' + fmtInt(v[metric]) + '<span>' + primaryMetricLabel(metric) + '</span></div>' +
+      '</div>' +
+      '<div class="video-card-body">' +
+        '<div class="video-card-title">' + escapeHtml(v.title || '(untitled)') + '</div>' +
+        (metaBits.length ? '<div class="video-card-meta">' + metaBits.map(function (b) { return '<span>' + b + '</span>'; }).join('') + '</div>' : '') +
+      '</div>';
 
-    if (openDetailId === v.id) {
-      list.appendChild(buildDetail(v));
-    }
+    card.addEventListener('click', function () { openVideoModal(v); });
+    list.appendChild(card);
   });
 }
 
-function toggleDetail(id) {
-  openDetailId = openDetailId === id ? null : id;
-  renderLibrary();
+/* ── Video detail modal ── */
+var modalVideoId = null;
+
+function openVideoModal(v) {
+  modalVideoId = v.id;
+  document.getElementById('video-modal-title').textContent = v.title || '(untitled)';
+
+  var metaBits = [escapeHtml(v.platform || 'Other')];
+  if (v.category) metaBits.push(escapeHtml(v.category));
+  if (v.posted_at) metaBits.push(new Date(v.posted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+  document.getElementById('video-modal-meta').innerHTML = metaBits.map(function (b) { return '<span>' + b + '</span>'; }).join('') +
+    '<span class="video-modal-del" onclick="deleteVideo(\'' + v.id + '\'); closeVideoModal();">Delete video</span>';
+
+  document.getElementById('video-modal-body').innerHTML = buildVideoModalBody(v);
+  document.getElementById('video-modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
-function buildDetail(v) {
-  var wrap = document.createElement('div');
-  wrap.className = 'glass video-detail open';
+function closeVideoModal() {
+  document.getElementById('video-modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  modalVideoId = null;
+}
+document.getElementById('video-modal-close').addEventListener('click', closeVideoModal);
+document.getElementById('video-modal-overlay').addEventListener('click', function (e) {
+  if (e.target === this) closeVideoModal();
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeVideoModal(); });
+
+/* Every stat here is skipped entirely when the field is blank —
+   no dashes, no zeros-that-are-really-"never filled in". A real
+   0 (e.g. 0 comments) still shows, since that's a fact, not a gap. */
+function buildVideoModalBody(v) {
   var er = engagementRate(v);
   var comp = completionOf(v);
 
-  var statsHtml =
-    '<div class="detail-grid">' +
-      statBlock(fmtInt(v.likes), 'Likes') +
-      statBlock(fmtInt(v.comments), 'Comments') +
-      statBlock(fmtInt(v.shares), 'Shares') +
-      statBlock(fmtInt(v.saves), 'Saves') +
-      statBlock(v.avg_watch_time ? num(v.avg_watch_time).toFixed(1) + 's' : '—', 'Avg Watch Time') +
-      statBlock(fmtPct(er), 'Engagement Rate') +
-      statBlock(comp === null ? '—' : fmtPct100(comp), 'Completion') +
-      statBlock((v.hashtags && v.hashtags.length) || 0, 'Hashtags') +
-    '</div>';
+  var stats = [];
+  if (v.likes !== null && v.likes !== undefined && v.likes !== '') stats.push(statBlock(fmtInt(v.likes), 'Likes'));
+  if (v.comments !== null && v.comments !== undefined && v.comments !== '') stats.push(statBlock(fmtInt(v.comments), 'Comments'));
+  if (v.shares !== null && v.shares !== undefined && v.shares !== '') stats.push(statBlock(fmtInt(v.shares), 'Shares'));
+  if (v.saves !== null && v.saves !== undefined && v.saves !== '') stats.push(statBlock(fmtInt(v.saves), 'Saves'));
+  if (v.avg_watch_time !== null && v.avg_watch_time !== undefined && v.avg_watch_time !== '') stats.push(statBlock(num(v.avg_watch_time).toFixed(1) + 's', 'Avg Watch Time'));
+  if (er !== null) stats.push(statBlock(fmtPct(er), 'Engagement Rate'));
+  if (comp !== null) stats.push(statBlock(fmtPct100(comp), 'Completion'));
+  if (v.hashtags && v.hashtags.length) stats.push(statBlock(v.hashtags.length, 'Hashtags'));
+
+  var statsHtml = stats.length ? '<div class="detail-grid">' + stats.join('') + '</div>' : '';
 
   var retentionHtml = '';
   if (v.retention_curve && v.retention_curve.length > 1) {
@@ -1166,8 +1255,7 @@ function buildDetail(v) {
       '<div class="raw-preview">' + escapeHtml(JSON.stringify(v.raw_data, null, 2)) + '</div></div>';
   }
 
-  wrap.innerHTML = statsHtml + formatHtml + retentionHtml + hashHtml + videoHtml + linkHtml + rawHtml;
-  return wrap;
+  return statsHtml + formatHtml + retentionHtml + hashHtml + videoHtml + linkHtml + rawHtml;
 }
 
 function statBlock(val, lbl) {
@@ -1210,6 +1298,87 @@ function escapeHtml(s) {
 }
 
 /* ════════════════════════════════════════
+   CHART PRIMITIVES — one horizontal-bar
+   component, one vertical-bar component, and
+   one donut, reused across every breakdown
+   below so the page reads as one visual
+   system instead of a form with a few bars.
+════════════════════════════════════════ */
+var CHART_PALETTE = ['#e8b84b', '#b02a2a', '#c8852a', '#7a1a1a', '#ede0cc', '#6fae6a'];
+var _chartIdSeq = 1;
+
+function buildHBarChartSVG(items) {
+  if (!items.length) return '';
+  var max = Math.max.apply(null, items.map(function (it) { return it.value; })) || 1;
+  var gradId = 'hbarGrad' + (_chartIdSeq++);
+  var defs = '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="1" y2="0">' +
+    '<stop offset="0%" stop-color="#b02a2a" /><stop offset="100%" stop-color="#e8b84b" /></linearGradient></defs>';
+  var rows = items.map(function (it) {
+    var pct = Math.max(2, (it.value / max) * 100);
+    return '<div class="hbar-row">' +
+      '<div class="hbar-label" title="' + escapeHtml(it.title || it.label) + '">' + escapeHtml(it.label) + '</div>' +
+      '<div class="hbar-track"><svg viewBox="0 0 100 14" preserveAspectRatio="none">' + defs +
+        '<rect class="hbar-bar-bg" x="0" y="3" width="100" height="8" rx="4" />' +
+        '<line class="hbar-tick" x1="25" x2="25" y1="0" y2="14" /><line class="hbar-tick" x1="50" x2="50" y1="0" y2="14" /><line class="hbar-tick" x1="75" x2="75" y1="0" y2="14" />' +
+        '<rect x="0" y="3" width="' + pct + '" height="8" rx="4" fill="url(#' + gradId + ')" />' +
+      '</svg></div>' +
+      '<div class="hbar-val">' + it.valueLabel + '</div>' +
+    '</div>';
+  }).join('');
+  return '<div class="hbar-chart">' + rows + '</div>';
+}
+
+function buildVBarChartSVG(items) {
+  var W = 500, H = 150, padL = 22, padR = 10, padT = 16, padB = 22;
+  var plotW = W - padL - padR, plotH = H - padT - padB;
+  var max = Math.max.apply(null, items.map(function (it) { return it.value; })) || 1;
+  var n = items.length, gap = 10;
+  var barW = (plotW - gap * (n - 1)) / n;
+  var gradId = 'vbarGrad' + (_chartIdSeq++);
+  var bars = items.map(function (it, i) {
+    var h = it.value > 0 ? Math.max(2, (it.value / max) * plotH) : 0;
+    var x = padL + i * (barW + gap);
+    var y = padT + plotH - h;
+    return '<rect class="vbar-bar" fill="url(#' + gradId + ')" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" />' +
+      (it.valueLabel ? '<text class="vbar-val-text" x="' + (x + barW / 2).toFixed(1) + '" y="' + (y - 5).toFixed(1) + '" text-anchor="middle">' + it.valueLabel + '</text>' : '') +
+      '<text class="vbar-axis-text" x="' + (x + barW / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle">' + escapeHtml(it.label) + '</text>';
+  }).join('');
+  return '<div class="vbar-chart"><svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">' +
+    '<defs><linearGradient id="' + gradId + '" x1="0" y1="1" x2="0" y2="0">' +
+      '<stop offset="0%" stop-color="#b02a2a" /><stop offset="100%" stop-color="#e8b84b" /></linearGradient></defs>' +
+    '<line class="vbar-gridline" x1="' + padL + '" x2="' + (W - padR) + '" y1="' + (padT + plotH) + '" y2="' + (padT + plotH) + '" />' +
+    bars +
+  '</svg></div>';
+}
+
+function buildDonutSVG(segments, centerLabel, centerValue) {
+  var total = segments.reduce(function (s, seg) { return s + seg.value; }, 0) || 1;
+  var r = 46, cx = 64, cy = 64, strokeW = 18;
+  var circumference = 2 * Math.PI * r;
+  var offsetAcc = 0;
+  var arcs = segments.map(function (seg) {
+    var frac = seg.value / total;
+    var dash = frac * circumference;
+    var gap = circumference - dash;
+    var circle = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + seg.color + '" stroke-width="' + strokeW + '" ' +
+      'stroke-dasharray="' + dash.toFixed(2) + ' ' + gap.toFixed(2) + '" stroke-dashoffset="' + (-offsetAcc).toFixed(2) + '" transform="rotate(-90 ' + cx + ' ' + cy + ')" />';
+    offsetAcc += dash;
+    return circle;
+  }).join('');
+  var centerHtml = '<text x="' + cx + '" y="' + (cy - 3) + '" text-anchor="middle" class="donut-center-val">' + centerValue + '</text>' +
+    '<text x="' + cx + '" y="' + (cy + 13) + '" text-anchor="middle" class="donut-center-lbl">' + escapeHtml(centerLabel) + '</text>';
+  return '<svg class="donut-svg" viewBox="0 0 128 128">' + arcs + centerHtml + '</svg>';
+}
+
+function buildDonutLegend(segments) {
+  return '<div class="donut-legend">' + segments.map(function (seg) {
+    return '<div class="donut-legend-row"><span class="donut-swatch" style="background:' + seg.color + '"></span>' +
+      '<span class="donut-legend-label">' + escapeHtml(seg.label) + '</span>' +
+      '<span class="donut-legend-val">' + escapeHtml(seg.valueLabel) + '</span></div>';
+  }).join('') + '</div>';
+}
+
+/* ════════════════════════════════════════
    TOP PERFORMERS
 ════════════════════════════════════════ */
 function renderTopPerformers() {
@@ -1217,19 +1386,14 @@ function renderTopPerformers() {
   if (!VIDEOS.length) { el.innerHTML = '<div class="empty-note">Nothing to rank yet.</div>'; return; }
   var metric = primaryMetric();
   var top = VIDEOS.slice().sort(function (a, b) { return num(b[metric]) - num(a[metric]); }).slice(0, 8);
-  var max = num(top[0][metric]) || 1;
-  el.innerHTML = top.map(function (v) {
-    var pct = Math.max(4, Math.round((num(v[metric]) / max) * 100));
-    return '<div class="bd-row">' +
-      '<div class="bd-label" title="' + escapeHtml(v.title || '') + '">' + escapeHtml((v.title || '(untitled)').slice(0, 28)) + '</div>' +
-      '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
-      '<div class="bd-val">' + fmtInt(v[metric]) + '</div>' +
-      '</div>';
-  }).join('');
+  var items = top.map(function (v) {
+    return { label: (v.title || '(untitled)').slice(0, 28), value: num(v[metric]), valueLabel: fmtInt(v[metric]), title: v.title || '' };
+  });
+  el.innerHTML = buildHBarChartSVG(items);
 }
 
 /* ════════════════════════════════════════
-   PLATFORM + DAY BREAKDOWNS
+   PLATFORM (donut) + DAY-OF-WEEK (bar chart)
 ════════════════════════════════════════ */
 function renderBreakdowns() {
   var metric = primaryMetric();
@@ -1240,39 +1404,45 @@ function renderBreakdowns() {
     byPlatform[p].views += num(v[metric]);
     byPlatform[p].count += 1;
   });
-  renderBarGroup('platform-breakdown', byPlatform, function (k) { return k; }, function (d) { return fmtInt(d.views); });
+  renderPlatformDonut(byPlatform, metric);
 
-  var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   var byDay = {};
-  days.forEach(function (d) { byDay[d] = { views: 0, count: 0 }; });
+  dayLabels.forEach(function (d) { byDay[d] = { views: 0, count: 0 }; });
   VIDEOS.forEach(function (v) {
     if (!v.posted_at) return;
-    var d = days[new Date(v.posted_at).getDay()];
+    var d = dayLabels[new Date(v.posted_at).getDay()];
     byDay[d].views += num(v[metric]);
     byDay[d].count += 1;
   });
-  var anyDay = Object.keys(byDay).some(function (k) { return byDay[k].count > 0; });
+  var anyDay = dayLabels.some(function (k) { return byDay[k].count > 0; });
+  var dayEl = document.getElementById('day-breakdown');
   if (!anyDay) {
-    document.getElementById('day-breakdown').innerHTML = '<div class="empty-note">No posted dates yet.</div>';
+    dayEl.innerHTML = '<div class="empty-note">No posted dates yet.</div>';
   } else {
-    renderBarGroup('day-breakdown', byDay, function (k) { return k; }, function (d) { return fmtInt(d.views); });
+    var items = dayLabels.map(function (d) {
+      return { label: d, value: byDay[d].views, valueLabel: byDay[d].count ? fmtInt(byDay[d].views) : '' };
+    });
+    dayEl.innerHTML = buildVBarChartSVG(items);
   }
 }
 
-function renderBarGroup(elId, dataObj, labelFn, valFn) {
-  var el = document.getElementById(elId);
-  var keys = Object.keys(dataObj).filter(function (k) { return dataObj[k].count > 0; });
+function renderPlatformDonut(byPlatform, metric) {
+  var el = document.getElementById('platform-breakdown');
+  var keys = Object.keys(byPlatform).filter(function (k) { return byPlatform[k].count > 0; });
   if (!keys.length) { el.innerHTML = '<div class="empty-note">No data yet.</div>'; return; }
-  var max = Math.max.apply(null, keys.map(function (k) { return dataObj[k].views; })) || 1;
-  keys.sort(function (a, b) { return dataObj[b].views - dataObj[a].views; });
-  el.innerHTML = keys.map(function (k) {
-    var pct = Math.max(4, Math.round((dataObj[k].views / max) * 100));
-    return '<div class="bd-row">' +
-      '<div class="bd-label">' + escapeHtml(labelFn(k)) + '</div>' +
-      '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
-      '<div class="bd-val">' + valFn(dataObj[k]) + '</div>' +
-      '</div>';
-  }).join('');
+  keys.sort(function (a, b) { return byPlatform[b].count - byPlatform[a].count; });
+  var totalCount = keys.reduce(function (s, k) { return s + byPlatform[k].count; }, 0);
+  var segments = keys.map(function (k, i) {
+    var n = byPlatform[k].count;
+    return {
+      label: k,
+      value: n,
+      valueLabel: n + ' video' + (n === 1 ? '' : 's') + ' · ' + fmtInt(byPlatform[k].views) + ' ' + primaryMetricLabel(metric).toLowerCase(),
+      color: CHART_PALETTE[i % CHART_PALETTE.length]
+    };
+  });
+  el.innerHTML = '<div class="donut-wrap">' + buildDonutSVG(segments, 'videos', totalCount) + buildDonutLegend(segments) + '</div>';
 }
 
 /* ════════════════════════════════════════
@@ -1309,17 +1479,16 @@ function renderAvgBarGroup(elId, keyFn, sortOrder, useRate) {
   keys.forEach(function (k) { groups[k].avg = groups[k].sum / groups[k].count; });
   if (sortOrder) keys.sort(function (a, b) { return sortOrder.indexOf(a) - sortOrder.indexOf(b); });
   else keys.sort(function (a, b) { return groups[b].avg - groups[a].avg; });
-  var max = Math.max.apply(null, keys.map(function (k) { return groups[k].avg; })) || 0.0001;
-  el.innerHTML = keys.map(function (k) {
-    var pct = Math.max(4, Math.round((groups[k].avg / max) * 100));
-    var valLabel = useRate ? fmtPct(groups[k].avg) : fmtInt(groups[k].avg);
+  var items = keys.map(function (k) {
     var n = groups[k].count;
-    return '<div class="bd-row">' +
-      '<div class="bd-label" title="' + escapeHtml(k) + ' — ' + n + ' video' + (n === 1 ? '' : 's') + '">' + escapeHtml(k) + '</div>' +
-      '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
-      '<div class="bd-val">' + valLabel + '</div>' +
-      '</div>';
-  }).join('');
+    return {
+      label: k,
+      value: groups[k].avg,
+      valueLabel: useRate ? fmtPct(groups[k].avg) : fmtInt(groups[k].avg),
+      title: k + ' — ' + n + ' video' + (n === 1 ? '' : 's')
+    };
+  });
+  el.innerHTML = buildHBarChartSVG(items);
 }
 
 /* ════════════════════════════════════════
@@ -1348,7 +1517,7 @@ function extractKeywords(v) {
 }
 
 function renderSEO() {
-  var table = document.getElementById('seo-table');
+  var el = document.getElementById('seo-chart');
   var stats = {}; // term -> { count, views, engSum }
 
   VIDEOS.forEach(function (v) {
@@ -1370,19 +1539,22 @@ function renderSEO() {
   }).filter(function (r) { return r.count >= 1; });
 
   rows.sort(function (a, b) { return b.avgEng - a.avgEng; });
-  rows = rows.slice(0, 15);
+  rows = rows.slice(0, 12);
 
   if (!rows.length) {
-    table.innerHTML = '<tr><td class="empty-note" colspan="4">Add captions or hashtags to videos to see this breakdown.</td></tr>';
+    el.innerHTML = '<div class="empty-note">Add captions or hashtags to videos to see this breakdown.</div>';
     return;
   }
 
-  var head = '<tr><th>Term</th><th>Used In</th><th>Avg Views</th><th>Avg Engagement</th></tr>';
-  var body = rows.map(function (r) {
-    return '<tr><td class="seo-tag">' + escapeHtml(r.term) + '</td><td>' + r.count + ' video' + (r.count === 1 ? '' : 's') + '</td>' +
-      '<td>' + fmtInt(r.avgViews) + '</td><td>' + fmtPct(r.avgEng) + '</td></tr>';
-  }).join('');
-  table.innerHTML = head + body;
+  var items = rows.map(function (r) {
+    return {
+      label: r.term,
+      value: r.avgEng,
+      valueLabel: fmtPct(r.avgEng),
+      title: r.term + ' — used in ' + r.count + ' video' + (r.count === 1 ? '' : 's') + ', avg ' + fmtInt(r.avgViews) + ' views'
+    };
+  });
+  el.innerHTML = buildHBarChartSVG(items);
 }
 
 /* ════════════════════════════════════════
@@ -1405,16 +1577,11 @@ function renderAudience() {
     return;
   }
   var keys = Object.keys(combined);
-  var max = Math.max.apply(null, keys.map(function (k) { return combined[k]; })) || 1;
   keys.sort(function (a, b) { return combined[b] - combined[a]; });
-  el.innerHTML = keys.slice(0, 10).map(function (k) {
-    var pct = Math.max(4, Math.round((combined[k] / max) * 100));
-    return '<div class="bd-row">' +
-      '<div class="bd-label">' + escapeHtml(k) + '</div>' +
-      '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
-      '<div class="bd-val">' + (Math.round(combined[k] * 10) / 10) + '%</div>' +
-      '</div>';
-  }).join('');
+  var items = keys.slice(0, 10).map(function (k) {
+    return { label: k, value: combined[k], valueLabel: (Math.round(combined[k] * 10) / 10) + '%' };
+  });
+  el.innerHTML = buildHBarChartSVG(items);
 }
 
 /* ════════════════════════════════════════

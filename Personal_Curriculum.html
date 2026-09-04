@@ -819,10 +819,34 @@ const CURRICULUM = [
         ]
       },
       {
-        id: "2026-fall",
+        id: "2026-fall-lsat",
         label: "Fall",
-        track: "Upcoming",
-        books: []
+        track: "LSAT Prep — Logical Reasoning & Reading Comp",
+        books: [
+          { id: "kim-lsat-trainer",     title: "The LSAT Trainer",                        author: "Mike Kim" },
+          { id: "cassidy-loophole",     title: "The Loophole in Logical Reasoning",        author: "Ellen Cassidy" },
+          { id: "lsac-10-actual",       title: "10 Actual, Official LSAT PrepTests",       author: "LSAC" },
+        ]
+      },
+      {
+        id: "2026-fall-political",
+        label: "Fall",
+        track: "Political Theory & the First Amendment",
+        books: [
+          { id: "arendt-origins",       title: "The Origins of Totalitarianism",           author: "Hannah Arendt" },
+          { id: "snyder-tyranny",       title: "On Tyranny",                               author: "Timothy Snyder" },
+          { id: "lewis-freedom",        title: "Freedom for the Thought That We Hate",      author: "Anthony Lewis" },
+        ]
+      },
+      {
+        id: "2026-fall-thirdplaces",
+        label: "Fall",
+        track: "Third Places & Digital Life",
+        books: [
+          { id: "klinenberg-palaces",   title: "Palaces for the People",                   author: "Eric Klinenberg" },
+          { id: "putnam-bowling",       title: "Bowling Alone",                            author: "Robert Putnam" },
+          { id: "turkle-reclaiming",    title: "Reclaiming Conversation",                  author: "Sherry Turkle" },
+        ]
       }
     ]
   }
@@ -898,7 +922,7 @@ function renderCurriculum() {
     yearBlock.innerHTML = `
       <p class="section-label">Year</p>
       <h2 class="year-header">${year.yearLabel}</h2>
-      <p class="year-sub">${year.semesters.map(s => s.label).join(' · ')}</p>
+      <p class="year-sub">${[...new Set(year.semesters.map(s => s.label))].join(' · ')}</p>
     `;
 
     year.semesters.forEach(sem => {
