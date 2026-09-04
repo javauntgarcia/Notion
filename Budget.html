@@ -616,7 +616,7 @@ body {
 
   <!-- MONTH TOGGLE -->
   <div class="month-toggle">
-    <button class="month-tab active" onclick="switchMonth('july', this)">
+    <button class="month-tab" onclick="switchMonth('july', this)">
       <p class="month-tab-label">New Baseline</p>
       <p class="month-tab-name">July 2026</p>
       <p class="month-tab-sub">Gap year begins · new budget template</p>
@@ -625,6 +625,11 @@ body {
       <p class="month-tab-label">Steady State</p>
       <p class="month-tab-name">August 2026</p>
       <p class="month-tab-sub">Parking dropped · same baseline otherwise</p>
+    </button>
+    <button class="month-tab active" onclick="switchMonth('september', this)">
+      <p class="month-tab-label">Current</p>
+      <p class="month-tab-name">September 2026</p>
+      <p class="month-tab-sub">Transportation cut · LSAT & pharmacy removed</p>
     </button>
   </div>
 
@@ -831,6 +836,58 @@ const BUDGETS = {
         text: '<strong>$280/mo is fixed through Dec 2027.</strong> No changes from July — keep autopay running at $140 per payroll date.' },
     ],
   },
+
+  september: {
+    income: 6700,
+    incomeNote: '4 SFMTA pay periods · gap year planning continues',
+
+    oneTime: [],
+
+    sharedBills: [
+      { desc: 'Rent',               full: 2700, yourShare: 1620, yourPct: 60, note: 'BILT — Oakland place' },
+      { desc: 'PG&E / Utilities',  full: 267.81, yourShare: 133.91, yourPct: 50, note: 'holding steady' },
+      { desc: 'Lemonade Renters',  full: 84,   yourShare: 42,  yourPct: 50, note: 'confirm split' },
+    ],
+
+    lines: [
+      { cat: 'Housing',      desc: 'Rent — your share (60%)',            amount: 1620, type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Utilities',    desc: 'PG&E — your share (50%)',            amount: 134,  type: 'fixed',   group: 'Fixed Obligations' },
+      { cat: 'Pets',         desc: 'Lemonade pet insurance — your share (50%)', amount: 42,   type: 'fixed',   group: 'Fixed Obligations' },
+      // Debt — Discover paid off, Citi fixed at $280/mo
+      { cat: 'Debt',         desc: 'Citi — $140 biweekly (fixed plan)',  amount: 280,  type: 'debt',    group: 'Debt Payments' },
+      // Savings
+      { cat: 'Savings',      desc: 'WF Joint — travel/gap year fund',    amount: 1350, type: 'savings', group: 'Savings & Investing' },
+      { cat: 'Savings',      desc: 'WF Personal — buffer rebuild',       amount: 500,  type: 'savings', group: 'Savings & Investing' },
+      { cat: 'Savings',      desc: 'Roth IRA — Vanguard',                amount: 325,  type: 'savings', group: 'Savings & Investing' },
+      // Discretionary — grocery/dining/shopping rebalanced, transportation cut, LSAT & pharmacy lines removed
+      { cat: 'Shopping',     desc: 'Groceries & household',              amount: 600,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Dining Out',   desc: 'Restaurants & delivery',             amount: 250,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Transportation', desc: 'Clipper, Lyft, rideshare',         amount: 40,   type: 'flex',    group: 'Discretionary' },
+      { cat: 'Shopping',     desc: 'Clothing, Amazon, misc.',            amount: 200,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Subscriptions',desc: 'Adobe, Netflix, subscriptions',      amount: 120,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Entertainment',desc: 'Bars, events, shows',                amount: 200,  type: 'flex',    group: 'Discretionary' },
+      { cat: 'Travel',       desc: 'Gap year exploration fund',          amount: 300,  type: 'flex',    group: 'Discretionary' },
+    ],
+
+    savings: [
+      { label: 'WF Joint — Travel Fund',  amount: 1350, sub: 'auto each payroll' },
+      { label: 'WF Personal Buffer',      amount: 500,  sub: 'continued rebuild' },
+      { label: 'Vanguard Roth IRA',       amount: 325,  sub: '$6,500/yr target' },
+    ],
+
+    notes: [
+      { icon: '🚋', title: 'Transportation Cut to $40/mo',
+        text: 'Clipper/Lyft/rideshare drops from <strong>$120 to $40</strong> this month — a leaner rideshare + transit budget going forward.' },
+      { icon: '📚', title: 'LSAT & Pharmacy Lines Removed',
+        text: 'The $150 LSAT study-materials line and the $100 pharmacy/wellness line have both been removed from the Discretionary group entirely.' },
+      { icon: '🛒', title: 'Groceries, Dining & Shopping Rebalanced',
+        text: 'Groceries & household moves up to <strong>$600</strong> (from $450), Restaurants & delivery drops to <strong>$250</strong> (from $400), and Clothing/Amazon/misc drops to <strong>$200</strong> (from $250).' },
+      { icon: '💳', title: 'BILT — Stays External',
+        text: 'BILT remains a joint day-to-day card settled between you and Eston. Continue tagging in Statements.html: <strong>J</strong> for yours alone, <strong>E</strong> for Eston\'s (excluded from your budget), <strong>½</strong> + percentage for any shared charge. Your budget only reflects your confirmed share of split bills.' },
+      { icon: '⚖', title: 'Citi — Stay the Course',
+        text: '<strong>$280/mo is fixed through Dec 2027.</strong> No changes from August — keep autopay running at $140 per payroll date.' },
+    ],
+  },
 };
 
 // ══════════════════════════════════════════════
@@ -846,7 +903,7 @@ const GROUP_COLORS = {
 // ══════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════
-let activeMonth = 'july';
+let activeMonth = 'september';
 
 function fmt(n) {
   return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -869,7 +926,7 @@ function renderAll() {
   const net            = d.income - totalBudget;
 
   // Hero
-  document.getElementById('hero-month').textContent  = activeMonth === 'july' ? 'July 2026' : 'August 2026';
+  document.getElementById('hero-month').textContent  = activeMonth === 'july' ? 'July 2026' : activeMonth === 'august' ? 'August 2026' : 'September 2026';
   document.getElementById('hero-budget').textContent = fmt(totalBudget);
   const heroNet = document.getElementById('hero-net');
   heroNet.textContent = (net >= 0 ? '+' : '') + fmt(net);

@@ -429,11 +429,10 @@
     color: var(--warm-mid);
     text-transform: uppercase;
   }
-  .goal-notes {
-    font-size: 0.58rem; color: var(--cream); opacity: 0.75;
-    margin-top: 8px; line-height: 1.6; text-transform: none; letter-spacing: 0.02em;
-    border-top: 1px solid rgba(201,162,126,0.14);
-    padding-top: 8px;
+  .goal-cat-tag.complete {
+    color: var(--positive);
+    background: rgba(126,184,154,0.14);
+    border-color: rgba(126,184,154,0.35);
   }
   .goal-actions { display: flex; gap: 8px; margin-top: 12px; }
   .goal-action-btn {
@@ -902,12 +901,11 @@ function renderGoals() {
         <div class="goal-card ${complete ? 'complete' : ''}">
           <div class="goal-top-row">
             <p class="goal-name">${esc(g.name)}${complete ? ' ✓' : ''}</p>
-            <span class="goal-cat-tag">${esc(g.category || 'Other')}</span>
+            <span class="goal-cat-tag ${complete ? 'complete' : ''}">${esc(g.category || 'Other')}</span>
           </div>
-          <p class="goal-progress-text">${fmt(g.current)} <span class="of-target">/ ${fmt(target)}</span></p>
+          <p class="goal-progress-text">${fmt(g.current)} <span class="of-target">paid off</span></p>
           <div class="goal-bar-bg"><div class="goal-bar-fill ${complete ? 'complete' : ''}" style="width:${pct.toFixed(1)}%"></div></div>
-          <p class="goal-sub">${pct.toFixed(0)}% complete · ${fmt(remaining)} remaining${g.targetDate ? ' · target ' + fmtTargetDate(g.targetDate) : ''}</p>
-          ${g.notes ? `<p class="goal-notes">${esc(g.notes)}</p>` : ''}
+          <p class="goal-sub">${pct.toFixed(0)}% complete · ${fmt(remaining)} remaining</p>
           <div class="goal-actions">
             <button class="goal-action-btn" onclick="editGoal('${g.id}')">Edit</button>
             <button class="goal-action-btn danger" onclick="deleteGoal('${g.id}')">Delete</button>
