@@ -64,14 +64,20 @@
     background: linear-gradient(160deg, rgba(20,30,40,0.45) 0%, rgba(30,50,65,0.22) 45%, rgba(20,30,40,0.60) 100%);
   }
 
-  /* ── HERO / PAGE ── */
+  /* ── HERO / PAGE ──
+     hero-content is in normal document flow (not absolutely positioned)
+     so the hero section grows to fit everything inside it — the photo
+     (bg-layer, still absolutely pinned to the top of the outer wrapper)
+     only covers its own natural height, and anything past that — Weekly
+     Outline included — renders on the plain page background below it,
+     instead of floating on top of the photo regardless of how tall the
+     photo happens to render. */
   .hero {
     position: relative;
     min-height: 100vh;
   }
   .hero-content {
-    position: absolute;
-    top: 0; left: 0; right: 0;
+    position: relative;
     z-index: 10;
     padding: 2.5rem 3rem 3rem;
   }
@@ -164,7 +170,7 @@
   .evt-editor-overlay.open { display: flex; }
   .evt-editor-card {
     background: #FDF3F4;
-    border: 1px solid rgba(194,103,140,0.22);
+    border: 1px solid rgba(138,111,160,0.22);
     border-radius: 12px;
     padding: 1.4rem 1.5rem;
     width: 100%; max-width: 360px;
@@ -177,7 +183,7 @@
   .evt-editor-field input[type="date"],
   .evt-editor-field select {
     width: 100%; box-sizing: border-box;
-    background: rgba(194,103,140,0.07); border: 1px solid rgba(194,103,140,0.2);
+    background: rgba(138,111,160,0.07); border: 1px solid rgba(138,111,160,0.2);
     border-radius: 6px; padding: 0.4rem 0.6rem;
     font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #3A2A32;
     outline: none; letter-spacing: 0.04em;
@@ -186,11 +192,11 @@
   .evt-editor-row > div { flex: 1; }
   .evt-editor-label {
     font-size: 0.48rem; letter-spacing: 0.12em; text-transform: uppercase;
-    color: #C2678C; opacity: 0.75; margin-bottom: 0.25rem;
+    color: #8A6FA0; opacity: 0.75; margin-bottom: 0.25rem;
   }
   .evt-editor-checks {
     display: flex; gap: 1rem; margin: 0.7rem 0; font-size: 0.5rem;
-    color: #C2678C; letter-spacing: 0.08em;
+    color: #8A6FA0; letter-spacing: 0.08em;
   }
   .evt-editor-checks label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
   .evt-editor-actions {
@@ -201,8 +207,8 @@
     font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em;
     border-radius: 6px; padding: 0.4rem 0.85rem; cursor: pointer;
   }
-  .evt-editor-btn.save { background: #C2678C; border: 1px solid #C2678C; color: #fff; }
-  .evt-editor-btn.cancel { background: transparent; border: 1px solid rgba(194,103,140,0.3); color: #C2678C; }
+  .evt-editor-btn.save { background: #8A6FA0; border: 1px solid #8A6FA0; color: #fff; }
+  .evt-editor-btn.cancel { background: transparent; border: 1px solid rgba(138,111,160,0.3); color: #8A6FA0; }
   .evt-editor-btn.delete { background: transparent; border: 1px solid rgba(181,107,107,0.4); color: #b56b6b; }
 
   /* ── GRID LAYOUT ── */
@@ -471,7 +477,7 @@
   .habit-log-sub {
     font-size: 0.55rem;
     letter-spacing: 0.05em;
-    color: #C2678C;
+    color: #8A6FA0;
     opacity: 0.7;
     margin-bottom: 0.7rem;
   }
@@ -492,7 +498,7 @@
   }
   .habit-heatmap-stat-label {
     font-size: 0.46rem; letter-spacing: 0.14em; text-transform: uppercase;
-    color: #C2678C; opacity: 0.7;
+    color: #8A6FA0; opacity: 0.7;
   }
   .habit-heatmap-grid {
     display: grid;
@@ -502,16 +508,16 @@
   .habit-heatmap-cell {
     aspect-ratio: 1;
     border-radius: 5px;
-    background: rgba(194,103,140,0.10);
+    background: rgba(138,111,160,0.10);
     display: flex; align-items: center; justify-content: center;
     cursor: default;
     position: relative;
   }
-  .habit-heatmap-cell.tier-1 { background: rgba(194,103,140,0.28); }
-  .habit-heatmap-cell.tier-2 { background: rgba(194,103,140,0.5); }
-  .habit-heatmap-cell.tier-3 { background: rgba(194,103,140,0.72); }
-  .habit-heatmap-cell.tier-4 { background: #C2678C; }
-  .habit-heatmap-cell.today { box-shadow: 0 0 0 1.5px #8C3A5C; }
+  .habit-heatmap-cell.tier-1 { background: rgba(138,111,160,0.28); }
+  .habit-heatmap-cell.tier-2 { background: rgba(138,111,160,0.5); }
+  .habit-heatmap-cell.tier-3 { background: rgba(138,111,160,0.72); }
+  .habit-heatmap-cell.tier-4 { background: #8A6FA0; }
+  .habit-heatmap-cell.today { box-shadow: 0 0 0 1.5px #5C3A70; }
   .habit-heatmap-cell.empty { background: transparent; }
   .habit-heatmap-daynum {
     font-size: 0.42rem; color: #fff; opacity: 0.85; letter-spacing: 0.02em;
@@ -520,14 +526,14 @@
   .habit-heatmap-cell.tier-0 .habit-heatmap-daynum { color: #3A2A32; opacity: 0.4; text-shadow: none; }
   .habit-heatmap-legend {
     display: flex; align-items: center; gap: 4px;
-    margin-top: 0.6rem; font-size: 0.46rem; color: #C2678C; opacity: 0.6;
+    margin-top: 0.6rem; font-size: 0.46rem; color: #8A6FA0; opacity: 0.6;
     letter-spacing: 0.04em;
   }
   .habit-heatmap-legend-swatch { width: 9px; height: 9px; border-radius: 3px; }
   .week-look-sub {
     font-size: 0.52rem;
     letter-spacing: 0.04em;
-    color: #C2678C;
+    color: #8A6FA0;
     opacity: 0.7;
     margin-bottom: 0.7rem;
     line-height: 1.4;
@@ -557,15 +563,15 @@
     width: 100%;
     max-width: 20px;
     border-radius: 4px 4px 2px 2px;
-    background: rgba(194,103,140,0.22);
+    background: rgba(138,111,160,0.22);
     transition: height 0.4s ease;
   }
-  .week-bar.today { background: #C2678C; }
+  .week-bar.today { background: #8A6FA0; }
   .week-bar-label {
     font-size: 0.46rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #C2678C;
+    color: #8A6FA0;
     opacity: 0.65;
     margin-top: 0.35rem;
   }
@@ -625,18 +631,32 @@
     text-shadow: 0 1px 6px rgba(0,0,0,0.7);
   }
 
-  /* ── CALENDAR EMBED ── */
+  /* ── CALENDAR EMBED ──
+     Weekly Outline and everything below it (Habit Tracker, Weekly Look,
+     Ideal Day) use a dusty lavender accent instead of the rose used
+     above — a color the background photo doesn't carry — so the lower
+     half of the page reads as its own zone.
+     The background photo's rendered height scales with viewport width
+     (it's full-width, auto-height), so on wide screens it can run
+     taller than everything above this card combined. This margin grows
+     to match — clearing the photo with room to spare — and does
+     nothing once the content above is already taller than the photo
+     (narrow/tablet widths, or mobile's single-column stack). */
   .calendar-card {
     grid-column: 1 / 4;
+    margin-top: max(0px, calc(83vw - 950px));
     padding: 0;
     overflow: hidden;
+    background: rgba(232,222,240,0.62);
+    border-color: rgba(138,111,160,0.3);
   }
+  .calendar-card .section-label { color: #8A6FA0; }
   .cal-header {
     padding: 1rem 1.6rem 0.6rem;
     font-size: 0.58rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: #C2678C;
+    color: #8A6FA0;
     opacity: 0.9;
   }
 
@@ -656,28 +676,22 @@
   /* ── ANIMATIONS (matches subpages) ── */
   @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 
-  /* ── BG TAIL ── */
-  .bg-tail {
-    background: #3a2a32;
-    width: 100%;
-    min-height: 4rem;
-  }
-
   /* ── IDEAL DAY ── */
   .ideal-day-card {
     grid-column: 1 / 4;
     padding: 1.6rem 2rem 1.8rem;
     overflow: hidden;
     border-radius: 12px;
-    /* Dark navy — pulls from the background image's deep water tones */
-    background: rgba(18, 28, 40, 0.88) !important;
+    /* Pastel yellow glass — its own color, distinct from both the rose
+       above and the lavender used for Weekly Outline just above it. */
+    background: rgba(250,240,205,0.65) !important;
     backdrop-filter: blur(18px) saturate(1.1) !important;
     -webkit-backdrop-filter: blur(18px) saturate(1.1) !important;
-    border: 1px solid rgba(200,216,226,0.12) !important;
+    border: 1px solid rgba(201,162,39,0.3) !important;
   }
   .ideal-day-card .section-label {
     margin-bottom: 1rem;
-    color: rgba(200,216,226,0.55) !important;
+    color: #B8912A !important;
   }
 
   /* Phase color palette */
@@ -781,23 +795,23 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 0.88rem;
     font-weight: 400;
-    color: rgba(251,240,242,0.92);
+    color: #3A2A32;
     line-height: 1.25;
   }
   .id-dur {
     font-size: 0.46rem;
-    opacity: 0.4;
+    opacity: 0.55;
     margin-top: 2px;
     letter-spacing: 0.05em;
-    color: rgba(200,216,226,0.9);
+    color: #3A2A32;
   }
   .id-note {
     font-size: 0.44rem;
-    opacity: 0.55;
+    opacity: 0.65;
     font-style: italic;
     margin-top: 3px;
     line-height: 1.4;
-    color: rgba(200,216,226,0.9);
+    color: #3A2A32;
   }
 
   .id-tag {
@@ -824,11 +838,11 @@
   }
   .id-focus-box p {
     font-size: 0.55rem;
-    color: rgba(200,216,226,0.6);
+    color: rgba(58,42,50,0.75);
     line-height: 1.75;
     letter-spacing: 0.03em;
   }
-  .id-focus-box p strong { color: rgba(251,240,242,0.9); font-weight: 500; }
+  .id-focus-box p strong { color: #3A2A32; font-weight: 500; }
   .id-focus-box p em { color: #F0C99A; font-style: italic; }
 
   /* ── RESPONSIVE ── */
@@ -973,31 +987,31 @@
         <div class="cal-header" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.6rem 0.6rem;">
           <span>✦ Weekly Outline</span>
           <div style="display:flex;gap:0.5rem;align-items:center;">
-            <button onclick="calPrevWeek()" style="background:rgba(194,103,140,0.10);border:1px solid rgba(194,103,140,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#C2678C;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(194,103,140,0.22)'" onmouseout="this.style.background='rgba(194,103,140,0.10)'">‹</button>
-            <span id="calWeekLabel" style="font-size:0.58rem;letter-spacing:0.18em;color:#C2678C;min-width:120px;text-align:center;"></span>
-            <button onclick="calNextWeek()" style="background:rgba(194,103,140,0.10);border:1px solid rgba(194,103,140,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#C2678C;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(194,103,140,0.22)'" onmouseout="this.style.background='rgba(194,103,140,0.10)'">›</button>
-            <button onclick="calGoToday()" style="background:rgba(194,103,140,0.10);border:1px solid rgba(194,103,140,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#C2678C;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;" onmouseover="this.style.background='rgba(194,103,140,0.22)'" onmouseout="this.style.background='rgba(194,103,140,0.10)'">TODAY</button>
-            <button id="calSyncBtn" onclick="syncCurrentWeekWithMO()" style="background:rgba(194,103,140,0.10);border:1px solid rgba(194,103,140,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#C2678C;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(194,103,140,0.22)'" onmouseout="this.style.background='rgba(194,103,140,0.10)'" title="Sync this week with Monthly Outline">⟲ SYNC</button>
+            <button onclick="calPrevWeek()" style="background:rgba(138,111,160,0.10);border:1px solid rgba(138,111,160,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A6FA0;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(138,111,160,0.22)'" onmouseout="this.style.background='rgba(138,111,160,0.10)'">‹</button>
+            <span id="calWeekLabel" style="font-size:0.58rem;letter-spacing:0.18em;color:#8A6FA0;min-width:120px;text-align:center;"></span>
+            <button onclick="calNextWeek()" style="background:rgba(138,111,160,0.10);border:1px solid rgba(138,111,160,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A6FA0;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(138,111,160,0.22)'" onmouseout="this.style.background='rgba(138,111,160,0.10)'">›</button>
+            <button onclick="calGoToday()" style="background:rgba(138,111,160,0.10);border:1px solid rgba(138,111,160,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#8A6FA0;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;" onmouseover="this.style.background='rgba(138,111,160,0.22)'" onmouseout="this.style.background='rgba(138,111,160,0.10)'">TODAY</button>
+            <button id="calSyncBtn" onclick="syncCurrentWeekWithMO()" style="background:rgba(138,111,160,0.10);border:1px solid rgba(138,111,160,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#8A6FA0;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(138,111,160,0.22)'" onmouseout="this.style.background='rgba(138,111,160,0.10)'" title="Sync this week with Monthly Outline">⟲ SYNC</button>
           </div>
         </div>
         <div id="calSaveStatus" style="padding:0 1.6rem;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.1em;min-height:1em;"></div>
         <div id="calWeekGrid" style="padding:0 1rem 1rem;"></div>
 
-        <div style="display:flex;gap:1.6rem;flex-wrap:wrap;padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(194,103,140,0.14);margin-top:0.2rem;">
+        <div style="display:flex;gap:1.6rem;flex-wrap:wrap;padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(138,111,160,0.14);margin-top:0.2rem;">
           <div style="flex:1.3;min-width:230px;">
             <div class="section-label" style="margin-bottom:0.5rem;">✦ Habit Tracker</div>
             <div class="habit-log-sub">Last two weeks of daily tasks completed — darker means more finished</div>
             <div class="habit-heatmap-stats" id="habitHeatmapStats"></div>
             <div class="habit-heatmap-grid" id="habitLogList">
-              <div style="font-size:0.56rem;color:#C2678C;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">Loading…</div>
+              <div style="font-size:0.56rem;color:#8A6FA0;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">Loading…</div>
             </div>
             <div class="habit-heatmap-legend">
               <span>Less</span>
-              <span class="habit-heatmap-legend-swatch" style="background:rgba(194,103,140,0.10);"></span>
-              <span class="habit-heatmap-legend-swatch" style="background:rgba(194,103,140,0.28);"></span>
-              <span class="habit-heatmap-legend-swatch" style="background:rgba(194,103,140,0.5);"></span>
-              <span class="habit-heatmap-legend-swatch" style="background:rgba(194,103,140,0.72);"></span>
-              <span class="habit-heatmap-legend-swatch" style="background:#C2678C;"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(138,111,160,0.10);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(138,111,160,0.28);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(138,111,160,0.5);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(138,111,160,0.72);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:#8A6FA0;"></span>
               <span>More</span>
             </div>
           </div>
@@ -1226,7 +1240,6 @@
 </div><!-- /hero -->
 
 </div><!-- /position:relative wrapper -->
-<div class="bg-tail"></div>
 
 <script>
 // ============================================================
@@ -2025,7 +2038,7 @@ async function saveEventEditor() {
   ev.color = document.getElementById('evtEdColorRow').dataset.selected || ev.color;
 
   const statusEl = document.getElementById('calSaveStatus');
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
   const ok = await saveCalEventsAsync(evts);
   closeEventEditor();
   renderWeekCalendar();
@@ -2135,27 +2148,27 @@ function renderWeekCalendar() {
     days.push(d);
   }
 
-  let html = '<div style="display:grid;grid-template-columns:38px repeat(7,1fr);gap:0;border:1px solid rgba(194,103,140,0.18);border-radius:8px;overflow:hidden;font-size:0.52rem;">';
+  let html = '<div style="display:grid;grid-template-columns:38px repeat(7,1fr);gap:0;border:1px solid rgba(138,111,160,0.18);border-radius:8px;overflow:hidden;font-size:0.52rem;">';
 
   // Header row
-  html += '<div style="background:rgba(194,103,140,0.06);border-bottom:1px solid rgba(194,103,140,0.18);"></div>';
+  html += '<div style="background:rgba(138,111,160,0.06);border-bottom:1px solid rgba(138,111,160,0.18);"></div>';
   days.forEach(function(d) {
     const isToday = dateKey(d) === today;
     html += '<div style="padding:0.45rem 0.3rem;text-align:center;background:' +
-      (isToday ? 'rgba(194,103,140,0.18)' : 'rgba(194,103,140,0.06)') +
-      ';border-left:1px solid rgba(194,103,140,0.18);border-bottom:1px solid rgba(194,103,140,0.18);">' +
-      '<div style="letter-spacing:0.15em;text-transform:uppercase;color:' + (isToday ? '#C2678C' : '#3A4F5C') + ';font-weight:' + (isToday ? '500' : '400') + ';">' + DAYS_SHORT[d.getDay()] + '</div>' +
-      '<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.9rem;font-weight:' + (isToday ? '700' : '400') + ';color:' + (isToday ? '#C2678C' : '#3A2A32') + ';line-height:1.2;">' + d.getDate() + '</div>' +
+      (isToday ? 'rgba(138,111,160,0.18)' : 'rgba(138,111,160,0.06)') +
+      ';border-left:1px solid rgba(138,111,160,0.18);border-bottom:1px solid rgba(138,111,160,0.18);">' +
+      '<div style="letter-spacing:0.15em;text-transform:uppercase;color:' + (isToday ? '#8A6FA0' : '#3A4F5C') + ';font-weight:' + (isToday ? '500' : '400') + ';">' + DAYS_SHORT[d.getDay()] + '</div>' +
+      '<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.9rem;font-weight:' + (isToday ? '700' : '400') + ';color:' + (isToday ? '#8A6FA0' : '#3A2A32') + ';line-height:1.2;">' + d.getDate() + '</div>' +
       '</div>';
   });
 
   // All-day row — events spanning the day (startH < 0 or endH < 0)
   const allDayEvts = evts.filter(function(e) { return e.allDay; });
-  html += '<div style="padding:0.35rem 0.25rem;text-align:right;background:rgba(194,103,140,0.03);border-bottom:1px solid rgba(194,103,140,0.12);color:#C2678C;opacity:0.5;font-size:0.45rem;letter-spacing:0.1em;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;">ALL DAY</div>';
+  html += '<div style="padding:0.35rem 0.25rem;text-align:right;background:rgba(138,111,160,0.03);border-bottom:1px solid rgba(138,111,160,0.12);color:#8A6FA0;opacity:0.5;font-size:0.45rem;letter-spacing:0.1em;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;">ALL DAY</div>';
   days.forEach(function(d) {
     const dk = dateKey(d);
     const dayAllDay = allDayEvts.filter(function(e){ return e.date === dk; });
-    html += '<div style="border-left:1px solid rgba(194,103,140,0.18);border-bottom:1px solid rgba(194,103,140,0.12);padding:0.2rem;min-height:22px;background:rgba(194,103,140,0.02);">';
+    html += '<div style="border-left:1px solid rgba(138,111,160,0.18);border-bottom:1px solid rgba(138,111,160,0.12);padding:0.2rem;min-height:22px;background:rgba(138,111,160,0.02);">';
     dayAllDay.forEach(function(e) {
       html += '<div style="background:' + (e.color||'#C2678C') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="Click to edit · right-click to recolor: ' + e.title + '">' + e.title + '</div>';
     });
@@ -2167,12 +2180,12 @@ function renderWeekCalendar() {
   // span the grid rows for its full duration instead of only appearing
   // in the hour it starts.
   HOURS.forEach(function(h) {
-    html += '<div style="padding:0.25rem 0.3rem 0 0;text-align:right;color:#C2678C;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(194,103,140,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
+    html += '<div style="padding:0.25rem 0.3rem 0 0;text-align:right;color:#8A6FA0;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(138,111,160,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
     days.forEach(function(d) {
       const dk = dateKey(d);
       const isToday = dk === today;
-      html += '<div style="border-left:1px solid rgba(194,103,140,0.18);border-bottom:1px solid rgba(194,103,140,0.07);min-height:28px;background:' +
-        (isToday ? 'rgba(194,103,140,0.04)' : 'transparent') +
+      html += '<div style="border-left:1px solid rgba(138,111,160,0.18);border-bottom:1px solid rgba(138,111,160,0.07);min-height:28px;background:' +
+        (isToday ? 'rgba(138,111,160,0.04)' : 'transparent') +
         ';" ondblclick="quickAddEvent(\'' + dk + '\',' + h + ')"></div>';
     });
   });
@@ -2261,21 +2274,21 @@ function renderWeekCalendar() {
 
   // Add event form
   html += '<div style="margin-top:0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">' +
-    '<input id="calEvtTitle" placeholder="Event title…" style="flex:2;min-width:110px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" />' +
-    '<input id="calEvtDate" type="date" style="flex:1;min-width:120px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;" />' +
-    '<select id="calEvtStart" style="background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
+    '<input id="calEvtTitle" placeholder="Event title…" style="flex:2;min-width:110px;background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" />' +
+    '<input id="calEvtDate" type="date" style="flex:1;min-width:120px;background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;" />' +
+    '<select id="calEvtStart" style="background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
     HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('') +
     '</select>' +
-    '<select id="calEvtEnd" style="background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
+    '<select id="calEvtEnd" style="background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
     HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('') +
     '</select>' +
-    '<label style="font-size:0.5rem;color:#C2678C;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" onchange="if(this.checked)document.getElementById(\'calEvtOvernight\').checked=false;" style="width:10px;height:10px;" /> All-day</label>' +
-    '<label style="font-size:0.5rem;color:#C2678C;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;" title="Ends the next calendar day, e.g. 8p–6a"><input type="checkbox" id="calEvtOvernight" onchange="if(this.checked)document.getElementById(\'calEvtAllDay\').checked=false;" style="width:10px;height:10px;" /> 🌙 Overnight</label>' +
+    '<label style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" onchange="if(this.checked)document.getElementById(\'calEvtOvernight\').checked=false;" style="width:10px;height:10px;" /> All-day</label>' +
+    '<label style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;" title="Ends the next calendar day, e.g. 8p–6a"><input type="checkbox" id="calEvtOvernight" onchange="if(this.checked)document.getElementById(\'calEvtAllDay\').checked=false;" style="width:10px;height:10px;" /> 🌙 Overnight</label>' +
     '<div style="display:flex;align-items:center;gap:5px;">' +
-    '<span style="font-size:0.5rem;color:#C2678C;letter-spacing:0.1em;">COLOR</span>' +
+    '<span style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;">COLOR</span>' +
     '<div style="display:flex;gap:5px;">' + evtColorSwatchesHtml() + '</div>' +
     '</div>' +
-    '<button onclick="addCalEvent()" style="background:#C2678C;border:1px solid #C2678C;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
+    '<button onclick="addCalEvent()" style="background:#8A6FA0;border:1px solid #8A6FA0;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
     '</div>';
 
   grid.innerHTML = html;
@@ -2338,7 +2351,7 @@ async function addCalEvent() {
     hubNative: true
   };
   evts.push(newEvt);
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
   const ok = await saveCalEventsAsync(evts);
   document.getElementById('calEvtTitle').value = '';
   renderWeekCalendar();
@@ -2360,7 +2373,7 @@ async function deleteCalEvent(id) {
   const evts = loadCalEvents().filter(function(e){ return e.id !== id; });
   // Also remove from in-memory MO-sourced display list
   _calEvents = _calEvents.filter(function(e){ return e.id !== id; });
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
   const ok = await saveCalEventsAsync(evts);
   // Remove from MO table too
   deleteEventFromMO(id);
@@ -2392,7 +2405,7 @@ async function quickAddEvent(dateStr, hour) {
     title: title.trim(), color: selectedEvtColor,
     cat: 'events', notes: '', hubNative: true
   });
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
   const ok = await saveCalEventsAsync(evts);
   renderWeekCalendar();
   if (statusEl) {
@@ -2466,7 +2479,7 @@ function renderHabitLog(archive) {
     rows.push({ id: day.id, label: day.label || day.id, done: s.done, total: s.total });
   });
   if (!rows.length) {
-    list.innerHTML = '<div style="font-size:0.56rem;color:#C2678C;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">No habit history yet</div>';
+    list.innerHTML = '<div style="font-size:0.56rem;color:#8A6FA0;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">No habit history yet</div>';
     stats.innerHTML = '';
     return;
   }
