@@ -301,6 +301,74 @@
   .budget-bar-fill.good { background: var(--positive); }
 
   /* ── GOALS ── */
+  .section-count {
+    font-size: 0.6rem; letter-spacing: 0.14em; color: var(--warm-mid); text-transform: uppercase;
+  }
+  .add-toggle-row { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+  .add-toggle-btn {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(201,162,126,0.10);
+    border: 1px solid rgba(201,162,126,0.32);
+    border-radius: 99px; padding: 0.45rem 1.1rem;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .add-toggle-btn:hover { background: rgba(201,162,126,0.20); }
+  .add-toggle-btn svg { transition: transform 0.3s; }
+  .add-toggle-btn.open svg { transform: rotate(45deg); }
+  .add-drawer {
+    overflow: hidden; max-height: 0; opacity: 0;
+    transition: max-height 0.38s ease, opacity 0.28s ease, margin-bottom 0.3s ease;
+    margin-bottom: 0;
+  }
+  .add-drawer.open { max-height: 480px; opacity: 1; margin-bottom: 24px; }
+  .add-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 22px 24px;
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; margin-bottom: 1rem; }
+  .form-field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .form-field.full { grid-column: 1 / -1; }
+  .form-field label {
+    font-size: 0.52rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--warm-mid);
+  }
+  .form-field input, .form-field select, .form-field textarea {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--parchment);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 7px; padding: 0.55rem 0.75rem;
+    outline: none; transition: border-color 0.2s; width: 100%;
+  }
+  .form-field textarea { resize: vertical; min-height: 44px; }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: rgba(201,162,126,0.55); }
+  .form-field select option { background: #1e1b18; }
+  .form-actions { display: flex; align-items: center; gap: 0.75rem; }
+  .btn-save {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 99px; padding: 0.5rem 1.2rem;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-save:hover { opacity: 0.85; }
+  .form-msg {
+    font-size: 0.56rem; letter-spacing: 0.08em; color: var(--positive);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .form-msg.show { opacity: 1; }
+  .save-status {
+    font-size: 0.55rem; letter-spacing: 0.08em; color: var(--warm-mid);
+    text-align: right; margin-top: -6px; margin-bottom: 12px; min-height: 1em;
+  }
   .goals-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -308,17 +376,29 @@
     margin-bottom: 48px;
   }
   .goal-card {
+    position: relative;
     background: var(--card-bg);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     padding: 20px 22px;
+    transition: border-color 0.2s, transform 0.15s;
   }
+  .goal-card:hover { border-color: rgba(201,162,126,0.5); transform: translateY(-2px); }
+  .goal-card.complete { border-left: 3px solid var(--positive); }
+  .goal-top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
   .goal-name {
     font-size: 0.62rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--warm-mid);
-    margin-bottom: 8px;
+  }
+  .goal-cat-tag {
+    font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--charcoal);
+    background: rgba(201,162,126,0.14);
+    border: 1px solid rgba(201,162,126,0.25);
+    border-radius: 4px; padding: 2px 7px;
+    white-space: nowrap; flex-shrink: 0;
   }
   .goal-progress-text {
     font-family: 'Cormorant Garamond', serif;
@@ -328,6 +408,7 @@
     margin-bottom: 10px;
     line-height: 1;
   }
+  .goal-progress-text .of-target { font-size: 1rem; color: var(--warm-mid); }
   .goal-bar-bg {
     height: 3px;
     background: rgba(255,255,255,0.08);
@@ -341,11 +422,33 @@
     border-radius: 2px;
     transition: width 0.7s ease;
   }
+  .goal-bar-fill.complete { background: var(--positive); }
   .goal-sub {
     font-size: 0.57rem;
     letter-spacing: 0.1em;
     color: var(--warm-mid);
     text-transform: uppercase;
+  }
+  .goal-notes {
+    font-size: 0.58rem; color: var(--cream); opacity: 0.75;
+    margin-top: 8px; line-height: 1.6; text-transform: none; letter-spacing: 0.02em;
+    border-top: 1px solid rgba(201,162,126,0.14);
+    padding-top: 8px;
+  }
+  .goal-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .goal-action-btn {
+    font-size: 0.52rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--warm-mid);
+    background: none; border: 1px solid var(--glass-border);
+    border-radius: 6px; padding: 4px 10px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .goal-action-btn:hover { color: var(--parchment); border-color: rgba(201,162,126,0.5); }
+  .goal-action-btn.danger:hover { color: var(--negative); border-color: rgba(201,126,126,0.5); }
+  .empty-note {
+    text-align: center; padding: 40px 0;
+    font-style: italic; color: var(--warm-mid); opacity: 0.6; font-size: 0.9rem;
+    grid-column: 1 / -1;
   }
 
   /* ── SUBPAGE NAV ── */
@@ -355,11 +458,11 @@
     gap: 16px;
     margin-bottom: 32px;
   }
-  @media (max-width: 900px) {
+  @media (max-width: 1080px) {
     .subpage-grid { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 560px) {
-    .subpage-grid { grid-template-columns: 1fr 1fr; }
+    .subpage-grid { grid-template-columns: 1fr; }
   }
   .subpage-card {
     position: relative;
@@ -533,9 +636,68 @@
     <div class="section-header">
       <h2 class="section-title">Financial Goals</h2>
       <div class="section-rule"></div>
+      <span class="section-count" id="section-count">0 goals</span>
     </div>
+
+    <div class="add-toggle-row">
+      <button class="add-toggle-btn" id="addToggleBtn" onclick="toggleAddForm()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Goal
+      </button>
+    </div>
+
+    <div class="add-drawer" id="addDrawer">
+      <div class="add-card">
+        <div class="form-grid">
+          <div class="form-field full">
+            <label for="f-name">Goal Name</label>
+            <input type="text" id="f-name" placeholder="Pay off Citi Diamond Preferred" autocomplete="off" />
+          </div>
+          <div class="form-field">
+            <label for="f-cat">Category</label>
+            <select id="f-cat">
+              <option value="Debt Payoff">Debt Payoff</option>
+              <option value="Savings">Savings</option>
+              <option value="Investment">Investment</option>
+              <option value="Big Purchase">Big Purchase</option>
+              <option value="Emergency Fund">Emergency Fund</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="f-target-date">Target Date (optional)</label>
+            <input type="date" id="f-target-date" />
+          </div>
+          <div class="form-field">
+            <label for="f-current">Current Amount</label>
+            <input type="number" id="f-current" step="0.01" placeholder="0.00" />
+          </div>
+          <div class="form-field">
+            <label for="f-target">Target Amount</label>
+            <input type="number" id="f-target" step="0.01" placeholder="0.00" />
+          </div>
+          <div class="form-field full">
+            <label for="f-notes">Notes</label>
+            <textarea id="f-notes" placeholder="Monthly contribution, context, next step…"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="saveGoalForm()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span id="saveBtnLabel">Save Goal</span>
+          </button>
+          <span class="form-msg" id="form-msg">saved.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="save-status" id="saveStatus"></div>
     <div class="goals-grid" id="goals-grid">
-      <!-- rendered by JS -->
+      <div class="empty-note">Loading…</div>
     </div>
   </section>
 
@@ -574,6 +736,19 @@
 </div>
 
 <script>
+// ── SUPABASE CONFIG — used only by the Financial Goals section below,
+// which stays in sync with Financial_Goals.html via the same table.
+// The rest of this page (accounts/budget) remains static/local. ──
+const SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
+const SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
+async function sbGet(table, id) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}&limit=1`,
+      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    const d = await r.json(); return d && d[0] ? d[0] : null;
+  } catch(e) { return null; }
+}
+
 // ── DATE ──
 const dateEl = document.getElementById('topbar-date');
 dateEl.textContent = new Date().toLocaleDateString('en-US', {
@@ -662,28 +837,159 @@ function loadBudget() {
   }).join('');
 }
 
-// ── GOALS ──
-const GOALS = [
-  { name: 'Discover — Paid Off ✓',    current: 2418.59, target: 2418.59, note: 'Paid in full in July · $32.37 credit carried to Aug' },
-  { name: 'Pay Off Citi (21 mo.)',     current:  420.00, target: 5459.99, note: '$280/mo · $140 posted so far in Aug · $5,040 remaining' },
-  { name: 'Roth IRA — 2026',          current: 1625.00, target: 6500.00, note: 'no contribution logged Jun–Aug — resume $325 biweekly' },
-  { name: 'WF Personal Buffer',        current:  528.20, target: 2000.00, note: 'rebuilding — Aug payroll + Depop sales, still below target' },
+// ── GOALS — Supabase-backed (`financial_goals` table), fully managed
+// right here now rather than on a separate page. ──
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtTargetDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso + 'T12:00:00');
+  const days = Math.round((d - new Date()) / 86400000);
+  const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (days < 0) return dateStr + ' (past)';
+  if (days === 0) return dateStr + ' (today)';
+  return dateStr + ' (' + days + 'd)';
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+// Seed — starting point the first time this loads with nothing saved yet.
+const SEED_GOALS = [
+  { id: 'seed-discover', name: 'Discover — Paid Off', category: 'Debt Payoff', current: 2418.59, target: 2418.59, targetDate: '', notes: 'Paid in full in July. $32.37 credit carried forward.' },
+  { id: 'seed-citi', name: 'Pay Off Citi Diamond Preferred', category: 'Debt Payoff', current: 420.00, target: 5459.99, targetDate: '', notes: '$280/mo · ~21 months at current pace.' },
+  { id: 'seed-roth', name: 'Roth IRA — 2026', category: 'Investment', current: 1625.00, target: 6500.00, targetDate: '2026-12-31', notes: 'Resume $325 biweekly to hit the annual max.' },
+  { id: 'seed-wf', name: 'WF Personal Buffer', category: 'Emergency Fund', current: 528.20, target: 2000.00, notes: 'Rebuilding via payroll + Depop sales.' },
 ];
 
-function loadGoals() {
+let goals = [];
+let editingId = null;
+
+async function loadGoals() {
+  const row = await sbGet('financial_goals', 'singleton');
+  if (row && Array.isArray(row.goals) && row.goals.length) {
+    goals = row.goals;
+  } else {
+    try {
+      const local = JSON.parse(lsGet('fg_goals') || 'null');
+      goals = (local && local.length) ? local : SEED_GOALS.slice();
+    } catch(e) { goals = SEED_GOALS.slice(); }
+  }
+  renderGoals();
+}
+
+async function saveGoals() {
+  lsSet('fg_goals', JSON.stringify(goals));
+  const statusEl = document.getElementById('saveStatus');
+  statusEl.textContent = 'saving…';
+  const ok = await sbUpsert('financial_goals', { id: 'singleton', goals: goals });
+  statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only';
+  statusEl.style.color = ok ? 'var(--positive)' : 'var(--negative)';
+  setTimeout(() => { if (statusEl.textContent.indexOf('saved') === 0) statusEl.textContent = ''; }, 2000);
+}
+
+function renderGoals() {
   const grid = document.getElementById('goals-grid');
-  grid.innerHTML = GOALS.map(g => {
-    const pct = Math.min((g.current / g.target) * 100, 100);
-    const remaining = Math.max(g.target - g.current, 0);
-    return `<div class="goal-card">
-      <p class="goal-name">${g.name}</p>
-      <p class="goal-progress-text">${fmt(g.current)} <span style="font-size:1rem;color:var(--warm-mid)">/ ${fmt(g.target)}</span></p>
-      <div class="goal-bar-bg">
-        <div class="goal-bar-fill" style="width:${pct.toFixed(1)}%"></div>
-      </div>
-      <p class="goal-sub">${pct.toFixed(0)}% complete · ${fmt(remaining)} remaining · ${g.note}</p>
-    </div>`;
-  }).join('');
+  if (!goals.length) {
+    grid.innerHTML = '<div class="empty-note">No goals yet — add one above.</div>';
+  } else {
+    grid.innerHTML = goals.map(g => {
+      const target = g.target || 0;
+      const pct = target > 0 ? Math.min(100, (g.current / target) * 100) : 0;
+      const complete = pct >= 100;
+      const remaining = Math.max(target - g.current, 0);
+      return `
+        <div class="goal-card ${complete ? 'complete' : ''}">
+          <div class="goal-top-row">
+            <p class="goal-name">${esc(g.name)}${complete ? ' ✓' : ''}</p>
+            <span class="goal-cat-tag">${esc(g.category || 'Other')}</span>
+          </div>
+          <p class="goal-progress-text">${fmt(g.current)} <span class="of-target">/ ${fmt(target)}</span></p>
+          <div class="goal-bar-bg"><div class="goal-bar-fill ${complete ? 'complete' : ''}" style="width:${pct.toFixed(1)}%"></div></div>
+          <p class="goal-sub">${pct.toFixed(0)}% complete · ${fmt(remaining)} remaining${g.targetDate ? ' · target ' + fmtTargetDate(g.targetDate) : ''}</p>
+          ${g.notes ? `<p class="goal-notes">${esc(g.notes)}</p>` : ''}
+          <div class="goal-actions">
+            <button class="goal-action-btn" onclick="editGoal('${g.id}')">Edit</button>
+            <button class="goal-action-btn danger" onclick="deleteGoal('${g.id}')">Delete</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+  document.getElementById('section-count').textContent = goals.length + (goals.length === 1 ? ' goal' : ' goals');
+}
+
+// ── ADD / EDIT FORM ──
+function toggleAddForm() {
+  const drawer = document.getElementById('addDrawer');
+  const btn = document.getElementById('addToggleBtn');
+  const open = drawer.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  if (!open) resetForm();
+  if (open) setTimeout(() => document.getElementById('f-name').focus(), 320);
+}
+
+function resetForm() {
+  editingId = null;
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-cat').value = 'Debt Payoff';
+  document.getElementById('f-target-date').value = '';
+  document.getElementById('f-current').value = '';
+  document.getElementById('f-target').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('saveBtnLabel').textContent = 'Save Goal';
+}
+
+function editGoal(id) {
+  const g = goals.find(x => x.id === id);
+  if (!g) return;
+  editingId = id;
+  document.getElementById('f-name').value = g.name;
+  document.getElementById('f-cat').value = g.category || 'Debt Payoff';
+  document.getElementById('f-target-date').value = g.targetDate || '';
+  document.getElementById('f-current').value = g.current;
+  document.getElementById('f-target').value = g.target;
+  document.getElementById('f-notes').value = g.notes || '';
+  document.getElementById('saveBtnLabel').textContent = 'Update Goal';
+  const drawer = document.getElementById('addDrawer');
+  if (!drawer.classList.contains('open')) {
+    drawer.classList.add('open');
+    document.getElementById('addToggleBtn').classList.add('open');
+  }
+  document.getElementById('f-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function saveGoalForm() {
+  const name = document.getElementById('f-name').value.trim();
+  const category = document.getElementById('f-cat').value;
+  const targetDate = document.getElementById('f-target-date').value;
+  const current = parseFloat(document.getElementById('f-current').value) || 0;
+  const target = parseFloat(document.getElementById('f-target').value) || 0;
+  const notes = document.getElementById('f-notes').value.trim();
+  if (!name || !target) { flashMsg('name + target amount required.'); return; }
+
+  if (editingId) {
+    const g = goals.find(x => x.id === editingId);
+    if (g) Object.assign(g, { name, category, targetDate, current, target, notes });
+  } else {
+    goals.push({ id: 'g' + Date.now(), name, category, targetDate, current, target, notes });
+  }
+  saveGoals();
+  renderGoals();
+  resetForm();
+  flashMsg('saved.');
+}
+
+function deleteGoal(id) {
+  goals = goals.filter(g => g.id !== id);
+  saveGoals();
+  renderGoals();
+}
+
+function flashMsg(txt) {
+  const el = document.getElementById('form-msg');
+  el.textContent = txt;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
 }
 
 // ── INIT ──

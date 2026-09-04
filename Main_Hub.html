@@ -8,31 +8,31 @@
 <style>
   :root {
     /* Calming palette drawn from the photo's serene tones */
-    --denim:       #4A6A8A;
-    --denim-light: #7DA0BC;
+    --denim:       #C2678C;
+    --denim-light: #E3A9BE;
     --slate:       #6B7F8E;
     --slate-light: #9BB0BE;
-    --sage:        #6B8C6E;
-    --sage-light:  #9AB89C;
-    --ivory:       #F0EBE1;
-    --ivory-dark:  #DDD5C8;
+    --sage:        #9DBB9A;
+    --sage-light:  #C3DAC0;
+    --ivory:       #FBF0F2;
+    --ivory-dark:  #F0D9DE;
     --mist:        #C8D8E2;
-    --fog:         #2A3A45;
+    --fog:         #F8ECEE;
     --fog-mid:     #3A4F5C;
-    --ink:         #1A2530;
+    --ink:         #3A2A32;
     --glass:       rgba(200,216,226,0.13);
-    --glass-border: rgba(200,216,226,0.22);
+    --glass-border: rgba(201,123,147,0.28);
     /* semantic aliases */
-    --rust:        #4A6A8A;
-    --rust-light:  #7DA0BC;
-    --navy:        #2A3A45;
+    --rust:        #C2678C;
+    --rust-light:  #E3A9BE;
+    --navy:        #F8ECEE;
     --navy-mid:    #3A4F5C;
     --gold:        #6B7F8E;
     --gold-light:  #C8D8E2;
-    --green:       #6B8C6E;
-    --green-light: #9AB89C;
-    --cream:       #F0EBE1;
-    --cream-dark:  #DDD5C8;
+    --green:       #9DBB9A;
+    --green-light: #C3DAC0;
+    --cream:       #FBF0F2;
+    --cream-dark:  #F0D9DE;
     --chestnut:    #6B7F8E;
   }
 
@@ -139,16 +139,16 @@
   }
   .hero-title em {
     font-style: italic;
-    color: #C4622D;
+    color: #C9527A;
     text-shadow: 0 2px 16px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
   }
 
   /* ── GLASS CARD ── */
   .glass {
-    background: rgba(255, 255, 255, 0.55);
+    background: rgba(252,232,236,0.62);
     backdrop-filter: blur(14px) saturate(1.3);
     -webkit-backdrop-filter: blur(14px) saturate(1.3);
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid rgba(201,123,147,0.3);
     border-radius: 12px;
   }
 
@@ -163,8 +163,8 @@
   }
   .evt-editor-overlay.open { display: flex; }
   .evt-editor-card {
-    background: #FBF9F5;
-    border: 1px solid rgba(74,106,138,0.22);
+    background: #FDF3F4;
+    border: 1px solid rgba(194,103,140,0.22);
     border-radius: 12px;
     padding: 1.4rem 1.5rem;
     width: 100%; max-width: 360px;
@@ -177,20 +177,20 @@
   .evt-editor-field input[type="date"],
   .evt-editor-field select {
     width: 100%; box-sizing: border-box;
-    background: rgba(74,106,138,0.07); border: 1px solid rgba(74,106,138,0.2);
+    background: rgba(194,103,140,0.07); border: 1px solid rgba(194,103,140,0.2);
     border-radius: 6px; padding: 0.4rem 0.6rem;
-    font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #1A2530;
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #3A2A32;
     outline: none; letter-spacing: 0.04em;
   }
   .evt-editor-row { display: flex; gap: 0.5rem; }
   .evt-editor-row > div { flex: 1; }
   .evt-editor-label {
     font-size: 0.48rem; letter-spacing: 0.12em; text-transform: uppercase;
-    color: #4A6A8A; opacity: 0.75; margin-bottom: 0.25rem;
+    color: #C2678C; opacity: 0.75; margin-bottom: 0.25rem;
   }
   .evt-editor-checks {
     display: flex; gap: 1rem; margin: 0.7rem 0; font-size: 0.5rem;
-    color: #4A6A8A; letter-spacing: 0.08em;
+    color: #C2678C; letter-spacing: 0.08em;
   }
   .evt-editor-checks label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
   .evt-editor-actions {
@@ -201,9 +201,9 @@
     font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em;
     border-radius: 6px; padding: 0.4rem 0.85rem; cursor: pointer;
   }
-  .evt-editor-btn.save { background: #4A6A8A; border: 1px solid #4A6A8A; color: #fff; }
-  .evt-editor-btn.cancel { background: transparent; border: 1px solid rgba(74,106,138,0.3); color: #4A6A8A; }
-  .evt-editor-btn.delete { background: transparent; border: 1px solid rgba(176,80,80,0.4); color: #b05050; }
+  .evt-editor-btn.save { background: #C2678C; border: 1px solid #C2678C; color: #fff; }
+  .evt-editor-btn.cancel { background: transparent; border: 1px solid rgba(194,103,140,0.3); color: #C2678C; }
+  .evt-editor-btn.delete { background: transparent; border: 1px solid rgba(181,107,107,0.4); color: #b56b6b; }
 
   /* ── GRID LAYOUT ── */
   .main-grid {
@@ -222,7 +222,7 @@
     font-size: 0.58rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: #4A6A8A;
+    color: #C2678C;
     margin-bottom: 0.7rem;
     opacity: 1;
   }
@@ -231,33 +231,33 @@
     font-size: 1.15rem;
     font-style: italic;
     line-height: 1.55;
-    color: #1A2530;
+    color: #3A2A32;
     margin-bottom: 0.5rem;
   }
   .quote-attr {
     font-size: 0.6rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: #4A6A8A;
+    color: #C2678C;
     opacity: 0.85;
   }
   .word-pill {
     display: inline-block;
     margin-top: 1rem;
-    background: rgba(74,106,138,0.12);
-    border: 1px solid rgba(74,106,138,0.3);
+    background: rgba(194,103,140,0.12);
+    border: 1px solid rgba(194,103,140,0.3);
     border-radius: 100px;
     padding: 0.3rem 1rem;
     font-size: 0.58rem;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: #4A6A8A;
+    color: #C2678C;
   }
   .word-of-week {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.4rem;
     font-weight: 700;
-    color: #1A2530;
+    color: #3A2A32;
     margin-top: 0.25rem;
     letter-spacing: 0.05em;
   }
@@ -282,20 +282,20 @@
   }
   .todo-input {
     flex: 1;
-    background: rgba(74,106,138,0.07);
-    border: 1px solid rgba(74,106,138,0.2);
+    background: rgba(194,103,140,0.07);
+    border: 1px solid rgba(194,103,140,0.2);
     border-radius: 6px;
     padding: 0.4rem 0.7rem;
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
-    color: #1A2530;
+    color: #3A2A32;
     outline: none;
     letter-spacing: 0.05em;
   }
   .todo-input::placeholder { color: rgba(26,37,48,0.35); }
-  .todo-input:focus { border-color: #4A6A8A; }
+  .todo-input:focus { border-color: #C2678C; }
   .add-btn {
-    background: #4A6A8A;
+    background: #C2678C;
     border: none;
     border-radius: 6px;
     color: var(--ivory);
@@ -306,19 +306,19 @@
     flex-shrink: 0;
     transition: background 0.2s;
   }
-  .add-btn:hover { background: #7DA0BC; }
+  .add-btn:hover { background: #E3A9BE; }
   .todo-list { list-style: none; max-height: 180px; overflow-y: auto; }
   .todo-list::-webkit-scrollbar { width: 3px; }
-  .todo-list::-webkit-scrollbar-thumb { background: rgba(196,98,45,0.4); border-radius: 2px; }
+  .todo-list::-webkit-scrollbar-thumb { background: rgba(201,82,122,0.4); border-radius: 2px; }
   .todo-item {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     padding: 0.35rem 0;
-    border-bottom: 1px solid rgba(74,106,138,0.12);
+    border-bottom: 1px solid rgba(194,103,140,0.12);
     font-size: 0.6rem;
     letter-spacing: 0.04em;
-    color: #1A2530;
+    color: #3A2A32;
     opacity: 0.9;
     animation: fadeIn 0.2s ease;
   }
@@ -327,17 +327,17 @@
   .todo-check {
     width: 14px; height: 14px;
     border-radius: 50%;
-    border: 1.5px solid #4A6A8A;
+    border: 1.5px solid #C2678C;
     background: transparent;
     cursor: pointer;
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     transition: background 0.2s;
   }
-  .todo-check.checked { background: #4A6A8A; border-color: #4A6A8A; }
+  .todo-check.checked { background: #C2678C; border-color: #C2678C; }
   .todo-check.checked::after { content: '✓'; font-size: 8px; color: white; }
-  .todo-del { margin-left: auto; color: rgba(74,106,138,0.3); cursor: pointer; font-size: 0.7rem; transition: color 0.2s; }
-  .todo-del:hover { color: #4A6A8A; }
+  .todo-del { margin-left: auto; color: rgba(194,103,140,0.3); cursor: pointer; font-size: 0.7rem; transition: color 0.2s; }
+  .todo-del:hover { color: #C2678C; }
 
   /* ── GOAL TRACKER ── */
   .goals-card {
@@ -377,18 +377,18 @@
     font-size: 0.58rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: #1A2530;
+    color: #3A2A32;
     opacity: 0.75;
   }
   .goal-pct {
     font-family: 'Cormorant Garamond', serif;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #4A6A8A;
+    color: #C2678C;
   }
   .goal-bar-track {
     height: 5px;
-    background: rgba(74,106,138,0.12);
+    background: rgba(194,103,140,0.12);
     border-radius: 100px;
     overflow: hidden;
   }
@@ -397,11 +397,11 @@
     border-radius: 100px;
     transition: width 1.2s cubic-bezier(.4,0,.2,1);
   }
-  .bar-rust  { background: linear-gradient(90deg, #4A6A8A, #7DA0BC); }
-  .bar-navy  { background: linear-gradient(90deg, #3A4F5C, #6B7F8E); }
-  .bar-gold  { background: linear-gradient(90deg, #5A7A8A, #9BB0BE); }
-  .bar-green { background: linear-gradient(90deg, #6B8C6E, #9AB89C); }
-  .bar-cream { background: linear-gradient(90deg, #8A9EA8, #C8D8E2); }
+  .bar-rust  { background: linear-gradient(90deg, #C2678C, #E3A9BE); }
+  .bar-navy  { background: linear-gradient(90deg, #8FB8D6, #C6B3E0); }
+  .bar-gold  { background: linear-gradient(90deg, #F0C99A, #F5DDB5); }
+  .bar-green { background: linear-gradient(90deg, #9DBB9A, #C3DAC0); }
+  .bar-cream { background: linear-gradient(90deg, #C6B3E0, #C8D8E2); }
   .goal-milestone {
     font-size: 0.52rem;
     color: #3A4F5C;
@@ -416,7 +416,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #4A6A8A;
+    color: #C2678C;
     cursor: pointer;
     text-align: right;
     outline: none;
@@ -436,33 +436,33 @@
   .goal-carousel-dot {
     width: 5px; height: 5px;
     border-radius: 50%;
-    background: rgba(74,106,138,0.22);
+    background: rgba(194,103,140,0.22);
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
   }
   .goal-carousel-dot.active {
-    background: #4A6A8A;
+    background: #C2678C;
     transform: scale(1.5);
   }
   .goal-carousel-btn {
-    background: rgba(74,106,138,0.10);
-    border: 1px solid rgba(74,106,138,0.22);
+    background: rgba(194,103,140,0.10);
+    border: 1px solid rgba(194,103,140,0.22);
     border-radius: 50%;
     width: 22px; height: 22px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
-    color: #4A6A8A;
+    color: #C2678C;
     font-size: 0.7rem;
     transition: background 0.15s;
     flex-shrink: 0;
   }
-  .goal-carousel-btn:hover { background: rgba(74,106,138,0.22); }
+  .goal-carousel-btn:hover { background: rgba(194,103,140,0.22); }
   .goal-carousel-btn:disabled { opacity: 0.25; cursor: default; }
   .goal-sub-label {
     font-size: 0.5rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #4A6A8A;
+    color: #C2678C;
     opacity: 0.65;
     text-align: center;
     flex: 1;
@@ -471,57 +471,63 @@
   .habit-log-sub {
     font-size: 0.55rem;
     letter-spacing: 0.05em;
-    color: #4A6A8A;
+    color: #C2678C;
     opacity: 0.7;
     margin-bottom: 0.7rem;
   }
-  .habit-log-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    max-height: 160px;
-    overflow-y: auto;
+
+  /* Habit heatmap — a GitHub-contributions-style grid replacing the old
+     plain date + bar list. Each cell is one archived day, shaded by
+     completion %, with the exact date/fraction on hover. */
+  .habit-heatmap-stats {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 0.7rem;
   }
-  .habit-log-list::-webkit-scrollbar { width: 3px; }
-  .habit-log-list::-webkit-scrollbar-thumb { background: rgba(74,106,138,0.25); border-radius: 3px; }
-  .habit-log-row {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    font-size: 0.56rem;
-    color: #1A2530;
+  .habit-heatmap-stat {
+    display: flex; flex-direction: column; gap: 0.1rem;
   }
-  .habit-log-date {
-    min-width: 84px;
-    opacity: 0.75;
-    letter-spacing: 0.03em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .habit-heatmap-stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; font-weight: 600; color: #3A2A32; line-height: 1;
   }
-  .habit-log-bar-track {
-    flex: 1;
-    height: 6px;
-    border-radius: 4px;
-    background: rgba(74,106,138,0.12);
-    overflow: hidden;
+  .habit-heatmap-stat-label {
+    font-size: 0.46rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #C2678C; opacity: 0.7;
   }
-  .habit-log-bar-fill {
-    height: 100%;
-    background: #4A6A8A;
-    border-radius: 4px;
+  .habit-heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
   }
-  .habit-log-frac {
-    min-width: 38px;
-    text-align: right;
-    opacity: 0.65;
-    font-size: 0.52rem;
-    flex-shrink: 0;
+  .habit-heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 5px;
+    background: rgba(194,103,140,0.10);
+    display: flex; align-items: center; justify-content: center;
+    cursor: default;
+    position: relative;
   }
+  .habit-heatmap-cell.tier-1 { background: rgba(194,103,140,0.28); }
+  .habit-heatmap-cell.tier-2 { background: rgba(194,103,140,0.5); }
+  .habit-heatmap-cell.tier-3 { background: rgba(194,103,140,0.72); }
+  .habit-heatmap-cell.tier-4 { background: #C2678C; }
+  .habit-heatmap-cell.today { box-shadow: 0 0 0 1.5px #8C3A5C; }
+  .habit-heatmap-cell.empty { background: transparent; }
+  .habit-heatmap-daynum {
+    font-size: 0.42rem; color: #fff; opacity: 0.85; letter-spacing: 0.02em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  }
+  .habit-heatmap-cell.tier-0 .habit-heatmap-daynum { color: #3A2A32; opacity: 0.4; text-shadow: none; }
+  .habit-heatmap-legend {
+    display: flex; align-items: center; gap: 4px;
+    margin-top: 0.6rem; font-size: 0.46rem; color: #C2678C; opacity: 0.6;
+    letter-spacing: 0.04em;
+  }
+  .habit-heatmap-legend-swatch { width: 9px; height: 9px; border-radius: 3px; }
   .week-look-sub {
     font-size: 0.52rem;
     letter-spacing: 0.04em;
-    color: #4A6A8A;
+    color: #C2678C;
     opacity: 0.7;
     margin-bottom: 0.7rem;
     line-height: 1.4;
@@ -542,7 +548,7 @@
   }
   .week-bar-count {
     font-size: 0.44rem;
-    color: #1A2530;
+    color: #3A2A32;
     opacity: 0.55;
     margin-bottom: 2px;
     min-height: 1em;
@@ -551,15 +557,15 @@
     width: 100%;
     max-width: 20px;
     border-radius: 4px 4px 2px 2px;
-    background: rgba(74,106,138,0.22);
+    background: rgba(194,103,140,0.22);
     transition: height 0.4s ease;
   }
-  .week-bar.today { background: #4A6A8A; }
+  .week-bar.today { background: #C2678C; }
   .week-bar-label {
     font-size: 0.46rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #4A6A8A;
+    color: #C2678C;
     opacity: 0.65;
     margin-top: 0.35rem;
   }
@@ -630,7 +636,7 @@
     font-size: 0.58rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: #4A6A8A;
+    color: #C2678C;
     opacity: 0.9;
   }
 
@@ -652,7 +658,7 @@
 
   /* ── BG TAIL ── */
   .bg-tail {
-    background: #1a2530;
+    background: #3a2a32;
     width: 100%;
     min-height: 4rem;
   }
@@ -675,10 +681,10 @@
   }
 
   /* Phase color palette */
-  /* morning: warm amber  #E8A96A */
-  /* commute: steel blue  #5A8FB5 */
-  /* evening: soft violet #9A82C8 */
-  /* night:   seafoam     #5AAFA8  */
+  /* morning: warm amber  #F0C99A */
+  /* commute: steel blue  #8FB8D6 */
+  /* evening: soft violet #C6B3E0 */
+  /* night:   seafoam     #8FCEC7  */
 
   .id-phase-label {
     font-size: 0.5rem;
@@ -695,14 +701,14 @@
     flex: 1;
     height: 1px;
   }
-  .id-phase-label.morning  { color: #E8A96A; }
-  .id-phase-label.morning::after  { background: rgba(232,169,106,0.2); }
-  .id-phase-label.commute  { color: #5A8FB5; }
-  .id-phase-label.commute::after  { background: rgba(90,143,181,0.2); }
-  .id-phase-label.evening  { color: #9A82C8; }
-  .id-phase-label.evening::after  { background: rgba(154,130,200,0.2); }
-  .id-phase-label.night    { color: #5AAFA8; }
-  .id-phase-label.night::after    { background: rgba(90,175,168,0.2); }
+  .id-phase-label.morning  { color: #F0C99A; }
+  .id-phase-label.morning::after  { background: rgba(240,201,154,0.2); }
+  .id-phase-label.commute  { color: #8FB8D6; }
+  .id-phase-label.commute::after  { background: rgba(143,184,214,0.2); }
+  .id-phase-label.evening  { color: #C6B3E0; }
+  .id-phase-label.evening::after  { background: rgba(198,179,224,0.2); }
+  .id-phase-label.night    { color: #8FCEC7; }
+  .id-phase-label.night::after    { background: rgba(143,206,199,0.2); }
 
   .id-grid {
     display: grid;
@@ -721,28 +727,28 @@
   }
   /* Per-phase block tinting */
   .id-block.morning {
-    background: rgba(232,169,106,0.07);
-    border: 1px solid rgba(232,169,106,0.16);
+    background: rgba(240,201,154,0.07);
+    border: 1px solid rgba(240,201,154,0.16);
   }
-  .id-block.morning:hover { background: rgba(232,169,106,0.13); border-color: rgba(232,169,106,0.28); }
+  .id-block.morning:hover { background: rgba(240,201,154,0.13); border-color: rgba(240,201,154,0.28); }
 
   .id-block.commute {
-    background: rgba(90,143,181,0.07);
-    border: 1px solid rgba(90,143,181,0.16);
+    background: rgba(143,184,214,0.07);
+    border: 1px solid rgba(143,184,214,0.16);
   }
-  .id-block.commute:hover { background: rgba(90,143,181,0.13); border-color: rgba(90,143,181,0.28); }
+  .id-block.commute:hover { background: rgba(143,184,214,0.13); border-color: rgba(143,184,214,0.28); }
 
   .id-block.evening {
-    background: rgba(154,130,200,0.07);
-    border: 1px solid rgba(154,130,200,0.16);
+    background: rgba(198,179,224,0.07);
+    border: 1px solid rgba(198,179,224,0.16);
   }
-  .id-block.evening:hover { background: rgba(154,130,200,0.13); border-color: rgba(154,130,200,0.28); }
+  .id-block.evening:hover { background: rgba(198,179,224,0.13); border-color: rgba(198,179,224,0.28); }
 
   .id-block.night {
-    background: rgba(90,175,168,0.07);
-    border: 1px solid rgba(90,175,168,0.16);
+    background: rgba(143,206,199,0.07);
+    border: 1px solid rgba(143,206,199,0.16);
   }
-  .id-block.night:hover { background: rgba(90,175,168,0.13); border-color: rgba(90,175,168,0.28); }
+  .id-block.night:hover { background: rgba(143,206,199,0.13); border-color: rgba(143,206,199,0.28); }
 
   .id-dot {
     width: 7px;
@@ -752,10 +758,10 @@
     margin-top: 5px;
     border: 1.5px solid;
   }
-  .id-dot.morning { background: rgba(232,169,106,0.5); border-color: #E8A96A; box-shadow: 0 0 6px rgba(232,169,106,0.3); }
-  .id-dot.commute { background: rgba(90,143,181,0.5);  border-color: #5A8FB5; box-shadow: 0 0 6px rgba(90,143,181,0.3); }
-  .id-dot.evening { background: rgba(154,130,200,0.5); border-color: #9A82C8; box-shadow: 0 0 6px rgba(154,130,200,0.3); }
-  .id-dot.night   { background: rgba(90,175,168,0.5);  border-color: #5AAFA8; box-shadow: 0 0 6px rgba(90,175,168,0.3); }
+  .id-dot.morning { background: rgba(240,201,154,0.5); border-color: #F0C99A; box-shadow: 0 0 6px rgba(240,201,154,0.3); }
+  .id-dot.commute { background: rgba(143,184,214,0.5);  border-color: #8FB8D6; box-shadow: 0 0 6px rgba(143,184,214,0.3); }
+  .id-dot.evening { background: rgba(198,179,224,0.5); border-color: #C6B3E0; box-shadow: 0 0 6px rgba(198,179,224,0.3); }
+  .id-dot.night   { background: rgba(143,206,199,0.5);  border-color: #8FCEC7; box-shadow: 0 0 6px rgba(143,206,199,0.3); }
 
   .id-info { flex: 1; min-width: 0; }
 
@@ -766,16 +772,16 @@
     margin-bottom: 2px;
     opacity: 0.9;
   }
-  .id-block.morning .id-time { color: #E8A96A; }
-  .id-block.commute .id-time { color: #5A8FB5; }
-  .id-block.evening .id-time { color: #9A82C8; }
-  .id-block.night   .id-time { color: #5AAFA8; }
+  .id-block.morning .id-time { color: #F0C99A; }
+  .id-block.commute .id-time { color: #8FB8D6; }
+  .id-block.evening .id-time { color: #C6B3E0; }
+  .id-block.night   .id-time { color: #8FCEC7; }
 
   .id-activity {
     font-family: 'Cormorant Garamond', serif;
     font-size: 0.88rem;
     font-weight: 400;
-    color: rgba(240,235,225,0.92);
+    color: rgba(251,240,242,0.92);
     line-height: 1.25;
   }
   .id-dur {
@@ -804,17 +810,17 @@
     border-radius: 3px;
     margin-top: 4px;
   }
-  .id-tag.keystone { background: rgba(232,169,106,0.15); color: #E8A96A; border: 1px solid rgba(232,169,106,0.3); }
-  .id-tag.habit    { background: rgba(90,175,168,0.12);  color: #5AAFA8; border: 1px solid rgba(90,175,168,0.28); }
-  .id-tag.flex     { background: rgba(154,130,200,0.12); color: #9A82C8; border: 1px solid rgba(154,130,200,0.28); }
-  .id-tag.sacred   { background: rgba(90,143,181,0.12);  color: #5A8FB5; border: 1px solid rgba(90,143,181,0.28); }
+  .id-tag.keystone { background: rgba(240,201,154,0.15); color: #F0C99A; border: 1px solid rgba(240,201,154,0.3); }
+  .id-tag.habit    { background: rgba(143,206,199,0.12);  color: #8FCEC7; border: 1px solid rgba(143,206,199,0.28); }
+  .id-tag.flex     { background: rgba(198,179,224,0.12); color: #C6B3E0; border: 1px solid rgba(198,179,224,0.28); }
+  .id-tag.sacred   { background: rgba(143,184,214,0.12);  color: #8FB8D6; border: 1px solid rgba(143,184,214,0.28); }
 
   .id-focus-box {
     margin-top: 1.1rem;
     padding: 0.75rem 1rem;
-    border: 1px solid rgba(232,169,106,0.2);
+    border: 1px solid rgba(240,201,154,0.2);
     border-radius: 8px;
-    background: rgba(232,169,106,0.05);
+    background: rgba(240,201,154,0.05);
   }
   .id-focus-box p {
     font-size: 0.55rem;
@@ -822,8 +828,8 @@
     line-height: 1.75;
     letter-spacing: 0.03em;
   }
-  .id-focus-box p strong { color: rgba(240,235,225,0.9); font-weight: 500; }
-  .id-focus-box p em { color: #E8A96A; font-style: italic; }
+  .id-focus-box p strong { color: rgba(251,240,242,0.9); font-weight: 500; }
+  .id-focus-box p em { color: #F0C99A; font-style: italic; }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
@@ -872,11 +878,6 @@
         <p class="quote-text" id="quoteText" style="opacity:0.3;font-style:italic;">No quote set yet — add one below.</p>
         <p class="quote-attr" id="quoteAttr"></p>
 
-        <div style="margin-top:0.9rem;padding-top:0.9rem;border-top:1px solid rgba(74,106,138,0.14);">
-          <p class="quote-text" id="quoteText2" style="opacity:0.3;font-style:italic;">No second quote set yet — add one below.</p>
-          <p class="quote-attr" id="quoteAttr2"></p>
-        </div>
-
         <div style="margin-top:1.2rem;">
           <div class="section-label">✦ Word of the Week</div>
           <div class="word-pill" id="wotwPill" style="opacity:0.3;">Word · Week —</div>
@@ -885,19 +886,14 @@
         </div>
 
         <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
-          <input id="quoteIn" style="flex:1;min-width:140px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Edit quote…" />
-          <input id="attrIn" style="flex:1;min-width:100px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="— Attribution" />
-          <button onclick="saveQuote()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
+          <input id="quoteIn" style="flex:1;min-width:140px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" placeholder="Edit quote…" />
+          <input id="attrIn" style="flex:1;min-width:100px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" placeholder="— Attribution" />
+          <button onclick="saveQuote()" style="background:#C2678C;border:1px solid #C2678C;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
         </div>
         <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-          <input id="quoteIn2" style="flex:1;min-width:140px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Edit second quote…" />
-          <input id="attrIn2" style="flex:1;min-width:100px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="— Attribution" />
-          <button onclick="saveQuote()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
-        </div>
-        <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-          <input id="wotwIn" style="flex:1;min-width:100px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Word of week…" />
-          <input id="wotwDefIn" style="flex:2;min-width:160px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" placeholder="Definition…" />
-          <button onclick="saveWord()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
+          <input id="wotwIn" style="flex:1;min-width:100px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" placeholder="Word of week…" />
+          <input id="wotwDefIn" style="flex:2;min-width:160px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" placeholder="Definition…" />
+          <button onclick="saveWord()" style="background:#C2678C;border:1px solid #C2678C;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
         </div>
         <div style="margin-top:0.4rem;font-family:'DM Mono',monospace;font-size:0.48rem;letter-spacing:0.08em;min-height:1em;" id="hubSaveStatus"></div>
       </div>
@@ -936,35 +932,35 @@
       <!-- EDIT: nav tile links — set each id="nav-*" href via the NAV_URLS config in <script> below -->
       <div class="nav-strip">
         <a class="nav-tile" id="nav-wellness" href="https://javauntgarcia.github.io/Notion/Wellness.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Wellness.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Wellness.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Wellness</span>
           </div>
         </a>
         <a class="nav-tile" id="nav-growth" href="https://javauntgarcia.github.io/Notion/Growth.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Growth.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Growth.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Growth</span>
           </div>
         </a>
         <a class="nav-tile" id="nav-finances" href="https://javauntgarcia.github.io/Notion/Finances.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Finances.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Finances.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Finances</span>
           </div>
         </a>
         <a class="nav-tile" id="nav-productivity" href="https://javauntgarcia.github.io/Notion/Productivity.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Productivity.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Productivity.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Productivity</span>
           </div>
         </a>
         <a class="nav-tile" id="nav-planning" href="https://javauntgarcia.github.io/Notion/Planning.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/planning.jpg');background-color:#1a2530;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/planning.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Planning</span>
@@ -977,22 +973,32 @@
         <div class="cal-header" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.6rem 0.6rem;">
           <span>✦ Weekly Outline</span>
           <div style="display:flex;gap:0.5rem;align-items:center;">
-            <button onclick="calPrevWeek()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A6A8A;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'">‹</button>
-            <span id="calWeekLabel" style="font-size:0.58rem;letter-spacing:0.18em;color:#4A6A8A;min-width:120px;text-align:center;"></span>
-            <button onclick="calNextWeek()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A6A8A;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'">›</button>
-            <button onclick="calGoToday()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#4A6A8A;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'">TODAY</button>
-            <button id="calSyncBtn" onclick="syncCurrentWeekWithMO()" style="background:rgba(74,106,138,0.10);border:1px solid rgba(74,106,138,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#4A6A8A;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(74,106,138,0.22)'" onmouseout="this.style.background='rgba(74,106,138,0.10)'" title="Sync this week with Monthly Outline">⟲ SYNC</button>
+            <button onclick="calPrevWeek()" style="background:rgba(194,103,140,0.10);border:1px solid rgba(194,103,140,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#C2678C;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(194,103,140,0.22)'" onmouseout="this.style.background='rgba(194,103,140,0.10)'">‹</button>
+            <span id="calWeekLabel" style="font-size:0.58rem;letter-spacing:0.18em;color:#C2678C;min-width:120px;text-align:center;"></span>
+            <button onclick="calNextWeek()" style="background:rgba(194,103,140,0.10);border:1px solid rgba(194,103,140,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#C2678C;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(194,103,140,0.22)'" onmouseout="this.style.background='rgba(194,103,140,0.10)'">›</button>
+            <button onclick="calGoToday()" style="background:rgba(194,103,140,0.10);border:1px solid rgba(194,103,140,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#C2678C;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;" onmouseover="this.style.background='rgba(194,103,140,0.22)'" onmouseout="this.style.background='rgba(194,103,140,0.10)'">TODAY</button>
+            <button id="calSyncBtn" onclick="syncCurrentWeekWithMO()" style="background:rgba(194,103,140,0.10);border:1px solid rgba(194,103,140,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#C2678C;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(194,103,140,0.22)'" onmouseout="this.style.background='rgba(194,103,140,0.10)'" title="Sync this week with Monthly Outline">⟲ SYNC</button>
           </div>
         </div>
         <div id="calSaveStatus" style="padding:0 1.6rem;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.1em;min-height:1em;"></div>
         <div id="calWeekGrid" style="padding:0 1rem 1rem;"></div>
 
-        <div style="display:flex;gap:1.6rem;flex-wrap:wrap;padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(74,106,138,0.14);margin-top:0.2rem;">
+        <div style="display:flex;gap:1.6rem;flex-wrap:wrap;padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(194,103,140,0.14);margin-top:0.2rem;">
           <div style="flex:1.3;min-width:230px;">
             <div class="section-label" style="margin-bottom:0.5rem;">✦ Habit Tracker</div>
-            <div class="habit-log-sub">Log of daily tasks completed, most recent first</div>
-            <div class="habit-log-list" id="habitLogList">
-              <div style="font-size:0.56rem;color:#4A6A8A;opacity:0.5;text-align:center;padding:1rem 0;">Loading…</div>
+            <div class="habit-log-sub">Last two weeks of daily tasks completed — darker means more finished</div>
+            <div class="habit-heatmap-stats" id="habitHeatmapStats"></div>
+            <div class="habit-heatmap-grid" id="habitLogList">
+              <div style="font-size:0.56rem;color:#C2678C;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">Loading…</div>
+            </div>
+            <div class="habit-heatmap-legend">
+              <span>Less</span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(194,103,140,0.10);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(194,103,140,0.28);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(194,103,140,0.5);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(194,103,140,0.72);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:#C2678C;"></span>
+              <span>More</span>
             </div>
           </div>
           <div style="flex:1;min-width:180px;">
@@ -1229,6 +1235,29 @@
 // redirect layer.
 // ============================================================
 
+// Mirrors the ✦ Ideal Day section below, at hour-row precision (the
+// weekly grid only places events on the hour) — consecutive entries
+// that land in the same hour are shown as stacked lines in one block;
+// each block otherwise runs until the next entry's hour so the day
+// reads as continuous, not gapped. Defined up top so it's ready
+// before the first renderWeekCalendar() call.
+const IDEAL_DAY = [
+  { startH: 5,  endH: 6,  lines: ['5:30 Wake Up + To-Do List', '5:35 Gym — workout or run'] },
+  { startH: 6,  endH: 7,  lines: ['6:50 Smoothie + Shower'] },
+  { startH: 7,  endH: 8,  lines: ['7:05 Get Ready', '7:35 Breakfast + Coffee + Reading'] },
+  { startH: 8,  endH: 9,  lines: ['8:15 Commute — Read or Podcast'] },
+  { startH: 9,  endH: 12, lines: ['9:00 Work'] },
+  { startH: 12, endH: 13, lines: ['12:30 Lunch — Read, Edit, or Podcast'] },
+  { startH: 13, endH: 16, lines: ['1:30 Work'] },
+  { startH: 16, endH: 17, lines: ['4:30 Commute Home — Read or Podcast'] },
+  { startH: 17, endH: 18, lines: ['5:15 Decompress — Chill Hour'] },
+  { startH: 18, endH: 19, lines: ['6:45 Make + Eat Dinner'] },
+  { startH: 19, endH: 20, lines: ['7:45 TV with Eston'] },
+  { startH: 20, endH: 21, lines: ['8:45 Read a Book'] },
+  { startH: 21, endH: 22, lines: ['9:45 Wind-Down + Prep for Tomorrow'] },
+  { startH: 22, endH: 24, lines: ['10:00 Lights Out'] },
+];
+
 // ── DATE ──
 function updateDate() {
   const now = new Date();
@@ -1280,12 +1309,7 @@ const local = {
 };
 
 // ── HUB STATE ──
-let hubData = { quote:'', quote_attr:'', quote2:'', quote2_attr:'', word:'', word_def:'', todos:[], cal_events:[] };
-
-// This week's second quote — added alongside the existing Quote of the
-// Week (Kaveh Akbar). Seeded once below if no quote2 has been saved yet.
-const DEFAULT_QUOTE2 = "My God, I just remembered that we die, But—but me too?! Don't forget that for now, it's strawberry season.";
-const DEFAULT_QUOTE2_ATTR = 'Clarice Lispector';
+let hubData = { quote:'', quote_attr:'', word:'', word_def:'', todos:[], cal_events:[] };
 
 async function loadHub() {
   try {
@@ -1293,29 +1317,17 @@ async function loadHub() {
     if (row) {
       hubData = { ...hubData, ...row };
       applyHubToUI();
-      seedQuote2IfMissing();
       return;
     }
   } catch(e) {}
   // Fallback to localStorage
   hubData.quote          = local.get('hub_quote') || '';
   hubData.quote_attr     = local.get('hub_attr') || '';
-  hubData.quote2         = local.get('hub_quote2') || '';
-  hubData.quote2_attr    = local.get('hub_attr2') || '';
   hubData.word           = local.get('hub_wotw') || '';
   hubData.word_def       = local.get('hub_wotwdef') || '';
   hubData.todos          = JSON.parse(local.get('hub_todos') || '[]');
   try { hubData.cal_events = JSON.parse(local.get('hub_cal_events') || '[]'); } catch(e) { hubData.cal_events = []; }
   applyHubToUI();
-  seedQuote2IfMissing();
-}
-
-async function seedQuote2IfMissing() {
-  if (hubData.quote2) return;
-  hubData.quote2 = DEFAULT_QUOTE2;
-  hubData.quote2_attr = DEFAULT_QUOTE2_ATTR;
-  applyHubToUI();
-  await saveQuoteMeta();
 }
 
 function applyHubToUI() {
@@ -1325,13 +1337,6 @@ function applyHubToUI() {
   }
   if (hubData.quote_attr) document.getElementById('quoteAttr').textContent = hubData.quote_attr;
   if (hubData.quote) syncQuoteToVocabulary(hubData.quote, hubData.quote_attr);
-  if (hubData.quote2) {
-    const el2 = document.getElementById('quoteText2');
-    el2.textContent = hubData.quote2; el2.style.opacity = ''; el2.style.fontStyle = '';
-    el2.parentElement.style.display = '';
-  }
-  if (hubData.quote2_attr) document.getElementById('quoteAttr2').textContent = hubData.quote2_attr;
-  if (hubData.quote2) syncQuoteToVocabulary(hubData.quote2, hubData.quote2_attr);
   if (hubData.word) {
     const wEl = document.getElementById('wotw');
     const pEl = document.getElementById('wotwPill');
@@ -1361,13 +1366,17 @@ function applyHubToUI() {
 
 async function patchHub(fields, statusElId) {
   const statusEl = statusElId ? document.getElementById(statusElId) : null;
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
   try {
     await sbUpsert('main_hub', Object.assign({ id: 'singleton' }, fields));
-    if (statusEl) { statusEl.textContent = 'saved ✓'; statusEl.style.color = '#4a8a6e'; setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 2500); }
+    if (statusEl) { statusEl.textContent = 'saved ✓'; statusEl.style.color = '#6fa88c'; setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 2500); }
     return true;
   } catch(e) {
-    if (statusEl) { statusEl.textContent = 'cloud save failed — local only'; statusEl.style.color = '#b05050'; }
+    if (statusEl) {
+      statusEl.textContent = 'cloud save failed — local only';
+      statusEl.style.color = '#b56b6b';
+      setTimeout(()=>{ if(statusEl && statusEl.textContent === 'cloud save failed — local only') statusEl.textContent=''; }, 4000);
+    }
     console.warn('[Hub] save failed for', Object.keys(fields), ':', e.message);
     return false;
   }
@@ -1380,13 +1389,10 @@ async function patchHub(fields, statusElId) {
 // calendar hiccup can no longer block a word save.)
 async function saveQuoteMeta() {
   await patchHub({
-    quote: hubData.quote || '', quote_attr: hubData.quote_attr || '',
-    quote2: hubData.quote2 || '', quote2_attr: hubData.quote2_attr || ''
+    quote: hubData.quote || '', quote_attr: hubData.quote_attr || ''
   }, 'hubSaveStatus');
   local.set('hub_quote', hubData.quote);
   local.set('hub_attr',  hubData.quote_attr);
-  local.set('hub_quote2', hubData.quote2);
-  local.set('hub_attr2',  hubData.quote2_attr);
 }
 
 // Keeps the Vocabulary List's "Quotes of the Week" tab in sync with
@@ -1461,21 +1467,8 @@ function saveQuote() {
   document.getElementById('quoteIn').value = '';
   document.getElementById('attrIn').value = '';
 
-  const q2 = document.getElementById('quoteIn2').value.trim();
-  const a2 = document.getElementById('attrIn2').value.trim();
-  if (q2) {
-    const el2 = document.getElementById('quoteText2');
-    el2.textContent = q2; el2.style.opacity = ''; el2.style.fontStyle = '';
-    el2.parentElement.style.display = '';
-    hubData.quote2 = q2;
-  }
-  if (a2) { document.getElementById('quoteAttr2').textContent = a2; hubData.quote2_attr = a2; }
-  document.getElementById('quoteIn2').value = '';
-  document.getElementById('attrIn2').value = '';
-
   saveQuoteMeta();
   if (hubData.quote) syncQuoteToVocabulary(hubData.quote, hubData.quote_attr);
-  if (hubData.quote2) syncQuoteToVocabulary(hubData.quote2, hubData.quote2_attr);
 }
 function saveWord() {
   const wIn = document.getElementById('wotwIn').value.trim();
@@ -1562,57 +1555,11 @@ function habitOccurrenceStats(habitText) {
   return { done: done, total: total };
 }
 
+// Order: Productivity, then Planning, shown first — Wellness follows.
 const goalSlides = [
   {
-    subpage: 'Wellness',
-    color: '#2d5ba8',
-    goals: [
-      {
-        name: 'Consistency',
-        color: 'bar-green',
-        milestone: 'Active 75% of year',
-        compute: function() {
-          var activeDays = parseInt(hubData._wellness ? hubData._wellness.active_days : 0) || 0;
-          var now = new Date();
-          var elapsed = Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000);
-          var target = Math.round(elapsed * 0.75);
-          return { pct: target > 0 ? Math.min(100, Math.round(activeDays/target*100)) : 0,
-                   meta: activeDays + ' active days' };
-        }
-      },
-      {
-        name: 'Body — 165 lbs',
-        color: 'bar-rust',
-        milestone: 'Reach 165 lbs',
-        compute: function() {
-          var wrow = hubData._wellness || {};
-          var cur = parseFloat(wrow.weight) || 0;
-          if (!cur && wrow.checkin_entries && wrow.checkin_entries.length) {
-            var sorted = wrow.checkin_entries.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-            cur = parseFloat(sorted[0].weight) || 0;
-          }
-          if (!cur) return { pct: 0, meta: 'No weight logged' };
-          var start = parseFloat(wrow.weight_start) || cur;
-          var totalToLose = Math.abs(start - 165);
-          var pct = totalToLose > 0 ? Math.min(100, Math.round(Math.abs(cur-start)/totalToLose*100)) : (cur<=165?100:0);
-          if (cur <= 165) pct = 100;
-          return { pct: pct, meta: cur + ' lbs current' };
-        }
-      },
-      {
-        name: 'Strength — 50 Push-Ups',
-        color: 'bar-navy',
-        milestone: 'Achieve 50 push-ups',
-        compute: function() {
-          var n = parseInt((hubData._wellness||{}).pushups) || 0;
-          return { pct: Math.min(100, Math.round(n/50*100)), meta: n ? n+' max reps' : 'Not logged yet' };
-        }
-      }
-    ]
-  },
-  {
     subpage: 'Productivity',
-    color: '#7a1a1a',
+    color: '#8C3A5C',
     goals: [
       {
         name: 'Curriculum',
@@ -1666,8 +1613,11 @@ const goalSlides = [
     ]
   },
   {
-    subpage: 'Growth',
-    color: '#4A6A8A',
+    // Both goals here are sourced from Planning.html's habit tracker
+    // (archived nightly to planning_archive), so this slide is labeled
+    // Planning rather than Growth.
+    subpage: 'Planning',
+    color: '#C2678C',
     goals: [
       {
         // Tracked via the "Wake up before 6 AM" daily task in Planning.html's
@@ -1695,10 +1645,96 @@ const goalSlides = [
         }
       }
     ]
+  },
+  {
+    // Goals here are pulled live from the `financial_goals` Supabase
+    // table (same one Finances.html reads/writes), so this list is
+    // built dynamically by syncFinancialGoalsSlide() rather than
+    // hardcoded like the slides above — see that function below.
+    subpage: 'Finances',
+    color: '#c47a9a',
+    goals: []
+  },
+  {
+    subpage: 'Wellness',
+    color: '#2d5ba8',
+    goals: [
+      {
+        name: 'Consistency',
+        color: 'bar-green',
+        milestone: 'Active 75% of year',
+        compute: function() {
+          var activeDays = parseInt(hubData._wellness ? hubData._wellness.active_days : 0) || 0;
+          var now = new Date();
+          var elapsed = Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000);
+          var target = Math.round(elapsed * 0.75);
+          return { pct: target > 0 ? Math.min(100, Math.round(activeDays/target*100)) : 0,
+                   meta: activeDays + ' active days' };
+        }
+      },
+      {
+        name: 'Body — 165 lbs',
+        color: 'bar-rust',
+        milestone: 'Reach 165 lbs',
+        compute: function() {
+          var wrow = hubData._wellness || {};
+          var cur = parseFloat(wrow.weight) || 0;
+          if (!cur && wrow.checkin_entries && wrow.checkin_entries.length) {
+            var sorted = wrow.checkin_entries.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+            cur = parseFloat(sorted[0].weight) || 0;
+          }
+          if (!cur) return { pct: 0, meta: 'No weight logged' };
+          var start = parseFloat(wrow.weight_start) || cur;
+          var totalToLose = Math.abs(start - 165);
+          var pct = totalToLose > 0 ? Math.min(100, Math.round(Math.abs(cur-start)/totalToLose*100)) : (cur<=165?100:0);
+          if (cur <= 165) pct = 100;
+          return { pct: pct, meta: cur + ' lbs current' };
+        }
+      },
+      {
+        name: 'Strength — 50 Push-Ups',
+        color: 'bar-navy',
+        milestone: 'Achieve 50 push-ups',
+        compute: function() {
+          var n = parseInt((hubData._wellness||{}).pushups) || 0;
+          return { pct: Math.min(100, Math.round(n/50*100)), meta: n ? n+' max reps' : 'Not logged yet' };
+        }
+      }
+    ]
   }
 ];
 
 var goalCarouselIdx = 0;
+
+// Rebuilds the Finances slide's goal list from the live `financial_goals`
+// Supabase row (the same singleton Finances.html reads/writes) right
+// before each carousel render, since — unlike the other slides — this
+// list of goals is user-editable and not known ahead of time.
+function syncFinancialGoalsSlide() {
+  var slide = goalSlides.filter(function(s) { return s.subpage === 'Finances'; })[0];
+  if (!slide) return;
+  var raw = (hubData._financial && hubData._financial.goals) || [];
+  var palette = ['bar-rust', 'bar-gold', 'bar-navy', 'bar-green'];
+  slide.goals = raw.slice(0, 6).map(function(g, i) {
+    var current = parseFloat(g.current) || 0;
+    var target  = parseFloat(g.target) || 0;
+    return {
+      name: g.name || 'Goal',
+      color: palette[i % palette.length],
+      milestone: target ? ('Save $' + target.toLocaleString()) : 'No target set',
+      compute: function() {
+        var pct = target > 0 ? Math.min(100, Math.round(current / target * 100)) : 0;
+        return { pct: pct, meta: '$' + current.toLocaleString() + ' of $' + target.toLocaleString() };
+      }
+    };
+  });
+  if (!slide.goals.length) {
+    slide.goals = [{
+      name: 'Financial Goals', color: 'bar-rust', milestone: 'Add a goal on the Finances page',
+      compute: function() { return { pct: 0, meta: 'No goals set yet' }; }
+    }];
+  }
+}
 
 function buildGoalCarousel() {
   var track = document.getElementById('goalTrack');
@@ -1773,7 +1809,7 @@ function updateGoalCarouselState() {
   if (label) {
     var sp = goalSlides[goalCarouselIdx].subpage;
     var url = subpageURLs[sp] || '#';
-    label.innerHTML = '<a href="' + url + '" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(74,106,138,0.35);padding-bottom:1px;transition:border-color 0.2s;" onmouseover="this.style.borderColor=\'#7DA0BC\'" onmouseout="this.style.borderColor=\'rgba(74,106,138,0.35)\'">' + sp + ' goals ↗</a>';
+    label.innerHTML = '<a href="' + url + '" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(194,103,140,0.35);padding-bottom:1px;transition:border-color 0.2s;" onmouseover="this.style.borderColor=\'#E3A9BE\'" onmouseout="this.style.borderColor=\'rgba(194,103,140,0.35)\'">' + sp + ' goals ↗</a>';
   }
 }
 
@@ -1799,6 +1835,7 @@ function goalCarouselNext() { goalCarouselGoTo(goalCarouselIdx + 1); }
   });
 })();
 
+syncFinancialGoalsSlide();
 buildGoalCarousel();
 
 // Load wellness + productivity data for goal carousel
@@ -1807,9 +1844,11 @@ buildGoalCarousel();
     hubData._wellness    = await sbGet('wellness', 'singleton');
     hubData._productivity = await sbGet('productivity', 'singleton');
     hubData._vocabulary  = await sbGet('vocabulary', 'singleton');
+    hubData._financial   = await sbGet('financial_goals', 'singleton');
     var hubRow = await sbGet('main_hub', 'singleton');
     if (hubRow && hubRow.habits) hubData.habits = hubRow.habits;
     hubData._planningArchive = await loadPlanningArchive();
+    syncFinancialGoalsSlide();
     buildGoalCarousel();
   } catch(e) {}
 })();
@@ -1865,15 +1904,15 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 // remembered locally so repeated adds of the same kind of event (e.g.
 // several "Work" blocks in a row) don't require reselecting each time.
 const EVENT_COLORS = [
-  { hex: '#4A6A8A', name: 'Denim' },
-  { hex: '#7DA0BC', name: 'Sky' },
-  { hex: '#6B8C6E', name: 'Sage' },
-  { hex: '#9AB89C', name: 'Mint' },
+  { hex: '#C2678C', name: 'Rose' },
+  { hex: '#E3A9BE', name: 'Blush' },
+  { hex: '#9DBB9A', name: 'Sage' },
+  { hex: '#C3DAC0', name: 'Mint' },
+  { hex: '#8FB8D6', name: 'Sky' },
   { hex: '#6B7F8E', name: 'Slate' },
-  { hex: '#3A5878', name: 'Navy' },
-  { hex: '#C4622D', name: 'Rust' },
-  { hex: '#8B5FA3', name: 'Plum' },
-  { hex: '#B5657A', name: 'Rose' }
+  { hex: '#C9527A', name: 'Berry' },
+  { hex: '#C6B3E0', name: 'Lavender' },
+  { hex: '#F0C99A', name: 'Sand' }
 ];
 let selectedEvtColor = local.get('cal_last_color') || EVENT_COLORS[0].hex;
 
@@ -1986,13 +2025,13 @@ async function saveEventEditor() {
   ev.color = document.getElementById('evtEdColorRow').dataset.selected || ev.color;
 
   const statusEl = document.getElementById('calSaveStatus');
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
   const ok = await saveCalEventsAsync(evts);
   closeEventEditor();
   renderWeekCalendar();
   if (statusEl) {
     statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only, will retry on next sync';
-    statusEl.style.color = ok ? '#4a8a6e' : '#b05050';
+    statusEl.style.color = ok ? '#6fa88c' : '#b56b6b';
     if (ok) setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
   }
 }
@@ -2096,29 +2135,29 @@ function renderWeekCalendar() {
     days.push(d);
   }
 
-  let html = '<div style="display:grid;grid-template-columns:38px repeat(7,1fr);gap:0;border:1px solid rgba(74,106,138,0.18);border-radius:8px;overflow:hidden;font-size:0.52rem;">';
+  let html = '<div style="display:grid;grid-template-columns:38px repeat(7,1fr);gap:0;border:1px solid rgba(194,103,140,0.18);border-radius:8px;overflow:hidden;font-size:0.52rem;">';
 
   // Header row
-  html += '<div style="background:rgba(74,106,138,0.06);border-bottom:1px solid rgba(74,106,138,0.18);"></div>';
+  html += '<div style="background:rgba(194,103,140,0.06);border-bottom:1px solid rgba(194,103,140,0.18);"></div>';
   days.forEach(function(d) {
     const isToday = dateKey(d) === today;
     html += '<div style="padding:0.45rem 0.3rem;text-align:center;background:' +
-      (isToday ? 'rgba(74,106,138,0.18)' : 'rgba(74,106,138,0.06)') +
-      ';border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.18);">' +
-      '<div style="letter-spacing:0.15em;text-transform:uppercase;color:' + (isToday ? '#4A6A8A' : '#3A4F5C') + ';font-weight:' + (isToday ? '500' : '400') + ';">' + DAYS_SHORT[d.getDay()] + '</div>' +
-      '<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.9rem;font-weight:' + (isToday ? '700' : '400') + ';color:' + (isToday ? '#4A6A8A' : '#1A2530') + ';line-height:1.2;">' + d.getDate() + '</div>' +
+      (isToday ? 'rgba(194,103,140,0.18)' : 'rgba(194,103,140,0.06)') +
+      ';border-left:1px solid rgba(194,103,140,0.18);border-bottom:1px solid rgba(194,103,140,0.18);">' +
+      '<div style="letter-spacing:0.15em;text-transform:uppercase;color:' + (isToday ? '#C2678C' : '#3A4F5C') + ';font-weight:' + (isToday ? '500' : '400') + ';">' + DAYS_SHORT[d.getDay()] + '</div>' +
+      '<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.9rem;font-weight:' + (isToday ? '700' : '400') + ';color:' + (isToday ? '#C2678C' : '#3A2A32') + ';line-height:1.2;">' + d.getDate() + '</div>' +
       '</div>';
   });
 
   // All-day row — events spanning the day (startH < 0 or endH < 0)
   const allDayEvts = evts.filter(function(e) { return e.allDay; });
-  html += '<div style="padding:0.35rem 0.25rem;text-align:right;background:rgba(74,106,138,0.03);border-bottom:1px solid rgba(74,106,138,0.12);color:#4A6A8A;opacity:0.5;font-size:0.45rem;letter-spacing:0.1em;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;">ALL DAY</div>';
+  html += '<div style="padding:0.35rem 0.25rem;text-align:right;background:rgba(194,103,140,0.03);border-bottom:1px solid rgba(194,103,140,0.12);color:#C2678C;opacity:0.5;font-size:0.45rem;letter-spacing:0.1em;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;">ALL DAY</div>';
   days.forEach(function(d) {
     const dk = dateKey(d);
     const dayAllDay = allDayEvts.filter(function(e){ return e.date === dk; });
-    html += '<div style="border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.12);padding:0.2rem;min-height:22px;background:rgba(74,106,138,0.02);">';
+    html += '<div style="border-left:1px solid rgba(194,103,140,0.18);border-bottom:1px solid rgba(194,103,140,0.12);padding:0.2rem;min-height:22px;background:rgba(194,103,140,0.02);">';
     dayAllDay.forEach(function(e) {
-      html += '<div style="background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="Click to edit · right-click to recolor: ' + e.title + '">' + e.title + '</div>';
+      html += '<div style="background:' + (e.color||'#C2678C') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="Click to edit · right-click to recolor: ' + e.title + '">' + e.title + '</div>';
     });
     html += '</div>';
   });
@@ -2128,15 +2167,32 @@ function renderWeekCalendar() {
   // span the grid rows for its full duration instead of only appearing
   // in the hour it starts.
   HOURS.forEach(function(h) {
-    html += '<div style="padding:0.25rem 0.3rem 0 0;text-align:right;color:#4A6A8A;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(74,106,138,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
+    html += '<div style="padding:0.25rem 0.3rem 0 0;text-align:right;color:#C2678C;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(194,103,140,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
     days.forEach(function(d) {
       const dk = dateKey(d);
       const isToday = dk === today;
-      html += '<div style="border-left:1px solid rgba(74,106,138,0.18);border-bottom:1px solid rgba(74,106,138,0.07);min-height:28px;background:' +
-        (isToday ? 'rgba(74,106,138,0.04)' : 'transparent') +
+      html += '<div style="border-left:1px solid rgba(194,103,140,0.18);border-bottom:1px solid rgba(194,103,140,0.07);min-height:28px;background:' +
+        (isToday ? 'rgba(194,103,140,0.04)' : 'transparent') +
         ';" ondblclick="quickAddEvent(\'' + dk + '\',' + h + ')"></div>';
     });
   });
+
+  // Ideal-day template — the same daily routine (from the Ideal Day
+  // section below) repeated as a light-grey backdrop on every day
+  // column, sitting behind the real colored events so the week can be
+  // built up on top of it. Purely visual: pointer-events:none lets
+  // double-clicks reach the hour cell underneath to still add a real
+  // event there.
+  for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
+    const colStart = 2 + dayIdx;
+    IDEAL_DAY.forEach(function(blk) {
+      const rowStart = 3 + blk.startH;
+      const rowEnd = 3 + blk.endH;
+      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';box-sizing:border-box;margin:1px 0 0 1px;background:rgba(120,120,120,0.14);border:1px dashed rgba(120,120,120,0.32);border-radius:3px;padding:0.15rem 0.3rem;font-size:0.44rem;line-height:1.35;color:#5a6068;pointer-events:none;overflow:hidden;z-index:1;">' +
+        blk.lines.map(function(l){ return '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0.85;">' + l + '</div>'; }).join('') +
+        '</div>';
+    });
+  }
 
   // Event blocks — one grid item per event (or per overnight segment),
   // explicitly placed by grid-row/grid-column so it visually blocks out
@@ -2194,7 +2250,7 @@ function renderWeekCalendar() {
       if (seg.kind === 'end') { prefix = '↳ '; suffix = ' ends ' + hourLabel(e.endH); title = 'Overnight from ' + hourLabel(e.startH) + ' the night before, ends ' + hourLabel(e.endH) + '. Click to edit · right-click to recolor: ' + e.title; }
       const showTimeLabel = (seg.endH - seg.startH) >= 2;
 
-      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';position:relative;left:' + leftPct + '%;width:calc(' + widthPct + '% - 3px);box-sizing:border-box;margin:1px 0 0 1px;background:' + (e.color||'#4A6A8A') + ';color:#fff;border-radius:3px;padding:0.15rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;overflow:hidden;z-index:2;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="' + title + '">' +
+      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';position:relative;left:' + leftPct + '%;width:calc(' + widthPct + '% - 3px);box-sizing:border-box;margin:1px 0 0 1px;background:' + (e.color||'#C2678C') + ';color:#fff;border-radius:3px;padding:0.15rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;overflow:hidden;z-index:2;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="' + title + '">' +
         '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + prefix + e.title + suffix + '</div>' +
         (showTimeLabel ? '<div style="opacity:0.8;font-size:0.42rem;margin-top:1px;">' + hourLabel(seg.startH) + '–' + hourLabel(seg.endH) + '</div>' : '') +
         '</div>';
@@ -2205,21 +2261,21 @@ function renderWeekCalendar() {
 
   // Add event form
   html += '<div style="margin-top:0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">' +
-    '<input id="calEvtTitle" placeholder="Event title…" style="flex:2;min-width:110px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;letter-spacing:0.04em;" />' +
-    '<input id="calEvtDate" type="date" style="flex:1;min-width:120px;background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;" />' +
-    '<select id="calEvtStart" style="background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;">' +
+    '<input id="calEvtTitle" placeholder="Event title…" style="flex:2;min-width:110px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" />' +
+    '<input id="calEvtDate" type="date" style="flex:1;min-width:120px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;" />' +
+    '<select id="calEvtStart" style="background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
     HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('') +
     '</select>' +
-    '<select id="calEvtEnd" style="background:rgba(74,106,138,0.07);border:1px solid rgba(74,106,138,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#1A2530;outline:none;">' +
+    '<select id="calEvtEnd" style="background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
     HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('') +
     '</select>' +
-    '<label style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" onchange="if(this.checked)document.getElementById(\'calEvtOvernight\').checked=false;" style="width:10px;height:10px;" /> All-day</label>' +
-    '<label style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;" title="Ends the next calendar day, e.g. 8p–6a"><input type="checkbox" id="calEvtOvernight" onchange="if(this.checked)document.getElementById(\'calEvtAllDay\').checked=false;" style="width:10px;height:10px;" /> 🌙 Overnight</label>' +
+    '<label style="font-size:0.5rem;color:#C2678C;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" onchange="if(this.checked)document.getElementById(\'calEvtOvernight\').checked=false;" style="width:10px;height:10px;" /> All-day</label>' +
+    '<label style="font-size:0.5rem;color:#C2678C;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;" title="Ends the next calendar day, e.g. 8p–6a"><input type="checkbox" id="calEvtOvernight" onchange="if(this.checked)document.getElementById(\'calEvtAllDay\').checked=false;" style="width:10px;height:10px;" /> 🌙 Overnight</label>' +
     '<div style="display:flex;align-items:center;gap:5px;">' +
-    '<span style="font-size:0.5rem;color:#4A6A8A;letter-spacing:0.1em;">COLOR</span>' +
+    '<span style="font-size:0.5rem;color:#C2678C;letter-spacing:0.1em;">COLOR</span>' +
     '<div style="display:flex;gap:5px;">' + evtColorSwatchesHtml() + '</div>' +
     '</div>' +
-    '<button onclick="addCalEvent()" style="background:#4A6A8A;border:1px solid #4A6A8A;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
+    '<button onclick="addCalEvent()" style="background:#C2678C;border:1px solid #C2678C;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
     '</div>';
 
   grid.innerHTML = html;
@@ -2282,18 +2338,18 @@ async function addCalEvent() {
     hubNative: true
   };
   evts.push(newEvt);
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
   const ok = await saveCalEventsAsync(evts);
   document.getElementById('calEvtTitle').value = '';
   renderWeekCalendar();
   if (statusEl) {
     if (ok) {
       statusEl.textContent = 'saved ✓';
-      statusEl.style.color = '#4a8a6e';
+      statusEl.style.color = '#6fa88c';
       setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
     } else {
       statusEl.textContent = 'cloud save failed — kept locally only, will retry on next sync';
-      statusEl.style.color = '#b05050';
+      statusEl.style.color = '#b56b6b';
     }
   }
 }
@@ -2304,14 +2360,14 @@ async function deleteCalEvent(id) {
   const evts = loadCalEvents().filter(function(e){ return e.id !== id; });
   // Also remove from in-memory MO-sourced display list
   _calEvents = _calEvents.filter(function(e){ return e.id !== id; });
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
   const ok = await saveCalEventsAsync(evts);
   // Remove from MO table too
   deleteEventFromMO(id);
   renderWeekCalendar();
   if (statusEl) {
     statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only, will retry on next sync';
-    statusEl.style.color = ok ? '#4a8a6e' : '#b05050';
+    statusEl.style.color = ok ? '#6fa88c' : '#b56b6b';
     if (ok) setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
   }
 }
@@ -2336,12 +2392,12 @@ async function quickAddEvent(dateStr, hour) {
     title: title.trim(), color: selectedEvtColor,
     cat: 'events', notes: '', hubNative: true
   });
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#4A6A8A'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
   const ok = await saveCalEventsAsync(evts);
   renderWeekCalendar();
   if (statusEl) {
     statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only, will retry on next sync';
-    statusEl.style.color = ok ? '#4a8a6e' : '#b05050';
+    statusEl.style.color = ok ? '#6fa88c' : '#b56b6b';
     if (ok) setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
   }
 }
@@ -2383,34 +2439,77 @@ async function refreshHabitInsights() {
   buildGoalCarousel();
 }
 
+function habitPctTier(pct, total) {
+  if (!total) return 0;
+  if (pct >= 100) return 4;
+  if (pct >= 67)  return 3;
+  if (pct >= 34)  return 2;
+  if (pct > 0)    return 1;
+  return 0;
+}
+
 function renderHabitLog(archive) {
-  const list = document.getElementById('habitLogList');
+  const list  = document.getElementById('habitLogList');
+  const stats = document.getElementById('habitHeatmapStats');
   if (!list) return;
   const todayId = dateKey(new Date());
   const rows = [];
   if (hubData.habits && hubData.habits.length) {
     const total = hubData.habits.length;
     const done  = hubData.habits.filter(function(h){ return h.done; }).length;
-    rows.push({ label: 'Today', done: done, total: total });
+    rows.push({ id: todayId, label: 'Today', done: done, total: total });
   }
   archive.forEach(function(day) {
     if (day.id === todayId) return; // avoid duplicating today before it's archived
     const s = dayStats(day);
     if (!s.total) return;
-    rows.push({ label: day.label || day.id, done: s.done, total: s.total });
+    rows.push({ id: day.id, label: day.label || day.id, done: s.done, total: s.total });
   });
   if (!rows.length) {
-    list.innerHTML = '<div style="font-size:0.56rem;color:#4A6A8A;opacity:0.5;text-align:center;padding:1rem 0;">No habit history yet</div>';
+    list.innerHTML = '<div style="font-size:0.56rem;color:#C2678C;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">No habit history yet</div>';
+    stats.innerHTML = '';
     return;
   }
-  list.innerHTML = rows.slice(0, 14).map(function(r) {
-    const pct = r.total ? Math.round((r.done / r.total) * 100) : 0;
-    return '<div class="habit-log-row">' +
-      '<span class="habit-log-date">' + escapeLogLabel(r.label) + '</span>' +
-      '<div class="habit-log-bar-track"><div class="habit-log-bar-fill" style="width:' + pct + '%"></div></div>' +
-      '<span class="habit-log-frac">' + r.done + '/' + r.total + '</span>' +
+
+  // Most-recent-first → chronological (oldest first) so the heatmap
+  // reads left-to-right, top-to-bottom like a calendar.
+  const days = rows.slice(0, 14).slice().reverse();
+
+  // Total check-ins: sum of every completed habit across the window —
+  // an accumulating, always-positive number rather than a streak that
+  // resets to zero the moment one day doesn't hit every checkmark.
+  const totalCheckins = days.reduce(function(sum, d) { return sum + d.done; }, 0);
+  const bestPct = days.reduce(function(max, d) {
+    const pct = d.total ? Math.round((d.done / d.total) * 100) : 0;
+    return Math.max(max, pct);
+  }, 0);
+  const avgPct = Math.round(days.reduce(function(sum, d) {
+    return sum + (d.total ? (d.done / d.total) * 100 : 0);
+  }, 0) / days.length);
+
+  if (stats) {
+    stats.innerHTML =
+      '<div class="habit-heatmap-stat"><div class="habit-heatmap-stat-val">' + totalCheckins + '</div><div class="habit-heatmap-stat-label">Total Check-Ins</div></div>' +
+      '<div class="habit-heatmap-stat"><div class="habit-heatmap-stat-val">' + bestPct + '%</div><div class="habit-heatmap-stat-label">Best Day</div></div>' +
+      '<div class="habit-heatmap-stat"><div class="habit-heatmap-stat-val">' + avgPct + '%</div><div class="habit-heatmap-stat-label">14-Day Average</div></div>';
+  }
+
+  // Left-pad so columns line up as Sun–Sat.
+  const firstDow = days[0].id ? new Date(days[0].id + 'T12:00:00').getDay() : 0;
+  let html = '';
+  for (let p = 0; p < firstDow; p++) html += '<div class="habit-heatmap-cell empty"></div>';
+
+  days.forEach(function(d) {
+    const pct  = d.total ? Math.round((d.done / d.total) * 100) : 0;
+    const tier = habitPctTier(pct, d.total);
+    const dNum = d.id ? new Date(d.id + 'T12:00:00').getDate() : '';
+    const isToday = d.id === todayId;
+    const title = escapeLogLabel(d.label) + ': ' + d.done + '/' + d.total + ' (' + pct + '%)';
+    html += '<div class="habit-heatmap-cell tier-' + tier + (isToday ? ' today' : '') + '" title="' + title + '">' +
+      '<span class="habit-heatmap-daynum">' + dNum + '</span>' +
       '</div>';
-  }).join('');
+  });
+  list.innerHTML = html;
 }
 
 function renderWeekLook(archive) {
