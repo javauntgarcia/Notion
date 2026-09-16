@@ -1368,7 +1368,9 @@ function applyHubToUI() {
   }
   if (hubData.word_def) { const dEl = document.getElementById('wotwDef'); dEl.textContent = hubData.word_def; dEl.style.opacity = ''; }
   if (hubData.word) syncWordToVocabulary(hubData.word, hubData.word_def);
-  todos = hubData.todos || [];
+  // Backfill stable ids onto any todos saved before this field existed,
+  // so toggling/deleting can target an item reliably instead of by index.
+  todos = (hubData.todos || []).map(t => t.id ? t : { ...t, id: Date.now() + Math.random() });
   renderTodos();
   _calEvents = hubData.cal_events || [];
   renderWeekCalendar();
@@ -1516,31 +1518,60 @@ loadHub();
 
 // ── TO-DO ──
 let todos = [];
-function saveTodos() { hubData.todos = todos; saveTodosToHub(); }
 function renderTodos() {
   const ul = document.getElementById('todoList');
   ul.innerHTML = '';
-  todos.forEach((t, i) => {
+  todos.forEach(t => {
     const li = document.createElement('li');
     li.className = 'todo-item' + (t.done ? ' done' : '');
     li.innerHTML = `
-      <div class="todo-check ${t.done?'checked':''}" onclick="toggleTodo(${i})"></div>
+      <div class="todo-check ${t.done?'checked':''}" onclick="toggleTodo(${t.id})"></div>
       <span>${t.text}</span>
-      <span class="todo-del" onclick="deleteTodo(${i})">✕</span>
+      <span class="todo-del" onclick="deleteTodo(${t.id})">✕</span>
     `;
     ul.appendChild(li);
   });
+}
+// Applies one change to the to-do list, then re-applies that SAME change on
+// top of whatever is currently saved in Supabase before writing back. This
+// is what stops the Main Hub and Planning.html's task list from clobbering
+// each other: both read/write the same `todos` column, so without this,
+// whichever page saved last would silently erase the other's edits. The
+// local list still updates immediately for instant feedback; this just
+// makes sure the save itself doesn't stomp a concurrent edit.
+async function mutateTodos(fn) {
+  todos = fn(todos);
+  hubData.todos = todos;
+  renderTodos();
+  let latest = todos;
+  try {
+    const row = await sbGet('main_hub', 'singleton');
+    if (row && Array.isArray(row.todos)) {
+      const withIds = row.todos.map(t => t.id ? t : { ...t, id: Date.now() + Math.random() });
+      latest = fn(withIds);
+    }
+  } catch (e) {
+    // offline / unreachable — keep the optimistic local version
+  }
+  todos = latest;
+  hubData.todos = todos;
+  renderTodos();
+  await saveTodosToHub();
 }
 function addTodo() {
   const inp = document.getElementById('todoInput');
   const v = inp.value.trim();
   if (!v) return;
-  todos.unshift({ text: v, done: false });
-  saveTodos(); renderTodos();
   inp.value = '';
+  const id = Date.now();
+  mutateTodos(list => [{ id, text: v, done: false }, ...list]);
 }
-function toggleTodo(i) { todos[i].done = !todos[i].done; saveTodos(); renderTodos(); }
-function deleteTodo(i) { todos.splice(i, 1); saveTodos(); renderTodos(); }
+function toggleTodo(id) {
+  mutateTodos(list => list.map(t => t.id === id ? { ...t, done: !t.done } : t));
+}
+function deleteTodo(id) {
+  mutateTodos(list => list.filter(t => t.id !== id));
+}
 
 // ── GOALS — carousel grouped by subpage ──
 // Each "slide" represents one subpage's goals, synced from its localStorage keys.

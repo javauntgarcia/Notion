@@ -816,6 +816,7 @@ async function sbUpsert(table, row) {
   if (!res.ok) {
     const errText = await res.text();
     console.warn(`[sbUpsert ${table}] ${res.status}:`, errText);
+    throw new Error(errText);
   }
 }
 async function sbDelete(table, id) {
@@ -1015,14 +1016,35 @@ async function saveTasks() {
   }
 }
 
+// Applies one change to the task list, then re-applies that SAME change on
+// top of whatever is currently saved in Supabase before writing back. This
+// is what stops Planning and the Main Hub's own Daily To-Do widget from
+// clobbering each other: both read/write the same `todos` column, so
+// without this, whichever page saved last would silently erase the other's
+// edits. The local list still updates immediately for instant feedback;
+// this just makes sure the save itself doesn't stomp a concurrent edit.
+async function mutateTasks(fn) {
+  _tasks = fn(_tasks);
+  renderTasks();
+  let latest = _tasks;
+  try {
+    const row = await sbGet('main_hub', 'singleton');
+    if (row && Array.isArray(row.todos)) latest = fn(row.todos);
+  } catch (e) {
+    // offline / unreachable — keep the optimistic local version
+  }
+  _tasks = latest;
+  renderTasks();
+  await saveTasks();
+}
+
 function addTask() {
   const input = document.getElementById('taskInput');
   const text  = input.value.trim();
   if (!text) return;
-  _tasks.push({ id: Date.now(), text, done: false });
-  saveTasks();
   input.value = '';
-  renderTasks();
+  const id = Date.now();
+  mutateTasks(tasks => [...tasks, { id, text, done: false }]);
 }
 
 function renderTasks() {
@@ -1051,16 +1073,13 @@ function renderTasks() {
 }
 
 function toggleTask(id) {
-  const t = _tasks.find(x => x.id === id);
-  if (t) { t.done = !t.done; saveTasks(); renderTasks(); }
+  mutateTasks(tasks => tasks.map(t => t.id === id ? { ...t, done: !t.done } : t));
 }
 function deleteTask(id) {
-  _tasks = _tasks.filter(x => x.id !== id);
-  saveTasks(); renderTasks();
+  mutateTasks(tasks => tasks.filter(x => x.id !== id));
 }
 function clearDone() {
-  _tasks = _tasks.filter(x => !x.done);
-  saveTasks(); renderTasks();
+  mutateTasks(tasks => tasks.filter(x => !x.done));
 }
 
 // ── HABITS ──
