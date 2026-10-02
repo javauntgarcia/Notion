@@ -964,6 +964,21 @@ function ensureMonthlyTodos() {
 async function maybeRolloverDay() {
   const key = todayKey();
   if (_lastSeen === key) return;
+  // Re-read the saved row first so the rollover never acts on stale in-memory
+  // data (a tab left open overnight, or to-dos added from the Main Hub).
+  // If another tab/device already rolled the day over, just adopt its state.
+  try {
+    const row = await sbGet('main_hub', 'singleton');
+    if (row) {
+      if (Array.isArray(row.todos)) _tasks = row.todos;
+      if (row.last_seen === key) {
+        if (Array.isArray(row.habits) && row.habits.length) _habits = row.habits;
+        _lastSeen = key;
+        syncTasksForToday();
+        return;
+      }
+    }
+  } catch(e) {}
   if (_lastSeen && _habits.length) {
     const d = new Date(_lastSeen + 'T00:00:00');
     const entry = {
@@ -975,10 +990,13 @@ async function maybeRolloverDay() {
     };
     try { await sbUpsert('planning_archive', entry); } catch(e) {}
     await loadArchive();
-    // The ad-hoc checklist belonged to the day that just ended — it's now
-    // captured in the archive entry above, so start the new day fresh.
-    _tasks = [];
-    await saveTasks();
+    // The day that just ended is captured in the archive entry above.
+    // Completed to-dos are cleared; unfinished ones carry over to the new
+    // day so the list is never wiped just because the date changed.
+    if (_tasks.some(t => t.done)) {
+      _tasks = _tasks.filter(t => !t.done);
+      await saveTasks();
+    }
   }
   _habits = _habits.map(h => ({ ...h, done: false }));
   syncTasksForToday();
