@@ -615,7 +615,6 @@ html, body {
           <span class="panel-therapy-badge" id="panel-therapy-badge" style="display:none;">Therapy Day</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <span id="save-status" style="font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(61,127,181,0.55);opacity:0;transition:opacity 0.4s;"></span>
           <button class="panel-close" onclick="closePanel()">✕</button>
         </div>
       </div>
@@ -624,6 +623,8 @@ html, body {
 
   </div>
 </div>
+
+<span id="save-status" style="position:fixed;top:14px;right:16px;z-index:20;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(160,200,235,0.8);opacity:0;transition:opacity 0.4s;pointer-events:none;"></span>
 
 <!-- Bottom Nav -->
 <div class="bottom-nav">
@@ -647,20 +648,19 @@ async function sbGet(table, id) {
     const d = await r.json(); return d && d[0] ? d[0] : null;
   } catch(e) { return null; }
 }
-async function sbUpsert(table, row) {
+async function sbUpsert(table, row, keepalive) {
   try {
     const r = await fetch(`${SB_URL}/rest/v1/${table}?on_conflict=id`, {
       method: 'POST',
+      keepalive: !!keepalive,
       headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
     });
-    if (!r.ok) {
-      const txt = await r.text();
-      console.warn('sbUpsert error', r.status, txt);
-    }
-  } catch(e) { console.warn('sbUpsert fetch failed', e); }
+    if (!r.ok) { console.warn('sbUpsert error', r.status, await r.text()); return false; }
+    return true;
+  } catch(e) { console.warn('sbUpsert fetch failed', e); return false; }
 }
 function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
@@ -687,40 +687,81 @@ function isTherapyFriday(date) {
 /* ─── STATE ─── */
 let entries = {};
 
-/* ─── PERSIST (debounced) ─── */
-let _persistTimer = null;
-function persist() {
-  // Immediately write to localStorage
-  lsSet('therapy_entries_v2', JSON.stringify(entries));
-  showSaveStatus('saving');
-  // Debounce Supabase writes by 800ms
-  clearTimeout(_persistTimer);
-  _persistTimer = setTimeout(async () => {
-    const arr = Object.values(entries);
-    await sbUpsert('therapy', { id: 'singleton', entries: arr });
-    showSaveStatus('saved');
-  }, 800);
+const TABLE = 'therapy', DIRTY_KEY = 'therapy_dirty';
+let orphans = [];   // older cloud entries saved without a date — kept so nothing is lost
+function writeLocal() { lsSet('therapy_entries_v2', JSON.stringify(entries)); }
+function cloudPayload() {
+  return Object.keys(entries).map(k => ({ ...entries[k], date: k })).concat(orphans);
 }
+
+/* ─── AUTOSAVE ───
+   Every change is written to this device immediately, then pushed to the
+   cloud ~half a second after the last keystroke. Anything still pending
+   is flushed when the tab is hidden or closed. A "dirty" flag marks local
+   changes the cloud hasn't confirmed yet, so they're re-sent on next load
+   instead of being overwritten by an older cloud copy. */
+let _persistTimer = null, _saveSeq = 0;
+function persist() {
+  writeLocal();
+  lsSet(DIRTY_KEY, '1');
+  _saveSeq++;
+  showSaveStatus('saving');
+  clearTimeout(_persistTimer);
+  _persistTimer = setTimeout(flushSave, 500);
+}
+async function flushSave(keepalive) {
+  clearTimeout(_persistTimer); _persistTimer = null;
+  const seq = _saveSeq;
+  const ok = await sbUpsert(TABLE, { id: 'singleton', entries: cloudPayload() }, keepalive === true);
+  if (seq !== _saveSeq) return;            // newer edits are already queued
+  if (ok) lsSet(DIRTY_KEY, '0');
+  showSaveStatus(ok ? 'saved' : 'failed');
+}
+function flushIfPending() { if (_persistTimer) flushSave(true); }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushIfPending(); });
+window.addEventListener('pagehide', flushIfPending);
+window.addEventListener('online', () => { if (lsGet(DIRTY_KEY) === '1') flushSave(); });
 
 function showSaveStatus(state) {
   const el = document.getElementById('save-status');
   if (!el) return;
-  el.textContent = state === 'saving' ? 'saving…' : 'saved ✓';
+  el.textContent = state === 'saving' ? 'saving…' : state === 'saved' ? 'saved ✓' : 'saved on this device · cloud sync failed';
   el.style.opacity = '1';
-  if (state === 'saved') {
-    setTimeout(() => { el.style.opacity = '0'; }, 1800);
-  }
+  clearTimeout(showSaveStatus._t);
+  if (state === 'saved') showSaveStatus._t = setTimeout(() => { el.style.opacity = '0'; }, 1800);
 }
 
 // ── BOOTSTRAP ──
 async function initTherapy() {
+  let localEntries = {};
+  try { const s = lsGet('therapy_entries_v2'); if (s) localEntries = JSON.parse(s) || {}; } catch(e) {}
+  const dirty = lsGet(DIRTY_KEY) === '1';
   const row = await sbGet('therapy', 'singleton');
-  if (row && row.entries && row.entries.length) {
-    entries = {};
-    row.entries.forEach(e => { entries[e.id || e.date] = e; });
-  } else {
-    try { const s = lsGet('therapy_entries_v2'); if (s) entries = JSON.parse(s); } catch(e) {}
+
+  // Cloud entries are stored as a list; each one needs its date to be
+  // placed back on the calendar. Older saves didn't include the date, so
+  // recover it from this device's copy (matched by id) where possible.
+  const remote = {}; let needsMigration = false;
+  orphans = [];
+  if (row && Array.isArray(row.entries)) {
+    const localKeyById = {};
+    Object.keys(localEntries).forEach(k => { const e = localEntries[k]; if (e && e.id != null) localKeyById[e.id] = k; });
+    row.entries.forEach(e => {
+      if (!e) return;
+      const k = e.date || localKeyById[e.id];
+      if (!e.date) needsMigration = true;
+      if (k) remote[k] = { ...e, date: k }; else orphans.push(e);
+    });
   }
+
+  if (dirty) entries = localEntries;                               // unsynced local edits win
+  else if (needsMigration) entries = { ...localEntries, ...remote };
+  else if (row && Array.isArray(row.entries) && row.entries.length) entries = remote;
+  else entries = localEntries;
+
+  renderCalendar();
+  if (dirty || needsMigration) persist();
+}
 
 /* ─── CALENDAR STATE ─── */
 const today = new Date();
@@ -849,6 +890,7 @@ function closePanel() {
 function renderPanelContent(key) {
   const container = document.getElementById('panel-content');
   const entry = entries[key];
+  if (entry) { if (!Array.isArray(entry.takeaways)) entry.takeaways = ['','']; if (!Array.isArray(entry.steps)) entry.steps = []; }
 
   if (!entry) {
     container.innerHTML = `
@@ -874,8 +916,7 @@ function renderPanelContent(key) {
     </div>`).join('');
 
   const feelingChips = FEELINGS.map(f => `
-    <span class="chip ${(entry.feelings || []).includes(f) ? 'on' : ''}"
-      onclick="toggleFeeling('${key}', '${f}', this)">${f}</span>`).join('');
+    <span class="chip ${(entry.feelings || []).includes(f) ? 'on' : ''}">${f}</span>`).join('');
 
   container.innerHTML = `
     <div class="entry-card">
@@ -936,6 +977,7 @@ function renderPanelContent(key) {
 function createEntry(key) {
   entries[key] = {
     id: Date.now(),
+    date: key,
     notes: '',
     takeaways: ['', ''],
     steps: [{text:'',done:false},{text:'',done:false}],
@@ -1031,8 +1073,6 @@ function escHtml(str) {
 }
 
 /* ─── INIT ─── */
-  renderCalendar();
-}
 initTherapy();
 </script>
 </body>
