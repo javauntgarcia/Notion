@@ -404,11 +404,11 @@ html, body {
     <div class="composer" id="composer">
       <div class="composer-meta">
         <span class="composer-date" id="composer-date-label"></span>
-        <input type="text" class="tag-input" id="composer-tag" placeholder="tag (poem, note, reflection…)" maxlength="30" />
+        <input type="text" class="tag-input" id="composer-tag" oninput="composerAutoSave()" placeholder="tag (poem, note, reflection…)" maxlength="30" />
       </div>
       <textarea class="composer-textarea" id="composer-textarea" rows="6"
         placeholder="Write freely. Poems, notes, fragments, streams of thought — all of it belongs here."
-        oninput="updateCharCount()"></textarea>
+        oninput="composerAutoSave()"></textarea>
       <div class="composer-footer">
         <span class="char-count" id="char-count">0 words</span>
         <button class="save-btn" onclick="saveEntry()">Save Entry</button>
@@ -420,6 +420,8 @@ html, body {
   </div>
 </div>
 </div><!-- /page-wrap -->
+
+<span id="save-status" style="position:fixed;top:14px;right:16px;z-index:20;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(210,215,220,0.75);opacity:0;transition:opacity 0.4s;pointer-events:none;"></span>
 
 <!-- Bottom Nav -->
 <div class="bottom-nav">
@@ -443,15 +445,19 @@ async function sbGet(table, id) {
     const d = await r.json(); return d && d[0] ? d[0] : null;
   } catch(e) { return null; }
 }
-async function sbUpsert(table, row) {
+async function sbUpsert(table, row, keepalive) {
   try {
-    await fetch(`${SB_URL}/rest/v1/${table}`, {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?on_conflict=id`, {
       method: 'POST',
+      keepalive: !!keepalive,
       headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`,
-        'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify({ ...row, updated_at: new Date().toISOString() })
     });
-  } catch(e) {}
+    if (!r.ok) { console.warn('sbUpsert error', r.status, await r.text()); return false; }
+    return true;
+  } catch(e) { console.warn('sbUpsert fetch failed', e); return false; }
 }
 function lsGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
@@ -514,27 +520,62 @@ function weekIndexOf2026(dateStr) {
   return Math.floor((d - jan1_2026) / (7 * 24 * 60 * 60 * 1000));
 }
 
-async function loadState() {
-  const row = await sbGet('journal', 'singleton');
-  if (row && row.entries && row.entries.length) {
-    entries = row.entries;
-    weekMap = new Set(row.entries.map(e => getISOWeek(e.date)));
-  } else {
-    try {
-      const s = lsGet('jv_growth_journal_v2');
-      if (s) { const parsed = JSON.parse(s); entries = parsed.entries || []; weekMap = new Set(parsed.weekMap || []); }
-    } catch(e) {}
-    if (entries.length === 0) {
-      entries = SEED_ENTRIES;
-      SEED_ENTRIES.forEach(e => weekMap.add(getISOWeek(e.date)));
-      await persist();
-    }
-  }
+const TABLE = 'journal', DIRTY_KEY = 'jv_growth_journal_dirty';
+function writeLocal() { lsSet('jv_growth_journal_v2', JSON.stringify({ entries, weekMap: [...weekMap] })); }
+function cloudPayload() { return entries; }
+function localDateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-async function persist() {
-  await sbUpsert('journal', { id: 'singleton', entries });
-  lsSet('jv_growth_journal_v2', JSON.stringify({ entries, weekMap: [...weekMap] }));
+/* ─── AUTOSAVE ───
+   Every change is written to this device immediately, then pushed to the
+   cloud ~half a second after the last keystroke. Anything still pending
+   is flushed when the tab is hidden or closed. A "dirty" flag marks local
+   changes the cloud hasn't confirmed yet, so they're re-sent on next load
+   instead of being overwritten by an older cloud copy. */
+let _persistTimer = null, _saveSeq = 0;
+function persist() {
+  writeLocal();
+  lsSet(DIRTY_KEY, '1');
+  _saveSeq++;
+  showSaveStatus('saving');
+  clearTimeout(_persistTimer);
+  _persistTimer = setTimeout(flushSave, 500);
+}
+async function flushSave(keepalive) {
+  clearTimeout(_persistTimer); _persistTimer = null;
+  const seq = _saveSeq;
+  const ok = await sbUpsert(TABLE, { id: 'singleton', entries: cloudPayload() }, keepalive === true);
+  if (seq !== _saveSeq) return;            // newer edits are already queued
+  if (ok) lsSet(DIRTY_KEY, '0');
+  showSaveStatus(ok ? 'saved' : 'failed');
+}
+function flushIfPending() { if (_persistTimer) flushSave(true); }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushIfPending(); });
+window.addEventListener('pagehide', flushIfPending);
+window.addEventListener('online', () => { if (lsGet(DIRTY_KEY) === '1') flushSave(); });
+
+function showSaveStatus(state) {
+  const el = document.getElementById('save-status');
+  if (!el) return;
+  el.textContent = state === 'saving' ? 'saving…' : state === 'saved' ? 'saved ✓' : 'saved on this device · cloud sync failed';
+  el.style.opacity = '1';
+  clearTimeout(showSaveStatus._t);
+  if (state === 'saved') showSaveStatus._t = setTimeout(() => { el.style.opacity = '0'; }, 1800);
+}
+
+async function loadState() {
+  let localEntries = null;
+  try { const s = lsGet('jv_growth_journal_v2'); if (s) localEntries = (JSON.parse(s) || {}).entries || null; } catch(e) {}
+  const dirty = lsGet(DIRTY_KEY) === '1';
+  const row = await sbGet('journal', 'singleton');
+  const remote = row && Array.isArray(row.entries) && row.entries.length ? row.entries : null;
+
+  if (dirty && localEntries) { entries = localEntries; persist(); }   // unsynced local edits win
+  else if (remote) entries = remote;
+  else if (localEntries && localEntries.length) entries = localEntries;
+  else entries = SEED_ENTRIES.slice();
+  weekMap = new Set(entries.map(e => getISOWeek(e.date)));
 }
 
 // ── SNAPSHOT STRIP ──
@@ -591,6 +632,8 @@ function toggleComposer() {
     document.getElementById('composer-date-label').textContent =
       now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     document.getElementById('composer-textarea').focus();
+  } else {
+    renderAll();   // show whatever was auto-saved while the composer was open
   }
 }
 
@@ -600,25 +643,43 @@ function updateCharCount() {
   document.getElementById('char-count').textContent = words + (words === 1 ? ' word' : ' words');
 }
 
-function saveEntry() {
-  const text = document.getElementById('composer-textarea').value.trim();
-  if (!text) { document.getElementById('composer-textarea').focus(); return; }
+// The composer saves as you type: the first keystroke creates the entry,
+// every later change (text or tag) updates it. "Save Entry" just files it
+// away and clears the composer.
+let composerEntryId = null;
+function composerAutoSave() {
+  updateCharCount();
+  const text = document.getElementById('composer-textarea').value;
   const tag = document.getElementById('composer-tag').value.trim() || 'entry';
-  const now = new Date();
-  const dateStr = now.toISOString().split('T')[0];
-  const month = dateStr.slice(0,7);
-
-  entries.unshift({ id: Date.now().toString(), date: dateStr, tag, text, month });
-  weekMap.add(getISOWeek(dateStr));
+  let e = composerEntryId ? entries.find(x => x.id === composerEntryId) : null;
+  if (!e) {
+    if (!text.trim()) return;
+    const dateStr = localDateStr(new Date());
+    e = { id: Date.now().toString(), date: dateStr, tag, text, month: dateStr.slice(0,7) };
+    composerEntryId = e.id;
+    entries.unshift(e);
+    weekMap.add(getISOWeek(dateStr));
+    renderWeekGrid();
+  } else {
+    e.text = text; e.tag = tag;
+  }
   persist();
+}
 
-  document.getElementById('composer-textarea').value = '';
+function saveEntry() {
+  const ta = document.getElementById('composer-textarea');
+  if (!ta.value.trim()) { ta.focus(); return; }
+  composerAutoSave();
+  const e = entries.find(x => x.id === composerEntryId);
+  if (e) { e.text = e.text.trim(); activeMonth = e.month; persist(); }
+  flushSave();
+
+  composerEntryId = null;
+  ta.value = '';
   document.getElementById('composer-tag').value = '';
   document.getElementById('char-count').textContent = '0 words';
   composerOpen = false;
   document.getElementById('composer').classList.remove('open');
-
-  activeMonth = month;
   renderAll();
 }
 
@@ -690,22 +751,18 @@ function toggleCard(id) {
   if (card.classList.contains('open')) card.querySelector('textarea').focus();
 }
 
-const saveTimers = {};
 function autoSave(id, val) {
-  clearTimeout(saveTimers[id]);
-  saveTimers[id] = setTimeout(() => {
-    const e = entries.find(e => e.id === id);
-    if (e) {
-      e.text = val;
-      persist();
-      const wc = document.getElementById('wc-' + id);
-      if (wc) wc.textContent = wordCount(val) + ' words';
-    }
-  }, 600);
+  const e = entries.find(e => e.id === id);
+  if (!e) return;
+  e.text = val;
+  const wc = document.getElementById('wc-' + id);
+  if (wc) wc.textContent = wordCount(val) + ' words';
+  persist();
 }
 
 function deleteEntry(id) {
   if (!confirm('Delete this entry?')) return;
+  if (id === composerEntryId) composerEntryId = null;
   entries = entries.filter(e => e.id !== id);
   // Rebuild weekMap from remaining entries
   weekMap = new Set(entries.map(e => getISOWeek(e.date)));
@@ -720,8 +777,8 @@ function renderAll() {
 }
 
 // ── INIT ──
-loadState();
-renderAll();
+renderAll();                       // paint the shell right away
+loadState().then(renderAll);       // then fill in entries once they've loaded
 </script>
 </body>
 </html>
