@@ -1031,6 +1031,13 @@
             <div class="week-chart" id="weekChart"></div>
           </div>
         </div>
+
+        <!-- REWARD TRACKER — sleep checks + gear fund, read from Planning's daily tasks -->
+        <div style="padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(138,111,160,0.14);">
+          <div class="section-label" style="margin-bottom:0.5rem;">✦ Reward Tracker</div>
+          <div class="habit-log-sub">Checked off in Planning — $5 to the gear fund per workout or run, one check per sleep day (in bed by 10)</div>
+          <div id="rewardTracker"><div style="font-size:0.56rem;color:#8A6FA0;opacity:0.5;padding:0.6rem 0;">Loading…</div></div>
+        </div>
       </div>
 
       <!-- EVENT EDITOR MODAL — opened by clicking any Weekly Outline event -->
@@ -1688,11 +1695,13 @@ const goalSlides = [
       {
         // Tracked via the "Wake up before 6 AM" daily task in Planning.html's
         // habit tracker (archived nightly to planning_archive).
-        name: 'Wake Up Before 6 AM',
+        name: 'Wake Up at 6 AM',
         color: 'bar-navy',
         milestone: 'Consistent early wake-ups',
         compute: function() {
-          var s = habitOccurrenceStats('Wake up before 6 AM');
+          // Counts the task under its current and its earlier name.
+          var a = habitOccurrenceStats('Wake up at 6 AM'), b = habitOccurrenceStats('Wake up before 6 AM');
+          var s = { done: a.done + b.done, total: a.total + b.total };
           return { pct: s.total ? Math.round(s.done / s.total * 100) : 0,
                    meta: s.total ? (s.done + ' of ' + s.total + ' days') : 'No data yet' };
         }
@@ -2567,6 +2576,75 @@ async function refreshHabitInsights() {
   renderHabitLog(archive);
   renderWeekLook(archive);
   buildGoalCarousel();
+  renderRewardTracker();
+}
+
+// ── REWARD TRACKER ──
+// Reads Planning.html's daily tasks: any done task starting "Workout (" or
+// "Run (" earns $5 for the gear fund, and the "Sleep check" task is the
+// nightly checkmark. Counts from REWARD_START onward. Sessions are looked
+// up in their own query so the fund total isn't capped by the 60-day
+// archive window used elsewhere on this page.
+const REWARD_START = '2026-10-04';
+const REWARD_PER_SESSION = 5;
+const SLEEP_CHECK_TEXT = 'Sleep check: in bed by 10 PM';
+const SESSION_PLAN = ['Run?', 'Workout', 'Run', 'Workout', 'Run', 'Workout', 'Workout']; // Sun…Sat
+function isSessionTask(h) { return /^(Workout|Run) \(/.test(h.text || ''); }
+
+async function renderRewardTracker() {
+  const el = document.getElementById('rewardTracker');
+  if (!el) return;
+  let rows = [];
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/planning_archive?id=gte.${REWARD_START}&select=id,habits`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+    });
+    const d = await r.json();
+    if (Array.isArray(d)) rows = d;
+  } catch(e) {}
+  const byDay = {};
+  rows.forEach(function(d) { byDay[d.id] = d.habits || []; });
+  const todayId = dateKey(new Date());
+  // Today's live list is fresher than any same-day archive snapshot.
+  if (hubData.habits && hubData.habits.length) byDay[todayId] = hubData.habits;
+
+  let sessionsAll = 0;
+  Object.keys(byDay).forEach(function(id) {
+    if (id >= REWARD_START && byDay[id].some(function(h) { return isSessionTask(h) && h.done; })) sessionsAll++;
+  });
+
+  const ws = getWeekStart(0);
+  let weekSessions = 0, weekSleep = 0, cells = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(ws); d.setDate(ws.getDate() + i);
+    const id = dateKey(d);
+    const habits = byDay[id] || [];
+    const session = habits.some(function(h) { return isSessionTask(h) && h.done; });
+    const sleep = habits.some(function(h) { return h.text === SLEEP_CHECK_TEXT && h.done; });
+    if (session) weekSessions++;
+    if (sleep) weekSleep++;
+    const isToday = id === todayId, past = id < todayId;
+    const pill = function(on, label, hex) {
+      return '<div style="border-radius:4px;padding:0.2rem 0.15rem;margin-top:3px;font-size:0.46rem;letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;' +
+        (on ? 'background:' + hex + ';color:#fff;' : 'border:1px dashed ' + hex + ';color:' + hex + ';opacity:' + (past ? '0.35' : '0.75') + ';') + '">' + label + '</div>';
+    };
+    cells += '<div style="flex:1;min-width:0;text-align:center;padding:0.35rem 0.2rem;border-radius:6px;background:' + (isToday ? 'rgba(138,111,160,0.14)' : 'rgba(138,111,160,0.05)') + ';">' +
+      '<div style="font-size:0.48rem;letter-spacing:0.12em;text-transform:uppercase;color:#8A6FA0;">' + DAYS_SHORT[i] + '</div>' +
+      pill(session, session ? '+$' + REWARD_PER_SESSION : SESSION_PLAN[i], '#3E9A8F') +
+      pill(sleep, sleep ? '✓ Sleep' : 'Sleep', '#8A6FA0') +
+      '</div>';
+  }
+  const stat = function(big, small) {
+    return '<div><div style="font-family:\'Cormorant Garamond\',serif;font-size:1.25rem;font-weight:600;color:#3A2A32;line-height:1.1;">' + big + '</div>' +
+      '<div style="font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;color:#8A6FA0;opacity:0.8;">' + small + '</div></div>';
+  };
+  el.innerHTML =
+    '<div style="display:flex;gap:1.6rem;flex-wrap:wrap;margin-bottom:0.7rem;">' +
+      stat('$' + (sessionsAll * REWARD_PER_SESSION), 'Gear fund earned · ' + sessionsAll + ' session' + (sessionsAll === 1 ? '' : 's')) +
+      stat(weekSessions + ' of 6', 'Sessions this week') +
+      stat(weekSleep + ' of 7', 'Sleep checks this week') +
+    '</div>' +
+    '<div style="display:flex;gap:4px;">' + cells + '</div>';
 }
 
 function habitPctTier(pct, total) {

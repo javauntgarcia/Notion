@@ -847,9 +847,14 @@ let _habits = [];
 let _lastSeen = null;
 
 // Fixed tasks that show up every single day
+// Morning chain: 6 AM alarm → wake up → snack → workout/run → $5 to the
+// gear fund. Night chain: wind-down alarm → skincare → hairline → coffee
+// → sleep check as you head to bed. The workout/run itself is day-specific
+// (see CONDITIONAL_TASKS). The Main Hub's Reward Tracker reads these by
+// their exact text, so keep the two files in step if you rename any.
 const DEFAULT_TASKS = [
-  'Wake up before 6 AM',
-  'Go to the gym',
+  'Wake up at 6 AM',
+  'Pre-workout snack',
   'Eat breakfast',
   'Make it to work by 9:30 AM',
   'Lunch (home)',
@@ -857,15 +862,20 @@ const DEFAULT_TASKS = [
   'Make dinner',
   'Post on social media',
   'Do to-do list',
-  'Hairline treatment',
   'Compliment Eston',
-  'Nightcare routine'
+  'Nightcare routine',
+  'Hairline treatment',
+  'Make coffee for the morning',
+  'Sleep check: in bed by 10 PM'
 ];
+
+// Default tasks that have been replaced — removed from the saved list.
+const RETIRED_TASKS = ['Go to the gym'];
 
 // One-time text migrations for renamed default tasks — old label -> new
 // label, so an existing saved habit gets renamed in place instead of the
 // old entry sticking around alongside a brand-new duplicate.
-const TASK_RENAMES = { 'Post on TikTok': 'Post on social media' };
+const TASK_RENAMES = { 'Post on TikTok': 'Post on social media', 'Wake up before 6 AM': 'Wake up at 6 AM' };
 
 // Any of these labels (old or new) count as "the social media task" for
 // the Productivity page's Social Media goal sync — so history logged
@@ -875,6 +885,13 @@ function isSocialTask(text) { return SOCIAL_TASK_TEXTS.includes(text); }
 
 // Tasks that only appear on specific days of the week (0=Sun … 6=Sat)
 const CONDITIONAL_TASKS = [
+  { day: 1, text: 'Workout (60 min) → $5 to gear fund' },   // Monday
+  { day: 3, text: 'Workout (60 min) → $5 to gear fund' },   // Wednesday
+  { day: 5, text: 'Workout (60 min) → $5 to gear fund' },   // Friday
+  { day: 6, text: 'Workout (60 min) → $5 to gear fund' },   // Saturday
+  { day: 2, text: 'Run (30 min) → $5 to gear fund' },       // Tuesday
+  { day: 4, text: 'Run (30 min) → $5 to gear fund' },       // Thursday
+  { day: 0, text: 'Run (30 min, optional) → $5 to gear fund' }, // Sunday
   { day: 1, text: 'Voice memo Devon' },        // Monday
   { day: 6, text: 'Edit Content Calendar' },    // Saturday
   { day: 0, text: 'Financial tracker' },        // Sunday
@@ -894,6 +911,7 @@ function conditionalTextsForDate(d) {
 // and swaps in whichever conditional task belongs to today.
 function syncTasksForToday() {
   _habits = _habits.map(h => TASK_RENAMES[h.text] ? { ...h, text: TASK_RENAMES[h.text] } : h);
+  _habits = _habits.filter(h => !RETIRED_TASKS.includes(h.text));
   _habits = _habits.map(h => {
     if (h.type) return h;
     if (DEFAULT_TASKS.includes(h.text)) return { ...h, type: 'default' };
@@ -912,6 +930,16 @@ function syncTasksForToday() {
       _habits.push({ id: Date.now() + 3000 + i, text: c.text, done: false, type: 'conditional', day: c.day });
     }
   });
+  // Keep the list in the order the day actually runs: the workout/run sits
+  // right after the snack, everything else keeps its roster order, and
+  // custom tasks stay at the end in the order they were added.
+  const rank = h => {
+    if (/^(Workout|Run) \(/.test(h.text)) return 1.5;
+    const i = DEFAULT_TASKS.indexOf(h.text);
+    if (i > -1) return i;
+    return h.type === 'conditional' ? 500 : 1000;
+  };
+  _habits = _habits.map((h, i) => ({ h, i })).sort((a, b) => rank(a.h) - rank(b.h) || a.i - b.i).map(x => x.h);
 }
 
 async function loadAndRenderTasks() {
