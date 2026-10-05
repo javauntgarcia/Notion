@@ -956,7 +956,8 @@
 // ─────────────────────────────────────────────
 // DATA — sourced from Chase Sapphire, BILT,
 // Chase Checking, Wealthfront Personal &
-// Joint statements Jan–Jun 2026
+// Joint statements Jan–Jun 2026; Aug–Oct 2026 rebuilt from
+// the reviewed 2026-10-04 export (your share only: J = 100%, E = 0%, shared = your %)
 // ─────────────────────────────────────────────
 
 const MONTHS = {
@@ -1156,33 +1157,87 @@ const MONTHS = {
   },
   'Aug 2026': {
     income: {
-      'SFMTA Payroll':    { amt: 6423.11, note: 'CHK + WF Joint + WF Personal, through 8/23' },
-      'Depop Sales':      { amt:   54.12, note: 'WF personal' },
-      'Other Income':     { amt: 1992.00, note: 'Venmo cashouts + Wealthfront transfers to CHK' },
+      'SFMTA Payroll':    { amt: 5996.54, note: 'CHK + Savings + WF Personal · full month' },
+      'Depop Sales':      { amt: 54.12, note: 'WF personal' },
+      'From Eston':       { amt: 1892.00, note: 'Venmo cashouts — mostly bill-share reimbursements, offsets his share' },
     },
     spending: {
-      'Housing':        { amt: 1732.11, txns: 2,  color:'#c9a27e', pill:'pill-other'        },
-      'Travel':         { amt: 1173.63, txns: 1,  color:'#7ec9a2', pill:'pill-travel'       },
-      'Shopping':       { amt:  941.19, txns: 16, color:'#b87e9a', pill:'pill-shopping'     },
-      'Dining Out':     { amt:  441.59, txns: 16, color:'#c9927e', pill:'pill-dining'       },
-      'Transportation': { amt:  215.71, txns: 34, color:'#7e9ab8', pill:'pill-transport'    },
-      'Utilities':      { amt:  187.38, txns: 1,  color:'#b8b87e', pill:'pill-other'        },
-      'Pets':           { amt:   42.03, txns: 2,  color:'#9ab87e', pill:'pill-other'        },
-      'Entertainment':  { amt:   15.32, txns: 2,  color:'#c97eb8', pill:'pill-other'        },
-      'Subscriptions':  { amt:   10.99, txns: 1,  color:'#7e7eb8', pill:'pill-subscriptions'},
+      'Housing': { amt: 1732.11, txns: 2, color:'#c9a27e', pill:'pill-other' },
+      'Shopping': { amt: 1427.29, txns: 33, color:'#b87e9a', pill:'pill-shopping' },
+      'Travel': { amt: 1173.63, txns: 1, color:'#7ec9a2', pill:'pill-travel' },
+      'Dining Out': { amt: 812.71, txns: 26, color:'#c9927e', pill:'pill-dining' },
+      'Groceries': { amt: 485.32, txns: 9, color:'#7eb89a', pill:'pill-groceries' },
+      'Transportation': { amt: 364.85, txns: 46, color:'#7e9ab8', pill:'pill-transport' },
+      'Other': { amt: 240.00, txns: 2, color:'#8c8c8c', pill:'pill-other' },
+      'Utilities': { amt: 223.19, txns: 2, color:'#b8b87e', pill:'pill-other' },
+      'Subscriptions': { amt: 147.94, txns: 8, color:'#7e7eb8', pill:'pill-subscriptions' },
+      'Personal Care': { amt: 126.56, txns: 2, color:'#7eb8a2', pill:'pill-other' },
+      'Pets': { amt: 42.03, txns: 2, color:'#9ab87e', pill:'pill-other' },
+      'Entertainment': { amt: 31.31, txns: 4, color:'#c97eb8', pill:'pill-other' },
     },
     merchants: [
-      { name:'BILT Rent (Venmo)',    cat:'Housing',  pill:'pill-other',    amt: 1620.00 },
-      { name:'Chase Travel — Flight',cat:'Travel',   pill:'pill-travel',   amt: 1173.63 },
-      { name:'Best Buy',             cat:'Shopping', pill:'pill-shopping', amt:  552.60 },
-      { name:'Pacific Gas & Electric',cat:'Utilities',pill:'pill-other',   amt:  187.38 },
-      { name:'House of Prime Rib',   cat:'Dining Out',pill:'pill-dining',  amt:  115.64 },
+      { name:'BILT Rent (your 60%)', cat:'Housing', pill:'pill-other', amt: 1620.00 },
+      { name:'Chase Travel — Flight (Eston split $350)', cat:'Travel', pill:'pill-travel', amt: 1173.63 },
+      { name:'Best Buy', cat:'Shopping', pill:'pill-shopping', amt: 552.60 },
+      { name:'Amazon', cat:'Shopping', pill:'pill-shopping', amt: 396.04 },
+      { name:'Whole Foods Market', cat:'Groceries', pill:'pill-groceries', amt: 325.18 },
+    ],
+  },
+  'Sep 2026': {
+    income: {
+      'SFMTA Payroll':    { amt: 6380.86, note: '4 pay periods · CHK + Savings + WF Personal' },
+      'Depop Sales':      { amt: 20.49, note: 'WF personal' },
+      'From Eston':       { amt: 2065.23, note: 'bill-share reimbursements (Venmo + Zelle) — offsets his share' },
+    },
+    spending: {
+      'Housing': { amt: 1640.63, txns: 2, color:'#c9a27e', pill:'pill-other' },
+      'Shopping': { amt: 765.27, txns: 21, color:'#b87e9a', pill:'pill-shopping' },
+      'Groceries': { amt: 543.36, txns: 15, color:'#7eb89a', pill:'pill-groceries' },
+      'Dining Out': { amt: 508.49, txns: 22, color:'#c9927e', pill:'pill-dining' },
+      'Entertainment': { amt: 334.66, txns: 5, color:'#c97eb8', pill:'pill-other' },
+      'Other': { amt: 257.92, txns: 4, color:'#8c8c8c', pill:'pill-other' },
+      'Subscriptions': { amt: 217.10, txns: 14, color:'#7e7eb8', pill:'pill-subscriptions' },
+      'Transportation': { amt: 209.47, txns: 28, color:'#7e9ab8', pill:'pill-transport' },
+      'Utilities': { amt: 121.15, txns: 2, color:'#b8b87e', pill:'pill-other' },
+      'Personal Care': { amt: 59.29, txns: 2, color:'#7eb8a2', pill:'pill-other' },
+      'Pets': { amt: 42.03, txns: 2, color:'#9ab87e', pill:'pill-other' },
+    },
+    merchants: [
+      { name:'BILT Rent (your 60%)', cat:'Housing', pill:'pill-other', amt: 1620.00 },
+      { name:'Amazon', cat:'Shopping', pill:'pill-shopping', amt: 397.63 },
+      { name:'Adventure Out', cat:'Entertainment', pill:'pill-other', amt: 278.02 },
+      { name:'Costco - Instacart', cat:'Groceries', pill:'pill-groceries', amt: 182.27 },
+      { name:'Whole Foods Market', cat:'Groceries', pill:'pill-groceries', amt: 173.54 },
+    ],
+  },
+  'Oct 2026': {
+    income: {
+      'SFMTA Payroll':    { amt: 1675.00, note: 'through Oct 3 · 1 WF Personal deposit' },
+      'From Eston':       { amt: 1221.48, note: 'bill-share reimbursements — month in progress (through Oct 3)' },
+    },
+    spending: {
+      'Housing': { amt: 1620.00, txns: 1, color:'#c9a27e', pill:'pill-other' },
+      'Dining Out': { amt: 267.20, txns: 3, color:'#c9927e', pill:'pill-dining' },
+      'Entertainment': { amt: 107.90, txns: 2, color:'#c97eb8', pill:'pill-other' },
+      'Groceries': { amt: 85.86, txns: 3, color:'#7eb89a', pill:'pill-groceries' },
+      'Utilities': { amt: 75.67, txns: 1, color:'#b8b87e', pill:'pill-other' },
+      'Subscriptions': { amt: 51.99, txns: 2, color:'#7e7eb8', pill:'pill-subscriptions' },
+      'Transportation': { amt: 47.41, txns: 2, color:'#7e9ab8', pill:'pill-transport' },
+      'Pets': { amt: 42.03, txns: 2, color:'#9ab87e', pill:'pill-other' },
+      'Shopping': { amt: 23.25, txns: 1, color:'#b87e9a', pill:'pill-shopping' },
+    },
+    merchants: [
+      { name:'BILT Rent (your 60%)', cat:'Housing', pill:'pill-other', amt: 1620.00 },
+      { name:'Kokkari Estiatorio', cat:'Dining Out', pill:'pill-dining', amt: 235.17 },
+      { name:'Sonlight Surfshop', cat:'Entertainment', pill:'pill-other', amt: 87.90 },
+      { name:'Whole Foods Market', cat:'Groceries', pill:'pill-groceries', amt: 81.80 },
+      { name:'Pacific Gas & Electric', cat:'Utilities', pill:'pill-other', amt: 75.67 },
     ],
   },
 };
 
 const MONTH_KEYS = Object.keys(MONTHS);
-let activeMonth = 'Aug 2026';
+let activeMonth = 'Sep 2026'; // latest complete month (Oct 2026 is partial, through Oct 3)
 
 // ── HELPERS ──
 function fmt(n) {
