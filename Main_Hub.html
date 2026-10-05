@@ -1060,8 +1060,8 @@
             <label><input type="checkbox" id="evtEdOvernight" onchange="if(this.checked)document.getElementById('evtEdAllDay').checked=false;" /> 🌙 Overnight</label>
           </div>
           <div class="evt-editor-field">
-            <div class="evt-editor-label">Color</div>
-            <div style="display:flex;gap:6px;" id="evtEdColorRow"></div>
+            <div class="evt-editor-label">Type</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;" id="evtEdColorRow"></div>
           </div>
           <div class="evt-editor-actions">
             <button class="evt-editor-btn delete" onclick="deleteEventFromEditor()">Delete</button>
@@ -1082,34 +1082,36 @@
           <div class="id-block morning">
             <div class="id-dot morning"></div>
             <div class="id-info">
-              <div class="id-time">5:30 AM</div>
-              <div class="id-activity">Wake up + To-Do List</div>
-              <div class="id-dur">5 min</div>
+              <div class="id-time">6:00 AM</div>
+              <div class="id-activity">Wake up + Snack + Coffee + To-Do List</div>
+              <div class="id-dur">20 min</div>
               <div><span class="id-tag keystone">keystone</span></div>
+              <div class="id-note">Trigger: alarm across the room. Snack and coffee set out the night before.</div>
             </div>
           </div>
           <div class="id-block morning">
             <div class="id-dot morning"></div>
             <div class="id-info">
-              <div class="id-time">5:35 AM</div>
+              <div class="id-time">6:20 AM</div>
               <div class="id-activity">Gym — workout or run</div>
-              <div class="id-dur">60–75 min</div>
+              <div class="id-dur">60 min workout · 30 min run</div>
               <div><span class="id-tag keystone">keystone</span></div>
-              <div class="id-note">Phase 1 focus: build this first.</div>
+              <div class="id-note">Workout Mon/Wed/Fri/Sat. Run Tue/Thu (Sun optional). Phase 1 focus.</div>
             </div>
           </div>
           <div class="id-block morning">
             <div class="id-dot morning"></div>
             <div class="id-info">
-              <div class="id-time">6:50 AM</div>
+              <div class="id-time">7:20 AM</div>
               <div class="id-activity">Smoothie + Shower</div>
               <div class="id-dur">15 min</div>
+              <div class="id-note">Reward for the workout.</div>
             </div>
           </div>
           <div class="id-block morning">
             <div class="id-dot morning"></div>
             <div class="id-info">
-              <div class="id-time">7:05 AM</div>
+              <div class="id-time">7:35 AM</div>
               <div class="id-activity">Get Ready</div>
               <div class="id-dur">30 min</div>
             </div>
@@ -1117,9 +1119,9 @@
           <div class="id-block morning">
             <div class="id-dot morning"></div>
             <div class="id-info">
-              <div class="id-time">7:35 AM</div>
-              <div class="id-activity">Breakfast + Coffee + Reading</div>
-              <div class="id-dur">30–40 min</div>
+              <div class="id-time">8:05 AM</div>
+              <div class="id-activity">Breakfast + Reading</div>
+              <div class="id-dur">10 min · 40 on run days</div>
               <div><span class="id-tag habit">habit</span></div>
               <div class="id-note">News or book. Start with 10 pages.</div>
             </div>
@@ -1211,7 +1213,7 @@
             <div class="id-info">
               <div class="id-time">8:45 PM</div>
               <div class="id-activity">Read a Book</div>
-              <div class="id-dur">45–60 min</div>
+              <div class="id-dur">30 min</div>
               <div><span class="id-tag habit">habit</span></div>
               <div class="id-note">Analog only. No screens.</div>
             </div>
@@ -1219,10 +1221,20 @@
           <div class="id-block night">
             <div class="id-dot night"></div>
             <div class="id-info">
-              <div class="id-time">9:45 PM</div>
-              <div class="id-activity">Wind-Down + Prep for Tomorrow</div>
-              <div class="id-dur">15 min</div>
-              <div class="id-note">Lay out clothes, set intention.</div>
+              <div class="id-time">9:15 PM</div>
+              <div class="id-activity">Night Routine</div>
+              <div class="id-dur">25 min</div>
+              <div><span class="id-tag keystone">keystone</span></div>
+              <div class="id-note">Trigger: 9:15 alarm, phone on charger. Skincare → hairline treatment → set up coffee → lay out gym clothes + snack.</div>
+            </div>
+          </div>
+          <div class="id-block night">
+            <div class="id-dot night"></div>
+            <div class="id-info">
+              <div class="id-time">9:40 PM</div>
+              <div class="id-activity">Read in Bed</div>
+              <div class="id-dur">20 min</div>
+              <div class="id-note">Reward for finishing the night routine.</div>
             </div>
           </div>
           <div class="id-block night">
@@ -1238,7 +1250,7 @@
         </div>
 
         <div class="id-focus-box">
-          <p><strong>Phase 1 — The only thing that matters right now:</strong> Wake at 5:30. Get to the gym. Don't try to install all habits at once. Once the gym is locked in (2–3 weeks), everything else has a foundation to attach to. <em>Never miss twice.</em></p>
+          <p><strong>Phase 1 — The only thing that matters right now:</strong> Wake at 6:00. Get to the gym. Don't try to install all habits at once. Once the gym is locked in (2–3 weeks), everything else has a foundation to attach to. <em>Never miss twice.</em></p>
         </div>
       </div>
 
@@ -1265,10 +1277,9 @@
 // reads as continuous, not gapped. Defined up top so it's ready
 // before the first renderWeekCalendar() call.
 const IDEAL_DAY = [
-  { startH: 5,  endH: 6,  lines: ['5:30 Wake Up + To-Do List', '5:35 Gym — workout or run'] },
-  { startH: 6,  endH: 7,  lines: ['6:50 Smoothie + Shower'] },
-  { startH: 7,  endH: 8,  lines: ['7:05 Get Ready', '7:35 Breakfast + Coffee + Reading'] },
-  { startH: 8,  endH: 9,  lines: ['8:15 Commute — Read or Podcast'] },
+  { startH: 6,  endH: 7,  lines: ['6:00 Wake Up + Snack + Coffee', '6:20 Gym — 1 hr workout or 30 min run'] },
+  { startH: 7,  endH: 8,  lines: ['7:20 Smoothie + Shower', '7:35 Get Ready'] },
+  { startH: 8,  endH: 9,  lines: ['8:05 Breakfast + Reading', '8:15 Commute — Read or Podcast'] },
   { startH: 9,  endH: 12, lines: ['9:00 Work'] },
   { startH: 12, endH: 13, lines: ['12:30 Lunch — Read, Edit, or Podcast'] },
   { startH: 13, endH: 16, lines: ['1:30 Work'] },
@@ -1277,7 +1288,7 @@ const IDEAL_DAY = [
   { startH: 18, endH: 19, lines: ['6:45 Make + Eat Dinner'] },
   { startH: 19, endH: 20, lines: ['7:45 TV with Eston'] },
   { startH: 20, endH: 21, lines: ['8:45 Read a Book'] },
-  { startH: 21, endH: 22, lines: ['9:45 Wind-Down + Prep for Tomorrow'] },
+  { startH: 21, endH: 22, lines: ['9:15 Night Routine — skincare, hairline, coffee, lay out', '9:40 Read in Bed'] },
   { startH: 22, endH: 24, lines: ['10:00 Lights Out'] },
 ];
 
@@ -1373,6 +1384,7 @@ function applyHubToUI() {
   todos = (hubData.todos || []).map(t => t.id ? t : { ...t, id: Date.now() + Math.random() });
   renderTodos();
   _calEvents = hubData.cal_events || [];
+  seedWorkWeek();
   renderWeekCalendar();
   // Also pull Monthly Outline native events and merge for display
   mergeMOEventsIntoHub();
@@ -1948,59 +1960,107 @@ async function syncEventsToMonthlyOutline(hubEvts) {
   } catch(e) { console.warn('[Hub→MO sync]', e.message); }
 }
 
+// ── WORK WEEK SEED (Oct 4–10, 2026) ──
+// Confirmed events from the work calendar for this week (tentative and
+// "Following" items left out). Added once, by stable id, so reloading
+// never duplicates them and deleting one doesn't bring it back. The grid
+// is hour-based, so half-hour times are widened to the hours they touch.
+const WORK_WEEK_SEED_KEY = 'work_week_seed_2026-10-04_v3';
+const WORK_WEEK_SEED = [
+  { id: 'wk20261004_0', date: '2026-10-05', startH: 13, endH: 14, type: 'work',        title: 'Bayview Shuttle Chat (1:00)' },
+  { id: 'wk20261004_5', date: '2026-10-06', startH: 14, endH: 15, type: 'work',        title: 'Via ↔ SFMTA (2:00)' },
+  { id: 'wk20261004_6', date: '2026-10-06', startH: 15, endH: 16, type: 'work',        title: 'JC/JG Weekly (3:00)' },
+  { id: 'wk20261004_7', date: '2026-10-07', startH: 13, endH: 14, type: 'work',        title: 'Mobility Management Check In (1:00)' },
+  { id: 'wk20261004_8', date: '2026-10-07', startH: 14, endH: 15, type: 'work',        title: 'SacRT/SFMTA Connect (2:00)' },
+  { id: 'wk20261004_9', date: '2026-10-08', startH: 11, endH: 12, type: 'appointment', title: 'Appt (11:30)' }
+];
+// This week's morning training plan (6:20 start; hour grid, so a 1 hr
+// workout covers 6–8a and a 30 min run covers 6–7a).
+const TRAINING_WEEK_SEED = [
+  { id: 'tr20261004_mon', date: '2026-10-05', startH: 6, endH: 8, type: 'personal', title: 'Workout (6:20–7:20)' },
+  { id: 'tr20261004_tue', date: '2026-10-06', startH: 6, endH: 7, type: 'personal', title: 'Run (6:20–6:50)' },
+  { id: 'tr20261004_wed', date: '2026-10-07', startH: 6, endH: 8, type: 'personal', title: 'Workout (6:20–7:20)' },
+  { id: 'tr20261004_thu', date: '2026-10-08', startH: 6, endH: 7, type: 'personal', title: 'Run (6:20–6:50)' },
+  { id: 'tr20261004_fri', date: '2026-10-09', startH: 6, endH: 8, type: 'personal', title: 'Workout (6:20–7:20)' },
+  { id: 'tr20261004_sat', date: '2026-10-10', startH: 6, endH: 8, type: 'personal', title: 'Workout (6:20–7:20)' }
+];
+// Unconfirmed events an earlier version of this seed added — removed if present.
+const WORK_WEEK_SEED_REMOVE = ['wk20261004_1', 'wk20261004_2', 'wk20261004_3', 'wk20261004_4'];
+function seedWorkWeek() {
+  if (local.get(WORK_WEEK_SEED_KEY)) return;
+  const before = loadCalEvents();
+  const evts = before.filter(function(e) { return WORK_WEEK_SEED_REMOVE.indexOf(e.id) === -1; });
+  let changed = evts.length !== before.length;
+  const alreadySeeded = !!(local.get('work_week_seed_2026-10-04') || local.get('work_week_seed_2026-10-04_v2'));
+  WORK_WEEK_SEED.concat(TRAINING_WEEK_SEED).forEach(function(s) {
+    if (evts.some(function(e) { return e.id === s.id; })) return;
+    if (alreadySeeded && s.id.indexOf('wk') === 0) return;
+    const t = evtType(s.type);
+    evts.push({ id: s.id, date: s.date, startH: s.startH, endH: s.endH, allDay: false, overnight: false,
+      title: s.title, type: t.key, color: t.hex, cat: t.moCat, notes: '', hubNative: true });
+    changed = true;
+  });
+  local.set(WORK_WEEK_SEED_KEY, '1');
+  if (changed) saveCalEventsAsync(evts);
+}
+
 const HOURS = Array.from({length: 24}, (_, i) => i); // full day, 12am–11pm
 const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// ── EVENT COLOR CODING ──
-// A named palette (drawn from the page's own accent colors) that the
-// person picks from when adding an event. The last-used swatch is
-// remembered locally so repeated adds of the same kind of event (e.g.
-// several "Work" blocks in a row) don't require reselecting each time.
-const EVENT_COLORS = [
-  { hex: '#C2678C', name: 'Rose' },
-  { hex: '#E3A9BE', name: 'Blush' },
-  { hex: '#9DBB9A', name: 'Sage' },
-  { hex: '#C3DAC0', name: 'Mint' },
-  { hex: '#8FB8D6', name: 'Sky' },
-  { hex: '#6B7F8E', name: 'Slate' },
-  { hex: '#C9527A', name: 'Berry' },
-  { hex: '#C6B3E0', name: 'Lavender' },
-  { hex: '#F0C99A', name: 'Sand' }
+// ── EVENT TYPE COLOR CODING ──
+// Every event has a type, and the type decides its color — so the week
+// reads at a glance (all Work blocks are blue, all Content blocks rose…).
+// The last-used type is remembered so adding several of the same kind in
+// a row doesn't require reselecting each time.
+const EVENT_TYPES = [
+  { key: 'work',        name: 'Work',        hex: '#4F7CAC', moCat: 'work' },
+  { key: 'content',     name: 'Content',     hex: '#C2678C', moCat: 'creative' },
+  { key: 'appointment', name: 'Appointment', hex: '#3E9A8F', moCat: 'appointments' },
+  { key: 'reminder',    name: 'Reminder',    hex: '#C98A2B', moCat: 'events' },
+  { key: 'personal',    name: 'Personal',    hex: '#8A6FA0', moCat: 'activity' }
 ];
-let selectedEvtColor = local.get('cal_last_color') || EVENT_COLORS[0].hex;
-
-// Called from the swatch row in the Add Event form. Updates the picker
-// selection directly via the DOM (rather than a full renderWeekCalendar)
-// so the title/date/hour fields the person has already filled in aren't
-// wiped out by a re-render.
-function setEvtColor(hex, el) {
-  selectedEvtColor = hex;
-  local.set('cal_last_color', hex);
-  const row = el.parentElement;
-  Array.from(row.children).forEach(function(c) { c.style.boxShadow = 'none'; c.style.transform = 'scale(1)'; });
-  el.style.boxShadow = '0 0 0 2px #fff, 0 0 0 3.5px ' + hex;
-  el.style.transform = 'scale(1.15)';
+const MO_CAT_TO_TYPE = { work: 'work', creative: 'content', appointments: 'appointment' };
+function evtType(key) { return EVENT_TYPES.find(function(t) { return t.key === key; }) || null; }
+// An event's display color: its type's color if it has one; otherwise
+// whatever color it was saved with (events created before types existed).
+function evtColor(e) {
+  const t = evtType(e.type);
+  return t ? t.hex : (e.color || '#6B7F8E');
 }
+let selectedEvtType = evtType(local.get('cal_last_type')) ? local.get('cal_last_type') : 'work';
 
-function evtColorSwatchesHtml() {
-  return EVENT_COLORS.map(function(c) {
-    const active = c.hex === selectedEvtColor;
-    return '<div onclick="setEvtColor(\'' + c.hex + '\', this)" title="' + c.name + '" style="width:15px;height:15px;border-radius:50%;background:' + c.hex + ';cursor:pointer;flex-shrink:0;transition:transform 0.15s;' +
-      (active ? 'box-shadow:0 0 0 2px #fff, 0 0 0 3.5px ' + c.hex + ';transform:scale(1.15);' : '') + '"></div>';
+function typeChipStyle(t, active) {
+  return 'border:1px solid ' + t.hex + ';border-radius:100px;padding:0.2rem 0.55rem;font-family:\'DM Mono\',monospace;font-size:0.5rem;letter-spacing:0.08em;cursor:pointer;white-space:nowrap;user-select:none;' +
+    (active ? 'background:' + t.hex + ';color:#fff;' : 'background:transparent;color:' + t.hex + ';');
+}
+function typeChipsHtml(selected, handler) {
+  return EVENT_TYPES.map(function(t) {
+    return '<span data-type="' + t.key + '" onclick="' + handler + '(\'' + t.key + '\', this)" style="' + typeChipStyle(t, t.key === selected) + '">' + t.name + '</span>';
   }).join('');
 }
+function restyleTypeChips(row, selected) {
+  Array.from(row.children).forEach(function(c) {
+    c.setAttribute('style', typeChipStyle(evtType(c.dataset.type), c.dataset.type === selected));
+  });
+}
+// Called from the type row in the Add Event form. Updates the chips
+// directly via the DOM (rather than a full renderWeekCalendar) so the
+// title/date/hour fields already filled in aren't wiped by a re-render.
+function setEvtType(key, el) {
+  selectedEvtType = key;
+  local.set('cal_last_type', key);
+  restyleTypeChips(el.parentElement, key);
+}
 
-// Right-click on an event block cycles it to the next palette color —
-// deliberately a separate gesture from the left-click delete so the two
-// never collide.
+// Right-click on an event block cycles it to the next type (and color).
 async function recolorCalEvent(id) {
   const evts = loadCalEvents();
   const ev = evts.find(function(e) { return e.id === id; });
-  if (!ev) return;
-  const idx = EVENT_COLORS.findIndex(function(c) { return c.hex === ev.color; });
-  const next = EVENT_COLORS[(idx + 1) % EVENT_COLORS.length];
-  ev.color = next.hex;
+  if (!ev || ev.moSource) return;
+  const idx = EVENT_TYPES.findIndex(function(t) { return t.key === ev.type; });
+  const next = EVENT_TYPES[(idx + 1) % EVENT_TYPES.length];
+  ev.type = next.key; ev.color = next.hex; ev.cat = next.moCat;
   await saveCalEventsAsync(evts);
   renderWeekCalendar();
 }
@@ -2018,36 +2078,29 @@ function openEventEditor(id) {
   const startSel = document.getElementById('evtEdStart');
   const endSel = document.getElementById('evtEdEnd');
   startSel.innerHTML = HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('');
-  endSel.innerHTML = HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('');
+  endSel.innerHTML = HOURS.map(function(h){ return '<option value="'+(h+1)+'">'+hourLabel(h+1)+'</option>'; }).join('');
 
   document.getElementById('evtEdTitle').value = ev.title || '';
   document.getElementById('evtEdDate').value = ev.date || '';
   startSel.value = ev.startH != null ? ev.startH : 9;
-  // endH is stored exclusive (e.g. a 9a–10a event has endH 10); the
-  // selector shows inclusive hour labels like the Add Event form does,
-  // so step back by 1 for display and re-add it on save.
-  endSel.value = ev.endH != null ? Math.max(0, ev.endH - 1) : 10;
+  // The End selector is the actual end time: 3p → 4p blocks exactly
+  // the 3 o'clock hour.
+  endSel.value = ev.endH != null ? Math.min(24, Math.max(1, parseInt(ev.endH))) : Math.min(24, parseInt(startSel.value) + 1);
   document.getElementById('evtEdAllDay').checked = !!ev.allDay;
   document.getElementById('evtEdOvernight').checked = !!ev.overnight;
   document.getElementById('evtEdTimeRow').style.display = ev.allDay ? 'none' : 'flex';
 
-  const colorRow = document.getElementById('evtEdColorRow');
-  colorRow.innerHTML = EVENT_COLORS.map(function(c) {
-    const active = c.hex === (ev.color || EVENT_COLORS[0].hex);
-    return '<div onclick="setEvtEdColor(\'' + c.hex + '\', this)" title="' + c.name + '" style="width:15px;height:15px;border-radius:50%;background:' + c.hex + ';cursor:pointer;flex-shrink:0;transition:transform 0.15s;' +
-      (active ? 'box-shadow:0 0 0 2px #fff, 0 0 0 3.5px ' + c.hex + ';transform:scale(1.15);' : '') + '"></div>';
-  }).join('');
-  colorRow.dataset.selected = ev.color || EVENT_COLORS[0].hex;
+  const typeRow = document.getElementById('evtEdColorRow');
+  typeRow.innerHTML = typeChipsHtml(ev.type || '', 'setEvtEdType');
+  typeRow.dataset.selected = ev.type || '';
 
   document.getElementById('evtEditorOverlay').classList.add('open');
 }
 
-function setEvtEdColor(hex, el) {
+function setEvtEdType(key, el) {
   const row = el.parentElement;
-  row.dataset.selected = hex;
-  Array.from(row.children).forEach(function(c) { c.style.boxShadow = 'none'; c.style.transform = 'scale(1)'; });
-  el.style.boxShadow = '0 0 0 2px #fff, 0 0 0 3.5px ' + hex;
-  el.style.transform = 'scale(1.15)';
+  row.dataset.selected = key;
+  restyleTypeChips(row, key);
 }
 
 function closeEventEditor() {
@@ -2067,7 +2120,7 @@ async function saveEventEditor() {
   const allDay = document.getElementById('evtEdAllDay').checked;
   const overnight = !allDay && document.getElementById('evtEdOvernight').checked;
   const startH = parseInt(document.getElementById('evtEdStart').value);
-  let endH = parseInt(document.getElementById('evtEdEnd').value) + 1;
+  const endH = parseInt(document.getElementById('evtEdEnd').value);
   const isOvernight = !allDay && (overnight || endH <= startH);
 
   ev.title = title;
@@ -2076,7 +2129,8 @@ async function saveEventEditor() {
   ev.overnight = isOvernight;
   ev.startH = startH;
   ev.endH = endH;
-  ev.color = document.getElementById('evtEdColorRow').dataset.selected || ev.color;
+  const edType = evtType(document.getElementById('evtEdColorRow').dataset.selected);
+  if (edType) { ev.type = edType.key; ev.color = edType.hex; ev.cat = edType.moCat; }
 
   const statusEl = document.getElementById('calSaveStatus');
   if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
@@ -2156,6 +2210,7 @@ async function mergeMOEventsIntoHub() {
         allDay:   e.allDay || (!e.start && !e.end),
         overnight: e.overnight || false,
         color:    catColors[e.cat] || '#6B7F8E',
+        type:     MO_CAT_TO_TYPE[e.cat] || undefined,
         cat:      e.cat,
         notes:    e.notes || '',
         moSource: true
@@ -2211,7 +2266,7 @@ function renderWeekCalendar() {
     const dayAllDay = allDayEvts.filter(function(e){ return e.date === dk; });
     html += '<div style="border-left:1px solid rgba(138,111,160,0.18);border-bottom:1px solid rgba(138,111,160,0.12);padding:0.2rem;min-height:22px;background:rgba(138,111,160,0.02);">';
     dayAllDay.forEach(function(e) {
-      html += '<div style="background:' + (e.color||'#C2678C') + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="Click to edit · right-click to recolor: ' + e.title + '">' + e.title + '</div>';
+      html += '<div style="background:' + evtColor(e) + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="Click to edit · right-click to change type: ' + e.title + '">' + e.title + '</div>';
     });
     html += '</div>';
   });
@@ -2221,11 +2276,14 @@ function renderWeekCalendar() {
   // span the grid rows for its full duration instead of only appearing
   // in the hour it starts.
   HOURS.forEach(function(h) {
-    html += '<div style="padding:0.25rem 0.3rem 0 0;text-align:right;color:#8A6FA0;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(138,111,160,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
-    days.forEach(function(d) {
+    html += '<div style="grid-column:1;grid-row:' + (3 + h) + ';padding:0.25rem 0.3rem 0 0;text-align:right;color:#8A6FA0;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(138,111,160,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
+    // Each hour cell is pinned to its own row/column. (Left to auto-flow,
+    // the cells were pushed out of place by the event and routine blocks,
+    // so hour labels no longer lined up with the rows events sat in.)
+    days.forEach(function(d, di) {
       const dk = dateKey(d);
       const isToday = dk === today;
-      html += '<div style="border-left:1px solid rgba(138,111,160,0.18);border-bottom:1px solid rgba(138,111,160,0.07);min-height:28px;background:' +
+      html += '<div style="grid-column:' + (2 + di) + ';grid-row:' + (3 + h) + ';border-left:1px solid rgba(138,111,160,0.18);border-bottom:1px solid rgba(138,111,160,0.07);min-height:28px;background:' +
         (isToday ? 'rgba(138,111,160,0.04)' : 'transparent') +
         ';" ondblclick="quickAddEvent(\'' + dk + '\',' + h + ')"></div>';
     });
@@ -2299,12 +2357,12 @@ function renderWeekCalendar() {
       const rowEnd = 3 + seg.endH;
       const widthPct = 100 / seg.lanes;
       const leftPct = seg.lane * widthPct;
-      let prefix = '', suffix = '', title = 'Click to edit · right-click to recolor: ' + e.title;
-      if (seg.kind === 'start') { prefix = '🌙 '; title = 'Overnight: ' + hourLabel(e.startH) + ' → ' + hourLabel(e.endH) + ' next day. Click to edit · right-click to recolor: ' + e.title; }
-      if (seg.kind === 'end') { prefix = '↳ '; suffix = ' ends ' + hourLabel(e.endH); title = 'Overnight from ' + hourLabel(e.startH) + ' the night before, ends ' + hourLabel(e.endH) + '. Click to edit · right-click to recolor: ' + e.title; }
+      let prefix = '', suffix = '', title = 'Click to edit · right-click to change type: ' + e.title;
+      if (seg.kind === 'start') { prefix = '🌙 '; title = 'Overnight: ' + hourLabel(e.startH) + ' → ' + hourLabel(e.endH) + ' next day. Click to edit · right-click to change type: ' + e.title; }
+      if (seg.kind === 'end') { prefix = '↳ '; suffix = ' ends ' + hourLabel(e.endH); title = 'Overnight from ' + hourLabel(e.startH) + ' the night before, ends ' + hourLabel(e.endH) + '. Click to edit · right-click to change type: ' + e.title; }
       const showTimeLabel = (seg.endH - seg.startH) >= 2;
 
-      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';position:relative;left:' + leftPct + '%;width:calc(' + widthPct + '% - 3px);box-sizing:border-box;margin:1px 0 0 1px;background:' + (e.color||'#C2678C') + ';color:#fff;border-radius:3px;padding:0.15rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;overflow:hidden;z-index:2;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="' + title + '">' +
+      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';position:relative;left:' + leftPct + '%;width:calc(' + widthPct + '% - 3px);box-sizing:border-box;margin:1px 0 0 1px;background:' + evtColor(e) + ';color:#fff;border-radius:3px;padding:0.15rem 0.3rem;font-size:0.48rem;letter-spacing:0.04em;cursor:pointer;overflow:hidden;z-index:2;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="' + title + '">' +
         '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + prefix + e.title + suffix + '</div>' +
         (showTimeLabel ? '<div style="opacity:0.8;font-size:0.42rem;margin-top:1px;">' + hourLabel(seg.startH) + '–' + hourLabel(seg.endH) + '</div>' : '') +
         '</div>';
@@ -2313,30 +2371,47 @@ function renderWeekCalendar() {
 
   html += '</div>';
 
+  // Type legend
+  html += '<div style="margin-top:0.6rem;display:flex;gap:0.9rem;flex-wrap:wrap;align-items:center;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;color:#3A4F5C;">' +
+    EVENT_TYPES.map(function(t) { return '<span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:' + t.hex + ';display:inline-block;"></span>' + t.name + '</span>'; }).join('') +
+    '</div>';
+
   // Add event form
   html += '<div style="margin-top:0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">' +
     '<input id="calEvtTitle" placeholder="Event title…" style="flex:2;min-width:110px;background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" />' +
     '<input id="calEvtDate" type="date" style="flex:1;min-width:120px;background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;" />' +
-    '<select id="calEvtStart" style="background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
+    '<select id="calEvtStart" title="Start" onchange="document.getElementById(\'calEvtEnd\').value=Math.min(24,parseInt(this.value)+1)" style="background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
     HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('') +
     '</select>' +
-    '<select id="calEvtEnd" style="background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
-    HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('') +
+    '<span style="font-size:0.5rem;color:#8A6FA0;">to</span>' +
+    '<select id="calEvtEnd" title="End" style="background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
+    HOURS.map(function(h){ return '<option value="'+(h+1)+'">'+hourLabel(h+1)+'</option>'; }).join('') +
     '</select>' +
     '<label style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" onchange="if(this.checked)document.getElementById(\'calEvtOvernight\').checked=false;" style="width:10px;height:10px;" /> All-day</label>' +
     '<label style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;" title="Ends the next calendar day, e.g. 8p–6a"><input type="checkbox" id="calEvtOvernight" onchange="if(this.checked)document.getElementById(\'calEvtAllDay\').checked=false;" style="width:10px;height:10px;" /> 🌙 Overnight</label>' +
     '<div style="display:flex;align-items:center;gap:5px;">' +
-    '<span style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;">COLOR</span>' +
-    '<div style="display:flex;gap:5px;">' + evtColorSwatchesHtml() + '</div>' +
+    '<span style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;">TYPE</span>' +
+    '<div style="display:flex;gap:4px;flex-wrap:wrap;">' + typeChipsHtml(selectedEvtType, 'setEvtType') + '</div>' +
     '</div>' +
     '<button onclick="addCalEvent()" style="background:#8A6FA0;border:1px solid #8A6FA0;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
     '</div>';
 
+  // Keep whatever is already typed into the Add Event form across
+  // re-renders (the 30-second background sync redraws this whole grid).
+  const keep = {};
+  ['calEvtTitle','calEvtDate','calEvtStart','calEvtEnd'].forEach(function(id) { const el = document.getElementById(id); if (el) keep[id] = el.value; });
+  ['calEvtAllDay','calEvtOvernight'].forEach(function(id) { const el = document.getElementById(id); if (el) keep[id] = el.checked; });
+  const hadFocus = document.activeElement && document.activeElement.id === 'calEvtTitle';
+
   grid.innerHTML = html;
 
-  // Set today's date as default
-  const todayInput = document.getElementById('calEvtDate');
-  if (todayInput && !todayInput.value) todayInput.value = dateKey(new Date());
+  document.getElementById('calEvtTitle').value = keep.calEvtTitle || '';
+  document.getElementById('calEvtDate').value = keep.calEvtDate || dateKey(new Date());
+  document.getElementById('calEvtStart').value = keep.calEvtStart != null ? keep.calEvtStart : 9;
+  document.getElementById('calEvtEnd').value = keep.calEvtEnd != null ? keep.calEvtEnd : 10;
+  document.getElementById('calEvtAllDay').checked = !!keep.calEvtAllDay;
+  document.getElementById('calEvtOvernight').checked = !!keep.calEvtOvernight;
+  if (hadFocus) document.getElementById('calEvtTitle').focus();
 }
 
 function calPrevWeek() { calWeekOffset--; renderWeekCalendar(); }
@@ -2373,7 +2448,7 @@ async function addCalEvent() {
   const allDay = document.getElementById('calEvtAllDay').checked;
   const overnight = !allDay && document.getElementById('calEvtOvernight').checked;
   const startH = parseInt(document.getElementById('calEvtStart').value);
-  let endH = parseInt(document.getElementById('calEvtEnd').value) + 1;
+  const endH = parseInt(document.getElementById('calEvtEnd').value);
   // If not flagged overnight but the picked end hour is at/before the
   // start hour, treat it as overnight automatically rather than silently
   // storing a nonsense same-day range (e.g. 8p start, 6a end).
@@ -2386,8 +2461,9 @@ async function addCalEvent() {
     allDay: allDay,
     overnight: isOvernight,
     title: title,
-    color: selectedEvtColor,
-    cat: 'events',
+    type: selectedEvtType,
+    color: evtType(selectedEvtType).hex,
+    cat: evtType(selectedEvtType).moCat,
     notes: '',
     hubNative: true
   };
@@ -2443,8 +2519,8 @@ async function quickAddEvent(dateStr, hour) {
   evts.push({
     id: Date.now() + '' + Math.floor(Math.random()*1000),
     date: dateStr, startH: hour, endH: hour+1, allDay: false, overnight: false,
-    title: title.trim(), color: selectedEvtColor,
-    cat: 'events', notes: '', hubNative: true
+    title: title.trim(), type: selectedEvtType, color: evtType(selectedEvtType).hex,
+    cat: evtType(selectedEvtType).moCat, notes: '', hubNative: true
   });
   if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
   const ok = await saveCalEventsAsync(evts);
