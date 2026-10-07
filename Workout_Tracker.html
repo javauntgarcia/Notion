@@ -517,7 +517,11 @@ document.getElementById('f-date').value = today.toISOString().slice(0,10);
 let _wtData = { id: 'singleton', sessions: [], active_days: 0, pushups: 0, streak: 0 };
 
 async function loadWT() {
-  const row = await sbGet('workout_tracker', 'singleton');
+  // The `workout_tracker` table doesn't exist in Supabase yet — live data
+  // is in the `wellness` table (saveWT mirrors sessions there). Prefer the
+  // dedicated table if it ever gets created.
+  const row = await sbGet('workout_tracker', 'singleton')
+           || await sbGet('wellness', 'singleton');
   if (row) {
     _wtData = { ..._wtData, ...row };
   } else {
