@@ -954,8 +954,8 @@ const SEED_SETTLEMENT = {
     { label: 'Car payment share', amount: 125.00 },
   ],
   payments: [
-    { method: 'Zelle', amount: 500.00, note: '' },
-    { method: 'Venmo', amount: 858.51, note: '' },
+    { method: 'Zelle', amount: 500.00, date: '2026-10-01', note: '' },
+    { method: 'Venmo', amount: 721.48, date: '2026-10-02', note: 'Bill Share Reimbursement' },
   ],
 };
 let settlement = null;
@@ -1001,7 +1001,8 @@ function renderSettlement() {
     rows.push(`<div class="settle-row"><span class="k">${esc(c.label)}</span><span class="v">${fmt(c.amount)}</span></div>`);
   });
   (s.payments || []).forEach(p => {
-    const lbl = 'Paid — ' + p.method + (p.note ? ' (' + p.note + ')' : '');
+    const dstr = p.date ? fmtDate(p.date) : '';
+    const lbl = 'Paid — ' + p.method + (dstr ? ' · ' + dstr : '') + (p.note ? ' (' + p.note + ')' : '');
     rows.push(`<div class="settle-row"><span class="k">${esc(lbl)}</span><span class="v neg">−${fmt(p.amount).slice(1)}</span></div>`);
   });
   rows.push(`<div class="settle-row total"><span class="k">Remaining</span><span class="v">${fmt(t.remaining)}</span></div>`);
@@ -1017,6 +1018,7 @@ function logPayment() {
   settlement.payments.push({
     method: methodEl.value.trim() || 'Payment',
     amount: Math.round(amt * 100) / 100,
+    date: new Date().toISOString().slice(0, 10),
     note: noteEl.value.trim(),
   });
   settlement.updated = new Date().toISOString().slice(0, 10);
