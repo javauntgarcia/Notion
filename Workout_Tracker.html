@@ -524,6 +524,8 @@ async function loadWT() {
            || await sbGet('wellness', 'singleton');
   if (row) {
     _wtData = { ..._wtData, ...row };
+    // keep the offline cache fresh so the tracker opens instantly next time
+    lsSet('wt_sessions', JSON.stringify(_wtData.sessions || []));
   } else {
     _wtData.sessions    = JSON.parse(lsGet('wt_sessions') || '[]');
     _wtData.pushups     = parseInt(lsGet('wl_pushups') || '0');
