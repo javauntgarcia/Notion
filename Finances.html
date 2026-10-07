@@ -684,7 +684,7 @@
   <!-- BUDGET -->
   <section>
     <div class="section-header">
-      <h2 class="section-title">September — Budget vs. Actual</h2>
+      <h2 class="section-title">October — Budget vs. Actual</h2>
       <div class="section-rule"></div>
       <a id="nav-budget-manage" href="https://javauntgarcia.github.io/Notion/Budget.html" target="_blank" style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);text-decoration:none;">Manage →</a>
     </div>
@@ -867,18 +867,18 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// ── REAL ACCOUNT DATA (as of May 31, 2026) ──
+// ── REAL ACCOUNT DATA (Plaid balances as of Oct 7, 2026; Wealthfront manual) ──
 const ACCOUNTS = [
-  { name: 'BILT Mastercard',        type: 'Credit Card', class: 'debt',     balance: -2448.48, asOf: 'Oct 4, 2026' },
-  { name: 'Discover It',            type: 'Credit Card', class: 'debt',     balance: -49.98, asOf: 'Oct 2, 2026' },
-  { name: 'Citi Diamond Preferred', type: 'Credit Card', class: 'debt',     balance: -4413.27, asOf: 'Oct 2026' },
-  { name: 'Chase Sapphire Reserve', type: 'Credit Card', class: 'debt',     balance: -2068.71, asOf: 'Oct 2026' },
-  { name: 'Wells Fargo Active Cash',type: 'Credit Card', class: 'debt',     balance:  0.0, asOf: 'Oct 4, 2026' },
-  { name: 'Chase Checking',         type: 'Checking',    class: 'checking', balance:  198.77, asOf: 'Oct 2026' },
-  { name: 'Chase Savings',          type: 'Savings',     class: 'asset',    balance:  198.77, asOf: 'Oct 2026' },
+  { name: 'BILT Mastercard',        type: 'Credit Card', class: 'debt',     balance: -1681.27, asOf: 'Oct 7, 2026' },
+  { name: 'Discover It',            type: 'Credit Card', class: 'debt',     balance: -49.98, asOf: 'Oct 7, 2026' },
+  { name: 'Citi Diamond Preferred', type: 'Credit Card', class: 'debt',     balance: -4273.27, asOf: 'Oct 7, 2026' },
+  { name: 'Chase Sapphire Reserve', type: 'Credit Card', class: 'debt',     balance: -568.71, asOf: 'Oct 7, 2026' },
+  { name: 'Wells Fargo Active Cash',type: 'Credit Card', class: 'debt',     balance:  0.0, asOf: 'Oct 7, 2026' },
+  { name: 'Chase Checking',         type: 'Checking',    class: 'checking', balance:  147.30, asOf: 'Oct 7, 2026' },
+  { name: 'Chase Savings',          type: 'Savings',     class: 'asset',    balance:  48.77, asOf: 'Oct 7, 2026' },
   { name: 'Wealthfront Joint',      type: 'HYSA',        class: 'asset',    balance:  1748.37, asOf: 'Oct 2026' },
   { name: 'Wealthfront Personal',   type: 'HYSA',        class: 'asset',    balance:  1319.90, asOf: 'Oct 2026' },
-  { name: 'Vanguard Roth IRA',      type: 'Investment',  class: 'asset',    balance:  18193.10 },
+  { name: 'Vanguard Roth IRA',      type: 'Investment',  class: 'asset',    balance:  19319.17, asOf: 'Oct 7, 2026' },
 ];
 
 function loadAccounts() {
@@ -906,20 +906,20 @@ function loadAccounts() {
   nwEl.className = 'nw-value ' + (nw >= 0 ? 'positive' : 'negative');
   document.getElementById('total-assets').textContent = fmt(totalAssets);
   document.getElementById('total-debt').textContent   = '-' + fmt(totalDebt);
-  document.getElementById('last-updated').textContent = 'Oct 4, 2026';
+  document.getElementById('last-updated').textContent = 'Oct 7, 2026';
 }
 
-// ── BUDGET SUMMARY (September 2026 — full-month actuals, your share only, vs. September budget) ──
+// ── BUDGET SUMMARY (October 2026 — month-to-date actuals through Oct 7, your share only, vs. October budget) ──
 const BUDGET_CATS = [
-  { name: 'Housing',        spent: 1641, limit: 1620 },
-  { name: 'Debt',           spent:  280, limit:  280 },
-  { name: 'Savings',        spent: 1920, limit: 2175 }, // moved to Wealthfront Joint (2 × $960)
-  { name: 'Groceries',      spent: 543, limit:  600 },
-  { name: 'Shopping',       spent: 765, limit:  200 },
-  { name: 'Dining Out',     spent: 508, limit:  250 },
-  { name: 'Transportation', spent: 209, limit:   40 },
-  { name: 'Subscriptions',  spent: 217, limit:  120 },
-  { name: 'Entertainment',  spent: 335, limit:  200 },
+  { name: 'Housing',        spent: 1620, limit: 1620 },
+  { name: 'Debt',           spent:  307, limit:  280 },
+  { name: 'Savings',        spent: 768, limit: 2175 }, // Wealthfront Joint contribution Oct 2
+  { name: 'Groceries',      spent: 86, limit:  600 },
+  { name: 'Shopping',       spent: 23, limit:  200 },
+  { name: 'Dining Out',     spent: 267, limit:  250 },
+  { name: 'Transportation', spent: 47, limit:   40 },
+  { name: 'Subscriptions',  spent: 52, limit:  120 },
+  { name: 'Entertainment',  spent: 108, limit:  200 },
 ];
 
 function loadBudget() {
