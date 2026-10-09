@@ -730,6 +730,11 @@
                 <option>Direct to camera</option>
               </select>
             </div>
+            <div class="field">
+              <label>Hook — exact wording (optional)</label>
+              <input type="text" id="m-hooktext" placeholder="e.g. Fashion isn&apos;t political? History says otherwise." />
+              <div class="field-hint">The literal opening line — lets you compare which exact hooks pull viewers in</div>
+            </div>
 
             <div class="field"><label>Views</label><input type="number" id="m-views" min="0" /></div>
             <div class="field"><label>Likes</label><input type="number" id="m-likes" min="0" /></div>
@@ -1236,7 +1241,8 @@ function buildVideoModalBody(v) {
   if (v.camera_angle) formatBits.push(['Camera Angle', v.camera_angle]);
   if (v.editing_style) formatBits.push(['Editing Style', v.editing_style]);
   if (v.audio_type) formatBits.push(['Audio', v.audio_type]);
-  if (v.hook_type) formatBits.push(['Hook', v.hook_type]);
+  if (v.hook_type) formatBits.push(['Hook type', v.hook_type]);
+  if (v.hook_text) formatBits.push(['Hook text', '\u201c' + v.hook_text + '\u201d']);
   var formatHtml = '';
   if (formatBits.length) {
     formatHtml = '<div class="hashtag-pills" style="margin-top:0.9rem;">' +
@@ -2156,7 +2162,7 @@ function parseAudienceText(str) {
 function resetManualForm() {
   ['m-caption', 'm-views', 'm-likes', 'm-comments', 'm-shares', 'm-saves', 'm-watch',
    'm-r25', 'm-r50', 'm-r75', 'm-r100', 'm-audience', 'm-date', 'm-length',
-   'm-category-other', 'm-angle-other', 'm-editstyle-other'].forEach(function (id) {
+   'm-category-other', 'm-angle-other', 'm-editstyle-other', 'm-hooktext'].forEach(function (id) {
     document.getElementById(id).value = '';
   });
   ['m-category', 'm-angle', 'm-editstyle', 'm-audio', 'm-hook'].forEach(function (id) {
@@ -2203,6 +2209,7 @@ window.saveManualVideo = function () {
     editing_style: resolvedSelectValue('m-editstyle', 'm-editstyle-other') || null,
     audio_type: document.getElementById('m-audio').value || null,
     hook_type: document.getElementById('m-hook').value || null,
+    hook_text: document.getElementById('m-hooktext').value.trim() || null,
     views: num(document.getElementById('m-views').value),
     likes: num(document.getElementById('m-likes').value),
     comments: num(document.getElementById('m-comments').value),
