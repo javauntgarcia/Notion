@@ -866,6 +866,11 @@
     .nav-tile { min-height: 75px; }
     .id-grid { grid-template-columns: 1fr 1fr; }
   }
+  /* Mobile: let the 7-day week grid scroll horizontally instead of squeezing */
+  @media (max-width: 720px) {
+    #calWeekGrid { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    #calWeekGrid > div { min-width: 680px; }
+  }
 </style>
 </head>
 <body>
