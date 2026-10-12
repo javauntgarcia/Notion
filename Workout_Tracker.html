@@ -969,7 +969,7 @@ function renderSessions(){
   const sortedWks=Object.keys(groups).sort().reverse();
 
   container.innerHTML=sortedWks.map(wk=>{
-    const wkSessions=groups[wk];
+    const wkSessions=groups[wk].slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
     const items=wkSessions.map(s=>buildSessionRow(s,false)).join('');
     return `<div class="week-group">
       <div class="week-header">
@@ -993,7 +993,7 @@ function renderArchive(){
   const sortedWks=Object.keys(groups).sort().reverse();
 
   container.innerHTML=sortedWks.map(wk=>{
-    const wkSessions=groups[wk];
+    const wkSessions=groups[wk].slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
     const items=wkSessions.map(s=>buildSessionRow(s,true)).join('');
     return `<div class="week-group">
       <div class="week-header">
