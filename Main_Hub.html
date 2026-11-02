@@ -1591,10 +1591,10 @@ function addTodo() {
   mutateTodos(list => [{ id, text: v, done: false }, ...list]);
 }
 function toggleTodo(id) {
-  mutateTodos(list => list.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  mutateTodos(list => list.map(t => String(t.id) === String(id) ? { ...t, done: !t.done } : t));
 }
 function deleteTodo(id) {
-  mutateTodos(list => list.filter(t => t.id !== id));
+  mutateTodos(list => list.filter(t => String(t.id) !== String(id)));
 }
 
 // ── GOALS — carousel grouped by subpage ──
