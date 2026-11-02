@@ -1662,8 +1662,9 @@ const goalSlides = [
         color: 'bar-rust',
         milestone: 'Sell 25 items',
         compute: function() {
-          var n = Math.min(25, parseInt((hubData._productivity||{}).prod_dep_sold) || 0);
-          return { pct: Math.round(n/25*100), meta: n+' of 25 sold' };
+          var raw = Math.max(0, parseInt((hubData._productivity||{}).prod_dep_sold) || 0);
+          var n = Math.min(25, raw);
+          return { pct: Math.round(n/25*100), meta: raw+' of 25 sold' };
         }
       },
       {
