@@ -1119,10 +1119,10 @@ function renderTasks() {
 }
 
 function toggleTask(id) {
-  mutateTasks(tasks => tasks.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  mutateTasks(tasks => tasks.map(t => String(t.id) === String(id) ? { ...t, done: !t.done } : t));
 }
 function deleteTask(id) {
-  mutateTasks(tasks => tasks.filter(x => x.id !== id));
+  mutateTasks(tasks => tasks.filter(x => String(x.id) !== String(id)));
 }
 function clearDone() {
   mutateTasks(tasks => tasks.filter(x => !x.done));
@@ -1155,7 +1155,7 @@ function addHabit() {
 }
 
 function toggleHabit(id) {
-  const h = _habits.find(x => x.id === id);
+  const h = _habits.find(x => String(x.id) === String(id));
   if (h) {
     h.done = !h.done;
     saveHabits();
@@ -1213,7 +1213,7 @@ async function syncSocialGoal(dateKey, done) {
 }
 
 function deleteHabit(id) {
-  _habits = _habits.filter(x => x.id !== id);
+  _habits = _habits.filter(x => String(x.id) !== String(id));
   saveHabits(); renderHabits();
 }
 
