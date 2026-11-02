@@ -771,12 +771,14 @@
        GOAL 1: CONSISTENCY — active days this year
     ════════════════════════════════════════ */
     (function () {
-      var start = new Date(now.getFullYear(), 0, 1);
-      var elapsed = Math.ceil((now - start) / 86400000);
+      // Measured from when workout logging began (Jun 1, 2026), not Jan 1 —
+      // days before tracking started don't count against the %.
+      var trackStart = new Date(2026, 5, 1);
+      var elapsed = Math.max(1, Math.ceil((now - trackStart) / 86400000));
       var target = Math.round(elapsed * 0.75);
       var p = pct(activeDays, target);
       document.getElementById('consist-meta').textContent =
-        activeDays + ' active days / ' + target + ' target (' + elapsed + ' days elapsed)';
+        activeDays + ' active days / ' + target + ' target (' + elapsed + ' days since Jun 1)';
       document.getElementById('consist-val').innerHTML = p + '<span>% of pace</span>';
       bar('consist-bar', p);
       if (activeDays === 0) {

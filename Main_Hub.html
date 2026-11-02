@@ -1713,16 +1713,36 @@ const goalSlides = [
         }
       },
       {
-        // Tracked via the Sunday-only "Update weekly outline" task in
-        // Planning.html's habit tracker.
+        // Auto-updates: editing the Weekly Outline calendar stamps
+        // outline_updated_at, so the current week counts even if the
+        // Sunday habit wasn't manually marked (no double-count).
         name: 'Update Weekly Outline',
         color: 'bar-gold',
         milestone: 'Every Sunday in 2026',
         compute: function() {
           var s = habitOccurrenceStats('Update weekly outline');
           var target = 52;
-          return { pct: Math.min(100, Math.round(s.done / target * 100)),
-                   meta: s.done + ' of ' + target + ' weeks' };
+          var done = s.done;
+          var auto = false;
+          var ts = hubData.outline_updated_at;
+          if (ts) {
+            var upd = new Date(ts);
+            var now = new Date();
+            var dow = (now.getDay() + 6) % 7; // Monday = 0
+            var weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow);
+            if (upd >= weekStart) {
+              var days = getAllDaysForGoals();
+              var habitDoneThisWeek = days.some(function(d) {
+                var dd = new Date(d.id + 'T12:00:00');
+                if (dd < weekStart) return false;
+                var h = (d.habits || []).find(function(x) { return x.text === 'Update weekly outline'; });
+                return !!(h && h.done);
+              });
+              if (!habitDoneThisWeek) { done += 1; auto = true; }
+            }
+          }
+          return { pct: Math.min(100, Math.round(done / target * 100)),
+                   meta: done + ' of ' + target + ' weeks' + (auto ? ' · auto-detected' : '') };
         }
       }
     ]
@@ -1743,14 +1763,17 @@ const goalSlides = [
       {
         name: 'Consistency',
         color: 'bar-green',
-        milestone: 'Active 75% of year',
+        milestone: 'Active 75% of tracked days',
         compute: function() {
           var activeDays = parseInt(hubData._wellness ? hubData._wellness.active_days : 0) || 0;
           var now = new Date();
-          var elapsed = Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000);
+          // Measured from when workout logging began (Jun 1, 2026), not Jan 1 —
+          // days before tracking started don't count against the %.
+          var trackStart = new Date(2026, 5, 1);
+          var elapsed = Math.max(1, Math.ceil((now - trackStart) / 86400000));
           var target = Math.round(elapsed * 0.75);
           return { pct: target > 0 ? Math.min(100, Math.round(activeDays/target*100)) : 0,
-                   meta: activeDays + ' active days' };
+                   meta: activeDays + ' active days since Jun 1' };
         }
       },
       {
@@ -1766,9 +1789,10 @@ const goalSlides = [
           }
           if (!cur) return { pct: 0, meta: 'No weight logged' };
           var start = parseFloat(wrow.weight_start) || cur;
-          var totalToLose = Math.abs(start - 165);
-          var pct = totalToLose > 0 ? Math.min(100, Math.round(Math.abs(cur-start)/totalToLose*100)) : (cur<=165?100:0);
-          if (cur <= 165) pct = 100;
+          // Signed progress: works for bulking (start < target) and cutting.
+          var total = 165 - start;
+          var done = cur - start;
+          var pct = total !== 0 ? Math.min(100, Math.max(0, Math.round(done / total * 100))) : 100;
           return { pct: pct, meta: cur + ' lbs current' };
         }
       },
@@ -1928,6 +1952,7 @@ buildGoalCarousel();
     hubData._financial   = await sbGet('financial_goals', 'singleton');
     var hubRow = await sbGet('main_hub', 'singleton');
     if (hubRow && hubRow.habits) hubData.habits = hubRow.habits;
+    if (hubRow && hubRow.outline_updated_at) hubData.outline_updated_at = hubRow.outline_updated_at;
     hubData._planningArchive = await loadPlanningArchive();
     syncFinancialGoalsSlide();
     buildGoalCarousel();
@@ -1944,7 +1969,11 @@ async function saveCalEventsAsync(evts) {
   _calEvents = evts;
   hubData.cal_events = evts;
   local.set('hub_cal_events', JSON.stringify(evts));
-  const ok = await patchHub({ cal_events: evts || [] });
+  // Stamp every outline edit so the "Update Weekly Outline" goal can
+  // auto-detect the week's update without the Sunday habit being marked.
+  var stamp = new Date().toISOString();
+  hubData.outline_updated_at = stamp;
+  const ok = await patchHub({ cal_events: evts || [], outline_updated_at: stamp });
   syncEventsToMonthlyOutline(evts); // best-effort cross-sync, doesn't block the status
   return ok;
 }
