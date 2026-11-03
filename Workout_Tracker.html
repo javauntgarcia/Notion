@@ -927,12 +927,12 @@ function buildSessionRow(s, archived){
   const overallNote=s.notes?`<div class="session-note-overall">${esc(s.notes)}</div>`:'';
 
   const actions = archived
-    ? `<button class="btn-restore" onclick="event.stopPropagation();restoreSession(${s.id})" title="Restore">Restore</button>`
-    : `<button class="btn-edit" onclick="event.stopPropagation();editSession(${s.id})" title="Edit">✎</button>
-       <button class="btn-delete" onclick="event.stopPropagation();archiveSession(${s.id})" title="Archive">✕</button>`;
+    ? `<button class="btn-restore" onclick='event.stopPropagation();restoreSession(${JSON.stringify(s.id)})' title="Restore">Restore</button>`
+    : `<button class="btn-edit" onclick='event.stopPropagation();editSession(${JSON.stringify(s.id)})' title="Edit">✎</button>
+       <button class="btn-delete" onclick='event.stopPropagation();archiveSession(${JSON.stringify(s.id)})' title="Archive">✕</button>`;
 
   return `
-    <div class="session-summary" onclick="toggleDetail(${s.id})">
+    <div class="session-summary" onclick='toggleDetail(${JSON.stringify(s.id)})'>
       <div class="session-dot ${dotClass}"></div>
       <div class="session-body">
         <div class="session-name">${esc(displayName)}</div>
