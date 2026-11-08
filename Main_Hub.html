@@ -7,33 +7,33 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
   :root {
-    /* Retro 70s palette drawn from the burnt-orange coat photo (Nov 2026) */
-    --denim:       #BE5A1D;
-    --denim-light: #E8A05C;
-    --slate:       #8A6B4A;
-    --slate-light: #B99B72;
-    --sage:        #A8A06B;
-    --sage-light:  #CFC39A;
-    --ivory:       #FAF3E8;
-    --ivory-dark:  #F0E0C8;
-    --mist:        #D9C4A3;
-    --fog:         #FAF3E8;
-    --fog-mid:     #3A2A1E;
-    --ink:         #2E1F14;
-    --glass:       rgba(217,196,163,0.13);
-    --glass-border: rgba(200,140,80,0.28);
+    /* Calming palette drawn from the photo's serene tones */
+    --denim:       #C2678C;
+    --denim-light: #E3A9BE;
+    --slate:       #6B7F8E;
+    --slate-light: #9BB0BE;
+    --sage:        #9DBB9A;
+    --sage-light:  #C3DAC0;
+    --ivory:       #FBF0F2;
+    --ivory-dark:  #F0D9DE;
+    --mist:        #C8D8E2;
+    --fog:         #F8ECEE;
+    --fog-mid:     #3A4F5C;
+    --ink:         #3A2A32;
+    --glass:       rgba(200,216,226,0.13);
+    --glass-border: rgba(201,123,147,0.28);
     /* semantic aliases */
-    --rust:        #BE5A1D;
-    --rust-light:  #E8A05C;
-    --navy:        #FAF3E8;
-    --navy-mid:    #3A2A1E;
-    --gold:        #8A6B4A;
-    --gold-light:  #D9C4A3;
-    --green:       #A8A06B;
-    --green-light: #CFC39A;
-    --cream:       #FAF3E8;
-    --cream-dark:  #F0E0C8;
-    --chestnut:    #8A6B4A;
+    --rust:        #C2678C;
+    --rust-light:  #E3A9BE;
+    --navy:        #F8ECEE;
+    --navy-mid:    #3A4F5C;
+    --gold:        #6B7F8E;
+    --gold-light:  #C8D8E2;
+    --green:       #9DBB9A;
+    --green-light: #C3DAC0;
+    --cream:       #FBF0F2;
+    --cream-dark:  #F0D9DE;
+    --chestnut:    #6B7F8E;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -69,12 +69,12 @@
     display: block;
     width: 100%; height: 100%;
     object-fit: cover;
-    object-position: center 24%;
+    object-position: center 12%;
   }
   .bg-layer::after {
     content: '';
     position: absolute; inset: 0;
-    background: linear-gradient(160deg, rgba(35,22,12,0.45) 0%, rgba(50,32,18,0.22) 45%, rgba(35,22,12,0.60) 100%);
+    background: linear-gradient(160deg, rgba(20,30,40,0.45) 0%, rgba(30,50,65,0.22) 45%, rgba(20,30,40,0.60) 100%);
   }
 
   /* ── HERO / PAGE ──
@@ -104,10 +104,10 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.2rem 2rem;
-    background: rgba(35,22,12,0.42);
+    background: rgba(20,30,40,0.42);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(217,196,163,0.10);
+    border-bottom: 1px solid rgba(200,216,226,0.10);
   }
   .topbar-wordmark {
     font-family: 'Cormorant Garamond', serif;
@@ -158,16 +158,16 @@
   }
   .hero-title em {
     font-style: italic;
-    color: #BE5A1D;
+    color: #C9527A;
     text-shadow: 0 2px 16px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.3);
   }
 
   /* ── GLASS CARD ── */
   .glass {
-    background: rgba(250,235,215,0.62);
+    background: rgba(252,232,236,0.62);
     backdrop-filter: blur(14px) saturate(1.3);
     -webkit-backdrop-filter: blur(14px) saturate(1.3);
-    border: 1px solid rgba(200,140,80,0.3);
+    border: 1px solid rgba(201,123,147,0.3);
     border-radius: 12px;
   }
 
@@ -175,19 +175,19 @@
   .evt-editor-overlay {
     display: none;
     position: fixed; inset: 0; z-index: 999;
-    background: rgba(40,26,16,0.45);
+    background: rgba(26,37,48,0.45);
     backdrop-filter: blur(3px);
     align-items: center; justify-content: center;
     padding: 1rem;
   }
   .evt-editor-overlay.open { display: flex; }
   .evt-editor-card {
-    background: #FDF6EA;
-    border: 1px solid rgba(150,110,60,0.22);
+    background: #FDF3F4;
+    border: 1px solid rgba(138,111,160,0.22);
     border-radius: 12px;
     padding: 1.4rem 1.5rem;
     width: 100%; max-width: 360px;
-    box-shadow: 0 12px 40px rgba(40,26,16,0.35);
+    box-shadow: 0 12px 40px rgba(26,37,48,0.35);
     font-family: 'DM Mono', monospace;
   }
   .evt-editor-card .section-label { margin-bottom: 1rem; }
@@ -196,20 +196,20 @@
   .evt-editor-field input[type="date"],
   .evt-editor-field select {
     width: 100%; box-sizing: border-box;
-    background: rgba(150,110,60,0.07); border: 1px solid rgba(150,110,60,0.2);
+    background: rgba(138,111,160,0.07); border: 1px solid rgba(138,111,160,0.2);
     border-radius: 6px; padding: 0.4rem 0.6rem;
-    font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #2E1F14;
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #3A2A32;
     outline: none; letter-spacing: 0.04em;
   }
   .evt-editor-row { display: flex; gap: 0.5rem; }
   .evt-editor-row > div { flex: 1; }
   .evt-editor-label {
     font-size: 0.48rem; letter-spacing: 0.12em; text-transform: uppercase;
-    color: #8A5A2B; opacity: 0.75; margin-bottom: 0.25rem;
+    color: #8A6FA0; opacity: 0.75; margin-bottom: 0.25rem;
   }
   .evt-editor-checks {
     display: flex; gap: 1rem; margin: 0.7rem 0; font-size: 0.5rem;
-    color: #8A5A2B; letter-spacing: 0.08em;
+    color: #8A6FA0; letter-spacing: 0.08em;
   }
   .evt-editor-checks label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
   .evt-editor-actions {
@@ -220,9 +220,9 @@
     font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em;
     border-radius: 6px; padding: 0.4rem 0.85rem; cursor: pointer;
   }
-  .evt-editor-btn.save { background: #8A5A2B; border: 1px solid #8A5A2B; color: #fff; }
-  .evt-editor-btn.cancel { background: transparent; border: 1px solid rgba(150,110,60,0.3); color: #8A5A2B; }
-  .evt-editor-btn.delete { background: transparent; border: 1px solid rgba(170,80,50,0.4); color: #A6502E; }
+  .evt-editor-btn.save { background: #8A6FA0; border: 1px solid #8A6FA0; color: #fff; }
+  .evt-editor-btn.cancel { background: transparent; border: 1px solid rgba(138,111,160,0.3); color: #8A6FA0; }
+  .evt-editor-btn.delete { background: transparent; border: 1px solid rgba(181,107,107,0.4); color: #b56b6b; }
 
   /* ── GRID LAYOUT ── */
   .main-grid {
@@ -241,7 +241,7 @@
     font-size: 0.58rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: #BE5A1D;
+    color: #C2678C;
     margin-bottom: 0.7rem;
     opacity: 1;
   }
@@ -250,39 +250,39 @@
     font-size: 1.15rem;
     font-style: italic;
     line-height: 1.55;
-    color: #2E1F14;
+    color: #3A2A32;
     margin-bottom: 0.5rem;
   }
   .quote-attr {
     font-size: 0.6rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: #BE5A1D;
+    color: #C2678C;
     opacity: 0.85;
   }
   .word-pill {
     display: inline-block;
     margin-top: 1rem;
-    background: rgba(190,90,29,0.12);
-    border: 1px solid rgba(190,90,29,0.3);
+    background: rgba(194,103,140,0.12);
+    border: 1px solid rgba(194,103,140,0.3);
     border-radius: 100px;
     padding: 0.3rem 1rem;
     font-size: 0.58rem;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: #BE5A1D;
+    color: #C2678C;
   }
   .word-of-week {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.4rem;
     font-weight: 700;
-    color: #2E1F14;
+    color: #3A2A32;
     margin-top: 0.25rem;
     letter-spacing: 0.05em;
   }
   .word-def {
     font-size: 0.65rem;
-    color: #3A2A1E;
+    color: #3A4F5C;
     opacity: 0.8;
     margin-top: 0.2rem;
     line-height: 1.5;
@@ -301,20 +301,20 @@
   }
   .todo-input {
     flex: 1;
-    background: rgba(190,90,29,0.07);
-    border: 1px solid rgba(190,90,29,0.2);
+    background: rgba(194,103,140,0.07);
+    border: 1px solid rgba(194,103,140,0.2);
     border-radius: 6px;
     padding: 0.4rem 0.7rem;
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
-    color: #2E1F14;
+    color: #3A2A32;
     outline: none;
     letter-spacing: 0.05em;
   }
-  .todo-input::placeholder { color: rgba(40,26,16,0.35); }
-  .todo-input:focus { border-color: #BE5A1D; }
+  .todo-input::placeholder { color: rgba(26,37,48,0.35); }
+  .todo-input:focus { border-color: #C2678C; }
   .add-btn {
-    background: #BE5A1D;
+    background: #C2678C;
     border: none;
     border-radius: 6px;
     color: var(--ivory);
@@ -325,19 +325,19 @@
     flex-shrink: 0;
     transition: background 0.2s;
   }
-  .add-btn:hover { background: #E8A05C; }
+  .add-btn:hover { background: #E3A9BE; }
   .todo-list { list-style: none; max-height: 180px; overflow-y: auto; }
   .todo-list::-webkit-scrollbar { width: 3px; }
-  .todo-list::-webkit-scrollbar-thumb { background: rgba(200,110,40,0.4); border-radius: 2px; }
+  .todo-list::-webkit-scrollbar-thumb { background: rgba(201,82,122,0.4); border-radius: 2px; }
   .todo-item {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     padding: 0.35rem 0;
-    border-bottom: 1px solid rgba(190,90,29,0.12);
+    border-bottom: 1px solid rgba(194,103,140,0.12);
     font-size: 0.6rem;
     letter-spacing: 0.04em;
-    color: #2E1F14;
+    color: #3A2A32;
     opacity: 0.9;
     animation: fadeIn 0.2s ease;
   }
@@ -346,17 +346,17 @@
   .todo-check {
     width: 14px; height: 14px;
     border-radius: 50%;
-    border: 1.5px solid #BE5A1D;
+    border: 1.5px solid #C2678C;
     background: transparent;
     cursor: pointer;
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     transition: background 0.2s;
   }
-  .todo-check.checked { background: #BE5A1D; border-color: #BE5A1D; }
+  .todo-check.checked { background: #C2678C; border-color: #C2678C; }
   .todo-check.checked::after { content: '✓'; font-size: 8px; color: white; }
-  .todo-del { margin-left: auto; color: rgba(190,90,29,0.3); cursor: pointer; font-size: 0.7rem; transition: color 0.2s; }
-  .todo-del:hover { color: #BE5A1D; }
+  .todo-del { margin-left: auto; color: rgba(194,103,140,0.3); cursor: pointer; font-size: 0.7rem; transition: color 0.2s; }
+  .todo-del:hover { color: #C2678C; }
 
   /* ── GOAL TRACKER ── */
   .goals-card {
@@ -396,18 +396,18 @@
     font-size: 0.58rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: #2E1F14;
+    color: #3A2A32;
     opacity: 0.75;
   }
   .goal-pct {
     font-family: 'Cormorant Garamond', serif;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #BE5A1D;
+    color: #C2678C;
   }
   .goal-bar-track {
     height: 5px;
-    background: rgba(190,90,29,0.12);
+    background: rgba(194,103,140,0.12);
     border-radius: 100px;
     overflow: hidden;
   }
@@ -416,14 +416,14 @@
     border-radius: 100px;
     transition: width 1.2s cubic-bezier(.4,0,.2,1);
   }
-  .bar-rust  { background: linear-gradient(90deg, #BE5A1D, #E8A05C); }
-  .bar-navy  { background: linear-gradient(90deg, #D9A05B, #E8C48A); }
+  .bar-rust  { background: linear-gradient(90deg, #C2678C, #E3A9BE); }
+  .bar-navy  { background: linear-gradient(90deg, #8FB8D6, #C6B3E0); }
   .bar-gold  { background: linear-gradient(90deg, #F0C99A, #F5DDB5); }
-  .bar-green { background: linear-gradient(90deg, #A8A06B, #CFC39A); }
-  .bar-cream { background: linear-gradient(90deg, #E8C48A, #D9C4A3); }
+  .bar-green { background: linear-gradient(90deg, #9DBB9A, #C3DAC0); }
+  .bar-cream { background: linear-gradient(90deg, #C6B3E0, #C8D8E2); }
   .goal-milestone {
     font-size: 0.52rem;
-    color: #3A2A1E;
+    color: #3A4F5C;
     opacity: 0.55;
     margin-top: 0.2rem;
     letter-spacing: 0.05em;
@@ -435,7 +435,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #BE5A1D;
+    color: #C2678C;
     cursor: pointer;
     text-align: right;
     outline: none;
@@ -455,33 +455,33 @@
   .goal-carousel-dot {
     width: 5px; height: 5px;
     border-radius: 50%;
-    background: rgba(190,90,29,0.22);
+    background: rgba(194,103,140,0.22);
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
   }
   .goal-carousel-dot.active {
-    background: #BE5A1D;
+    background: #C2678C;
     transform: scale(1.5);
   }
   .goal-carousel-btn {
-    background: rgba(190,90,29,0.10);
-    border: 1px solid rgba(190,90,29,0.22);
+    background: rgba(194,103,140,0.10);
+    border: 1px solid rgba(194,103,140,0.22);
     border-radius: 50%;
     width: 22px; height: 22px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
-    color: #BE5A1D;
+    color: #C2678C;
     font-size: 0.7rem;
     transition: background 0.15s;
     flex-shrink: 0;
   }
-  .goal-carousel-btn:hover { background: rgba(190,90,29,0.22); }
+  .goal-carousel-btn:hover { background: rgba(194,103,140,0.22); }
   .goal-carousel-btn:disabled { opacity: 0.25; cursor: default; }
   .goal-sub-label {
     font-size: 0.5rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #BE5A1D;
+    color: #C2678C;
     opacity: 0.65;
     text-align: center;
     flex: 1;
@@ -490,7 +490,7 @@
   .habit-log-sub {
     font-size: 0.55rem;
     letter-spacing: 0.05em;
-    color: #8A5A2B;
+    color: #8A6FA0;
     opacity: 0.7;
     margin-bottom: 0.7rem;
   }
@@ -507,11 +507,11 @@
   }
   .habit-heatmap-stat-val {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem; font-weight: 600; color: #2E1F14; line-height: 1;
+    font-size: 1.3rem; font-weight: 600; color: #3A2A32; line-height: 1;
   }
   .habit-heatmap-stat-label {
     font-size: 0.46rem; letter-spacing: 0.14em; text-transform: uppercase;
-    color: #8A5A2B; opacity: 0.7;
+    color: #8A6FA0; opacity: 0.7;
   }
   .habit-heatmap-grid {
     display: grid;
@@ -521,32 +521,32 @@
   .habit-heatmap-cell {
     aspect-ratio: 1;
     border-radius: 5px;
-    background: rgba(150,110,60,0.10);
+    background: rgba(138,111,160,0.10);
     display: flex; align-items: center; justify-content: center;
     cursor: default;
     position: relative;
   }
-  .habit-heatmap-cell.tier-1 { background: rgba(150,110,60,0.28); }
-  .habit-heatmap-cell.tier-2 { background: rgba(150,110,60,0.5); }
-  .habit-heatmap-cell.tier-3 { background: rgba(150,110,60,0.72); }
-  .habit-heatmap-cell.tier-4 { background: #8A5A2B; }
-  .habit-heatmap-cell.today { box-shadow: 0 0 0 1.5px #5C3A1E; }
+  .habit-heatmap-cell.tier-1 { background: rgba(138,111,160,0.28); }
+  .habit-heatmap-cell.tier-2 { background: rgba(138,111,160,0.5); }
+  .habit-heatmap-cell.tier-3 { background: rgba(138,111,160,0.72); }
+  .habit-heatmap-cell.tier-4 { background: #8A6FA0; }
+  .habit-heatmap-cell.today { box-shadow: 0 0 0 1.5px #5C3A70; }
   .habit-heatmap-cell.empty { background: transparent; }
   .habit-heatmap-daynum {
     font-size: 0.42rem; color: #fff; opacity: 0.85; letter-spacing: 0.02em;
     text-shadow: 0 1px 2px rgba(0,0,0,0.25);
   }
-  .habit-heatmap-cell.tier-0 .habit-heatmap-daynum { color: #2E1F14; opacity: 0.4; text-shadow: none; }
+  .habit-heatmap-cell.tier-0 .habit-heatmap-daynum { color: #3A2A32; opacity: 0.4; text-shadow: none; }
   .habit-heatmap-legend {
     display: flex; align-items: center; gap: 4px;
-    margin-top: 0.6rem; font-size: 0.46rem; color: #8A5A2B; opacity: 0.6;
+    margin-top: 0.6rem; font-size: 0.46rem; color: #8A6FA0; opacity: 0.6;
     letter-spacing: 0.04em;
   }
   .habit-heatmap-legend-swatch { width: 9px; height: 9px; border-radius: 3px; }
   .week-look-sub {
     font-size: 0.52rem;
     letter-spacing: 0.04em;
-    color: #8A5A2B;
+    color: #8A6FA0;
     opacity: 0.7;
     margin-bottom: 0.7rem;
     line-height: 1.4;
@@ -567,7 +567,7 @@
   }
   .week-bar-count {
     font-size: 0.44rem;
-    color: #2E1F14;
+    color: #3A2A32;
     opacity: 0.55;
     margin-bottom: 2px;
     min-height: 1em;
@@ -576,15 +576,15 @@
     width: 100%;
     max-width: 20px;
     border-radius: 4px 4px 2px 2px;
-    background: rgba(150,110,60,0.22);
+    background: rgba(138,111,160,0.22);
     transition: height 0.4s ease;
   }
-  .week-bar.today { background: #8A5A2B; }
+  .week-bar.today { background: #8A6FA0; }
   .week-bar-label {
     font-size: 0.46rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #8A5A2B;
+    color: #8A6FA0;
     opacity: 0.65;
     margin-top: 0.35rem;
   }
@@ -619,10 +619,10 @@
   .nav-tile-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(160deg, rgba(30,20,12,0.35) 0%, rgba(30,20,12,0.65) 100%);
+    background: linear-gradient(160deg, rgba(10,20,30,0.35) 0%, rgba(10,20,30,0.65) 100%);
     transition: background 0.22s;
   }
-  .nav-tile:hover .nav-tile-overlay { background: linear-gradient(160deg, rgba(30,20,12,0.22) 0%, rgba(30,20,12,0.52) 100%); }
+  .nav-tile:hover .nav-tile-overlay { background: linear-gradient(160deg, rgba(10,20,30,0.22) 0%, rgba(10,20,30,0.52) 100%); }
   .nav-tile-content {
     position: relative;
     z-index: 2;
@@ -657,16 +657,16 @@
     margin-top: 1.5rem;
     padding: 0;
     overflow: hidden;
-    background: rgba(240,222,190,0.62);
-    border-color: rgba(150,110,60,0.3);
+    background: rgba(232,222,240,0.62);
+    border-color: rgba(138,111,160,0.3);
   }
-  .calendar-card .section-label { color: #8A5A2B; }
+  .calendar-card .section-label { color: #8A6FA0; }
   .cal-header {
     padding: 1rem 1.6rem 0.6rem;
     font-size: 0.58rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: #8A5A2B;
+    color: #8A6FA0;
     opacity: 0.9;
   }
 
@@ -706,9 +706,9 @@
 
   /* Phase color palette */
   /* morning: warm amber  #F0C99A */
-  /* commute: steel blue  #D9A05B */
-  /* evening: soft violet #E8C48A */
-  /* night:   seafoam     #C99A5B  */
+  /* commute: steel blue  #8FB8D6 */
+  /* evening: soft violet #C6B3E0 */
+  /* night:   seafoam     #8FCEC7  */
 
   .id-phase-label {
     font-size: 0.5rem;
@@ -727,12 +727,12 @@
   }
   .id-phase-label.morning  { color: #F0C99A; }
   .id-phase-label.morning::after  { background: rgba(240,201,154,0.2); }
-  .id-phase-label.commute  { color: #D9A05B; }
-  .id-phase-label.commute::after  { background: rgba(217,160,91,0.2); }
-  .id-phase-label.evening  { color: #E8C48A; }
-  .id-phase-label.evening::after  { background: rgba(232,196,138,0.2); }
-  .id-phase-label.night    { color: #C99A5B; }
-  .id-phase-label.night::after    { background: rgba(201,154,91,0.2); }
+  .id-phase-label.commute  { color: #8FB8D6; }
+  .id-phase-label.commute::after  { background: rgba(143,184,214,0.2); }
+  .id-phase-label.evening  { color: #C6B3E0; }
+  .id-phase-label.evening::after  { background: rgba(198,179,224,0.2); }
+  .id-phase-label.night    { color: #8FCEC7; }
+  .id-phase-label.night::after    { background: rgba(143,206,199,0.2); }
 
   .id-grid {
     display: grid;
@@ -757,22 +757,22 @@
   .id-block.morning:hover { background: rgba(240,201,154,0.13); border-color: rgba(240,201,154,0.28); }
 
   .id-block.commute {
-    background: rgba(217,160,91,0.07);
-    border: 1px solid rgba(217,160,91,0.16);
+    background: rgba(143,184,214,0.07);
+    border: 1px solid rgba(143,184,214,0.16);
   }
-  .id-block.commute:hover { background: rgba(217,160,91,0.13); border-color: rgba(217,160,91,0.28); }
+  .id-block.commute:hover { background: rgba(143,184,214,0.13); border-color: rgba(143,184,214,0.28); }
 
   .id-block.evening {
-    background: rgba(232,196,138,0.07);
-    border: 1px solid rgba(232,196,138,0.16);
+    background: rgba(198,179,224,0.07);
+    border: 1px solid rgba(198,179,224,0.16);
   }
-  .id-block.evening:hover { background: rgba(232,196,138,0.13); border-color: rgba(232,196,138,0.28); }
+  .id-block.evening:hover { background: rgba(198,179,224,0.13); border-color: rgba(198,179,224,0.28); }
 
   .id-block.night {
-    background: rgba(201,154,91,0.07);
-    border: 1px solid rgba(201,154,91,0.16);
+    background: rgba(143,206,199,0.07);
+    border: 1px solid rgba(143,206,199,0.16);
   }
-  .id-block.night:hover { background: rgba(201,154,91,0.13); border-color: rgba(201,154,91,0.28); }
+  .id-block.night:hover { background: rgba(143,206,199,0.13); border-color: rgba(143,206,199,0.28); }
 
   .id-dot {
     width: 7px;
@@ -783,9 +783,9 @@
     border: 1.5px solid;
   }
   .id-dot.morning { background: rgba(240,201,154,0.5); border-color: #F0C99A; box-shadow: 0 0 6px rgba(240,201,154,0.3); }
-  .id-dot.commute { background: rgba(217,160,91,0.5);  border-color: #D9A05B; box-shadow: 0 0 6px rgba(217,160,91,0.3); }
-  .id-dot.evening { background: rgba(232,196,138,0.5); border-color: #E8C48A; box-shadow: 0 0 6px rgba(232,196,138,0.3); }
-  .id-dot.night   { background: rgba(201,154,91,0.5);  border-color: #C99A5B; box-shadow: 0 0 6px rgba(201,154,91,0.3); }
+  .id-dot.commute { background: rgba(143,184,214,0.5);  border-color: #8FB8D6; box-shadow: 0 0 6px rgba(143,184,214,0.3); }
+  .id-dot.evening { background: rgba(198,179,224,0.5); border-color: #C6B3E0; box-shadow: 0 0 6px rgba(198,179,224,0.3); }
+  .id-dot.night   { background: rgba(143,206,199,0.5);  border-color: #8FCEC7; box-shadow: 0 0 6px rgba(143,206,199,0.3); }
 
   .id-info { flex: 1; min-width: 0; }
 
@@ -797,15 +797,15 @@
     opacity: 0.9;
   }
   .id-block.morning .id-time { color: #F0C99A; }
-  .id-block.commute .id-time { color: #D9A05B; }
-  .id-block.evening .id-time { color: #E8C48A; }
-  .id-block.night   .id-time { color: #C99A5B; }
+  .id-block.commute .id-time { color: #8FB8D6; }
+  .id-block.evening .id-time { color: #C6B3E0; }
+  .id-block.night   .id-time { color: #8FCEC7; }
 
   .id-activity {
     font-family: 'Cormorant Garamond', serif;
     font-size: 0.88rem;
     font-weight: 400;
-    color: #2E1F14;
+    color: #3A2A32;
     line-height: 1.25;
   }
   .id-dur {
@@ -813,7 +813,7 @@
     opacity: 0.55;
     margin-top: 2px;
     letter-spacing: 0.05em;
-    color: #2E1F14;
+    color: #3A2A32;
   }
   .id-note {
     font-size: 0.44rem;
@@ -821,7 +821,7 @@
     font-style: italic;
     margin-top: 3px;
     line-height: 1.4;
-    color: #2E1F14;
+    color: #3A2A32;
   }
 
   .id-tag {
@@ -835,9 +835,9 @@
     margin-top: 4px;
   }
   .id-tag.keystone { background: rgba(240,201,154,0.15); color: #F0C99A; border: 1px solid rgba(240,201,154,0.3); }
-  .id-tag.habit    { background: rgba(201,154,91,0.12);  color: #C99A5B; border: 1px solid rgba(201,154,91,0.28); }
-  .id-tag.flex     { background: rgba(232,196,138,0.12); color: #E8C48A; border: 1px solid rgba(232,196,138,0.28); }
-  .id-tag.sacred   { background: rgba(217,160,91,0.12);  color: #D9A05B; border: 1px solid rgba(217,160,91,0.28); }
+  .id-tag.habit    { background: rgba(143,206,199,0.12);  color: #8FCEC7; border: 1px solid rgba(143,206,199,0.28); }
+  .id-tag.flex     { background: rgba(198,179,224,0.12); color: #C6B3E0; border: 1px solid rgba(198,179,224,0.28); }
+  .id-tag.sacred   { background: rgba(143,184,214,0.12);  color: #8FB8D6; border: 1px solid rgba(143,184,214,0.28); }
 
   .id-focus-box {
     margin-top: 1.1rem;
@@ -848,11 +848,11 @@
   }
   .id-focus-box p {
     font-size: 0.55rem;
-    color: rgba(46,31,20,0.75);
+    color: rgba(58,42,50,0.75);
     line-height: 1.75;
     letter-spacing: 0.03em;
   }
-  .id-focus-box p strong { color: #2E1F14; font-weight: 500; }
+  .id-focus-box p strong { color: #3A2A32; font-weight: 500; }
   .id-focus-box p em { color: #F0C99A; font-style: italic; }
 
   /* ── RESPONSIVE ── */
@@ -884,7 +884,7 @@
 <div style="position:relative;">
 
   <div class="bg-layer">
-    <img src="https://ghcpmekdumlqrmjruuyn.supabase.co/storage/v1/object/public/inspo-media/mainhub-bg-2026-11-02.jpeg" alt="" />
+    <img src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/Main%20Hub.jpg" alt="" />
   </div>
 
 <div class="hero">
@@ -915,14 +915,14 @@
         </div>
 
         <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
-          <input id="quoteIn" style="flex:1;min-width:140px;background:rgba(190,90,29,0.07);border:1px solid rgba(190,90,29,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#2E1F14;outline:none;letter-spacing:0.04em;" placeholder="Edit quote…" />
-          <input id="attrIn" style="flex:1;min-width:100px;background:rgba(190,90,29,0.07);border:1px solid rgba(190,90,29,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#2E1F14;outline:none;letter-spacing:0.04em;" placeholder="— Attribution" />
-          <button onclick="saveQuote()" style="background:#BE5A1D;border:1px solid #BE5A1D;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
+          <input id="quoteIn" style="flex:1;min-width:140px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" placeholder="Edit quote…" />
+          <input id="attrIn" style="flex:1;min-width:100px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" placeholder="— Attribution" />
+          <button onclick="saveQuote()" style="background:#C2678C;border:1px solid #C2678C;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
         </div>
         <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-          <input id="wotwIn" style="flex:1;min-width:100px;background:rgba(190,90,29,0.07);border:1px solid rgba(190,90,29,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#2E1F14;outline:none;letter-spacing:0.04em;" placeholder="Word of week…" />
-          <input id="wotwDefIn" style="flex:2;min-width:160px;background:rgba(190,90,29,0.07);border:1px solid rgba(190,90,29,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#2E1F14;outline:none;letter-spacing:0.04em;" placeholder="Definition…" />
-          <button onclick="saveWord()" style="background:#BE5A1D;border:1px solid #BE5A1D;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
+          <input id="wotwIn" style="flex:1;min-width:100px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" placeholder="Word of week…" />
+          <input id="wotwDefIn" style="flex:2;min-width:160px;background:rgba(194,103,140,0.07);border:1px solid rgba(194,103,140,0.2);border-radius:6px;padding:0.35rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" placeholder="Definition…" />
+          <button onclick="saveWord()" style="background:#C2678C;border:1px solid #C2678C;border-radius:6px;padding:0.35rem 0.8rem;color:#fff;font-family:'DM Mono',monospace;font-size:0.55rem;cursor:pointer;letter-spacing:0.1em;">Save</button>
         </div>
         <div style="margin-top:0.4rem;font-family:'DM Mono',monospace;font-size:0.48rem;letter-spacing:0.08em;min-height:1em;" id="hubSaveStatus"></div>
       </div>
@@ -961,35 +961,35 @@
       <!-- EDIT: nav tile links — set each id="nav-*" href via the NAV_URLS config in <script> below -->
       <div class="nav-strip">
         <a class="nav-tile" id="nav-wellness" href="https://javauntgarcia.github.io/Notion/Wellness.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Wellness.jpg');background-color:#2e1f14;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Wellness.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Wellness</span>
           </div>
         </a>
         <a class="nav-tile" id="nav-growth" href="https://javauntgarcia.github.io/Notion/Growth.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Growth.jpg');background-color:#2e1f14;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Growth.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Growth</span>
           </div>
         </a>
         <a class="nav-tile" id="nav-finances" href="https://javauntgarcia.github.io/Notion/Finances.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Finances.jpg');background-color:#2e1f14;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Finances.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Finances</span>
           </div>
         </a>
         <a class="nav-tile" id="nav-productivity" href="https://javauntgarcia.github.io/Notion/Productivity.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Productivity.jpg');background-color:#2e1f14;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/Productivity.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Productivity</span>
           </div>
         </a>
         <a class="nav-tile" id="nav-planning" href="https://javauntgarcia.github.io/Notion/Planning.html" target="_blank">
-          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/planning.jpg');background-color:#2e1f14;"></div>
+          <div class="nav-tile-cover" style="background-image:url('https://raw.githubusercontent.com/javauntgarcia/Notion/main/planning.jpg');background-color:#3a2a32;"></div>
           <div class="nav-tile-overlay"></div>
           <div class="nav-tile-content">
             <span class="nav-label">Planning</span>
@@ -1002,31 +1002,31 @@
         <div class="cal-header" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.6rem 0.6rem;">
           <span>✦ Weekly Outline</span>
           <div style="display:flex;gap:0.5rem;align-items:center;">
-            <button onclick="calPrevWeek()" style="background:rgba(150,110,60,0.10);border:1px solid rgba(150,110,60,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A5A2B;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(150,110,60,0.22)'" onmouseout="this.style.background='rgba(150,110,60,0.10)'">‹</button>
-            <span id="calWeekLabel" style="font-size:0.58rem;letter-spacing:0.18em;color:#8A5A2B;min-width:120px;text-align:center;"></span>
-            <button onclick="calNextWeek()" style="background:rgba(150,110,60,0.10);border:1px solid rgba(150,110,60,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A5A2B;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(150,110,60,0.22)'" onmouseout="this.style.background='rgba(150,110,60,0.10)'">›</button>
-            <button onclick="calGoToday()" style="background:rgba(150,110,60,0.10);border:1px solid rgba(150,110,60,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#8A5A2B;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;" onmouseover="this.style.background='rgba(150,110,60,0.22)'" onmouseout="this.style.background='rgba(150,110,60,0.10)'">TODAY</button>
-            <button id="calSyncBtn" onclick="syncCurrentWeekWithMO()" style="background:rgba(150,110,60,0.10);border:1px solid rgba(150,110,60,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#8A5A2B;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(150,110,60,0.22)'" onmouseout="this.style.background='rgba(150,110,60,0.10)'" title="Sync this week with Monthly Outline">⟲ SYNC</button>
+            <button onclick="calPrevWeek()" style="background:rgba(138,111,160,0.10);border:1px solid rgba(138,111,160,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A6FA0;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(138,111,160,0.22)'" onmouseout="this.style.background='rgba(138,111,160,0.10)'">‹</button>
+            <span id="calWeekLabel" style="font-size:0.58rem;letter-spacing:0.18em;color:#8A6FA0;min-width:120px;text-align:center;"></span>
+            <button onclick="calNextWeek()" style="background:rgba(138,111,160,0.10);border:1px solid rgba(138,111,160,0.22);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A6FA0;font-size:0.65rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(138,111,160,0.22)'" onmouseout="this.style.background='rgba(138,111,160,0.10)'">›</button>
+            <button onclick="calGoToday()" style="background:rgba(138,111,160,0.10);border:1px solid rgba(138,111,160,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#8A6FA0;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;" onmouseover="this.style.background='rgba(138,111,160,0.22)'" onmouseout="this.style.background='rgba(138,111,160,0.10)'">TODAY</button>
+            <button id="calSyncBtn" onclick="syncCurrentWeekWithMO()" style="background:rgba(138,111,160,0.10);border:1px solid rgba(138,111,160,0.22);border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;color:#8A6FA0;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.12em;transition:background 0.15s;white-space:nowrap;" onmouseover="this.style.background='rgba(138,111,160,0.22)'" onmouseout="this.style.background='rgba(138,111,160,0.10)'" title="Sync this week with Monthly Outline">⟲ SYNC</button>
           </div>
         </div>
         <div id="calSaveStatus" style="padding:0 1.6rem;font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.1em;min-height:1em;"></div>
         <div id="calWeekGrid" style="padding:0 1rem 1rem;"></div>
 
-        <div style="display:flex;gap:1.6rem;flex-wrap:wrap;padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(150,110,60,0.14);margin-top:0.2rem;">
+        <div style="display:flex;gap:1.6rem;flex-wrap:wrap;padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(138,111,160,0.14);margin-top:0.2rem;">
           <div style="flex:1.3;min-width:230px;">
             <div class="section-label" style="margin-bottom:0.5rem;">✦ Habit Tracker</div>
             <div class="habit-log-sub">Last two weeks of daily tasks completed — darker means more finished</div>
             <div class="habit-heatmap-stats" id="habitHeatmapStats"></div>
             <div class="habit-heatmap-grid" id="habitLogList">
-              <div style="font-size:0.56rem;color:#8A5A2B;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">Loading…</div>
+              <div style="font-size:0.56rem;color:#8A6FA0;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">Loading…</div>
             </div>
             <div class="habit-heatmap-legend">
               <span>Less</span>
-              <span class="habit-heatmap-legend-swatch" style="background:rgba(150,110,60,0.10);"></span>
-              <span class="habit-heatmap-legend-swatch" style="background:rgba(150,110,60,0.28);"></span>
-              <span class="habit-heatmap-legend-swatch" style="background:rgba(150,110,60,0.5);"></span>
-              <span class="habit-heatmap-legend-swatch" style="background:rgba(150,110,60,0.72);"></span>
-              <span class="habit-heatmap-legend-swatch" style="background:#8A5A2B;"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(138,111,160,0.10);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(138,111,160,0.28);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(138,111,160,0.5);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:rgba(138,111,160,0.72);"></span>
+              <span class="habit-heatmap-legend-swatch" style="background:#8A6FA0;"></span>
               <span>More</span>
             </div>
           </div>
@@ -1038,10 +1038,10 @@
         </div>
 
         <!-- REWARD TRACKER — sleep checks + gear fund, read from Planning's daily tasks -->
-        <div style="padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(150,110,60,0.14);">
+        <div style="padding:0.9rem 1.6rem 1.4rem;border-top:1px solid rgba(138,111,160,0.14);">
           <div class="section-label" style="margin-bottom:0.5rem;">✦ Reward Tracker</div>
           <div class="habit-log-sub">Checked off in Planning — $5 to the gear fund per workout or run, one check per sleep day (in bed by 10)</div>
-          <div id="rewardTracker"><div style="font-size:0.56rem;color:#8A5A2B;opacity:0.5;padding:0.6rem 0;">Loading…</div></div>
+          <div id="rewardTracker"><div style="font-size:0.56rem;color:#8A6FA0;opacity:0.5;padding:0.6rem 0;">Loading…</div></div>
         </div>
       </div>
 
@@ -1415,15 +1415,15 @@ function applyHubToUI() {
 
 async function patchHub(fields, statusElId) {
   const statusEl = statusElId ? document.getElementById(statusElId) : null;
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#BE5A1D'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#C2678C'; }
   try {
     await sbUpsert('main_hub', Object.assign({ id: 'singleton' }, fields));
-    if (statusEl) { statusEl.textContent = 'saved ✓'; statusEl.style.color = '#A8A06B'; setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 2500); }
+    if (statusEl) { statusEl.textContent = 'saved ✓'; statusEl.style.color = '#6fa88c'; setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 2500); }
     return true;
   } catch(e) {
     if (statusEl) {
       statusEl.textContent = 'cloud save failed — local only';
-      statusEl.style.color = '#A6502E';
+      statusEl.style.color = '#b56b6b';
       setTimeout(()=>{ if(statusEl && statusEl.textContent === 'cloud save failed — local only') statusEl.textContent=''; }, 4000);
     }
     console.warn('[Hub] save failed for', Object.keys(fields), ':', e.message);
@@ -1549,9 +1549,9 @@ function renderTodos() {
     const li = document.createElement('li');
     li.className = 'todo-item' + (t.done ? ' done' : '');
     li.innerHTML = `
-      <div class="todo-check ${t.done?'checked':''}" onclick="toggleTodo(${t.id})"></div>
+      <div class="todo-check ${t.done?'checked':''}" onclick="toggleTodo('${t.id}')"></div>
       <span>${t.text}</span>
-      <span class="todo-del" onclick="deleteTodo(${t.id})">✕</span>
+      <span class="todo-del" onclick="deleteTodo('${t.id}')">✕</span>
     `;
     ul.appendChild(li);
   });
@@ -1637,7 +1637,7 @@ function habitOccurrenceStats(habitText) {
 const goalSlides = [
   {
     subpage: 'Productivity',
-    color: '#8A4A1F',
+    color: '#8C3A5C',
     goals: [
       {
         name: 'Curriculum',
@@ -1696,7 +1696,7 @@ const goalSlides = [
     // (archived nightly to planning_archive), so this slide is labeled
     // Planning rather than Growth.
     subpage: 'Planning',
-    color: '#BE5A1D',
+    color: '#C2678C',
     goals: [
       {
         // Tracked via the "Wake up before 6 AM" daily task in Planning.html's
@@ -1753,12 +1753,12 @@ const goalSlides = [
     // built dynamically by syncFinancialGoalsSlide() rather than
     // hardcoded like the slides above — see that function below.
     subpage: 'Finances',
-    color: '#C77A3A',
+    color: '#c47a9a',
     goals: []
   },
   {
     subpage: 'Wellness',
-    color: '#7A5A2E',
+    color: '#2d5ba8',
     goals: [
       {
         name: 'Consistency',
@@ -1914,7 +1914,7 @@ function updateGoalCarouselState() {
   if (label) {
     var sp = goalSlides[goalCarouselIdx].subpage;
     var url = subpageURLs[sp] || '#';
-    label.innerHTML = '<a href="' + url + '" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(190,90,29,0.35);padding-bottom:1px;transition:border-color 0.2s;" onmouseover="this.style.borderColor=\'#E8A05C\'" onmouseout="this.style.borderColor=\'rgba(190,90,29,0.35)\'">' + sp + ' goals ↗</a>';
+    label.innerHTML = '<a href="' + url + '" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(194,103,140,0.35);padding-bottom:1px;transition:border-color 0.2s;" onmouseover="this.style.borderColor=\'#E3A9BE\'" onmouseout="this.style.borderColor=\'rgba(194,103,140,0.35)\'">' + sp + ' goals ↗</a>';
   }
 }
 
@@ -2058,11 +2058,11 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 // The last-used type is remembered so adding several of the same kind in
 // a row doesn't require reselecting each time.
 const EVENT_TYPES = [
-  { key: 'work',        name: 'Work',        hex: '#8A6B3A', moCat: 'work' },
-  { key: 'content',     name: 'Content',     hex: '#BE5A1D', moCat: 'creative' },
-  { key: 'appointment', name: 'Appointment', hex: '#B07A35', moCat: 'appointments' },
+  { key: 'work',        name: 'Work',        hex: '#4F7CAC', moCat: 'work' },
+  { key: 'content',     name: 'Content',     hex: '#C2678C', moCat: 'creative' },
+  { key: 'appointment', name: 'Appointment', hex: '#3E9A8F', moCat: 'appointments' },
   { key: 'reminder',    name: 'Reminder',    hex: '#C98A2B', moCat: 'events' },
-  { key: 'personal',    name: 'Personal',    hex: '#8A5A2B', moCat: 'activity' }
+  { key: 'personal',    name: 'Personal',    hex: '#8A6FA0', moCat: 'activity' }
 ];
 const MO_CAT_TO_TYPE = { work: 'work', creative: 'content', appointments: 'appointment' };
 function evtType(key) { return EVENT_TYPES.find(function(t) { return t.key === key; }) || null; }
@@ -2070,7 +2070,7 @@ function evtType(key) { return EVENT_TYPES.find(function(t) { return t.key === k
 // whatever color it was saved with (events created before types existed).
 function evtColor(e) {
   const t = evtType(e.type);
-  return t ? t.hex : (e.color || '#8A6B4A');
+  return t ? t.hex : (e.color || '#6B7F8E');
 }
 let selectedEvtType = evtType(local.get('cal_last_type')) ? local.get('cal_last_type') : 'work';
 
@@ -2177,13 +2177,13 @@ async function saveEventEditor() {
   if (edType) { ev.type = edType.key; ev.color = edType.hex; ev.cat = edType.moCat; }
 
   const statusEl = document.getElementById('calSaveStatus');
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A5A2B'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
   const ok = await saveCalEventsAsync(evts);
   closeEventEditor();
   renderWeekCalendar();
   if (statusEl) {
     statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only, will retry on next sync';
-    statusEl.style.color = ok ? '#A8A06B' : '#A6502E';
+    statusEl.style.color = ok ? '#6fa88c' : '#b56b6b';
     if (ok) setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
   }
 }
@@ -2241,8 +2241,8 @@ async function mergeMOEventsIntoHub() {
       if (e.end   && e.end.length   >= 2) endH   = parseInt(e.end.split(':')[0])   || startH + 1;
       // Map MO category to a color
       var catColors = {
-        appointments: '#A9713A', birthdays: '#BE5A1D', events: '#7A5A2E',
-        work: '#6B5A44', creative: '#c07030', activity: '#8A7A3A',
+        appointments: '#4a9090', birthdays: '#c05878', events: '#3a5a9a',
+        work: '#506070', creative: '#c07030', activity: '#4a7a3a',
         bills: '#9a8020', meals: '#8c4a2f'
       };
       return {
@@ -2253,7 +2253,7 @@ async function mergeMOEventsIntoHub() {
         endH:     endH,
         allDay:   e.allDay || (!e.start && !e.end),
         overnight: e.overnight || false,
-        color:    catColors[e.cat] || '#8A6B4A',
+        color:    catColors[e.cat] || '#6B7F8E',
         type:     MO_CAT_TO_TYPE[e.cat] || undefined,
         cat:      e.cat,
         notes:    e.notes || '',
@@ -2288,27 +2288,27 @@ function renderWeekCalendar() {
     days.push(d);
   }
 
-  let html = '<div style="display:grid;grid-template-columns:38px repeat(7,1fr);gap:0;border:1px solid rgba(150,110,60,0.18);border-radius:8px;overflow:hidden;font-size:0.52rem;">';
+  let html = '<div style="display:grid;grid-template-columns:38px repeat(7,1fr);gap:0;border:1px solid rgba(138,111,160,0.18);border-radius:8px;overflow:hidden;font-size:0.52rem;">';
 
   // Header row
-  html += '<div style="background:rgba(150,110,60,0.06);border-bottom:1px solid rgba(150,110,60,0.18);"></div>';
+  html += '<div style="background:rgba(138,111,160,0.06);border-bottom:1px solid rgba(138,111,160,0.18);"></div>';
   days.forEach(function(d) {
     const isToday = dateKey(d) === today;
     html += '<div style="padding:0.45rem 0.3rem;text-align:center;background:' +
-      (isToday ? 'rgba(150,110,60,0.18)' : 'rgba(150,110,60,0.06)') +
-      ';border-left:1px solid rgba(150,110,60,0.18);border-bottom:1px solid rgba(150,110,60,0.18);">' +
-      '<div style="letter-spacing:0.15em;text-transform:uppercase;color:' + (isToday ? '#8A5A2B' : '#3A2A1E') + ';font-weight:' + (isToday ? '500' : '400') + ';">' + DAYS_SHORT[d.getDay()] + '</div>' +
-      '<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.9rem;font-weight:' + (isToday ? '700' : '400') + ';color:' + (isToday ? '#8A5A2B' : '#2E1F14') + ';line-height:1.2;">' + d.getDate() + '</div>' +
+      (isToday ? 'rgba(138,111,160,0.18)' : 'rgba(138,111,160,0.06)') +
+      ';border-left:1px solid rgba(138,111,160,0.18);border-bottom:1px solid rgba(138,111,160,0.18);">' +
+      '<div style="letter-spacing:0.15em;text-transform:uppercase;color:' + (isToday ? '#8A6FA0' : '#3A4F5C') + ';font-weight:' + (isToday ? '500' : '400') + ';">' + DAYS_SHORT[d.getDay()] + '</div>' +
+      '<div style="font-family:\'Cormorant Garamond\',serif;font-size:0.9rem;font-weight:' + (isToday ? '700' : '400') + ';color:' + (isToday ? '#8A6FA0' : '#3A2A32') + ';line-height:1.2;">' + d.getDate() + '</div>' +
       '</div>';
   });
 
   // All-day row — events spanning the day (startH < 0 or endH < 0)
   const allDayEvts = evts.filter(function(e) { return e.allDay; });
-  html += '<div style="padding:0.35rem 0.25rem;text-align:right;background:rgba(150,110,60,0.03);border-bottom:1px solid rgba(150,110,60,0.12);color:#8A5A2B;opacity:0.5;font-size:0.45rem;letter-spacing:0.1em;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;">ALL DAY</div>';
+  html += '<div style="padding:0.35rem 0.25rem;text-align:right;background:rgba(138,111,160,0.03);border-bottom:1px solid rgba(138,111,160,0.12);color:#8A6FA0;opacity:0.5;font-size:0.45rem;letter-spacing:0.1em;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:center;">ALL DAY</div>';
   days.forEach(function(d) {
     const dk = dateKey(d);
     const dayAllDay = allDayEvts.filter(function(e){ return e.date === dk; });
-    html += '<div style="border-left:1px solid rgba(150,110,60,0.18);border-bottom:1px solid rgba(150,110,60,0.12);padding:0.2rem;min-height:22px;background:rgba(150,110,60,0.02);">';
+    html += '<div style="border-left:1px solid rgba(138,111,160,0.18);border-bottom:1px solid rgba(138,111,160,0.12);padding:0.2rem;min-height:22px;background:rgba(138,111,160,0.02);">';
     dayAllDay.forEach(function(e) {
       html += '<div style="background:' + evtColor(e) + ';color:#fff;border-radius:3px;padding:0.1rem 0.3rem;margin-bottom:1px;font-size:0.48rem;letter-spacing:0.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;" onclick="openEventEditor(\'' + e.id + '\')" oncontextmenu="event.preventDefault();event.stopPropagation();recolorCalEvent(\'' + e.id + '\')" title="Click to edit · right-click to change type: ' + e.title + '">' + e.title + '</div>';
     });
@@ -2320,15 +2320,15 @@ function renderWeekCalendar() {
   // span the grid rows for its full duration instead of only appearing
   // in the hour it starts.
   HOURS.forEach(function(h) {
-    html += '<div style="grid-column:1;grid-row:' + (3 + h) + ';padding:0.25rem 0.3rem 0 0;text-align:right;color:#8A5A2B;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(150,110,60,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
+    html += '<div style="grid-column:1;grid-row:' + (3 + h) + ';padding:0.25rem 0.3rem 0 0;text-align:right;color:#8A6FA0;opacity:0.5;font-size:0.48rem;letter-spacing:0.06em;border-bottom:1px solid rgba(138,111,160,0.07);line-height:1;padding-top:0.3rem;">' + hourLabel(h) + '</div>';
     // Each hour cell is pinned to its own row/column. (Left to auto-flow,
     // the cells were pushed out of place by the event and routine blocks,
     // so hour labels no longer lined up with the rows events sat in.)
     days.forEach(function(d, di) {
       const dk = dateKey(d);
       const isToday = dk === today;
-      html += '<div style="grid-column:' + (2 + di) + ';grid-row:' + (3 + h) + ';border-left:1px solid rgba(150,110,60,0.18);border-bottom:1px solid rgba(150,110,60,0.07);min-height:28px;background:' +
-        (isToday ? 'rgba(150,110,60,0.04)' : 'transparent') +
+      html += '<div style="grid-column:' + (2 + di) + ';grid-row:' + (3 + h) + ';border-left:1px solid rgba(138,111,160,0.18);border-bottom:1px solid rgba(138,111,160,0.07);min-height:28px;background:' +
+        (isToday ? 'rgba(138,111,160,0.04)' : 'transparent') +
         ';" ondblclick="quickAddEvent(\'' + dk + '\',' + h + ')"></div>';
     });
   });
@@ -2344,7 +2344,7 @@ function renderWeekCalendar() {
     IDEAL_DAY.forEach(function(blk) {
       const rowStart = 3 + blk.startH;
       const rowEnd = 3 + blk.endH;
-      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';box-sizing:border-box;margin:1px 0 0 1px;background:rgba(120,120,120,0.14);border:1px dashed rgba(120,120,120,0.32);border-radius:3px;padding:0.15rem 0.3rem;font-size:0.44rem;line-height:1.35;color:#6B5A44;pointer-events:none;overflow:hidden;z-index:1;">' +
+      html += '<div style="grid-column:' + colStart + ' / span 1;grid-row:' + rowStart + ' / ' + rowEnd + ';box-sizing:border-box;margin:1px 0 0 1px;background:rgba(120,120,120,0.14);border:1px dashed rgba(120,120,120,0.32);border-radius:3px;padding:0.15rem 0.3rem;font-size:0.44rem;line-height:1.35;color:#5a6068;pointer-events:none;overflow:hidden;z-index:1;">' +
         blk.lines.map(function(l){ return '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0.85;">' + l + '</div>'; }).join('') +
         '</div>';
     });
@@ -2416,28 +2416,28 @@ function renderWeekCalendar() {
   html += '</div>';
 
   // Type legend
-  html += '<div style="margin-top:0.6rem;display:flex;gap:0.9rem;flex-wrap:wrap;align-items:center;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;color:#3A2A1E;">' +
+  html += '<div style="margin-top:0.6rem;display:flex;gap:0.9rem;flex-wrap:wrap;align-items:center;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;color:#3A4F5C;">' +
     EVENT_TYPES.map(function(t) { return '<span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:' + t.hex + ';display:inline-block;"></span>' + t.name + '</span>'; }).join('') +
     '</div>';
 
   // Add event form
   html += '<div style="margin-top:0.8rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">' +
-    '<input id="calEvtTitle" placeholder="Event title…" style="flex:2;min-width:110px;background:rgba(150,110,60,0.07);border:1px solid rgba(150,110,60,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#2E1F14;outline:none;letter-spacing:0.04em;" />' +
-    '<input id="calEvtDate" type="date" style="flex:1;min-width:120px;background:rgba(150,110,60,0.07);border:1px solid rgba(150,110,60,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#2E1F14;outline:none;" />' +
-    '<select id="calEvtStart" title="Start" onchange="document.getElementById(\'calEvtEnd\').value=Math.min(24,parseInt(this.value)+1)" style="background:rgba(150,110,60,0.07);border:1px solid rgba(150,110,60,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#2E1F14;outline:none;">' +
+    '<input id="calEvtTitle" placeholder="Event title…" style="flex:2;min-width:110px;background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;letter-spacing:0.04em;" />' +
+    '<input id="calEvtDate" type="date" style="flex:1;min-width:120px;background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.6rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;" />' +
+    '<select id="calEvtStart" title="Start" onchange="document.getElementById(\'calEvtEnd\').value=Math.min(24,parseInt(this.value)+1)" style="background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
     HOURS.map(function(h){ return '<option value="'+h+'">'+hourLabel(h)+'</option>'; }).join('') +
     '</select>' +
-    '<span style="font-size:0.5rem;color:#8A5A2B;">to</span>' +
-    '<select id="calEvtEnd" title="End" style="background:rgba(150,110,60,0.07);border:1px solid rgba(150,110,60,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#2E1F14;outline:none;">' +
+    '<span style="font-size:0.5rem;color:#8A6FA0;">to</span>' +
+    '<select id="calEvtEnd" title="End" style="background:rgba(138,111,160,0.07);border:1px solid rgba(138,111,160,0.2);border-radius:5px;padding:0.3rem 0.5rem;font-family:\'DM Mono\',monospace;font-size:0.55rem;color:#3A2A32;outline:none;">' +
     HOURS.map(function(h){ return '<option value="'+(h+1)+'">'+hourLabel(h+1)+'</option>'; }).join('') +
     '</select>' +
-    '<label style="font-size:0.5rem;color:#8A5A2B;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" onchange="if(this.checked)document.getElementById(\'calEvtOvernight\').checked=false;" style="width:10px;height:10px;" /> All-day</label>' +
-    '<label style="font-size:0.5rem;color:#8A5A2B;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;" title="Ends the next calendar day, e.g. 8p–6a"><input type="checkbox" id="calEvtOvernight" onchange="if(this.checked)document.getElementById(\'calEvtAllDay\').checked=false;" style="width:10px;height:10px;" /> 🌙 Overnight</label>' +
+    '<label style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="calEvtAllDay" onchange="if(this.checked)document.getElementById(\'calEvtOvernight\').checked=false;" style="width:10px;height:10px;" /> All-day</label>' +
+    '<label style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;display:flex;align-items:center;gap:3px;" title="Ends the next calendar day, e.g. 8p–6a"><input type="checkbox" id="calEvtOvernight" onchange="if(this.checked)document.getElementById(\'calEvtAllDay\').checked=false;" style="width:10px;height:10px;" /> 🌙 Overnight</label>' +
     '<div style="display:flex;align-items:center;gap:5px;">' +
-    '<span style="font-size:0.5rem;color:#8A5A2B;letter-spacing:0.1em;">TYPE</span>' +
+    '<span style="font-size:0.5rem;color:#8A6FA0;letter-spacing:0.1em;">TYPE</span>' +
     '<div style="display:flex;gap:4px;flex-wrap:wrap;">' + typeChipsHtml(selectedEvtType, 'setEvtType') + '</div>' +
     '</div>' +
-    '<button onclick="addCalEvent()" style="background:#8A5A2B;border:1px solid #8A5A2B;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
+    '<button onclick="addCalEvent()" style="background:#8A6FA0;border:1px solid #8A6FA0;border-radius:5px;padding:0.3rem 0.8rem;color:#fff;font-family:\'DM Mono\',monospace;font-size:0.52rem;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;">+ Add</button>' +
     '</div>';
 
   // Keep whatever is already typed into the Add Event form across
@@ -2512,18 +2512,18 @@ async function addCalEvent() {
     hubNative: true
   };
   evts.push(newEvt);
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A5A2B'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
   const ok = await saveCalEventsAsync(evts);
   document.getElementById('calEvtTitle').value = '';
   renderWeekCalendar();
   if (statusEl) {
     if (ok) {
       statusEl.textContent = 'saved ✓';
-      statusEl.style.color = '#A8A06B';
+      statusEl.style.color = '#6fa88c';
       setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
     } else {
       statusEl.textContent = 'cloud save failed — kept locally only, will retry on next sync';
-      statusEl.style.color = '#A6502E';
+      statusEl.style.color = '#b56b6b';
     }
   }
 }
@@ -2534,14 +2534,14 @@ async function deleteCalEvent(id) {
   const evts = loadCalEvents().filter(function(e){ return e.id !== id; });
   // Also remove from in-memory MO-sourced display list
   _calEvents = _calEvents.filter(function(e){ return e.id !== id; });
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A5A2B'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
   const ok = await saveCalEventsAsync(evts);
   // Remove from MO table too
   deleteEventFromMO(id);
   renderWeekCalendar();
   if (statusEl) {
     statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only, will retry on next sync';
-    statusEl.style.color = ok ? '#A8A06B' : '#A6502E';
+    statusEl.style.color = ok ? '#6fa88c' : '#b56b6b';
     if (ok) setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
   }
 }
@@ -2566,12 +2566,12 @@ async function quickAddEvent(dateStr, hour) {
     title: title.trim(), type: selectedEvtType, color: evtType(selectedEvtType).hex,
     cat: evtType(selectedEvtType).moCat, notes: '', hubNative: true
   });
-  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A5A2B'; }
+  if (statusEl) { statusEl.textContent = 'saving…'; statusEl.style.color = '#8A6FA0'; }
   const ok = await saveCalEventsAsync(evts);
   renderWeekCalendar();
   if (statusEl) {
     statusEl.textContent = ok ? 'saved ✓' : 'cloud save failed — kept locally only, will retry on next sync';
-    statusEl.style.color = ok ? '#A8A06B' : '#A6502E';
+    statusEl.style.color = ok ? '#6fa88c' : '#b56b6b';
     if (ok) setTimeout(() => { if (document.getElementById('calSaveStatus')) document.getElementById('calSaveStatus').textContent = ''; }, 2000);
   }
 }
@@ -2663,15 +2663,15 @@ async function renderRewardTracker() {
       return '<div style="border-radius:4px;padding:0.2rem 0.15rem;margin-top:3px;font-size:0.46rem;letter-spacing:0.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;' +
         (on ? 'background:' + hex + ';color:#fff;' : 'border:1px dashed ' + hex + ';color:' + hex + ';opacity:' + (past ? '0.35' : '0.75') + ';') + '">' + label + '</div>';
     };
-    cells += '<div style="flex:1;min-width:0;text-align:center;padding:0.35rem 0.2rem;border-radius:6px;background:' + (isToday ? 'rgba(150,110,60,0.14)' : 'rgba(150,110,60,0.05)') + ';">' +
-      '<div style="font-size:0.48rem;letter-spacing:0.12em;text-transform:uppercase;color:#8A5A2B;">' + DAYS_SHORT[i] + '</div>' +
-      pill(session, session ? '+$' + REWARD_PER_SESSION : SESSION_PLAN[i], '#B07A35') +
-      pill(sleep, sleep ? '✓ Sleep' : 'Sleep', '#8A5A2B') +
+    cells += '<div style="flex:1;min-width:0;text-align:center;padding:0.35rem 0.2rem;border-radius:6px;background:' + (isToday ? 'rgba(138,111,160,0.14)' : 'rgba(138,111,160,0.05)') + ';">' +
+      '<div style="font-size:0.48rem;letter-spacing:0.12em;text-transform:uppercase;color:#8A6FA0;">' + DAYS_SHORT[i] + '</div>' +
+      pill(session, session ? '+$' + REWARD_PER_SESSION : SESSION_PLAN[i], '#3E9A8F') +
+      pill(sleep, sleep ? '✓ Sleep' : 'Sleep', '#8A6FA0') +
       '</div>';
   }
   const stat = function(big, small) {
-    return '<div><div style="font-family:\'Cormorant Garamond\',serif;font-size:1.25rem;font-weight:600;color:#2E1F14;line-height:1.1;">' + big + '</div>' +
-      '<div style="font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;color:#8A5A2B;opacity:0.8;">' + small + '</div></div>';
+    return '<div><div style="font-family:\'Cormorant Garamond\',serif;font-size:1.25rem;font-weight:600;color:#3A2A32;line-height:1.1;">' + big + '</div>' +
+      '<div style="font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;color:#8A6FA0;opacity:0.8;">' + small + '</div></div>';
   };
   el.innerHTML =
     '<div style="display:flex;gap:1.6rem;flex-wrap:wrap;margin-bottom:0.7rem;">' +
@@ -2709,7 +2709,7 @@ function renderHabitLog(archive) {
     rows.push({ id: day.id, label: day.label || day.id, done: s.done, total: s.total });
   });
   if (!rows.length) {
-    list.innerHTML = '<div style="font-size:0.56rem;color:#8A5A2B;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">No habit history yet</div>';
+    list.innerHTML = '<div style="font-size:0.56rem;color:#8A6FA0;opacity:0.5;text-align:center;padding:1rem 0;grid-column:1/-1;">No habit history yet</div>';
     stats.innerHTML = '';
     return;
   }

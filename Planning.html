@@ -1110,9 +1110,9 @@ function renderTasks() {
     const row = document.createElement('div');
     row.className = 'task-item' + (t.done ? ' done' : '');
     row.innerHTML = `
-      <input type="checkbox" class="task-check" ${t.done?'checked':''} onchange="toggleTask(${t.id})" />
+      <input type="checkbox" class="task-check" ${t.done?'checked':''} onchange="toggleTask('${t.id}')" />
       <span class="task-text">${escHtml(t.text)}</span>
-      <button class="task-del" onclick="deleteTask(${t.id})">✕</button>
+      <button class="task-del" onclick="deleteTask('${t.id}')">✕</button>
     `;
     list.appendChild(row);
   });
@@ -1230,10 +1230,10 @@ function renderHabits() {
     const dayTag = h.type === 'conditional' && h.day !== undefined
       ? `<span class="habit-tag">${DOW_NAMES[h.day]} only</span>` : '';
     row.innerHTML = `
-      <input type="checkbox" class="task-check" ${h.done?'checked':''} onchange="toggleHabit(${h.id})" />
+      <input type="checkbox" class="task-check" ${h.done?'checked':''} onchange="toggleHabit('${h.id}')" />
       <span class="habit-text">${escHtml(h.text)}</span>
       ${dayTag}
-      <button class="habit-del" onclick="deleteHabit(${h.id})">✕</button>
+      <button class="habit-del" onclick="deleteHabit('${h.id}')">✕</button>
     `;
     list.appendChild(row);
   });
