@@ -447,7 +447,7 @@ async function sbGet(table,id){
   try{const r=await fetch(SB_URL+'/rest/v1/'+table+'?id=eq.'+encodeURIComponent(id)+'&limit=1',{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});const d=await r.json();return d&&d[0]?d[0]:null;}catch(e){return null;}
 }
 async function sbUpsert(table,row){
-  try{await fetch(SB_URL+'/rest/v1/'+table,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify({...row,updated_at:new Date().toISOString()})});}catch(e){}
+  try{const r=await fetch(SB_URL+'/rest/v1/'+table,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify({...row,updated_at:new Date().toISOString()})});return !!r&&r.ok;}catch(e){return false;}
 }
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
@@ -504,7 +504,16 @@ window.addEventListener('DOMContentLoaded',async()=>{
 async function saveState(){
   const dot=document.getElementById('saveDot');dot.classList.add('show');
   clearTimeout(dot._t);dot._t=setTimeout(()=>dot.classList.remove('show'),1400);
-  await sbUpsert('meal_planner',{id:'singleton',...state});
+  // The 'inventory' column may not exist yet in Supabase (it needs a one-time
+  // ALTER TABLE). If the full upsert is rejected, retry without inventory so
+  // week/recipes/shopping keep syncing; inventory still saves to localStorage.
+  const ok=await sbUpsert('meal_planner',{id:'singleton',...state});
+  if(!ok){
+    const rest={};Object.keys(state).forEach(k=>{if(k!=='inventory')rest[k]=state[k];});
+    const ok2=await sbUpsert('meal_planner',{id:'singleton',...rest});
+    if(!ok2)console.warn('Meal Planner: Supabase save failed; data kept in localStorage only.');
+    else console.warn('Meal Planner: saved without inventory — add the inventory column in Supabase to sync the Fridge.');
+  }
   lsSet('mp_state',JSON.stringify(state));
 }
 
