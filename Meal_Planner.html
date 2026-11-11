@@ -213,6 +213,38 @@
     .save-dot.show{opacity:1}
     .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:rgba(107,52,32,.92);border:1px solid var(--terra-lt);color:var(--ivory);padding:8px 22px;font-size:.68rem;letter-spacing:.08em;border-radius:10px;z-index:500;pointer-events:none;white-space:nowrap;animation:toastIn .2s ease}
     @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+    .fridge-strip-label{font-size:.57rem;letter-spacing:.2em;text-transform:uppercase;color:var(--terra-lt);margin-bottom:8px}
+    .urg-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);margin-bottom:6px;background:var(--surface)}
+    .urg-row.urg-expired{border-color:rgba(180,60,40,.5);background:rgba(180,60,40,.1)}
+    .urg-row.urg-soon{border-color:rgba(160,110,20,.45);background:rgba(160,110,20,.08)}
+    .urg-row.urg-week{border-color:rgba(196,168,130,.35)}
+    .urg-name{flex:1;font-size:.8rem;color:var(--ivory)}
+    .urg-qty{font-size:.62rem;color:var(--sand);opacity:.75;white-space:nowrap}
+    .urg-days{font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:6px;white-space:nowrap}
+    .urg-expired .urg-days{background:rgba(180,60,40,.18);color:#8a2f1c}
+    .urg-soon .urg-days{background:rgba(160,110,20,.16);color:#7a5a10}
+    .urg-week .urg-days{background:rgba(196,168,130,.18);color:var(--sand-lt)}
+    .urg-find{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(107,52,32,.4);border:1px solid rgba(160,84,56,.4);color:var(--on-accent);border-radius:8px;padding:6px 11px;cursor:pointer;white-space:nowrap;transition:all .15s}
+    .urg-find:hover{background:rgba(107,52,32,.65)}
+    .inv-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(196,168,130,.08);flex-wrap:wrap}
+    .inv-row:last-child{border-bottom:none}
+    .inv-name{flex:1;font-size:.78rem;color:var(--ivory);min-width:120px}
+    .inv-name small{display:block;font-size:.55rem;color:var(--sand);opacity:.6;letter-spacing:.04em;margin-top:1px}
+    .inv-qty{display:flex;align-items:center;gap:6px}
+    .qty-step{font-family:'DM Mono',monospace;font-size:.75rem;width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--sand);cursor:pointer;transition:all .15s;line-height:1;flex-shrink:0}
+    .qty-step:hover{border-color:var(--border-focus);color:var(--ivory)}
+    .inv-qty-val{font-size:.72rem;color:var(--ivory);min-width:44px;text-align:center}
+    .inv-exp{font-size:.6rem;color:var(--sand);opacity:.75;white-space:nowrap}
+    .inv-exp.expired{color:#a03a24}
+    .inv-exp.soon{color:#8a6d1f}
+    .inv-act{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;background:none;border:1px solid var(--border);border-radius:7px;color:var(--sand);padding:5px 9px;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .inv-act:hover{border-color:var(--border-focus);color:var(--ivory)}
+    .inv-act.toss:hover{border-color:rgba(140,94,88,.5);color:var(--mauve-lt)}
+    .fridge-add{display:grid;grid-template-columns:2fr 70px 90px 130px 130px auto;gap:7px;margin-top:12px}
+    @media(max-width:760px){.fridge-add{grid-template-columns:1fr 1fr}}
+    .fridge-add input{width:100%}
+    .shop-item .to-fridge{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.08em;text-transform:uppercase;background:none;border:1px solid rgba(160,84,56,.35);border-radius:6px;color:var(--terra-lt);padding:3px 8px;cursor:pointer;transition:all .15s;white-space:nowrap;margin-left:auto}
+    .shop-item .to-fridge:hover{background:rgba(107,52,32,.3);color:var(--ivory)}
     ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(196,168,130,.2);border-radius:4px}
   </style>
 </head>
@@ -238,6 +270,7 @@
       <button class="tab-btn" data-tab="daily">Daily Summary</button>
       <button class="tab-btn" data-tab="shopping">Shopping List</button>
       <button class="tab-btn" data-tab="vault">Recipe Vault</button>
+      <button class="tab-btn" data-tab="fridge">Fridge</button>
     </div>
     <div id="tab-weekly" class="panel active">
       <div class="glass-card" style="margin-bottom:14px">
@@ -293,6 +326,25 @@
         <button class="btn-primary" onclick="openRecipeModal()">+ New Recipe</button>
       </div>
       <div class="recipe-grid" id="recipeGrid"></div>
+    </div>
+    <div id="tab-fridge" class="panel">
+      <div class="glass-card" style="margin-bottom:14px">
+        <div class="fridge-strip-label">Use It Up &mdash; expiring soonest</div>
+        <div id="useItUp"></div>
+      </div>
+      <div class="glass-card">
+        <div class="section-label" style="display:flex;align-items:baseline;justify-content:space-between"><span>In the Fridge</span><span id="fridgeStats" style="letter-spacing:.06em;text-transform:none"></span></div>
+        <div id="invList"></div>
+        <div class="fridge-add">
+          <input id="invName" class="text-input" placeholder="Item name&hellip;" autocomplete="off" />
+          <input id="invQty" class="text-input" type="number" min="0" step="0.25" value="1" title="Quantity" />
+          <input id="invUnit" class="text-input" placeholder="unit" />
+          <input id="invPurchased" class="text-input" type="date" title="Bought" />
+          <input id="invExpires" class="text-input" type="date" title="Expires" />
+          <button class="btn-primary" style="white-space:nowrap" onclick="addInvItem()">+ Add</button>
+        </div>
+        <div style="font-size:.58rem;color:var(--sand);opacity:.55;margin-top:8px;letter-spacing:.04em">Expiry is auto-filled from the item name (produce ~6 days, dairy ~10, meat ~3, pantry ~30) &mdash; adjust the date before adding.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -403,8 +455,9 @@ function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 // ── STATE ─────────────────────────────────────────────────────────────────
 // state.week[key] = {name, ingredients:[{text,have,servingAmt,servingUnit,calories,protein,carbs,fat}], eaten, notes, url}
 // state.ingredientLibrary = { "greek yogurt": {text,servingAmt,servingUnit,calories,protein,carbs,fat} }
+// state.inventory = [{id, name, qty, unit, purchased:'YYYY-MM-DD', expires:'YYYY-MM-DD'}]
 // Snack keys: "Day-Snack-N"  Base keys: "Day-Slot"
-let state={week:{},recipes:[],shopping:{manual:[]},ingredientLibrary:{}};
+let state={week:{},recipes:[],shopping:{manual:[]},ingredientLibrary:{},inventory:[]};
 const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const BASE_SLOTS=['Breakfast','Lunch','Dinner'];
 let vaultFilter='all',editingId=null,mealTarget=null,modalIngredients=[],vaultIngredients=[];
@@ -423,11 +476,11 @@ window.addEventListener('DOMContentLoaded',async()=>{
 
   const row=await sbGet('meal_planner','singleton');
   if(row){
-    state.week=row.week||{};state.recipes=row.recipes||[];state.shopping=row.shopping||{manual:[]};state.ingredientLibrary=row.ingredientLibrary||{};
+    state.week=row.week||{};state.recipes=row.recipes||[];state.shopping=row.shopping||{manual:[]};state.ingredientLibrary=row.ingredientLibrary||{};state.inventory=(row.inventory||[]).map(migrateInv).filter(Boolean);
     Object.keys(state.week).forEach(k=>{const m=state.week[k];if(m&&m.ingredients)m.ingredients=m.ingredients.map(migrateIng);});
     state.recipes=state.recipes.map(r=>({...r,ingredients:(r.ingredients||[]).map(migrateIng)}));
   }else{
-    try{const s=lsGet('mp_state');if(s){const p=JSON.parse(s);Object.assign(state,p);state.ingredientLibrary=p.ingredientLibrary||{};}}catch(e){}
+    try{const s=lsGet('mp_state');if(s){const p=JSON.parse(s);Object.assign(state,p);state.ingredientLibrary=p.ingredientLibrary||{};state.inventory=(state.inventory||[]).map(migrateInv).filter(Boolean);}}catch(e){}
   }
 
   // Wire events
@@ -437,11 +490,15 @@ window.addEventListener('DOMContentLoaded',async()=>{
   document.getElementById('newIngInput').addEventListener('blur',()=>setTimeout(()=>{document.getElementById('ingSuggestions').style.display='none';},150));
   document.getElementById('addVaultIngBtn').addEventListener('click',addVaultIng);
   document.getElementById('manualInput').addEventListener('keydown',e=>{if(e.key==='Enter')addManual();});
+  document.getElementById('invName').addEventListener('input',onInvNameInput);
+  document.getElementById('invName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addInvItem();}});
+  document.getElementById('invPurchased').addEventListener('change',onInvDateInput);
+  document.getElementById('invExpires').addEventListener('change',()=>{invExpTouched=true;});
   document.getElementById('mealModal').addEventListener('click',function(e){if(e.target===this)closeMealModal();});
   document.getElementById('recipeModal').addEventListener('click',function(e){if(e.target===this)closeRecipeModal();});
   document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
 
-  renderWeek();renderVault();renderShopping();
+  renderWeek();renderVault();renderShopping();renderFridge();
 });
 
 async function saveState(){
@@ -496,6 +553,7 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.add('active');
   if(tab==='shopping')renderShopping();
   if(tab==='daily')renderDailySummary();
+  if(tab==='fridge')renderFridge();
 }
 
 // ── SNACK HELPERS ─────────────────────────────────────────────────────────
@@ -564,7 +622,7 @@ function openMealModal(day,slot,isNewSnack,existingKey){
   document.getElementById('mealName').value=meal?meal.name:'';
   document.getElementById('mealNotes').value=meal?(meal.notes||''):'';
   document.getElementById('mealUrl').value=meal?(meal.url||''):'';
-  modalIngredients=meal?meal.ingredients.map(i=>({...i})):[];
+  modalIngredients=meal?meal.ingredients.map(i=>({...i})):[];autoCheckFromInventory(modalIngredients);
   renderModalIngredients();updateModalMacroTotals();renderVaultPicker();
   document.getElementById('newIngInput').value='';
   document.getElementById('ingSuggestions').style.display='none';
@@ -654,13 +712,14 @@ function loadFromVault(recipeId){
   document.getElementById('mealName').value=r.name;
   document.getElementById('mealNotes').value=r.notes||'';
   document.getElementById('mealUrl').value=r.url||'';
-  modalIngredients=r.ingredients.map(i=>({...i,have:false}));
+  modalIngredients=r.ingredients.map(i=>({...i,have:false}));autoCheckFromInventory(modalIngredients);
   renderModalIngredients();updateModalMacroTotals();toast('Loaded: '+r.name);
 }
 function saveMealSlot(){
   const name=document.getElementById('mealName').value.trim();
   if(!name||!mealTarget){document.getElementById('mealName').focus();return;}
   const existing=state.week[mealTarget.key]||{};
+  autoCheckFromInventory(modalIngredients);
   state.week[mealTarget.key]={name,ingredients:[...modalIngredients],notes:document.getElementById('mealNotes').value.trim(),url:document.getElementById('mealUrl').value.trim(),eaten:existing.eaten||false};
   // Save all ingredients to library
   modalIngredients.forEach(ing=>saveToLibrary(ing));
@@ -720,8 +779,9 @@ function renderShopping(){
       sec.innerHTML='<div class="shop-group-label">'+esc(g.group)+'<span class="shop-group-day">'+esc(g.label)+'</span></div>';
       g.items.forEach((item,ii)=>{
         const row=document.createElement('div');row.className='shop-item';row.id='ai-'+gi+'-'+ii;
-        row.innerHTML='<input type="checkbox" id="ach-'+gi+'-'+ii+'" /><label for="ach-'+gi+'-'+ii+'">'+esc(item.text)+'</label>';
+        row.innerHTML='<input type="checkbox" id="ach-'+gi+'-'+ii+'" /><label for="ach-'+gi+'-'+ii+'">'+esc(item.text)+'</label><button class="to-fridge" title="Bought it? Move to Fridge">&rarr; Fridge</button>';
         row.querySelector('input').addEventListener('change',function(){markIngHave(item.slotKey,item.ingIdx,this.checked);});
+        row.querySelector('.to-fridge').addEventListener('click',()=>moveToFridge(item.slotKey,item.ingIdx));
         sec.appendChild(row);
       });
       autoEl.appendChild(sec);
@@ -740,9 +800,10 @@ function renderManualItems(){
   el.innerHTML='';
   items.forEach((item,i)=>{
     const row=document.createElement('div');row.className='shop-item'+(item.checked?' shop-checked':'');
-    row.innerHTML='<input type="checkbox" id="man-'+i+'"'+(item.checked?' checked':'')+' /><label for="man-'+i+'">'+esc(item.text)+'</label><button class="rm">&times;</button>';
+    row.innerHTML='<input type="checkbox" id="man-'+i+'"'+(item.checked?' checked':'')+' /><label for="man-'+i+'">'+esc(item.text)+'</label><button class="to-fridge" title="Bought it? Move to Fridge">&rarr; Fridge</button><button class="rm">&times;</button>';
     row.querySelector('input').addEventListener('change',()=>toggleManual(i));
     row.querySelector('.rm').addEventListener('click',()=>removeManual(i));
+    row.querySelector('.to-fridge').addEventListener('click',()=>moveManualToFridge(i));
     el.appendChild(row);
   });
 }
@@ -859,6 +920,195 @@ function saveRecipe(){
 function deleteRecipe(id){
   if(!confirm('Delete this recipe?'))return;
   state.recipes=state.recipes.filter(r=>r.id!==id);saveState();renderVault();toast('Recipe deleted');
+}
+
+
+// ── FRIDGE / INVENTORY ────────────────────────────────────────────────────
+// state.inventory = [{id, name, qty, unit, purchased:'YYYY-MM-DD', expires:'YYYY-MM-DD'}]
+// Survives New Week by design (unlike the per-meal 'have' flags) so expiry
+// tracking is never wiped. Read by the daily food-waste check.
+let editingInvId=null,invExpTouched=false;
+function migrateInv(it){
+  if(!it||typeof it!=='object')return null;
+  return{id:it.id||('inv'+Date.now()+Math.floor(Math.random()*1e6)),name:String(it.name||'').trim(),qty:Number(it.qty)||1,unit:String(it.unit||''),purchased:it.purchased||todayISO(),expires:it.expires||todayISO()};
+}
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function addDaysISO(iso,days){const p=String(iso||'').split('-').map(Number);if(p.length<3||!p[0])return todayISO();const d=new Date(Date.UTC(p[0],p[1]-1,p[2]));d.setUTCDate(d.getUTCDate()+days);return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');}
+function daysLeft(iso){
+  if(!iso)return 99;
+  const p=String(iso).split('-').map(Number);if(p.length<3||!p[0])return 99;
+  const exp=Date.UTC(p[0],p[1]-1,p[2]);
+  const t=todayISO().split('-').map(Number);const tod=Date.UTC(t[0],t[1]-1,t[2]);
+  return Math.round((exp-tod)/86400000);
+}
+function fmtDaysLeft(n){
+  if(n<0)return Math.abs(n)===1?'expired yesterday':'expired '+Math.abs(n)+'d ago';
+  if(n===0)return 'expires today';
+  if(n===1)return 'expires tomorrow';
+  return n+' days left';
+}
+function fmtQty(q){const n=Number(q)||0;return Number.isInteger(n)?String(n):String(Math.round(n*100)/100);}
+function fmtQtyUnit(it){return fmtQty(it.qty)+(it.unit?' '+it.unit:'');}
+function escAttr(s){return esc(s).replace(/"/g,'&quot;');}
+// Per-category default shelf life (days) — guessed from the item name, editable per item
+function defaultShelfDays(name){
+  const n=(name||'').toLowerCase();
+  const has=(...ws)=>ws.some(w=>n.includes(w));
+  if(has('chicken','beef','pork','salmon','tuna','shrimp','fish','steak','ground ','turkey','bacon','sausage','lamb','cod','tilapia','scallop','crab','lobster'))return 3;
+  if(has('milk','yogurt','cream','butter','cheese','cottage','sour cream','half and half','kefir'))return 10;
+  if(has('egg'))return 14;
+  if(has('lettuce','spinach','kale','arugula','basil','cilantro','parsley','mint','dill','berry','berries','strawberr','raspberr','blueberr','avocado','tomato','cucumber','zucchini','pepper','mushroom','broccoli','cauliflower','carrot','celery','onion','garlic','ginger','lemon','lime','orange','apple','banana','peach','plum','grape','melon','mango','kiwi','pear','potato','sweet potato','squash','corn','pea','tofu','tempeh'))return 6;
+  if(has('bread','bagel','tortilla','pita','bun','roll','croissant','muffin'))return 5;
+  if(has('rice','pasta','noodle','oat','flour','sugar','oil','vinegar','sauce','canned','beans','lentil','quinoa','nut','peanut butter','honey','jam','cereal','cracker','chip','popcorn','spice','salt','coffee','tea'))return 30;
+  if(has('frozen','ice cream'))return 60;
+  return 7;
+}
+function normName(s){return String(s||'').trim().toLowerCase();}
+function inventoryHas(name){
+  const n=normName(name);if(n.length<3)return false;
+  return (state.inventory||[]).some(it=>{const m=normName(it.name);return m===n||m.includes(n)||n.includes(m);});
+}
+function autoCheckFromInventory(ings){
+  if(!ings)return;
+  ings.forEach(i=>{if(!i.have&&inventoryHas(i.text))i.have=true;});
+}
+function addToInventory(name,qty,unit,purchased,expires){
+  if(!name||!name.trim())return null;
+  const pur=purchased||todayISO();
+  const item={id:'inv'+Date.now()+Math.floor(Math.random()*1e6),name:name.trim(),qty:Number(qty)||1,unit:(unit||'').trim(),purchased:pur,expires:expires||addDaysISO(pur,defaultShelfDays(name))};
+  if(!state.inventory)state.inventory=[];
+  state.inventory.push(item);
+  return item;
+}
+function moveToFridge(slotKey,ingIdx){
+  const meal=state.week[slotKey];if(!meal||!meal.ingredients[ingIdx])return;
+  const ing=meal.ingredients[ingIdx];
+  ing.have=true;
+  const item=addToInventory(ing.text,1,'',todayISO(),addDaysISO(todayISO(),defaultShelfDays(ing.text)));
+  saveState();renderShopping();renderWeek();
+  if(item)toast('In the Fridge: '+item.name+' — expires '+item.expires);
+}
+function moveManualToFridge(i){
+  const item=state.shopping.manual&&state.shopping.manual[i];if(!item)return;
+  item.checked=true;
+  const inv=addToInventory(item.text,1,'',todayISO(),addDaysISO(todayISO(),defaultShelfDays(item.text)));
+  saveState();renderManualItems();renderShopping();
+  if(inv)toast('In the Fridge: '+inv.name+' — expires '+inv.expires);
+}
+function findRecipesFor(ingName){
+  vaultFilter='all';
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  const allPill=document.querySelector('.pill');if(allPill)allPill.classList.add('active');
+  document.getElementById('vaultSearch').value=ingName;
+  renderVault();switchTab('vault');
+}
+function removeInvItem(id,reason){
+  const it=(state.inventory||[]).find(x=>x.id===id);
+  state.inventory=(state.inventory||[]).filter(x=>x.id!==id);
+  saveState();renderFridge();
+  if(it)toast(reason==='tossed'?('Tossed: '+it.name):('Used up: '+it.name));
+}
+function bumpInvQty(id,delta){
+  const it=(state.inventory||[]).find(x=>x.id===id);if(!it)return;
+  it.qty=Math.round(((Number(it.qty)||0)+delta)*100)/100;
+  if(it.qty<=0){removeInvItem(id,'used');return;}
+  saveState();renderFridge();
+}
+function onInvNameInput(){
+  if(invExpTouched)return;
+  const name=document.getElementById('invName').value.trim();
+  const pur=document.getElementById('invPurchased').value||todayISO();
+  if(name)document.getElementById('invExpires').value=addDaysISO(pur,defaultShelfDays(name));
+}
+function onInvDateInput(){
+  if(invExpTouched)return;
+  const name=document.getElementById('invName').value.trim();
+  const pur=document.getElementById('invPurchased').value||todayISO();
+  if(name)document.getElementById('invExpires').value=addDaysISO(pur,defaultShelfDays(name));
+}
+function addInvItem(){
+  const nameEl=document.getElementById('invName');
+  const name=nameEl.value.trim();if(!name){nameEl.focus();return;}
+  const qty=parseFloat(document.getElementById('invQty').value)||1;
+  const unit=document.getElementById('invUnit').value.trim();
+  const purchased=document.getElementById('invPurchased').value||todayISO();
+  let expires=document.getElementById('invExpires').value;
+  if(!expires)expires=addDaysISO(purchased,defaultShelfDays(name));
+  const item=addToInventory(name,qty,unit,purchased,expires);
+  nameEl.value='';document.getElementById('invQty').value='1';document.getElementById('invUnit').value='';
+  document.getElementById('invPurchased').value=todayISO();document.getElementById('invExpires').value='';
+  invExpTouched=false;nameEl.focus();
+  saveState();renderFridge();
+  if(item)toast('Added to Fridge: '+item.name+' — expires '+item.expires);
+}
+function saveInvEdit(id){
+  const it=(state.inventory||[]).find(x=>x.id===id);if(!it){editingInvId=null;renderFridge();return;}
+  const name=document.getElementById('ei-name').value.trim();if(!name){document.getElementById('ei-name').focus();return;}
+  it.name=name;
+  it.qty=parseFloat(document.getElementById('ei-qty').value)||0;
+  it.unit=document.getElementById('ei-unit').value.trim();
+  it.purchased=document.getElementById('ei-pur').value||it.purchased;
+  it.expires=document.getElementById('ei-exp').value||it.expires;
+  editingInvId=null;saveState();renderFridge();toast('Updated: '+it.name);
+}
+function renderFridge(){
+  const strip=document.getElementById('useItUp');
+  const list=document.getElementById('invList');
+  const stats=document.getElementById('fridgeStats');
+  const inv=(state.inventory||[]).slice().sort((a,b)=>daysLeft(a.expires)-daysLeft(b.expires));
+  const urgent=inv.filter(it=>daysLeft(it.expires)<=5);
+  if(!urgent.length){strip.innerHTML='<p class="empty-note">Nothing expiring soon.</p>';}
+  else{
+    strip.innerHTML='';
+    urgent.forEach(it=>{
+      const d=daysLeft(it.expires);
+      const cls=d<0?'urg-expired':(d<=2?'urg-soon':'urg-week');
+      const row=document.createElement('div');row.className='urg-row '+cls;
+      row.innerHTML='<span class="urg-name">'+esc(it.name)+'</span><span class="urg-qty">'+esc(fmtQtyUnit(it))+'</span><span class="urg-days">'+esc(fmtDaysLeft(d))+'</span>';
+      const btn=document.createElement('button');btn.className='urg-find';btn.textContent='Find a recipe';
+      btn.addEventListener('click',()=>findRecipesFor(it.name));
+      row.appendChild(btn);strip.appendChild(row);
+    });
+  }
+  const total=inv.length;
+  const expiring=inv.filter(it=>daysLeft(it.expires)<=2).length;
+  stats.textContent=total?total+' item'+(total!==1?'s':'')+(expiring?' · '+expiring+' expiring soon':''):'';
+  if(!inv.length){list.innerHTML='<p class="empty-note">Fridge is empty — add what you bought, or move items from the Shopping List.</p>';}
+  else{
+    list.innerHTML='';
+    inv.forEach(it=>{
+      const d=daysLeft(it.expires);
+      const row=document.createElement('div');row.className='inv-row';
+      if(editingInvId===it.id){
+        row.innerHTML='<input class="text-input" style="flex:1;min-width:120px" id="ei-name" value="'+escAttr(it.name)+'" />'
+          +'<input class="text-input" style="width:64px;text-align:center" id="ei-qty" type="number" min="0" step="0.25" value="'+it.qty+'" />'
+          +'<input class="text-input" style="width:80px" id="ei-unit" value="'+escAttr(it.unit)+'" placeholder="unit" />'
+          +'<input class="text-input" style="width:132px" id="ei-pur" type="date" value="'+escAttr(it.purchased||'')+'" />'
+          +'<input class="text-input" style="width:132px" id="ei-exp" type="date" value="'+escAttr(it.expires||'')+'" />';
+        const saveBtn=document.createElement('button');saveBtn.className='inv-act';saveBtn.textContent='Save';
+        saveBtn.addEventListener('click',()=>saveInvEdit(it.id));
+        const cancelBtn=document.createElement('button');cancelBtn.className='inv-act';cancelBtn.textContent='Cancel';
+        cancelBtn.addEventListener('click',()=>{editingInvId=null;renderFridge();});
+        row.appendChild(saveBtn);row.appendChild(cancelBtn);
+      }else{
+        const expCls=d<0?'expired':(d<=2?'soon':'');
+        row.innerHTML='<span class="inv-name">'+esc(it.name)+'<small>bought '+esc(it.purchased||'—')+'</small></span>'
+          +'<span class="inv-qty"><button class="qty-step" data-d="-1" title="Less">&minus;</button><span class="inv-qty-val">'+esc(fmtQtyUnit(it))+'</span><button class="qty-step" data-d="1" title="More">+</button></span>'
+          +'<span class="inv-exp '+expCls+'">'+esc(fmtDaysLeft(d))+'</span>';
+        row.querySelectorAll('.qty-step').forEach(b=>b.addEventListener('click',()=>bumpInvQty(it.id,Number(b.dataset.d))));
+        const editBtn=document.createElement('button');editBtn.className='inv-act';editBtn.textContent='Edit';
+        editBtn.addEventListener('click',()=>{editingInvId=it.id;renderFridge();});
+        const usedBtn=document.createElement('button');usedBtn.className='inv-act';usedBtn.textContent='Used up';
+        usedBtn.addEventListener('click',()=>removeInvItem(it.id,'used'));
+        const tossBtn=document.createElement('button');tossBtn.className='inv-act toss';tossBtn.textContent='Tossed';
+        tossBtn.addEventListener('click',()=>removeInvItem(it.id,'tossed'));
+        row.appendChild(editBtn);row.appendChild(usedBtn);row.appendChild(tossBtn);
+      }
+      list.appendChild(row);
+    });
+  }
+  const purEl=document.getElementById('invPurchased');
+  if(purEl&&!purEl.value)purEl.value=todayISO();
 }
 
 // ── SYNC TO MONTHLY OUTLINE ───────────────────────────────────────────────
