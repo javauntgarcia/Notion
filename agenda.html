@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Political Agenda — Growth</title>
+<!--
+  POLITICAL AGENDA — Growth subpage.
+  Things to make note of — and enact — in San Francisco.
+
+  Storage: items live in localStorage on each device by default. For
+  cross-device sync, run this once in the Supabase SQL editor — the page
+  will then read/write the agenda_items table automatically:
+
+    create table if not exists agenda_items (
+      id text primary key,
+      title text not null,
+      notes text default '',
+      cat text default 'General',
+      status text default 'Noted',
+      date text default '',
+      order_index integer default 0
+    );
+    alter table agenda_items enable row level security;
+    create policy "anon all" on agenda_items for all using (true) with check (true);
+-->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root {
+  --bg: #0a0508;
+  --magenta: #c0135a;
+  --magenta-bright: #e8186e;
+  --magenta-dim: rgba(192,19,90,0.45);
+  --magenta-ghost: rgba(192,19,90,0.2);
+  --magenta-veil: rgba(192,19,90,0.08);
+  --pink: #ff2d78;
+  --cream: rgba(245,238,242,0.88);
+  --cream-dim: rgba(230,218,228,0.55);
+  --cream-ghost: rgba(210,195,210,0.28);
+  --sage: #9db89a;
+  --gold: #d4a45a;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+html, body { min-height: 100vh; background: var(--bg); font-family: var(--font-body); color: var(--cream); overflow-x: hidden; }
+
+/* BG */
+.bg { position: fixed; inset: 0; z-index: 0; }
+.bg-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 25%; filter: brightness(0.52) saturate(1.15); }
+.bg-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 90% 55% at 50% 100%, rgba(5,2,4,0.97) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 100% 0%, rgba(5,2,4,0.8) 0%, transparent 55%), radial-gradient(ellipse 50% 60% at 0% 50%, rgba(5,2,4,0.6) 0%, transparent 55%), linear-gradient(to bottom, rgba(5,2,4,0.55) 0%, transparent 25%, transparent 60%, rgba(5,2,4,0.85) 100%); }
+
+/* LAYOUT */
+.page { position: relative; z-index: 1; min-height: 100vh; padding-bottom: 6rem; }
+
+/* HEADER */
+.page-header { display: flex; align-items: center; justify-content: space-between; padding: 2rem 1.5rem 0.5rem; max-width: 860px; margin: 0 auto; }
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.back-btn { width: 36px; height: 36px; border-radius: 50%; border: 0.5px solid var(--cream-ghost); background: rgba(10,5,8,0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; backdrop-filter: blur(8px); color: var(--cream-dim); font-size: 14px; text-decoration: none; }
+.back-btn:hover { background: var(--magenta-veil); border-color: var(--magenta-dim); }
+.page-title-wrap .eyebrow { font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--cream-ghost); margin-bottom: 2px; }
+.page-title-wrap h1 { font-family: var(--font-display); font-size: 1.9rem; font-weight: 300; color: var(--cream); letter-spacing: 0.02em; line-height: 1.1; }
+.page-title-wrap h1 em { font-style: italic; color: var(--magenta-bright); }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.count-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--cream-ghost); }
+.add-btn { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 9px 20px; background: var(--magenta-ghost); border: 0.5px solid var(--magenta-dim); border-radius: 100px; color: rgba(232,24,110,0.85); cursor: pointer; transition: all 0.25s; backdrop-filter: blur(8px); }
+.add-btn:hover { background: rgba(192,19,90,0.3); border-color: var(--magenta-bright); color: var(--pink); }
+.page-sub { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 1rem; font-family: var(--font-display); font-style: italic; font-size: 1.05rem; color: var(--cream-dim); }
+
+/* FILTER BAR */
+.filter-bar { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 1.25rem; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-pill { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; padding: 6px 14px; border-radius: 100px; border: 0.5px solid var(--cream-ghost); background: rgba(10,5,8,0.35); color: var(--cream-ghost); cursor: pointer; transition: all 0.2s; white-space: nowrap; backdrop-filter: blur(6px); user-select: none; }
+.filter-pill:hover { color: var(--cream-dim); border-color: rgba(210,195,210,0.4); }
+.filter-pill.active { background: var(--magenta-ghost); border-color: var(--magenta-dim); color: rgba(232,24,110,0.9); }
+
+/* AGENDA LIST */
+.agenda-list { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; display: flex; flex-direction: column; gap: 12px; }
+.agenda-item { display: flex; gap: 1rem; background: rgba(12,6,10,0.72); border: 0.5px solid rgba(192,19,90,0.18); border-radius: 18px; padding: 1.1rem 1.25rem; backdrop-filter: blur(14px); }
+.item-num { font-family: var(--font-display); font-style: italic; font-size: 1.5rem; color: var(--magenta-bright); line-height: 1.2; flex-shrink: 0; width: 2rem; text-align: right; }
+.item-body { flex: 1; min-width: 0; }
+.item-title { font-size: 1.02rem; font-weight: 500; letter-spacing: 0.01em; line-height: 1.35; margin-bottom: 0.35rem; }
+.item-notes { font-size: 0.85rem; line-height: 1.55; color: var(--cream-dim); white-space: pre-wrap; }
+.item-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.7rem; align-items: center; }
+.meta-pill { font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; padding: 4px 10px; border-radius: 100px; border: 0.5px solid var(--cream-ghost); color: var(--cream-dim); }
+.status-noted { border-color: var(--cream-ghost); color: var(--cream-dim); }
+.status-progress { border-color: rgba(212,164,90,0.5); color: var(--gold); }
+.status-enacted { border-color: rgba(157,184,154,0.5); color: var(--sage); }
+.item-date { font-family: var(--font-mono); font-size: 9px; color: var(--cream-ghost); letter-spacing: 0.05em; }
+.item-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.icon-btn { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 12px; border-radius: 100px; border: 0.5px solid var(--cream-ghost); background: transparent; color: var(--cream-dim); cursor: pointer; transition: all 0.2s; }
+.icon-btn:hover { border-color: var(--magenta-dim); color: var(--pink); }
+.icon-btn.danger:hover { border-color: rgba(200,80,80,0.6); color: rgba(255,140,140,0.95); }
+
+.empty-state { max-width: 860px; margin: 3rem auto; text-align: center; padding: 0 1.5rem; }
+.empty-state p { font-family: var(--font-display); font-size: 1.2rem; font-style: italic; color: rgba(192,19,90,0.25); line-height: 1.7; }
+
+/* MODAL */
+.modal-backdrop { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(5,2,4,0.82); backdrop-filter: blur(10px); align-items: flex-start; justify-content: center; padding: 1.5rem; overflow-y: auto; }
+.modal-backdrop.open { display: flex; }
+.modal { background: rgba(12,6,10,0.96); border: 0.5px solid rgba(192,19,90,0.3); border-radius: 22px; padding: 1.75rem; width: 100%; max-width: 500px; backdrop-filter: blur(24px); margin: auto; }
+.modal h3 { font-family: var(--font-display); font-size: 1.45rem; font-weight: 300; font-style: italic; color: var(--cream); margin-bottom: 1.2rem; }
+.field { margin-bottom: 1rem; }
+.field label { display: block; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream-ghost); margin-bottom: 6px; }
+.field input[type="text"], .field select, .field textarea { width: 100%; background: rgba(10,5,8,0.6); border: 0.5px solid var(--cream-ghost); border-radius: 12px; color: var(--cream); font-family: var(--font-body); font-size: 0.9rem; padding: 10px 13px; outline: none; }
+.field textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--magenta-dim); }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.25rem; }
+.btn-cancel { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 20px; border-radius: 100px; border: 0.5px solid var(--cream-ghost); background: transparent; color: var(--cream-dim); cursor: pointer; }
+.btn-save { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 10px 22px; border-radius: 100px; border: 0.5px solid var(--magenta-dim); background: var(--magenta-ghost); color: rgba(232,24,110,0.9); cursor: pointer; }
+.modal-error { display: none; font-size: 10px; letter-spacing: 0.04em; line-height: 1.5; color: rgba(255,140,140,0.95); background: rgba(180,40,40,0.14); border: 0.5px solid rgba(200,80,80,0.4); border-radius: 10px; padding: 10px 13px; margin-top: 1rem; }
+.modal-error.show { display: block; }
+
+/* BOTTOM NAV */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; display: flex; justify-content: center; padding: 0.75rem 1rem 1rem; background: linear-gradient(to top, rgba(5,2,4,0.95) 0%, transparent 100%); }
+.bottom-nav-inner { display: flex; gap: 4px; background: rgba(8,4,6,0.82); border: 0.5px solid rgba(192,19,90,0.18); border-radius: 100px; padding: 5px; backdrop-filter: blur(16px); overflow-x: auto; scrollbar-width: none; max-width: 100vw; }
+.bottom-nav-inner::-webkit-scrollbar { display: none; }
+.nav-pill { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 6px 14px; border-radius: 100px; cursor: pointer; transition: all 0.25s; color: rgba(192,19,90,0.35); border: none; background: transparent; text-decoration: none; display: inline-block; white-space: nowrap; }
+.nav-pill:hover { color: rgba(192,19,90,0.75); }
+.nav-pill.active { background: rgba(192,19,90,0.15); color: var(--magenta-bright); border: 0.5px solid rgba(192,19,90,0.4); }
+
+/* TOAST */
+.toast { position: fixed; left: 50%; bottom: 5.5rem; transform: translateX(-50%) translateY(10px); z-index: 300; background: rgba(12,6,10,0.97); border: 0.5px solid rgba(192,19,90,0.4); border-radius: 12px; padding: 10px 18px; font-size: 10px; letter-spacing: 0.05em; color: var(--cream); box-shadow: 0 12px 40px rgba(0,0,0,0.5); backdrop-filter: blur(16px); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; max-width: 90vw; text-align: center; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <img class="bg-img" src="https://raw.githubusercontent.com/javauntgarcia/Notion/main/inspo.jpg" alt="Political Agenda" />
+  <div class="bg-vignette"></div>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <div class="header-left">
+      <a class="back-btn" href="Growth.html">←</a>
+      <div class="page-title-wrap">
+        <p class="eyebrow">Growth &middot; San Francisco</p>
+        <h1><em>Political</em> Agenda</h1>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="count-label" id="count-label">0 items</span>
+      <button class="add-btn" onclick="openAddModal()">+ Add</button>
+    </div>
+  </div>
+  <p class="page-sub">Things to make note of &mdash; and enact &mdash; in San Francisco.</p>
+
+  <div class="filter-bar" id="filter-bar"></div>
+
+  <div class="agenda-list" id="agenda-list"></div>
+  <div class="empty-state" id="empty-state" style="display:none;">
+    <p>Nothing here yet.<br>Add the first thing you want to enact.</p>
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-backdrop" id="item-modal">
+  <div class="modal">
+    <h3 id="modal-title">Add to the agenda</h3>
+    <input type="hidden" id="f-id" value="">
+    <div class="field">
+      <label for="f-title">Item</label>
+      <input type="text" id="f-title" placeholder="e.g. Fare-free Muni for youth" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="f-cat">Category</label>
+      <select id="f-cat"></select>
+    </div>
+    <div class="field">
+      <label for="f-status">Status</label>
+      <select id="f-status">
+        <option value="Noted">Noted</option>
+        <option value="In progress">In progress</option>
+        <option value="Enacted">Enacted</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-notes">Notes</label>
+      <textarea id="f-notes" placeholder="Why it matters, what enactment looks like, who it serves&hellip;"></textarea>
+    </div>
+    <div class="modal-error" id="modal-error"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveItem()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <a class="nav-pill" href="Growth.html">Home</a>
+    <a class="nav-pill" href="Journal.html">Journal</a>
+    <a class="nav-pill" href="wants.html">Wants</a>
+    <a class="nav-pill" href="inspo.html">Inspo</a>
+    <a class="nav-pill" href="vision.html">Vision</a>
+    <a class="nav-pill" href="therapy.html">Therapy</a>
+    <a class="nav-pill active" href="agenda.html">Agenda</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SUPABASE ──
+const SB_URL = 'https://ghcpmekdumlqrmjruuyn.supabase.co';
+const SB_KEY = 'sb_publishable_Am9YxRGdHcF9eIDD032STA_FuyKXaYj';
+const TABLE = 'agenda_items';
+const LS_KEY = 'politicalAgenda.v1';
+
+const CATEGORIES = ['General', 'Transit', 'Housing', 'Workforce', 'Youth & Education', 'Public Safety', 'Equity', 'Environment'];
+const STATUSES = ['Noted', 'In progress', 'Enacted'];
+
+// ── SEED ──
+// Shown when the agenda_items table doesn't exist yet (or is empty) and
+// there's no local copy. Once the table exists, seeds migrate up on first load.
+const SEED_ITEMS = [
+  { id: 'agenda-interns', title: 'Intern program: intentionally invest in HBCUs and disadvantaged communities',
+    cat: 'Workforce', status: 'Noted', date: '2026-11-14',
+    notes: 'Make the intern program an intentional pipeline: recruit from HBCUs, rural communities, and historically underserved communities; track where applications come from (newsletters, outreach) and set a baseline against last year so the investment is measurable. Builds on the SFMTA intern committee work.',
+    order_index: 1 }
+];
+
+let items = [];
+let activeFilter = 'All';
+let sbAvailable = false;
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2600);
+}
+
+// ── Supabase helpers (best-effort; a missing table just means local mode) ──
+function sbHeaders(extra) {
+  const h = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Accept': 'application/json' };
+  if (extra) Object.assign(h, extra);
+  return h;
+}
+async function sbFetch() {
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/' + TABLE + '?select=*&order=order_index.asc', { headers: sbHeaders() });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch (e) { return null; }
+}
+async function sbUpsertAll(rows) {
+  const r = await fetch(SB_URL + '/rest/v1/' + TABLE + '?on_conflict=id', {
+    method: 'POST',
+    headers: sbHeaders({ 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' }),
+    body: JSON.stringify(rows)
+  });
+  if (!r.ok) throw new Error('upsert failed: ' + r.status);
+}
+async function sbDeleteRow(id) {
+  const r = await fetch(SB_URL + '/rest/v1/' + TABLE + '?id=eq.' + encodeURIComponent(id), {
+    method: 'DELETE', headers: sbHeaders()
+  });
+  if (!r.ok) throw new Error('delete failed: ' + r.status);
+}
+function itemToRow(it) {
+  return { id: it.id, title: it.title, notes: it.notes || '', cat: it.cat, status: it.status, date: it.date || '', order_index: it.order_index };
+}
+function rowToItem(row) {
+  return { id: row.id, title: row.title, notes: row.notes || '', cat: row.cat || 'General', status: row.status || 'Noted', date: row.date || '', order_index: row.order_index || 0 };
+}
+
+async function persist() {
+  lsSet(LS_KEY, JSON.stringify(items));
+  if (sbAvailable) {
+    try { await sbUpsertAll(items.map(itemToRow)); } catch (e) { console.error('agenda cloud save failed', e); }
+  }
+}
+
+async function initAgenda() {
+  let local = [];
+  try { local = JSON.parse(lsGet(LS_KEY) || '[]'); } catch (e) { local = []; }
+  if (!Array.isArray(local)) local = [];
+
+  const rows = await sbFetch();
+  if (rows) {
+    sbAvailable = true;
+    if (rows.length > 0) {
+      items = rows.map(rowToItem);
+      // Merge in any seed items added since this device first loaded the page.
+      const haveIds = new Set(items.map(function (c) { return c.id; }));
+      const missing = SEED_ITEMS.filter(function (s) { return !haveIds.has(s.id); });
+      if (missing.length) {
+        items = items.concat(missing);
+        items.forEach(function (it, i) { it.order_index = i + 1; });
+        await persist();
+      }
+    } else if (local.length > 0) {
+      items = local;
+      await persist(); // migrate the local list up
+    } else {
+      items = SEED_ITEMS.map(function (c) { return Object.assign({}, c); });
+      await persist();
+    }
+  } else {
+    sbAvailable = false;
+    items = local.length > 0 ? local : SEED_ITEMS.map(function (c) { return Object.assign({}, c); });
+    lsSet(LS_KEY, JSON.stringify(items));
+  }
+  items.sort(function (a, b) { return (a.order_index || 0) - (b.order_index || 0); });
+  buildFilters();
+  buildCatSelect();
+  render();
+}
+
+// ── Rendering ──
+function statusClass(status) {
+  if (status === 'In progress') return 'status-progress';
+  if (status === 'Enacted') return 'status-enacted';
+  return 'status-noted';
+}
+function fmtDate(d) {
+  if (!d) return '';
+  const parts = d.split('-');
+  if (parts.length !== 3) return d;
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[parseInt(parts[1], 10) - 1] + ' ' + parseInt(parts[2], 10) + ', ' + parts[0];
+}
+function render() {
+  const list = document.getElementById('agenda-list');
+  const empty = document.getElementById('empty-state');
+  const shown = items.filter(function (it) { return activeFilter === 'All' || it.cat === activeFilter; });
+  document.getElementById('count-label').textContent = items.length + (items.length === 1 ? ' item' : ' items');
+  if (shown.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = shown.map(function (it, i) {
+    return '<div class="agenda-item">' +
+      '<div class="item-num">' + (i + 1) + '</div>' +
+      '<div class="item-body">' +
+        '<div class="item-title">' + esc(it.title) + '</div>' +
+        (it.notes ? '<div class="item-notes">' + esc(it.notes) + '</div>' : '') +
+        '<div class="item-meta">' +
+          '<span class="meta-pill">' + esc(it.cat) + '</span>' +
+          '<span class="meta-pill ' + statusClass(it.status) + '">' + esc(it.status) + '</span>' +
+          (it.date ? '<span class="item-date">added ' + esc(fmtDate(it.date)) + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="item-actions">' +
+        '<button class="icon-btn" onclick="editItem(\'' + it.id + '\')">Edit</button>' +
+        '<button class="icon-btn danger" onclick="deleteItem(\'' + it.id + '\')">Delete</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function buildFilters() {
+  const bar = document.getElementById('filter-bar');
+  const cats = ['All'].concat(CATEGORIES);
+  bar.innerHTML = cats.map(function (c) {
+    return '<span class="filter-pill' + (c === activeFilter ? ' active' : '') + '" data-cat="' + esc(c) + '">' + esc(c) + '</span>';
+  }).join('');
+  bar.querySelectorAll('.filter-pill').forEach(function (pill) {
+    pill.addEventListener('click', function () { setFilter(pill.getAttribute('data-cat'), pill); });
+  });
+}
+function setFilter(cat, el) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-pill').forEach(function (p) { p.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  render();
+}
+function buildCatSelect() {
+  const sel = document.getElementById('f-cat');
+  sel.innerHTML = CATEGORIES.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+}
+
+// ── Modal / CRUD ──
+function openAddModal() {
+  document.getElementById('modal-title').textContent = 'Add to the agenda';
+  document.getElementById('f-id').value = '';
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-cat').value = 'General';
+  document.getElementById('f-status').value = 'Noted';
+  document.getElementById('f-notes').value = '';
+  hideModalError();
+  document.getElementById('item-modal').classList.add('open');
+  setTimeout(function () { document.getElementById('f-title').focus(); }, 60);
+}
+function editItem(id) {
+  const it = items.find(function (x) { return x.id === id; });
+  if (!it) return;
+  document.getElementById('modal-title').textContent = 'Edit agenda item';
+  document.getElementById('f-id').value = it.id;
+  document.getElementById('f-title').value = it.title;
+  document.getElementById('f-cat').value = it.cat;
+  document.getElementById('f-status').value = it.status;
+  document.getElementById('f-notes').value = it.notes || '';
+  hideModalError();
+  document.getElementById('item-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('item-modal').classList.remove('open');
+}
+function showModalError(msg) {
+  const e = document.getElementById('modal-error');
+  e.textContent = msg;
+  e.classList.add('show');
+}
+function hideModalError() {
+  document.getElementById('modal-error').classList.remove('show');
+}
+function todayStr() {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + m + '-' + day;
+}
+async function saveItem() {
+  const id = document.getElementById('f-id').value;
+  const title = document.getElementById('f-title').value.trim();
+  const cat = document.getElementById('f-cat').value;
+  const status = document.getElementById('f-status').value;
+  const notes = document.getElementById('f-notes').value.trim();
+  if (!title) { showModalError('Give the item a title first.'); return; }
+  if (id) {
+    const it = items.find(function (x) { return x.id === id; });
+    if (it) { it.title = title; it.cat = cat; it.status = status; it.notes = notes; }
+    showToast('Updated.');
+  } else {
+    const maxOrder = items.reduce(function (m, x) { return Math.max(m, x.order_index || 0); }, 0);
+    items.push({
+      id: 'agenda-' + Date.now() + '_' + Math.floor(Math.random() * 10000),
+      title: title, notes: notes, cat: cat, status: status,
+      date: todayStr(), order_index: maxOrder + 1
+    });
+    showToast('Added to the agenda.');
+  }
+  await persist();
+  closeModal();
+  render();
+}
+async function deleteItem(id) {
+  const it = items.find(function (x) { return x.id === id; });
+  if (!it) return;
+  if (!confirm('Remove "' + it.title + '" from the agenda?')) return;
+  items = items.filter(function (x) { return x.id !== id; });
+  items.forEach(function (x, i) { x.order_index = i + 1; });
+  await persist();
+  if (sbAvailable) { try { await sbDeleteRow(id); } catch (e) { console.error('agenda cloud delete failed', e); } }
+  render();
+  showToast('Removed.');
+}
+
+document.getElementById('item-modal').addEventListener('click', function (e) {
+  if (e.target === this) closeModal();
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+initAgenda();
+</script>
+</body>
+</html>
